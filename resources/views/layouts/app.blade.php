@@ -53,11 +53,9 @@
     <script src="{{ asset('assets/js/apexcharts/apexcharts.min.js') }}"></script>
     <script src="{{ asset('assets/js/chart.js/chart.umd.js') }}"></script>
     <script src="{{ asset('assets/js/echarts/echarts.min.js') }}"></script>
-    <script src="{{ asset('assets/js/custom-dashboard.js') }}"></script>
     <script src="{{ asset('assets/js/jquery-ui-1.14.0/jquery-ui.min.js') }}"></script>
     <script src="{{ asset('assets/js/sliptree-bootstrap-tokenfield-ff5b929/dist/bootstrap-tokenfield.min.js') }}"></script>
     <script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ asset('assets/js/custom-js.js') }}"></script>
 
     <!-- Vendor JS Files -->
 

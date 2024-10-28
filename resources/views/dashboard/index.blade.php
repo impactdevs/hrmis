@@ -273,6 +273,7 @@
 
 
     @push('scripts')
+        @vite(['resources/js/custom-dashboard.js'])
 
         <script type="module">
             $(document).ready(function() {
