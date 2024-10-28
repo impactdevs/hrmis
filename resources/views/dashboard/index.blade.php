@@ -273,7 +273,6 @@
 
 
     @push('scripts')
-        @vite(['resources/js/apexcharts/apexcharts.min.js', 'resources/js/chart.js/chart.umd.js', 'resources/js/echarts/echarts.min.js', 'resources/js/custom-dashboard.js'])
 
         <script type="module">
             $(document).ready(function() {
