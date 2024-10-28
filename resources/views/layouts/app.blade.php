@@ -29,7 +29,7 @@
     <link rel="stylesheet" href="{{ asset('assets/css/custom-css.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/js/simple-datatables/style.css') }}">
     <!-- Custom styles for this template -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/custom-js.js'])
 </head>
 
 <body>

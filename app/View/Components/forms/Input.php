@@ -19,7 +19,8 @@ class Input extends Component
         public string $placeholder = '', // Default value provided here
         public string $value = '', // Default value provided here
 
-    ) {
+    )
+    {
         //
     }
 
