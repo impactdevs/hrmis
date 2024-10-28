@@ -21,8 +21,13 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/font-awesome-animation@1.1.1/css/font-awesome-animation.min.css">
+    <link rel="stylesheet" href="{{ asset('assets/js/jquery-ui-1.14.0/jquery-ui.min.css') }}">
+    <link rel="stylesheet"
+        href="{{ asset('assets/js/sliptree-bootstrap-tokenfield-ff5b929/dist/css/bootstrap-tokenfield.min.css') }}">
+    <link rel="stylesheet"
+        href="{{ asset('assets/js/sliptree-bootstrap-tokenfield-ff5b929/dist/css/tokenfield-typeahead.min.css') }}">
     <!-- Custom styles for this template -->
-    @vite(['resources/css/app.css','resources/js/jquery-ui-1.14.0/jquery-ui.min.js', 'resources/js/jquery-ui-1.14.0/jquery-ui.min.css',  'resources/js/sliptree-bootstrap-tokenfield-ff5b929/dist/bootstrap-tokenfield.min.js', 'resources/js/sliptree-bootstrap-tokenfield-ff5b929/dist/css/bootstrap-tokenfield.min.css', 'resources/js/sliptree-bootstrap-tokenfield-ff5b929/dist/css/tokenfield-typeahead.min.css', 'resources/css/custom-css.css', 'resources/js/app.js', 'resources/js/bootstrap.bundle.min.js', 'resources/js/custom-js.js'])
+    @vite(['resources/css/app.css', 'resources/css/custom-css.css', 'resources/js/app.js', 'resources/js/custom-js.js'])
 </head>
 
 <body>
@@ -42,7 +47,11 @@
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.pjax/2.0.1/jquery.pjax.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-
+    <script src="{{ asset('assets/js/jquery-ui-1.14.0/jquery-ui.min.js') }}"></script>
+    <script src="{{ asset('assets/js/sliptree-bootstrap-tokenfield-ff5b929/dist/bootstrap-tokenfield.min.js') }}"></script>
+    <script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('assets/js/sliptree-bootstrap-tokenfield-ff5b929/dist/bootstrap-tokenfield.min.js') }}"></script>
+    <script src="{{ asset('assets/js/sliptree-bootstrap-tokenfield-ff5b929/dist/bootstrap-tokenfield.min.js') }}"></script>
     <!-- Vendor JS Files -->
 
     @if (session()->has('success'))
