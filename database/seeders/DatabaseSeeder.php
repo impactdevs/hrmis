@@ -5,6 +5,10 @@ namespace Database\Seeders;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+
+
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,11 +17,37 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $this->call(PermissionsDemoSeeder::class);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        $positions = [
+            ['position_id' => Str::uuid(), 'position_name' => 'Manager'],
+            ['position_id' => Str::uuid(), 'position_name' => 'Developer'],
+            ['position_id' => Str::uuid(), 'position_name' => 'Designer'],
+            ['position_id' => Str::uuid(), 'position_name' => 'Analyst'],
+            ['position_id' => Str::uuid(), 'position_name' => 'Tester'],
+        ];
+
+        DB::table('positions')->insert($positions);
+
+        $userIds = DB::table('users')->pluck('id')->toArray();
+
+        $departments = [
+            ['department_id' => Str::uuid(), 'department_name' => 'Human Resources', 'department_head' => $userIds[array_rand($userIds)]],
+            ['department_id' => Str::uuid(), 'department_name' => 'Engineering', 'department_head' => $userIds[array_rand($userIds)]],
+            ['department_id' => Str::uuid(), 'department_name' => 'Marketing', 'department_head' => $userIds[array_rand($userIds)]],
+            ['department_id' => Str::uuid(), 'department_name' => 'Sales', 'department_head' => $userIds[array_rand($userIds)]],
+            ['department_id' => Str::uuid(), 'department_name' => 'Finance', 'department_head' => $userIds[array_rand($userIds)]],
+        ];
+
+        DB::table('departments')->insert($departments);
+
+
+        $this->call(EmployeeSeeder::class);
+
+        // $this->call(TrainingSeeder::class);
+
+        // $this->call(EventsSeeder::class);
+
+        $this->call(AttendanceSeeder::class);
     }
 }
