@@ -25,7 +25,7 @@
             <div class="invalid-feedback d-block">{{ $message }}</div>
         @enderror
     </div>
-    <div id="{{ $form_text_id }}" class="form-text text-muted">
+    <div class="form-text text-muted">
         {{ $description }}
     </div>
 </div>
