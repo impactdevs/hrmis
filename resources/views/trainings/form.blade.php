@@ -1,14 +1,14 @@
 <div class="row mb-3">
     <div class="col-md-6">
-        <x-forms.input name="training_start_date" label="Training Start Date" type="date" id="training_start_date" placeholder="Start date"
+        <x-forms.input name="training_start_date" label="Training Start Date" type="date" id="training_start_date"
             value="{{ old('training_start_date', isset($training) && $training->training_start_date ? $training->training_start_date->toDateString() : '') }}" />
     </div>
     <div class="col-md-6">
-        <x-forms.input name="training_end_date" label="Training End Date" type="date" id="training_end_date" placeholder="End date"
+        <x-forms.input name="training_end_date" label="Training End Date" type="date" id="training_end_date"
             value="{{ old('training_end_date', isset($training) && $training->training_end_date ? $training->training_end_date->toDateString() : '') }}" />
     </div>
     <div class="col-md-6">
-        <x-forms.input name="training_location" label="Training Location" type="text" id="training_location" placeholder="Enter Training Location"
+        <x-forms.input name="training_location" label="Training Location" type="text" id="training_location"
             value="{{ old('training_title', $training->training_location ?? '') }}" />
     </div>
 </div>

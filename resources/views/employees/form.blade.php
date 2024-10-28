@@ -38,12 +38,12 @@
     </div>
     <div class="row mb-3">
         <div class="col-md-6">
-            <x-forms.input name="date_of_entry" label="Date of Entry" type="date" id="date_of_entry" placeholder="Date of Entry"
+            <x-forms.input name="date_of_entry" label="Date of Entry" type="date" id="date_of_entry"
                 value="{{ old('date_of_entry', isset($employee) && $employee->date_of_entry ? $employee->date_of_entry->toDateString() : '') }}" />
         </div>
 
         <div class="col-md-6">
-            <x-forms.input name="contract_expiry_date" label="Contract Expiry Date" type="date" placeholder="Contact Expiry"
+            <x-forms.input name="contract_expiry_date" label="Contract Expiry Date" type="date"
                 id="contract_expiry_date"
                 value="{{ old('contract_expiry_date', isset($employee) && $employee->contract_expiry_date ? $employee->contract_expiry_date->toDateString() : '') }}" />
         </div>
@@ -118,7 +118,7 @@
     </div>
     <div class="row mb-3">
         <div class="col-md-6">
-            <x-forms.input name="date_of_birth" label="Date of Birth" type="date" id="date_of_birth" placeholder="Date of birth"
+            <x-forms.input name="date_of_birth" label="Date of Birth" type="date" id="date_of_birth"
                 value="{{ old('date_of_birth', isset($employee) && $employee->date_of_birth ? $employee->date_of_birth->toDateString() : '') }}" />
         </div>
     </div>
