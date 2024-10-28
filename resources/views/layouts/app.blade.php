@@ -22,7 +22,8 @@
     <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/font-awesome-animation@1.1.1/css/font-awesome-animation.min.css">
     <!-- Custom styles for this template -->
-    @vite(['resources/css/app.css','resources/js/jquery-ui-1.14.0/jquery-ui.min.js', 'resources/js/jquery-ui-1.14.0/jquery-ui.min.css',  'resources/js/sliptree-bootstrap-tokenfield-ff5b929/dist/bootstrap-tokenfield.min.js', 'resources/js/sliptree-bootstrap-tokenfield-ff5b929/dist/css/bootstrap-tokenfield.min.css', 'resources/js/sliptree-bootstrap-tokenfield-ff5b929/dist/css/tokenfield-typeahead.min.css', 'resources/css/custom-css.css', 'resources/js/app.js', 'resources/js/bootstrap.bundle.min.js', 'resources/js/custom-js.js'])
+    {{-- ,'resources/js/jquery-ui-1.14.0/jquery-ui.min.js', 'resources/js/jquery-ui-1.14.0/jquery-ui.min.css', --}}
+    @vite(['resources/css/app.css', 'resources/js/sliptree-bootstrap-tokenfield-ff5b929/dist/bootstrap-tokenfield.min.js', 'resources/js/sliptree-bootstrap-tokenfield-ff5b929/dist/css/bootstrap-tokenfield.min.css', 'resources/js/sliptree-bootstrap-tokenfield-ff5b929/dist/css/tokenfield-typeahead.min.css', 'resources/css/custom-css.css', 'resources/js/app.js', 'resources/js/bootstrap.bundle.min.js', 'resources/js/custom-js.js'])
 </head>
 
 <body>
