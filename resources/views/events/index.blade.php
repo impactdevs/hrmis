@@ -32,32 +32,53 @@
                             <td>{{ $event->event_start_date->format('d/m/Y') }}</td>
                             <td>{{ $event->event_end_date->format('d/m/Y') }}</td>
                             <td>
-                                @foreach ($event->category as $category)
-                                    <span class="badge bg-primary">{{ $category }}</span>
+                                @php
+                                    // Assume training_category contains comma-separated IDs for each category
+                                    $userIds = explode(',', $event->category['users'] ?? '');
+                                    $departmentIds = explode(',', $event->category['departments'] ?? '');
+                                    $positionIds = explode(',', $event->category['positions'] ?? '');
+                                @endphp
+
+                                @foreach ($userIds as $id)
+                                    <span class="badge bg-primary">{{ $options['users'][$id] ?? 'Unknown User' }}</span>
                                 @endforeach
 
+                                @foreach ($departmentIds as $id)
+                                    <span
+                                        class="badge bg-success">{{ $options['departments'][$id] ?? 'Unknown Department' }}</span>
+                                @endforeach
+
+                                @foreach ($positionIds as $id)
+                                    <span
+                                        class="badge bg-info">{{ $options['positions'][$id] ?? 'Unknown Position' }}</span>
+                                @endforeach
                             </td>
                             <td class="align-middle">
                                 <div class="dropdown">
-                                    <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <button class="btn btn-sm btn-secondary dropdown-toggle" type="button"
+                                        id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                                         Actions
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                         <li>
-                                            <a class="dropdown-item" href="{{ route('events.edit', $event->event_id) }}">
+                                            <a class="dropdown-item"
+                                                href="{{ route('events.edit', $event->event_id) }}">
                                                 <i class="bi bi-pencil"></i> Edit
                                             </a>
                                         </li>
                                         <li>
-                                            <a class="dropdown-item" href="{{ route('events.show', $event->event_id) }}">
+                                            <a class="dropdown-item"
+                                                href="{{ route('events.show', $event->event_id) }}">
                                                 <i class="bi bi-eye"></i> View
                                             </a>
                                         </li>
                                         <li>
-                                            <form action="{{ route('events.destroy', $event->event_id) }}" method="POST" style="display:inline;">
+                                            <form action="{{ route('events.destroy', $event->event_id) }}"
+                                                method="POST" style="display:inline;">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="dropdown-item text-danger" onclick="return confirm('Are you sure?')">
+                                                <button type="submit" class="dropdown-item text-danger"
+                                                    onclick="return confirm('Are you sure?')">
                                                     <i class="bi bi-trash"></i> Delete
                                                 </button>
                                             </form>

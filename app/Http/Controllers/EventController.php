@@ -20,8 +20,14 @@ class EventController extends Controller
     {
         $positions = Position::pluck('position_name', 'position_id')->toArray();
         $departments = Department::pluck('department_name', 'department_id')->toArray();
+        $users = User::pluck('name', 'id')->toArray() ?? [];
 
-        $options = array_merge($positions, $departments);
+        // Keep the options separate for later use if needed
+        $options = [
+            'positions' => $positions,
+            'departments' => $departments,
+            'users' => $users,
+        ];
 
         $events = Event::paginate(10);
         return view('events.index', compact('events', 'options'));
