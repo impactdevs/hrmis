@@ -23,14 +23,15 @@ class Upload extends Component
         string $label,
         string $name,
         string $id,
+        string $form_text_id = '',
         string $value = '',
         string $description = 'The file should be in PNG or JPG format.',
         string $filetype = 'image'
-    )
-    {
+    ) {
         $this->label = $label;
         $this->name = $name;
         $this->id = $id;
+        $this->form_text_id = $form_text_id;
         $this->value = $value;
         $this->description = $description;
         $this->filetype = $filetype;
