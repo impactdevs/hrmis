@@ -112,7 +112,7 @@
                 placeholder="Employee Next Of Kin" value="{{ old('next_of_kin', $employee->next_of_kin ?? '') }}" />
         </div>
         <div class="col-md-6">
-            <x-forms.upload name="passport_photo" label="Passport Photo" id="passport_photo"
+            <x-forms.upload name="passport_photo" label="Passport Photo" id="passport_photo" form_text_id=""
                 value="{{ old('passport_photo', $employee->passport_photo ?? '') }}" />
         </div>
     </div>
