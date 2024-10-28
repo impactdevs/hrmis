@@ -1,10 +1,10 @@
 <div class="row mb-3">
     <div class="col-md-6">
-        <x-forms.input name="event_start_date" label="Event Start Date" type="date" id="event_start_date"
+        <x-forms.input name="event_start_date" label="Event Start Date" type="date" id="event_start_date" placeholder="Start date"
             value="{{ old('event_start_date', isset($event) && $event->event_start_date ? $event->event_start_date->toDateString() : '') }}" />
     </div>
     <div class="col-md-6">
-        <x-forms.input name="event_end_date" label="Event End Date" type="date" id="event_end_date"
+        <x-forms.input name="event_end_date" label="Event End Date" type="date" id="event_end_date" placeholder="End Date"
             value="{{ old('event_end_date', isset($event) && $event->event_end_date ? $event->event_end_date->toDateString() : '') }}" />
     </div>
 </div>
