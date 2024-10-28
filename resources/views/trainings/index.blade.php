@@ -34,9 +34,9 @@
                             <td>
                                 @php
                                     // Assume training_category contains comma-separated IDs for each category
-                                    $userIds = explode(',', $training->training_category['users']);
-                                    $departmentIds = explode(',', $training->training_category['departments']);
-                                    $positionIds = explode(',', $training->training_category['positions']);
+                                    $userIds = explode(',', $training->training_category['users'] ?? '');
+                                    $departmentIds = explode(',', $training->training_category['departments'] ?? '');
+                                    $positionIds = explode(',', $training->training_category['positions'] ?? '');
                                 @endphp
 
                                 @foreach ($userIds as $id)
