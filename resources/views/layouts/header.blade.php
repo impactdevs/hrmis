@@ -29,7 +29,7 @@
                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                     <li class="dropdown-header">
                         <h6>{{ auth()->user()->name }}</h6>
-                        <span>{{ optional(auth()->user()->employee->position)->position_name }}</span>
+                        <span>{{ optional(auth()->user()->employee)->position->position_name }}</span>
                     </li>
                     <li>
                         <hr class="dropdown-divider">
