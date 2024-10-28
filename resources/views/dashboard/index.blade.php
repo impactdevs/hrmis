@@ -273,8 +273,8 @@
 
 
     @push('scripts')
-        @vite(['resources/js/apexcharts/apexcharts.min.js', 'resources/js/chart.js/chart.umd.js', 'resources/js/echarts/echarts.min.js', 'resources/js/simple-datatables/simple-datatables.js', 'resources/js/simple-datatables/style.css', 'resources/js/custom-dashboard.js'])
-        <script src="{{ asset('assets/js/custom-js.js') }}"></script>
+        @vite(['resources/js/apexcharts/apexcharts.min.js', 'resources/js/chart.js/chart.umd.js', 'resources/js/echarts/echarts.min.js', 'resources/js/custom-dashboard.js'])
+
         <script type="module">
             $(document).ready(function() {
                 var leaveTypes = {!! $leaveTypesJson !!}; // Leave type names
