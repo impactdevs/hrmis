@@ -4,7 +4,7 @@
             <h5 class="ms-3">Events Management</h5>
             <div>
                 <a href="{{ route('events.create') }}" class="btn border-t-neutral-50 btn-primary">
-                    <i class="bi bi-database-add me-2"></i>Add Event
+                    <i class="bi bi-database-add me-2"></i>Add An Event
                 </a>
             </div>
         </div>
