@@ -26,10 +26,10 @@
         href="{{ asset('assets/js/sliptree-bootstrap-tokenfield-ff5b929/dist/css/bootstrap-tokenfield.min.css') }}">
     <link rel="stylesheet"
         href="{{ asset('assets/js/sliptree-bootstrap-tokenfield-ff5b929/dist/css/tokenfield-typeahead.min.css') }}">
-    <link rel="stylesheet"
-        href="{{ asset('assets/css/custom-css.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/custom-css.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/js/simple-datatables/style.css') }}">
     <!-- Custom styles for this template -->
-    @vite(['resources/css/app.css','resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
 <body>
@@ -52,7 +52,7 @@
     <script src="{{ asset('assets/js/jquery-ui-1.14.0/jquery-ui.min.js') }}"></script>
     <script src="{{ asset('assets/js/sliptree-bootstrap-tokenfield-ff5b929/dist/bootstrap-tokenfield.min.js') }}"></script>
     <script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ asset('assets/js/custom-js.js') }}"></script>
+
     <!-- Vendor JS Files -->
 
     @if (session()->has('success'))
