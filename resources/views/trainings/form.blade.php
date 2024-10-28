@@ -8,7 +8,7 @@
             value="{{ old('training_end_date', isset($training) && $training->training_end_date ? $training->training_end_date->toDateString() : '') }}" />
     </div>
     <div class="col-md-6">
-        <x-forms.input name="training_location" label="Training Location" type="text" id="training_location"
+        <x-forms.input name="training_location" label="Training Location" type="text" id="training_location" placeholder="Enter Training Location"
             value="{{ old('training_title', $training->training_location ?? '') }}" />
     </div>
 </div>
