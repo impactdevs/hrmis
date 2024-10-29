@@ -41,11 +41,6 @@ class AttendanceScope implements Scope
                 // Add logic if needed
                 break;
 
-            case 'Staff':
-                // Filter leaves by the user's ID
-                $builder->where('leaves.user_id', $user->id);
-                break;
-
             default:
                 // Handle other roles if needed
                 break;
