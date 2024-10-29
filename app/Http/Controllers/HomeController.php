@@ -160,7 +160,19 @@ class HomeController extends Controller
             ->latest()
             ->get();
 
+
+
+
+
+
+        //get the current leave requests
         $leaves = Leave::with('employee', 'leaveCategory')->where('user_id', auth()->user()->id)->get();
+
+        $totalLeaves = $leaves->count();
+        $totalDays = $leaves->sum(function ($leave) {
+            return Carbon::parse($leave->start_date)->diffInDays(Carbon::parse($leave->end_date)) + 1;
+        });
+        $leavesPerCategory = $leaves->groupBy('leaveCategory.leave_type_name')->map->count();
 
         // Prepare leave approval progress data
         $leaveApprovalData = [];
@@ -207,6 +219,6 @@ class HomeController extends Controller
 
 
 
-        return view('dashboard.index', compact('number_of_employees', 'attendances', 'available_leave', 'hours', 'todayCounts', 'yesterdayCounts', 'lateCounts', 'chartDataJson', 'leaveTypesJson', 'chartEmployeeDataJson', 'events', 'trainings', 'entries', 'appraisals', 'leaveApprovalData', 'daysUntilExpiry'));
+        return view('dashboard.index', compact('number_of_employees', 'attendances', 'available_leave', 'hours', 'todayCounts', 'yesterdayCounts', 'lateCounts', 'chartDataJson', 'leaveTypesJson', 'chartEmployeeDataJson', 'events', 'trainings', 'entries', 'appraisals', 'leaveApprovalData', 'daysUntilExpiry', 'totalLeaves', 'totalDays'));
     }
 }

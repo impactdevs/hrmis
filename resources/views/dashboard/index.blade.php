@@ -292,7 +292,7 @@
                                             <i class="bi bi-person"></i>
                                         </div>
                                         <div class="ps-3">
-                                            <h6>55</h6>
+                                            <h6>{{ $totalLeaves }}</h6>
                                         </div>
                                     </div>
                                 </div>
@@ -313,7 +313,7 @@
                                             <i class="bi bi-person"></i>
                                         </div>
                                         <div class="ps-3">
-                                            <h6>99</h6>
+                                            <h6>{{ $totalDays }}</h6>
                                         </div>
                                     </div>
                                 </div>
