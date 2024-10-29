@@ -8,7 +8,7 @@
                     <div class="row">
 
                         <!-- Sales Card -->
-                        <div class="col-xxl-4 col-md-6">
+                        <div class="col-xxl-3 col-md-6">
                             <div class="card info-card sales-card">
 
                                 <div class="card-body">
@@ -29,7 +29,7 @@
                         </div><!-- End Sales Card -->
 
                         <!-- Revenue Card -->
-                        <div class="col-xxl-4 col-md-6">
+                        <div class="col-xxl-3 col-md-6">
                             <div class="card info-card revenue-card">
 
                                 <div class="card-body">
@@ -46,7 +46,7 @@
                         </div><!-- End Revenue Card -->
 
                         <!-- Customers Card -->
-                        <div class="col-xxl-4 col-xl-12">
+                        <div class="col-xxl-3 col-xl-12">
 
                             <div class="card info-card customers-card">
 
@@ -273,7 +273,232 @@
 
             </div>
         @elseif (auth()->user()->hasRole('Staff'))
-            <p>You are a staff</p>
+            <div class="row">
+
+                <!-- Left side columns -->
+                <div class="col-lg-8">
+                    <div class="row">
+
+                        <!-- Sales Card -->
+                        <div class="col-xxl-4 col-md-6">
+                            <div class="card info-card sales-card">
+
+                                <div class="card-body">
+                                    <h5 class="card-title">Leaves</h5>
+
+                                    <div class="d-flex align-items-center">
+                                        <div
+                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                            <i class="bi bi-person"></i>
+                                        </div>
+                                        <div class="ps-3">
+                                            <h6>55</h6>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div><!-- End Sales Card -->
+
+                        <!-- Revenue Card -->
+                        <div class="col-xxl-4 col-md-6">
+                            <div class="card info-card revenue-card">
+
+                                <div class="card-body">
+                                    <h5 class="card-title">Leave Days Used <span>| This Year</span></h5>
+
+                                    <div class="d-flex align-items-center">
+                                        <div
+                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                            <i class="bi bi-person"></i>
+                                        </div>
+                                        <div class="ps-3">
+                                            <h6>99</h6>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div><!-- End Revenue Card -->
+
+                        <!-- Customers Card -->
+                        <div class="col-xxl-4 col-xl-12">
+
+                            <div class="card info-card customers-card">
+
+                                <div class="card-body">
+                                    <h5 class="card-title">Ongoing Appraisals</h5>
+
+                                    <div class="d-flex align-items-center">
+                                        <div
+                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                            <i class="bi bi-people"></i>
+                                        </div>
+                                        <div class="ps-3">
+                                            <h6>20</h6>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div><!-- End Customers Card -->
+                        @if (count($leaveApprovalData) > 0)
+                            <!-- Leave Approval Progress -->
+                            <div class="col-xxl-12 col-md-12">
+                                <div class="card info-card leave-approval-card border border-5 border-primary">
+                                    <div class="card-body">
+                                        @foreach ($leaveApprovalData as $leaveData)
+                                            <div class="leave-approval-item">
+                                                <h6>Leave Requests</h6>
+
+                                                @if ($leaveData['esStatus'] === 'Approved')
+                                                    <!-- Hide progress area -->
+                                                    <div class="congratulations-message">
+                                                        <div class="balloons-css">
+                                                            <div class="balloon"></div>
+                                                            <div class="balloon"></div>
+                                                            <div class="balloon"></div>
+                                                            <div class="balloon"></div>
+                                                        </div>
+                                                        <p class="text-success fw-bold">🎉 Congratulations! 🎈 Your
+                                                            Leave Request was approved!!</p>
+                                                        @if ($leaveData['daysRemaining'] == 'Leave has not started')
+                                                            <p>Leave has not started yet!!</p>
+                                                        @else
+                                                            <p class="text-success fw-bold">Days remaining to complete
+                                                                leave:
+                                                                {{ $leaveData['daysRemaining'] }}</p>
+                                                        @endif
+                                                    </div>
+                                                @elseif ($leaveData['status'] === 'Pending' && isset($leaveData['rejection_reason']))
+                                                    <div class="rejected-message">
+                                                        <h6>Status: Rejected</h6>
+                                                        <p>Reason: {{ $leaveData['rejection_reason'] }}</p>
+                                                    </div>
+                                                @else
+                                                    <div class="progress">
+                                                        <div class="progress-bar" role="progressbar"
+                                                            style="width: {{ $leaveData['progress'] }}%;"
+                                                            aria-valuenow="{{ $leaveData['progress'] }}"
+                                                            aria-valuemin="0" aria-valuemax="100">
+                                                            {{ $leaveData['status'] }}
+                                                        </div>
+                                                    </div>
+                                                    <small>HR Review: {{ $leaveData['hrStatus'] }}</small><br>
+                                                    <small>HOD Review: {{ $leaveData['hodStatus'] }}</small><br>
+                                                    <small>Executive Staff Review: {{ $leaveData['esStatus'] }}</small>
+                                                @endif
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div><!-- End Leave Approval Progress Card -->
+                        @endif
+                        @if ($daysUntilExpiry <= 90)
+                            <!-- Revenue Card -->
+                            <div class="col-xxl-12 col-md-12">
+                                @if ($daysUntilExpiry >= 0)
+                                    <div class="alert alert-warning mt-3">
+                                        <h5>Contract Expiry Notification</h5>
+                                        <p>Your contract is expiring in <strong>{{ $daysUntilExpiry }}
+                                                days</strong>.</p>
+                                        <div class="countdown"
+                                            data-expiry="{{ auth()->user()->employee->contract_expiry_date }}">
+                                        </div>
+                                    </div>
+                                @endif
+                                @if ($daysUntilExpiry < 0)
+                                    <div class="alert alert-danger">
+                                        <h5>Contract Expired</h5>
+                                        <p>Your contract expired <strong>{{ abs($daysUntilExpiry) }} days
+                                                ago</strong>.</p>
+                                    </div>
+                                @endif
+
+                            </div><!-- End Revenue Card -->
+                        @endif
+
+                    </div>
+                </div>
+
+                <!-- Right side columns -->
+                <div class="col-lg-4">
+                    <!-- Budget Report -->
+                    <div class="card">
+                        <div class="card-body pb-0">
+                            <h5 class="card-title">Allocated Leave Analysis <span>| This Month</span></h5>
+
+                            <div id="budgetChart" style="min-height: 400px;" class="echart"></div>
+
+                        </div>
+                    </div><!-- End Budget Report -->
+                    <!-- Events -->
+                    <div class="card">
+                        <div class="card-body pb-0">
+                            <h5 class="card-title">Events &amp; Trainings <span>| Ongoing, Due Today & Tomorrow</span>
+                            </h5>
+
+                            <div class="news">
+                                @foreach ($events as $event)
+                                    <div class="post-item clearfix">
+                                        <img src="{{ 'assets/img/event.gif' }}" alt="">
+                                        <h4><a
+                                                href="{{ route('events.show', $event->event_id) }}">{{ $event->event_title }}</a>
+                                        </h4>
+                                        <p class="description">{{ $event->event_description }}</p>
+                                        <p>
+                                            @if (\Carbon\Carbon::parse($event->event_start_date)->isToday())
+                                                <strong>Status:</strong> <span class="badge text-bg-secondary">Due
+                                                    Today</span>
+                                            @elseif (\Carbon\Carbon::parse($event->event_start_date)->isTomorrow())
+                                                <strong>Status:</strong> <span class="badge text-bg-secondary">Due
+                                                    Tomorrow</span>
+                                            @elseif (
+                                                \Carbon\Carbon::parse($event->event_start_date)->isPast() &&
+                                                    \Carbon\Carbon::parse($event->event_end_date)->isFuture())
+                                                <strong>Status:</strong> <span
+                                                    class="badge text-bg-secondary">Ongoing</span>
+                                            @endif
+                                        </p>
+                                    </div>
+                                @endforeach
+
+                                @foreach ($trainings as $training)
+                                    <div class="post-item clearfix">
+                                        <img src="{{ 'assets/img/training.gif' }}" alt="">
+                                        <h4><a
+                                                href="{{ route('trainings.show', $training->training_id) }}">{{ $training->training_title }}</a>
+                                        </h4>
+                                        <p class="description">{{ $training->training_description }}</p>
+                                        <p>
+                                            @if (\Carbon\Carbon::parse($training->training_start_date)->isToday())
+                                                <strong>Status:</strong> <span class="badge text-bg-secondary">Due
+                                                    Today</span>
+                                            @elseif (\Carbon\Carbon::parse($training->training_start_date)->isTomorrow())
+                                                <strong>Status:</strong> <span class="badge text-bg-secondary">Due
+                                                    Tomorrow</span>
+                                            @elseif (
+                                                \Carbon\Carbon::parse($training->training_start_date)->isPast() &&
+                                                    \Carbon\Carbon::parse($training->training_end_date)->isFuture())
+                                                <strong>Status:</strong> <span
+                                                    class="badge text-bg-secondary">Ongoing</span>
+                                            @endif
+                                        </p>
+                                    </div>
+                                @endforeach
+
+                            </div><!-- End sidebar recent posts-->
+
+                        </div>
+                    </div><!-- End Events & Trainings -->
+
+
+
+
+                </div><!-- End Right side columns -->
+
+            </div>
         @endif
     </section>
 

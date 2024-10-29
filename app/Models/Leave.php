@@ -2,20 +2,21 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\LeaveScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 
+use Carbon\Carbon; // Make sure to import Carbon
+
+#[ScopedBy([LeaveScope::class])]
 class Leave extends Model
 {
     use HasFactory;
 
     protected $table = 'leaves';
-
     protected $primaryKey = 'leave_id';
-
     public $incrementing = false;
-
-    // Specify the type of the primary key
     protected $keyType = 'string';
 
     protected $fillable = [
@@ -53,4 +54,26 @@ class Leave extends Model
     {
         return $this->belongsTo(LeaveType::class, 'leave_type_id', 'leave_type_id');
     }
+
+    public function remainingLeaveDays()
+    {
+        $currentDate = Carbon::now()->startOfDay(); // Set to start of the day
+        $startDate = $this->start_date->startOfDay(); // Set to start of the day
+        $endDate = $this->end_date->startOfDay(); // Set to start of the day
+
+        // Check if the leave has not started
+        if ($currentDate->isBefore($startDate)) {
+            return "Leave has not started"; // Message for not started leave
+        }
+
+        // Check if the leave has ended
+        if ($currentDate->isAfter($endDate)) {
+            return 0; // No remaining days if the leave has ended
+        }
+
+        // Calculate the remaining days
+        return $currentDate->diffInDays($endDate); // Remaining days
+    }
+
+
 }

@@ -2,11 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\EmployeeScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 
 
+#[ScopedBy([EmployeeScope::class])]
 class Employee extends Model
 {
     use HasFactory;
@@ -79,4 +83,28 @@ class Employee extends Model
     {
         return $this->belongsTo(Position::class, 'position_id', 'position_id');
     }
+
+    public function daysUntilContractExpiry()
+    {
+        $today = now()->timezone('UTC'); // Ensure today is in UTC
+        $expiryDateString = $this->contract_expiry_date;
+
+        // Get the date part only
+        $expiryDateString = explode(' ', $expiryDateString)[0];
+
+        // Create Carbon instance from the formatted date string, assuming the expiry date is in UTC
+        $expiryDate = Carbon::createFromFormat('Y-m-d', $expiryDateString, 'UTC');
+
+        // Calculate the difference in days
+        $daysDifference = $today->diffInDays($expiryDate); // Reverse order
+
+        // Check if the expiry date is in the future using isAfter
+        if ($expiryDate->isAfter($today)) {
+            return (int) $daysDifference; // Days until expiry
+        } else {
+            return (int) -$daysDifference; // Days expired (negative value)
+        }
+    }
+
+
 }

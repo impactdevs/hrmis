@@ -6,7 +6,6 @@ use App\Models\Application;
 use App\Models\Appraisal;
 use App\Models\Attendance;
 use App\Models\Employee;
-use App\Models\Entry;
 use App\Models\Leave;
 use App\Models\LeaveType;
 use App\Models\Training;
@@ -27,6 +26,12 @@ class HomeController extends Controller
         $yesterdayCounts = [];
         $lateCounts = [];
         $allocatedLeaveDays = [];
+
+        $employee = auth()->user()->employee; // Assuming you have a relationship set up
+
+        // Check days until contract expiry for the logged-in employee
+        $daysUntilExpiry = optional($employee)->daysUntilContractExpiry();
+
         $leaveTypes = LeaveType::all()->keyBy('leave_type_id');
 
         //events and trainings
@@ -155,7 +160,53 @@ class HomeController extends Controller
             ->latest()
             ->get();
 
+        $leaves = Leave::with('employee', 'leaveCategory')->where('user_id', auth()->user()->id)->get();
 
-        return view('dashboard.index', compact('number_of_employees', 'attendances', 'available_leave', 'hours', 'todayCounts', 'yesterdayCounts', 'lateCounts', 'chartDataJson', 'leaveTypesJson', 'chartEmployeeDataJson', 'events', 'trainings', 'entries', 'appraisals'));
+        // Prepare leave approval progress data
+        $leaveApprovalData = [];
+        foreach ($leaves as $leave) {
+            if (($leave->leave_request_status != 'rejected') || ($leave->remainingLeaveDays() >= 0)) {
+                $progress = 0;
+                $status = '';
+
+                // Determine the approval status and progress
+                if ($leave->leave_request_status === 'approved') {
+                    $progress = 100;
+                    $status = 'Approved';
+                } elseif ($leave->leave_request_status === 'rejected') {
+                    $progress = 0;
+                    $status = 'Rejected';
+                } else {
+                    // Count stages based on status
+                    if ($leave->leave_request_status === 'Super Admin') {
+                        $progress += 33;
+                        $status = 'Awaiting HOD Approval';
+                    }
+                    if ($leave->leave_request_status === 'Head of Division') {
+                        $progress += 33;
+                        $status = 'Awaiting Executive Secretary Approval';
+                    }
+                    if ($leave->leave_request_status === 'Executive Secretary') {
+                        $progress += 34;
+                        $status = 'Your Leave request has been granted';
+                    }
+                }
+
+                $leaveApprovalData[] = [
+                    'leave' => $leave,
+                    'daysRemaining' => $leave->remainingLeaveDays(),
+                    'progress' => $progress,
+                    'status' => $status,
+                    'hrStatus' => $leave->leave_request_status === 'Super Admin' ? 'Approved' : 'Pending',
+                    'hodStatus' => $leave->leave_request_status === 'Head of Division' ? 'Apprroved' : 'Pending',
+                    'esStatus' => $leave->leave_request_status === 'Executive Secretary' ? 'Approved' : 'Pending',
+                ];
+
+            }
+        }
+
+
+
+        return view('dashboard.index', compact('number_of_employees', 'attendances', 'available_leave', 'hours', 'todayCounts', 'yesterdayCounts', 'lateCounts', 'chartDataJson', 'leaveTypesJson', 'chartEmployeeDataJson', 'events', 'trainings', 'entries', 'appraisals', 'leaveApprovalData', 'daysUntilExpiry'));
     }
 }

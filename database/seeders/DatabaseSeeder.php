@@ -42,12 +42,12 @@ class DatabaseSeeder extends Seeder
         DB::table('departments')->insert($departments);
 
 
-        // $this->call(EmployeeSeeder::class);
+        $this->call(EmployeeSeeder::class);
 
-        // $this->call(TrainingSeeder::class);
+        $this->call(TrainingSeeder::class);
 
-        // $this->call(EventsSeeder::class);
+        $this->call(EventsSeeder::class);
 
-        // $this->call(AttendanceSeeder::class);
+        $this->call(AttendanceSeeder::class);
     }
 }
