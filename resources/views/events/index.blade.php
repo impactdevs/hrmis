@@ -2,11 +2,13 @@
     <div class="mt-3">
         <div class="d-flex flex-row flex-1 justify-content-between">
             <h5 class="ms-3">Events Management</h5>
-            <div>
-                <a href="{{ route('events.create') }}" class="btn border-t-neutral-50 btn-primary">
-                    <i class="bi bi-database-add me-2"></i>Add An Event
-                </a>
-            </div>
+            @can('can add an event')
+                <div>
+                    <a href="{{ route('events.create') }}" class="btn border-t-neutral-50 btn-primary">
+                        <i class="bi bi-database-add me-2"></i>Add An Event
+                    </a>
+                </div>
+            @endcan
         </div>
 
         <div class="table-wrapper">
@@ -37,20 +39,26 @@
                                     $userIds = explode(',', $event->category['users'] ?? '');
                                     $departmentIds = explode(',', $event->category['departments'] ?? '');
                                     $positionIds = explode(',', $event->category['positions'] ?? '');
+
                                 @endphp
 
                                 @foreach ($userIds as $id)
-                                    <span class="badge bg-primary">{{ $options['users'][$id] ?? 'Unknown User' }}</span>
+                                    @if ($id == 'All')
+                                        <span class="badge bg-primary">All Users</span>
+                                    @else
+                                        <span
+                                            class="badge bg-primary">{{ $options['users'][$id] == '' ? '' : $options['users'][$id] ?? 'Unknown User' }}</span>
+                                    @endif
                                 @endforeach
 
                                 @foreach ($departmentIds as $id)
                                     <span
-                                        class="badge bg-success">{{ $options['departments'][$id] ?? 'Unknown Department' }}</span>
+                                        class="badge bg-success">{{ $options['departments'][$id] == '' ? '' : $options['departments'][$id] ?? 'Unknown Department' }}</span>
                                 @endforeach
 
                                 @foreach ($positionIds as $id)
                                     <span
-                                        class="badge bg-info">{{ $options['positions'][$id] ?? 'Unknown Position' }}</span>
+                                        class="badge bg-info">{{ $options['positions'][$id] == '' ? '' : $options['positions'][$id] ?? 'Unknown Position' }}</span>
                                 @endforeach
                             </td>
                             <td class="align-middle">

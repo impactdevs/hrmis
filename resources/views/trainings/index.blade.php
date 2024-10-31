@@ -2,11 +2,13 @@
     <div class="mt-3">
         <div class="d-flex flex-row flex-1 justify-content-between">
             <h5 class="ms-3">Training Management</h5>
-            <div>
-                <a href="{{ route('trainings.create') }}" class="btn border-t-neutral-50 btn-primary">
-                    <i class="bi bi-database-add me-2"></i>Add Training
-                </a>
-            </div>
+            @can('can add a training')
+                <div>
+                    <a href="{{ route('trainings.create') }}" class="btn border-t-neutral-50 btn-primary">
+                        <i class="bi bi-database-add me-2"></i>Add Training
+                    </a>
+                </div>
+            @endcan
         </div>
 
         <div class="table-wrapper">

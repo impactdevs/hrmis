@@ -88,17 +88,19 @@
                                     @endif
                                 </div>
                             </div>
-                            <div class="card-footer text-end">
-                                <button class="btn btn-primary btn-sm rounded-circle approve-btn" title="Approve"
-                                    data-leave-id="{{ $leave->leave_id }}">
-                                    <i class="fas fa-check"></i>
-                                </button>
-                                <button class="btn btn-danger btn-sm rounded-circle reject-btn" title="Reject"
-                                    data-leave-id="{{ $leave->leave_id }}" data-bs-toggle="modal"
-                                    data-bs-target="#rejectModal">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
+                            @can('can approve a leave')
+                                <div class="card-footer text-end">
+                                    <button class="btn btn-primary btn-sm rounded-circle approve-btn" title="Approve"
+                                        data-leave-id="{{ $leave->leave_id }}">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm rounded-circle reject-btn" title="Reject"
+                                        data-leave-id="{{ $leave->leave_id }}" data-bs-toggle="modal"
+                                        data-bs-target="#rejectModal">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            @endcan
                         </div>
                     </div>
                 @endforeach

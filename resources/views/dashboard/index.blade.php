@@ -142,8 +142,8 @@
                                                     $data = json_decode($appraisal->entry->responses, true); // true for associative array
                                                 @endphp
                                                 <tr>
-                                                    <td>{{ $data[1] }}</td>
-                                                    <td>{{ $data[2] }}</td>
+                                                    <td>{{ $data[76] }}</td>
+                                                    <td>{{ $data[77] }}</td>
                                                 </tr>
                                             @endforeach
 
@@ -335,7 +335,7 @@
                                             <i class="bi bi-people"></i>
                                         </div>
                                         <div class="ps-3">
-                                            <h6>20</h6>
+                                            <h6>{{ $ongoingAppraisals }}</h6>
                                         </div>
                                     </div>
 

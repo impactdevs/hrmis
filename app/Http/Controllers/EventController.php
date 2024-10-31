@@ -22,6 +22,7 @@ class EventController extends Controller
         $departments = Department::pluck('department_name', 'department_id')->toArray();
         $users = User::pluck('name', 'id')->toArray() ?? [];
 
+
         // Keep the options separate for later use if needed
         $options = [
             'positions' => $positions,
@@ -40,7 +41,10 @@ class EventController extends Controller
     {
         $positions = Position::pluck('position_name', 'position_id')->toArray();
         $departments = Department::pluck('department_name', 'department_id')->toArray();
-        $users = User::pluck('name', 'id')->toArray();
+        $users_without_all = User::pluck('name', 'id')->toArray();
+        $allUsersOption = ['0' => 'All'];
+        $users = array_merge($allUsersOption, $users_without_all);
+        //sort users to start with 'All'
         $options = array_merge($positions, $departments, $users);
 
         return view('events.create', compact('options', 'users', 'positions', 'departments'));

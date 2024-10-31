@@ -1,5 +1,5 @@
-<div class="form-group upload">
-    <label for="{{ $id }}" class="form-label">{{ $label }}(*)</label>
+<div class="form-group upload mt-2">
+    <label for="{{ $id }}" class="form-label">{{ $label }}</label>
     <div class="upload-container text-center">
         @if (old($name, $value) && $filetype == 'image')
             <label for="{{ $id }}">
@@ -31,5 +31,4 @@
 </div>
 
 @push('scripts')
-
 @endpush

@@ -20,6 +20,10 @@
             <x-forms.input name="staff_id" label="Staff ID" type="text" id="staff_id"
                 placeholder="Enter Employee Staff ID" value="{{ old('staff_id', $employee->staff_id ?? '') }}" />
         </div>
+        <div class="col-md-6">
+            <x-forms.upload name="passport_photo" label="Employee Passport Photo" id="passport_photo"
+                value="{{ old('passport_photo', $employee->passport_photo ?? '') }}" />
+        </div>
     </div>
 </fieldset>
 
@@ -111,10 +115,7 @@
             <x-forms.input name="next_of_kin" label="Next Of Kin" type="text" id="next_of_kin"
                 placeholder="Employee Next Of Kin" value="{{ old('next_of_kin', $employee->next_of_kin ?? '') }}" />
         </div>
-        <div class="col-md-6">
-            <x-forms.upload name="passport_photo" label="Passport Photo" id="passport_photo"
-                value="{{ old('passport_photo', $employee->passport_photo ?? '') }}" />
-        </div>
+
     </div>
     <div class="row mb-3">
         <div class="col-md-6">

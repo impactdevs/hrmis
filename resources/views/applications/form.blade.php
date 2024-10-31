@@ -19,8 +19,8 @@
                 <div class="col-12">
                     {{-- logo --}}
                     <div class="text-center">
-                        <img src="{{ asset('images/logo_bigger_white-1.png') }}" height="80vh" class="rounded-lg"
-                            alt="{{ config('zeus.site_title', config('app.name', 'Laravel')) }}">
+                        <img src="{{ asset('assets/img/logo.png') }}" alt="company logo"
+                        class="object-fit-contain border rounded img-fluid" style="max-width: 100%; height: auto;">
                     </div>
                 </div>
 
