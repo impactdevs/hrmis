@@ -73,14 +73,6 @@
                         Applications
                     </a>
                 </li>
-
-                <li class="nav-item">
-                    <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('appraisals.index')) bg-secondary @endif"
-                        href="{{ route('appraisals.index') }}">
-                        <i class="bi bi-envelope-plus"></i>
-                        Appraisals
-                    </a>
-                </li>
             @endif
         </ul>
         @if (auth()->user()->hasRole('Super Admin'))
