@@ -13,14 +13,25 @@ class ApplicationController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        // Initialize the query for applications
+        $query = Application::latest()->with('entry');
 
-        // Retrieve entries for the given form_id
-        $applications = Application::latest()->paginate();
-        $applications->load('entry');
-        return view('applications.index', compact('applications'));
+        // Filter by job if a job_id is provided
+        if ($request->filled('job_id')) {
+            $query->where('company_job_id', $request->input('job_id'));
+        }
+
+        // Paginate the results
+        $applications = $query->paginate();
+
+        // Get all jobs for the filter dropdown
+        $company_jobs = CompanyJob::all();
+
+        return view('applications.index', compact('applications', 'company_jobs'));
     }
+
 
     /**
      * Show the form for creating a new resource.

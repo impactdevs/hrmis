@@ -21,9 +21,8 @@
                         <thead>
                             <tr>
                                 <th scope="col">#</th>
-                                <th scope="col">First Name</th>
-                                <th scope="col">Last Name</th>
-                                <th scope="col">Employee</th>
+                                <th scope="col">Full Name</th>
+                                <th scope="col">Position</th>
                                 <th scope="col">Status</th>
                                 <th scope="col">Actions</th>
                             </tr>
@@ -37,10 +36,9 @@
                                     @endphp
                                     <tr>
                                         <th scope="row">{{ $appraisal->entry->id }}</th>
-                                        <td>{{ $data[1] }}</td>
-                                        <td>{{ $data[2] }}</td>
+                                        <td>{{ $data[76] }}</td>
+                                        <td>{{ $data[77] }}</td>
                                         <td>Accepted</td>
-                                        <td>{{ $appraisal->created_at->format('M d, Y') }}</td>
                                         <td>
                                             <a href="{{ url('entries', $appraisal->entry->id) }}"
                                                 class="btn btn-info text-white">

@@ -95,7 +95,7 @@
                                                 <th scope="col">#</th>
                                                 <th scope="col">First Name</th>
                                                 <th scope="col">Last Name</th>
-                                                <th scope="col">Status</th>
+                                                <th scope="col">Job</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -108,9 +108,11 @@
                                                     <td><a href="#"
                                                             class="btn btn-outline-danger">{{ $entry->job->job_code }}</a>
                                                         </th>
-                                                    <td>{{ $data[3] }}</td>
-                                                    <td>{{ $data[4] }}</td>
-                                                    <td><span class="badge bg-success">Approved</span></td>
+                                                    <td>{{ $data[93] }}</td>
+                                                    <td>{{ $data[94] }}</td>
+                                                    <td><span
+                                                            class="badge bg-success">{{ $entry->job->job_title }}</span>
+                                                    </td>
                                                 </tr>
                                             @endforeach
                                         </tbody>
@@ -131,8 +133,8 @@
                                     <table class="table table-borderless">
                                         <thead>
                                             <tr>
-                                                <th scope="col">FIRST NAME</th>
-                                                <th scope="col">LAST NAME</th>
+                                                <th scope="col">Full Name</th>
+                                                <th scope="col">Position</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -398,7 +400,7 @@
                         @if ($daysUntilExpiry <= 90)
                             <!-- Revenue Card -->
                             <div class="col-xxl-12 col-md-12">
-                                @if ($daysUntilExpiry >= 0)
+                                @if ($daysUntilExpiry >= 0 && $daysUntilExpiry != null)
                                     <div class="alert alert-warning mt-3">
                                         <h5>Contract Expiry Notification</h5>
                                         <p>Your contract is expiring in <strong>{{ $daysUntilExpiry }}

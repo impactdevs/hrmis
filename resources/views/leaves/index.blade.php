@@ -55,7 +55,8 @@
                     <div class="col-md-4 mb-3 leave-card" data-leave-id="{{ $leave->leave_id }}">
                         <div class="card border border-info">
                             <div class="card-header position-relative">
-                                <h6 class="m-0">{{ $leave->employee->first_name }}</h6>
+
+                                <h6 class="m-0">{{ optional($leave->employee)->first_name }}</h6>
                                 <span
                                     class="badge {{ $isExpired ? 'bg-danger' : 'bg-success' }} position-absolute top-0 end-0 m-1">
                                     {{ $isExpired ? 'Expired' : 'Ongoing' }}
@@ -71,7 +72,7 @@
                                 <p class="card-text"><strong>People to Stand In For Me:</strong></p>
                                 <div>
                                     @foreach ($leave->my_work_will_be_done_by as $person)
-                                        <span class="badge badge-info bg-info">{{ $person }}</span>
+                                        <span class="badge badge-info bg-info">{{ $users[$person] }}</span>
                                     @endforeach
                                 </div>
                                 <div class="status mt-2">

@@ -89,6 +89,11 @@ class Employee extends Model
         $today = now()->timezone('UTC'); // Ensure today is in UTC
         $expiryDateString = $this->contract_expiry_date;
 
+        // Check if expiry date is not set
+        if (empty($expiryDateString)) {
+            return null; // or you could return 0, or another appropriate value
+        }
+
         // Get the date part only
         $expiryDateString = explode(' ', $expiryDateString)[0];
 
@@ -105,6 +110,7 @@ class Employee extends Model
             return (int) -$daysDifference; // Days expired (negative value)
         }
     }
+
 
 
 }

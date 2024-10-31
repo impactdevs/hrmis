@@ -26,8 +26,9 @@ class LeaveController extends Controller
         });
         $leavesPerCategory = $leaves->groupBy('leaveCategory.leave_type_name')->map->count();
 
+        $users = User::pluck('name', 'id')->toArray();
 
-        return view('leaves.index', compact('leaves', 'totalLeaves', 'totalDays', 'leavesPerCategory'));
+        return view('leaves.index', compact('leaves', 'totalLeaves', 'totalDays', 'leavesPerCategory', 'users'));
     }
 
     /**
@@ -39,7 +40,8 @@ class LeaveController extends Controller
         $user_id = auth()->user()->id;
         $leaveTypes = LeaveType::pluck('leave_type_name', 'leave_type_id')->toArray();
         $existingValuesArray = [];
-        return view('leaves.create', compact('leaveTypes', 'user_id', 'existingValuesArray'));
+        $users = User::pluck('name', 'id')->toArray();
+        return view('leaves.create', compact('leaveTypes', 'user_id', 'existingValuesArray', 'users'));
 
     }
 

@@ -41,24 +41,29 @@
                                     $positionIds = explode(',', $event->category['positions'] ?? '');
 
                                 @endphp
-
                                 @foreach ($userIds as $id)
-                                    @if ($id == 'All')
+                                    @if ($id === 'All')
                                         <span class="badge bg-primary">All Users</span>
-                                    @else
+                                    @elseif (!empty($id) && isset($options['users'][$id]))
                                         <span
-                                            class="badge bg-primary">{{ $options['users'][$id] == '' ? '' : $options['users'][$id] ?? 'Unknown User' }}</span>
+                                            class="badge bg-primary">{{ $options['users'][$id] ?? 'Unknown User' }}</span>
                                     @endif
                                 @endforeach
 
+
+
                                 @foreach ($departmentIds as $id)
-                                    <span
-                                        class="badge bg-success">{{ $options['departments'][$id] == '' ? '' : $options['departments'][$id] ?? 'Unknown Department' }}</span>
+                                    @if (isset($options['users'][$id]))
+                                        <span
+                                            class="badge bg-success">{{ $options['departments'][$id] == '' ? '' : $options['departments'][$id] ?? 'Unknown Department' }}</span>
+                                    @endif
                                 @endforeach
 
                                 @foreach ($positionIds as $id)
-                                    <span
-                                        class="badge bg-info">{{ $options['positions'][$id] == '' ? '' : $options['positions'][$id] ?? 'Unknown Position' }}</span>
+                                    @if (isset($options['users'][$id]))
+                                        <span
+                                            class="badge bg-info">{{ $options['positions'][$id] == '' ? '' : $options['positions'][$id] ?? 'Unknown Position' }}</span>
+                                    @endif
                                 @endforeach
                             </td>
                             <td class="align-middle">
