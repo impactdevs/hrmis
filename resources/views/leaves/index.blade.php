@@ -72,7 +72,8 @@
                                 <p class="card-text"><strong>People to Stand In For Me:</strong></p>
                                 <div>
                                     @foreach ($leave->my_work_will_be_done_by as $person)
-                                        <span class="badge badge-info bg-info">{{ $users[$person] }}</span>
+                                        <span
+                                            class="badge badge-info bg-info">{{ $users[$person] ?? 'Unknown User' }}</span>
                                     @endforeach
                                 </div>
                                 <div class="status mt-2">
