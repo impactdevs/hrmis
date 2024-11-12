@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -18,9 +17,13 @@ return new class extends Migration
             $table->string('training_location');
             $table->date('training_start_date');
             $table->date('training_end_date');
-            $table->json('training_category');
+            $table->json('training_category')->nullable();
+            $table->string('approval_status')->nullable();
+            $table->longText('rejection_reason')->nullable();
+            $table->uuid('user_id')->nullable()->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });
+
     }
 
     /**

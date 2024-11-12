@@ -205,7 +205,7 @@
         'app_id' => '638977',
         'options' => 
         array (
-          'host' => '0.0.0.0',
+          'host' => '127.0.0.1',
           'port' => '8080',
           'scheme' => 'http',
           'useTLS' => false,
@@ -572,18 +572,18 @@
   ),
   'mail' => 
   array (
-    'default' => 'smtp',
+    'default' => 'log',
     'mailers' => 
     array (
       'smtp' => 
       array (
         'transport' => 'smtp',
         'url' => NULL,
-        'host' => 'smtp.gmail.com',
-        'port' => '465',
-        'encryption' => 'tls',
-        'username' => 'nsengiyumvawilberforce@gmail.com',
-        'password' => 'yzdkonaqadsimgsf',
+        'host' => '127.0.0.1',
+        'port' => '2525',
+        'encryption' => NULL,
+        'username' => NULL,
+        'password' => NULL,
         'timeout' => NULL,
         'local_domain' => 'localhost',
       ),
@@ -634,7 +634,7 @@
     ),
     'from' => 
     array (
-      'address' => 'nsengiyumvawilberforce@gmail.com',
+      'address' => 'hello@example.com',
       'name' => 'Human Resource Management System',
     ),
     'markdown' => 
@@ -764,9 +764,9 @@
     array (
       'reverb' => 
       array (
-        'host' => '0.0.0.0',
+        'host' => '127.0.0.1',
         'port' => '8080',
-        'hostname' => 'localhost',
+        'hostname' => '127.0.0.1',
         'options' => 
         array (
           'tls' => 
@@ -804,8 +804,8 @@
           'app_id' => '638977',
           'options' => 
           array (
-            'host' => 'localhost',
-            'port' => '',
+            'host' => '127.0.0.1',
+            'port' => '8080',
             'scheme' => 'http',
             'useTLS' => false,
           ),

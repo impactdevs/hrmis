@@ -51,4 +51,11 @@ class User extends Authenticatable
     {
         return $this->hasOne(Employee::class, 'email', 'email');
     }
+
+    //check if admin or executive sec
+    public function isAdminOrSecretary()
+    {
+        return $this->hasRole('Super Admin') || $this->hasRole('Executive Secretary') || $this->hasRole('Assistant Executive Secretary') || $this->hasRole('Head of Division');
+    }
+
 }

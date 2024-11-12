@@ -10,6 +10,9 @@ use App\Models\User;
 use App\Notifications\EventPosted;
 use Exception;
 use Illuminate\Support\Facades\Notification;
+use Log;
+use App\Models\Employee;
+
 
 class EventController extends Controller
 {
@@ -62,7 +65,32 @@ class EventController extends Controller
             // Create the event
             $eventCreated = Event::create($validatedData);
 
-            $users = User::role('Super Admin')->get();
+            // Process training category to send notifications to them
+            $users = array_map('trim', explode(',', $eventCreated->category['users'] ?? []));
+
+            // If $users has '0' then send notification to all users
+            if (in_array('0', $users)) {
+                $users = User::all(); // Get all User instances
+            } else {
+                // Departments
+                $departments = array_map('trim', explode(',', $eventCreated->category['departments'] ?? []));
+
+                // Get users that belong to these departments by getting user_id where department_id is in $departments from employees table
+                $department_users = Employee::whereIn('department_id', $departments)->pluck('user_id')->toArray();
+
+                // Positions
+                $positions = array_map('trim', explode(',', $eventCreated->category['positions'] ?? []));
+                // Get users that belong to these positions by getting user_id where position_id is in $positions from employees table
+                $position_users = Employee::whereIn('position_id', $positions)->pluck('user_id')->toArray();
+
+                // Combine the two arrays and get unique user IDs
+                $userIds = array_unique(array_merge($department_users, $position_users, $users));
+
+                // Fetch User instances based on the unique user IDs
+                $users = User::whereIn('id', $userIds)->get();
+
+            }
+
 
             Notification::send($users, new EventPosted($eventCreated));
 

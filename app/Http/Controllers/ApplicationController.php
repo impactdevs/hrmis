@@ -110,4 +110,33 @@ class ApplicationController extends Controller
 
         return view('applications.form', compact('form', 'company_jobs'));
     }
+
+    public function approveOrReject()
+    {
+        try {
+            $approval_status = request()->input('application_request_status');
+            $appraisal = Application::find(request()->input('application_id'));
+            $appraisal->application_status = $approval_status;
+            $appraisal->save();
+
+            $message = '';
+
+            if ($approval_status == 'approve')
+                $message = 'Appraisal request approved successfully.';
+
+            if ($approval_status == 'approve')
+                $message = 'Appraisal request rejected successfully.';
+            return response()->json([
+                'status' => 'success',
+                'message' => $message
+            ], 200);
+
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'approval failed',
+            ], 500);
+        }
+    }
 }

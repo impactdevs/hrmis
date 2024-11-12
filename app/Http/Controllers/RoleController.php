@@ -13,18 +13,32 @@ class RoleController extends Controller
         $roles = Role::all();
         return view('roles.index', compact('roles'));
     }
-
     public function create()
     {
-        return view('roles.create');
+        $permissions = Permission::all(); // Assuming you have a Permission model
+        return view('roles.create', compact('permissions'));
     }
+
 
     public function store(Request $request)
     {
-        $request->validate(['name' => 'required|unique:roles,name']);
-        Role::create(['name' => $request->name]);
+        $request->validate([
+            'name' => 'required|unique:roles,name',
+            'permissions' => 'array', // Ensure permissions are an array
+        ]);
+
+        $role = Role::create(['name' => $request->name]);
+
+        // Sync permissions
+        if ($request->permissions) {
+            //convert the ids to ints
+            $permissions = $this->convertPermissionsToInt($request->permissions);
+            $role->syncPermissions($permissions);
+        }
+
         return redirect()->route('roles.index')->with('success', 'Role created successfully.');
     }
+
 
     public function edit(Role $role)
     {
@@ -32,18 +46,29 @@ class RoleController extends Controller
         return view('roles.edit', compact('role', 'allPermissions'));
     }
 
+    /**
+     * Update the specified role in the database.
+     *
+     * Validates the role's name to ensure it is unique, updates the role's name,
+     * converts the provided permissions to integers, and syncs these permissions
+     * with the role. Upon successful update, redirects to the roles index page
+     * with a success message.
+     *
+     * @param Request $request The incoming HTTP request containing role data.
+     * @param Role $role The role instance to be updated.
+     * @return \Illuminate\Http\RedirectResponse A redirect response to the roles index page.
+     */
     public function update(Request $request, Role $role)
     {
-        // Validate the role name
-        $request->validate(['name' => 'required|unique:roles,name,' . $role->id]);
+        $permissions = $this->convertPermissionsToInt($request->permissions);
 
-        // Update the role name
-        $role->update(['name' => $request->name]);
-
-        // Sync permissions
-        $role->syncPermissions($request->permissions ?? []);
+        $role->syncPermissions($permissions);
 
         return redirect()->route('roles.index')->with('success', 'Role updated successfully.');
+    }
+    private function convertPermissionsToInt(array $permissions = []): array
+    {
+        return array_map('intval', $permissions);
     }
 
 

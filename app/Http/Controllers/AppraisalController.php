@@ -92,4 +92,33 @@ class AppraisalController extends Controller
 
         return view('appraisals.form', compact('form'));
     }
+
+    public function approveOrReject(Request $request)
+    {
+        try {
+            $approval_status = request()->input('appraisal_request_status');
+            $appraisal = Appraisal::find(request()->input('appraisal_id'));
+            $appraisal->appraisal_request_status = $approval_status;
+            $appraisal->save();
+
+            $message = '';
+
+            if ($approval_status == 'approve')
+                $message = 'Appraisal request approved successfully.';
+
+            if ($approval_status == 'reject')
+                $message = 'Appraisal request rejected successfully.';
+            return response()->json([
+                'status' => 'success',
+                'message' => $message
+            ], 200);
+
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'approval failed',
+            ], 500);
+        }
+    }
 }

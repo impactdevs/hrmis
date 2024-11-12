@@ -5,6 +5,7 @@ namespace App\Models\Scopes;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
+use Illuminate\Support\Facades\DB;
 use Auth;
 
 class AttendanceScope implements Scope
@@ -32,13 +33,19 @@ class AttendanceScope implements Scope
 
             case 'Head of Division':
                 // Get the department_id of the authenticated user
-                $employeeId = optional($user->employee)->employee_id;
+                $departmentId = DB::table('employees')->where('user_id', $user->id)->value('department_id');
 
-                $builder->where('attendances.employee_id', $employeeId);
+                if ($departmentId) {
+                    //only show attendances from the user's department
+                    $users = DB::table('employees')->where('department_id', $departmentId)->pluck('employee_id');
+
+                    $builder->whereIn('attendances.employee_id', $users);
+                }
                 break;
 
             case 'Executive Secretary':
-                // Add logic if needed
+            // Add logic if needed
+            case 'Assistant Executive Secretary':
                 break;
 
             default:

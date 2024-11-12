@@ -36,13 +36,33 @@
                                     @endphp
                                     <tr>
                                         <th scope="row">{{ $appraisal->entry->id }}</th>
-                                        <td>{{ $data[76] }}</td>
+                                        <td>
+                                            @if ($appraisal->appraisal_request_status == 'approve')
+                                                <span class="badge text-bg-success">
+                                                    {{ $data[76] }}
+                                                </span>
+                                            @else
+                                                {{ $data[76] }}
+                                            @endif
+                                        </td>
                                         <td>{{ $data[77] }}</td>
                                         <td>Accepted</td>
                                         <td>
                                             <a href="{{ url('entries', $appraisal->entry->id) }}"
-                                                class="btn btn-info text-white">
+                                                class="btn btn-info text-white fs-6">
                                                 <i class="bi bi-eye"></i>
+                                            </a>
+
+                                            <a href="#" class="btn btn-primary text-white fs-6" id="accept"
+                                                data-appraisal-id="{{ $appraisal->appraisal_id }}"
+                                                data-appraisal-request-status="approve">
+                                                <i class="bi bi-check"></i>
+                                            </a>
+
+                                            <a href="#" class="btn btn-danger text-white fs-6" id="reject"
+                                                data-appraisal-id="{{ $appraisal->appraisal_id }}"
+                                                data-appraisal-request-status="reject">
+                                                <i class="bi bi-x"></i>
                                             </a>
                                         </td>
                                     </tr>
@@ -58,5 +78,51 @@
             </div>
         </div>
     </div>
+
+    @push('scripts')
+        <script>
+            $(document).ready(function() {
+                //accept button
+                $(document).on('click', '#accept', function(e) {
+                    e.preventDefault();
+
+                    var appraisalId = $(this).data('appraisal-id');
+                    var appraisalRequestStatus = $(this).data('appraisal-request-status');
+
+                    $.ajax({
+                        url: '/appraisal/appraisal-approval/',
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        data: {
+                            appraisal_id: appraisalId,
+                            appraisal_request_status: appraisalRequestStatus
+                        },
+                        success: function(response) {
+                            location.reload();
+                            Toastify({
+                                text: response.message,
+                                duration: 3000,
+                                gravity: "top",
+                                position: "right",
+                                backgroundColor: "linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(121,14,9,1) 35%, rgba(0,212,255,1) 100%)",
+                            }).showToast();
+                        },
+                        error: function(xhr, status, error) {
+                            Toastify({
+                                text: xhr.responseJSON?.error || 'An error occurred',
+                                duration: 3000,
+                                gravity: "top",
+                                position: "right",
+                                backgroundColor: "linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(121,14,9,1) 35%, rgba(0,212,255,1) 100%)",
+                            }).showToast();
+                        }
+                    });
+                });
+
+            });
+        </script>
+    @endpush
 
 </x-app-layout>

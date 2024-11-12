@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Employee;
 use App\Models\Leave;
 use App\Models\LeaveType;
 use App\Models\User;
@@ -19,7 +20,6 @@ class LeaveController extends Controller
     public function index()
     {
         $leaves = Leave::with('employee', 'leaveCategory')->get();
-        $leaves = Leave::all();
         $totalLeaves = $leaves->count();
         $totalDays = $leaves->sum(function ($leave) {
             return Carbon::parse($leave->start_date)->diffInDays(Carbon::parse($leave->end_date)) + 1;
@@ -28,7 +28,14 @@ class LeaveController extends Controller
 
         $users = User::pluck('name', 'id')->toArray();
 
-        return view('leaves.index', compact('leaves', 'totalLeaves', 'totalDays', 'leavesPerCategory', 'users'));
+        //get the number leave days allocated to the employee
+        $user = auth()->user()->id;
+        //current year
+        $currentYear = Carbon::now()->year;
+        $employee = Employee::where('user_id', $user)->first();
+        $totalLeaveDaysAllocated = $employee->leaveRoster->totalLeaveDays();
+        $useDays = $employee->totalLeaveDays();
+        return view('leaves.index', compact('leaves', 'totalLeaves', 'totalDays', 'leavesPerCategory', 'users', 'totalLeaveDaysAllocated', 'useDays'));
     }
 
     /**
@@ -137,17 +144,17 @@ class LeaveController extends Controller
                 $leave->leave_request_status = 'rejected';
                 $leave->rejection_reason = $request->input('reason'); // Store rejection reason
             }
+
+            // Send notification
+            $leaveRequester = User::find($leave->user_id); // Get the user who requested the leave
+            $approver = User::find(auth()->user()->id);
+            Notification::send($leaveRequester, new LeaveApproval($leave, $approver));// Notify with the approver
         } else {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
         // Save the updated leave status
         $leave->save();
-
-        // Send notification
-        $leaveRequester = User::find($leave->user_id); // Get the user who requested the leave
-        $approver = User::find(auth()->user()->id);
-        Notification::send($leaveRequester, new LeaveApproval($leave, $approver));// Notify with the approver
 
         return response()->json(['message' => 'Leave application updated successfully.', 'status' => $leave->leave_request_status]);
     }

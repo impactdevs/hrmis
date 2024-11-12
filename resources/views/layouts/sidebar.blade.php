@@ -17,8 +17,16 @@
             <li class="nav-item">
                 <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('leaves.index')) bg-secondary @endif"
                     href="{{ route('leaves.index') }}">
-                    <i class="bi bi-arrow-bar-up"></i>
-                    {{ auth()->user()->hasRole('Super Admin') ? 'Leaves' : 'My Leaves' }}
+                    <i class="bi bi-bus-front"></i>
+                    {{ auth()->user()->isAdminOrSecretary() ? 'Leaves' : 'My Leaves' }}
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('leave-roster.index')) bg-secondary @endif"
+                    href="{{ route('leave-roster.index') }}">
+                    <i class="bi bi-calendar-plus"></i>
+                    {{ auth()->user()->isAdminOrSecretary() ? 'Leave Roster' : 'My Leave Roster' }}
                 </a>
             </li>
 
@@ -26,7 +34,7 @@
                 <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('appraisals.index')) bg-secondary @endif"
                     href="{{ route('appraisals.index') }}">
                     <i class="bi bi-arrow-bar-up"></i>
-                    {{ auth()->user()->hasRole('Super Admin') ? 'Appraisals' : 'My Appraisals' }}
+                    {{ auth()->user()->isAdminOrSecretary() ? 'Appraisals' : 'My Appraisals' }}
                 </a>
             </li>
 
@@ -34,15 +42,19 @@
                 <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('attendances.index')) bg-secondary @endif"
                     href="{{ route('attendances.index') }}">
                     <i class="bi bi-check2-all"></i>
-                    {{ auth()->user()->hasRole('Super Admin') ? 'Attendances' : 'My Attendance History' }}
+                    {{ auth()->user()->isAdminOrSecretary() ? 'Attendances' : 'My Attendance History' }}
                 </a>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('trainings.index') || request()->routeIs('trainings.show')) bg-secondary @endif"
+                <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('trainings.index') ||
+                        request()->routeIs('trainings.show') ||
+                        request()->routeIs('trainings.edit') ||
+                        request()->routeIs('trainings.create') ||
+                        request()->routeIs('apply')) bg-secondary @endif"
                     href="{{ route('trainings.index') }}">
                     <i class="bi bi-eyedropper"></i>
-                    Trainings
+                    Trainings/Travels
                 </a>
             </li>
 
@@ -57,15 +69,15 @@
 
             <li class="nav-item">
                 @php
-                    $currentUrl = auth()->user()->hasRole('Super Admin') ? 'employees.index' : 'employees.show';
+                    $currentUrl = auth()->user()->isAdminOrSecretary() ? 'employees.index' : 'employees.show';
                 @endphp
                 <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs($currentUrl)) bg-secondary @endif"
-                    href="{{ auth()->user()->hasRole('Super Admin') ? route('employees.index') : route('employees.show', auth()->user()->employee->employee_id) }}">
+                    href="{{ auth()->user()->isAdminOrSecretary() ? route('employees.index') : route('employees.show', auth()->user()->employee->employee_id) }}">
                     <i class="bi bi-database-down"></i>
-                    {{ auth()->user()->hasRole('Super Admin') ? 'Employees' : 'About Me' }}
+                    {{ auth()->user()->isAdminOrSecretary() ? 'Employees' : 'About Me' }}
                 </a>
             </li>
-            @if (auth()->user()->hasRole('Super Admin'))
+            @if (auth()->user()->isAdminOrSecretary())
                 <li class="nav-item">
                     <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('applications.index')) bg-secondary @endif"
                         href="{{ route('applications.index') }}">
@@ -74,6 +86,17 @@
                     </a>
                 </li>
             @endif
+
+            <li class="nav-item">
+                <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('recruitments.index') ||
+                        request()->routeIs('recruitments.show') ||
+                        request()->routeIs('recruitments.edit') ||
+                        request()->routeIs('recruitments.create')) bg-secondary @endif"
+                    href="{{ route('recruitments.index') }}">
+                    <i class="bi bi-bank2"></i>
+                    Staff Recruitment
+                </a>
+            </li>
         </ul>
         @if (auth()->user()->hasRole('Super Admin'))
             <h6

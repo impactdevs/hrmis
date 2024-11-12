@@ -19,6 +19,7 @@ class TrainingRequest extends FormRequest
      */
     public function rules(): array
     {
+
         return [
             'training_title' => 'required|string|max:255',
             'training_description' => 'required|string',

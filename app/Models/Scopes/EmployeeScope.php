@@ -1,11 +1,11 @@
 <?php
-
 namespace App\Models\Scopes;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
-use Auth;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class EmployeeScope implements Scope
 {
@@ -16,10 +16,6 @@ class EmployeeScope implements Scope
     {
         // Get the currently authenticated user
         $user = Auth::user();
-
-        if (!$user) {
-            return; // If no user is authenticated, don't apply any scope
-        }
 
         // Get the user's roles
         $roles = $user->getRoleNames();
@@ -32,9 +28,9 @@ class EmployeeScope implements Scope
 
             case 'Head of Division':
                 // Get the department_id of the authenticated user
-                $departmentId = optional($user->employee)->department_id;
-
+                $departmentId = DB::table('employees')->where('user_id', $user->id)->value('department_id');
                 if ($departmentId) {
+                    // Only show employees from the user's department
                     $builder->where('employees.department_id', $departmentId);
                 } else {
                     // If there's no department, don't show anything
@@ -42,10 +38,14 @@ class EmployeeScope implements Scope
                 }
                 break;
 
-            case 'Executive Secretary':
-                // Add logic if needed
+            case 'Staff':
+                $builder->where('employees.user_id', $user->id);
                 break;
 
+            case 'Executive Secretary':
+            // Add logic if needed
+            case 'Assistant Executive Secretary':
+                break;
             default:
                 // Handle other roles if needed
                 break;

@@ -1,14 +1,28 @@
 <x-app-layout>
-    <div class="container">
-        <h1>Create Role</h1>
+    <div class="container mt-4">
+        <h1 class="h2">Create Role</h1>
+
         <form action="{{ route('roles.store') }}" method="POST">
             @csrf
             <div class="form-group">
                 <label for="name">Role Name</label>
-                <input type="text" name="name" id="name" class="form-control" required>
+                <input type="text" class="form-control" id="name" name="name" required>
             </div>
-            <button type="submit" class="btn btn-primary">Create Role</button>
+
+            <div class="form-group mt-3">
+                <label>Tick which Permissions you want to assign to this <strong>Role</strong></label>
+                @foreach ($permissions as $permission)
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="permission{{ $permission->id }}"
+                            name="permissions[]" value="{{ $permission->id }}">
+                        <label class="form-check-label" for="permission{{ $permission->id }}">
+                            {{ $permission->name }}
+                        </label>
+                    </div>
+                @endforeach
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-4">Create Role</button>
         </form>
-        <a href="{{ route('roles.index') }}" class="btn btn-secondary mt-2">Back to Roles</a>
     </div>
 </x-app-layout>

@@ -17,9 +17,11 @@ class PermissionsDemoSeeder extends Seeder
         // Reset cached roles and permissions
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-
-
+        //create a role
         $role3 = 'Super Admin';
+
+        //create $role1
+        $role1 = Role::create(['name' => $role3]);
         // gets all permissions via Gate::before rule; see AuthServiceProvider
 
         $user = \App\Models\User::factory()->create([

@@ -73,29 +73,33 @@
                                         Actions
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        <li>
-                                            <a class="dropdown-item"
-                                                href="{{ route('events.edit', $event->event_id) }}">
-                                                <i class="bi bi-pencil"></i> Edit
-                                            </a>
-                                        </li>
+                                        @can('can edit an event')
+                                            <li>
+                                                <a class="dropdown-item"
+                                                    href="{{ route('events.edit', $event->event_id) }}">
+                                                    <i class="bi bi-pencil"></i> Edit
+                                                </a>
+                                            </li>
+                                        @endcan
                                         <li>
                                             <a class="dropdown-item"
                                                 href="{{ route('events.show', $event->event_id) }}">
                                                 <i class="bi bi-eye"></i> View
                                             </a>
                                         </li>
-                                        <li>
-                                            <form action="{{ route('events.destroy', $event->event_id) }}"
-                                                method="POST" style="display:inline;">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="dropdown-item text-danger"
-                                                    onclick="return confirm('Are you sure?')">
-                                                    <i class="bi bi-trash"></i> Delete
-                                                </button>
-                                            </form>
-                                        </li>
+                                        @can('can delete an event')
+                                            <li>
+                                                <form action="{{ route('events.destroy', $event->event_id) }}"
+                                                    method="POST" style="display:inline;">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="dropdown-item text-danger"
+                                                        onclick="return confirm('Are you sure?')">
+                                                        <i class="bi bi-trash"></i> Delete
+                                                    </button>
+                                                </form>
+                                            </li>
+                                        @endcan
                                     </ul>
                                 </div>
                             </td>

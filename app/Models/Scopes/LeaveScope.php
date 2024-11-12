@@ -5,7 +5,9 @@ namespace App\Models\Scopes;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
+use Illuminate\Support\Facades\DB;
 use Auth;
+
 
 class LeaveScope implements Scope
 {
@@ -32,15 +34,12 @@ class LeaveScope implements Scope
 
             case 'Head of Division':
                 // Get the department_id of the authenticated user
-                $departmentId = optional($user->employee)->department_id;
-
+                $departmentId = DB::table('employees')->where('user_id', $user->id)->value('department_id');
                 if ($departmentId) {
-                    // Filter to include only users from the same department
-                    $builder->whereIn('leaves.user_id', function ($query) use ($departmentId) {
-                        $query->select('id')
-                            ->from('users')
-                            ->where('department_id', $departmentId);
-                    });
+                    // Only show leaves from the user's department by using leaves.user_id
+                    $users = DB::table('employees')->where('department_id', $departmentId)->pluck('user_id');
+
+                    $builder->whereIn('leaves.user_id', $users);
                 } else {
                     // If there's no department, don't show anything
                     $builder->whereRaw('1 = 0'); // This condition will always be false
@@ -48,6 +47,8 @@ class LeaveScope implements Scope
                 break;
 
             case 'Executive Secretary':
+            // Add logic if needed
+            case 'Assistant Executive Secretary':
                 // Add logic if needed
                 break;
 

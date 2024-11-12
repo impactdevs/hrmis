@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="mt-3">
-        <div class="d-flex flex-row flex-1 justify-content-between">
-            <h5 class="ms-3">Attendance Management</h5>
+        <div class="d-flex flex-row flex-1 justify-content-between mb-3">
+            <h5 class="ms-3 text-primary">Attendance Management</h5>
             <form action="{{ route('attendances.index') }}" method="GET" class="d-flex align-items-center">
                 <input type="date" name="filter_date" class="form-control"
                     value="{{ request('filter_date', now()->format('Y-m-d')) }}">
@@ -10,8 +10,8 @@
         </div>
 
         <div class="table-wrapper">
-            <table class="table table-striped">
-                <thead>
+            <table class="table table-striped table-hover">
+                <thead class="table-light">
                     <tr>
                         <th scope="col">#</th>
                         <th scope="col">First Name</th>
@@ -21,11 +21,11 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($attendances as $index => $attendance)
+                    @forelse ($attendances as $index => $attendance)
                         <tr class="align-middle">
                             <th scope="row">
                                 <a href="{{ route('attendances.show', $attendance->attendance_id) }}"
-                                    class="btn btn-outline-primary">
+                                   class="btn btn-outline-primary">
                                     {{ $attendance->employee->staff_id }}
                                 </a>
                             </th>
@@ -34,7 +34,13 @@
                             <td>{{ \Carbon\Carbon::parse($attendance->attendance_date)->format('d-m-Y') }}</td>
                             <td>{{ \Carbon\Carbon::parse($attendance->clock_in)->format('H:i:s') }}</td>
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr>
+                            <td colspan="5" class="text-center text-danger">
+                                No attendance records found for the selected date.
+                            </td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
 

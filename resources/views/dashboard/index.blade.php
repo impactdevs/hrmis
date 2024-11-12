@@ -1,6 +1,6 @@
 <x-app-layout>
     <section class="section dashboard m-2">
-        @if (auth()->user()->hasRole('Super Admin'))
+        @if (auth()->user()->isAdminOrSecretary())
             <div class="row">
 
                 <!-- Left side columns -->

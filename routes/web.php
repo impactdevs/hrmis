@@ -14,14 +14,17 @@ use App\Http\Controllers\Form\FormSettingController;
 use App\Http\Controllers\Form\SectionController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LeaveController;
+use App\Http\Controllers\LeaveRosterController;
 use App\Http\Controllers\LeaveTypesController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\StaffRecruitmentController;
 use App\Http\Controllers\TrainingController;
 use App\Http\Controllers\UsersController;
+use App\Models\StaffRecruitment;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -39,13 +42,28 @@ Route::middleware('auth')->group(function () {
 
 
     Route::resource('employees', EmployeeController::class);
+    Route::resource('recruitments', StaffRecruitmentController::class);
+    Route::post('/recruitments/{recruitment}/status', [StaffRecruitmentController::class, 'approveOrReject'])
+        ->name('recruitmentments.approveOrReject');
     Route::resource('appraisals', AppraisalController::class);
+    Route::post('/appraisal/appraisal-approval/', [AppraisalController::class, 'approveOrReject'])
+        ->name('appraisals.approveOrReject');
     Route::resource('events', EventController::class);
     Route::resource('trainings', TrainingController::class);
+    Route::get('training-application', [TrainingController::class, 'apply'])->name('apply');
+    Route::post('save-training-application', [TrainingController::class, 'applyTraining'])->name('save.apply');
+    Route::post('/trainings/{training}/status', [TrainingController::class, 'approveOrReject'])
+        ->name('trainings.approveOrReject');
     Route::resource('positions', PositionController::class);
     Route::resource('attendances', AttendanceController::class);
     Route::resource('leaves', LeaveController::class);
+    //leave actions
+    Route::post('/leaves/{leave}/status', [LeaveController::class, 'approveOrReject'])
+        ->name('leaves.approveOrReject');
+    Route::post('save-leave-data', [LeaveRosterController::class, 'saveLeaveRosterData'])->name('save-leave-data');
+    Route::resource('leave-roster', LeaveRosterController::class);
     Route::resource('leave-types', LeaveTypesController::class);
+    Route::post('calender', [leaveRosterController::class, 'getcalender']);
     Route::resource('company-jobs', CompanyJobController::class);
     Route::resource('departments', DepartmentController::class);
 
@@ -79,6 +97,8 @@ Route::middleware('auth')->group(function () {
 
     //applications
     Route::get('/applications', [ApplicationController::class, 'index'])->name('applications.index');
+    Route::post('/application/application-approval/', [ApplicationController::class, 'approveOrReject'])
+        ->name('application.approveOrReject');
     Route::get('/unst-job-application', [ApplicationController::class, 'survey'])->name('application.survey');
     Route::post('/applications', [ApplicationController::class, 'store'])->name('applications.store');
 
@@ -94,9 +114,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/get-count', [NotificationController::class, 'getCount']);
 
-    //leave actions
-    Route::post('/leaves/{leave}/status', [LeaveController::class, 'approveOrReject'])
-        ->name('leaves.approveOrReject');
+
 
 });
 

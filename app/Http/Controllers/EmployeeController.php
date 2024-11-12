@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Log;
 class EmployeeController extends Controller
 {
     /**
@@ -118,6 +119,7 @@ class EmployeeController extends Controller
             $user = DB::table('users')->where('email', $validatedData['email'])->doesntExist();
             if ($user) {
                 $password = Str::random(10);
+                Log::info('Password generated for ' . $validatedData['email'] . ': ' . $password);
                 $user = new User();
                 $user->email = $validatedData['email'];
                 $user->name = $validatedData['first_name'] . ' ' . $validatedData['last_name'];
@@ -127,6 +129,9 @@ class EmployeeController extends Controller
                 $validatedData['user_id'] = $user->id;
                 // Send a welcome notification with credentials
                 $user->notify(new Welcome($user->email, $password));
+            } else {
+                //add user_id to employee
+                $validatedData['user_id'] = User::where('email', $validatedData['email'])->first()->id;
             }
             // Create a new employee record using validated data
             Employee::create($validatedData);
@@ -135,7 +140,7 @@ class EmployeeController extends Controller
             return redirect()->route('employees.index')->with('success', 'Employee Registered');
         } catch (Exception $exception) {
             // Log the error for debugging
-            \Log::error('Error adding employee: ' . $exception->getMessage());
+            Log::error('Error adding employee: ' . $exception->getMessage());
 
             // Redirect back with an error message
             return redirect()->back()->with('error', 'Problem Adding the Employee');

@@ -70,6 +70,16 @@ class Employee extends Model
         static::creating(function ($employee) {
             $employee->employee_id = (string) Str::uuid();
         });
+
+        // Create a corresponding LeaveRoster when an Employee is created
+        static::created(function ($employee) {
+            // Create a new leave roster for the employee
+            \App\Models\LeaveRoster::create([
+                'employee_id' => $employee->employee_id,
+                'months' => [],  // You can customize this depending on the company's policy for leave months
+                'year' => Carbon::now()->year, // You can customize this based on your requirements
+            ]);
+        });
     }
 
     // Define the relationship with the Department model
@@ -111,6 +121,99 @@ class Employee extends Model
         }
     }
 
+    //calculate retirement years remaining, every employee retires at 60
+    public function retirementYearsRemaining()
+    {
+        if (empty($this->date_of_birth)) {
+            return "no date of birth specified";
+        }
+
+        $today = now()->timezone('UTC'); // Ensure today is in UTC
+        $age = $today->diff($this->date_of_birth); // Get full date difference
+
+        $yearsRemaining = 60 - $age->y; // 60 is retirement age
+        $monthsRemaining = 12 - $age->m; // Calculate remaining months in current year
+
+        // If we have negative months remaining (i.e., we're already in a new year), adjust the year.
+        if ($monthsRemaining === 12) {
+            $yearsRemaining++;
+            $monthsRemaining = 0;
+        }
+
+        return "{$yearsRemaining} years, {$monthsRemaining} months"; // Return formatted string
+    }
 
 
+    //each employee has a leave roster
+    public function leaveRoster()
+    {
+        return $this->hasOne(LeaveRoster::class, 'employee_id', 'employee_id');
+    }
+
+    public function totalLeaveDays()
+    {
+        //get leaves where the employee id matches employee id and were created in the current year
+        $leaves = Leave::where('user_id', $this->user_id)->whereYear('created_at', Carbon::now()->year)->get();
+        $totalDays = $leaves->sum(function ($leave) {
+            return Carbon::parse($leave->start_date)->diffInDays(Carbon::parse($leave->end_date)) + 1;
+        });
+        return $totalDays;
+    }
+
+    public function leaveDaysConsumedPerMonth()
+    {
+        // Get all leave records for the employee (assuming $this->user_id is the employee ID)
+        $leaves = Leave::where('user_id', $this->user_id)->get();
+
+        // Initialize an array to hold the total leave days consumed per year and per month
+        $daysConsumedPerYearMonth = [];
+
+        // Iterate over each leave record
+        foreach ($leaves as $leave) {
+            // Start date and end date of the leave
+            $startDate = Carbon::parse($leave->start_date);
+            $endDate = Carbon::parse($leave->end_date);
+
+            // Loop through the months the leave spans (could span multiple months)
+            while ($startDate->lte($endDate)) {
+                // Get the year and month of the current leave date
+                $year = $startDate->year;
+                $month = $startDate->month;
+
+                // Calculate the number of days consumed in the current month
+                if ($startDate->month == $endDate->month) {
+                    // If the leave starts and ends in the same month, calculate the days between the two dates
+                    $daysInMonth = $startDate->diffInDays($endDate) + 1;
+                } else {
+                    // If the leave spans across multiple months
+                    if ($startDate->month == $month) {
+                        // For the first month, calculate days until the end of the month
+                        $daysInMonth = $startDate->endOfMonth()->diffInDays($startDate) + 1;
+                    } else {
+                        // For the last month, calculate days from the start of the month to the end date
+                        $daysInMonth = $startDate->diffInDays($endDate) + 1;
+                    }
+                }
+
+                // Initialize the year if it does not exist in the array
+                if (!isset($daysConsumedPerYearMonth[$year])) {
+                    $daysConsumedPerYearMonth[$year] = [];
+                }
+
+                // Initialize the month if it does not exist for the given year
+                if (!isset($daysConsumedPerYearMonth[$year][$month])) {
+                    $daysConsumedPerYearMonth[$year][$month] = 0;
+                }
+
+                // Add the calculated days to the corresponding month in the correct year
+                $daysConsumedPerYearMonth[$year][$month] += $daysInMonth;
+
+                // Move to the next month
+                $startDate->addMonth();
+            }
+        }
+
+        // Return the nested array of total leave days consumed per year and month
+        return $daysConsumedPerYearMonth;
+    }
 }

@@ -2,11 +2,13 @@
     <div class="mt-3">
         <div class="d-flex flex-row flex-1 justify-content-between">
             <h5 class="ms-3">Employee Management</h5>
-            <div>
-                <a href="{{ route('employees.create') }}" class="btn border-t-neutral-50 btn-primary">
-                    <i class="bi bi-database-add me-2"></i>Add Employee
-                </a>
-            </div>
+            @can('add an employee')
+                <div>
+                    <a href="{{ route('employees.create') }}" class="btn border-t-neutral-50 btn-primary">
+                        <i class="bi bi-database-add me-2"></i>Add Employee
+                    </a>
+                </div>
+            @endcan
         </div>
 
         <div class="mt-3">
@@ -81,27 +83,34 @@
                                         Actions
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+
                                         <li>
                                             <a class="dropdown-item"
                                                 href="{{ route('employees.show', $employee->employee_id) }}">
                                                 <i class="fas fa-eye"></i> View
                                             </a>
                                         </li>
-                                        <li>
-                                            <a class="dropdown-item"
-                                                href="{{ route('employees.edit', $employee->employee_id) }}">
-                                                <i class="fas fa-edit"></i> Edit
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <form action="{{ route('employees.destroy', $employee->employee_id) }}" method="POST" style="display:inline;">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="dropdown-item text-danger" onclick="return confirm('Are you sure?')">
-                                                    <i class="bi bi-trash"></i> Delete
-                                                </button>
-                                            </form>
-                                        </li>
+                                        @can('can edit an employee')
+                                            <li>
+                                                <a class="dropdown-item"
+                                                    href="{{ route('employees.edit', $employee->employee_id) }}">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </a>
+                                            </li>
+                                        @endcan
+                                        @can('can delete an employee')
+                                            <li>
+                                                <form action="{{ route('employees.destroy', $employee->employee_id) }}"
+                                                    method="POST" style="display:inline;">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="dropdown-item text-danger"
+                                                        onclick="return confirm('Are you sure?')">
+                                                        <i class="bi bi-trash"></i> Delete
+                                                    </button>
+                                                </form>
+                                            </li>
+                                        @endcan
                                     </ul>
                                 </div>
                             </td>

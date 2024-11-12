@@ -5,7 +5,8 @@
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <div>
-                    <h2>{{ $employee->title }} {{ $employee->first_name }} {{ $employee->last_name }}</h2>
+                    <h2>{{ $employee->title }} {{ $employee->first_name }} {{ $employee->last_name }}(Remaining with
+                        {{ $employee->retirementYearsRemaining() }} to retire)</h2>
                 </div>
                 <div>
                     @if ($employee->passport_photo)

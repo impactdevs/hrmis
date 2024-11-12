@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\TrainingScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 
+#[ScopedBy([TrainingScope::class])]
 class Training extends Model
 {
     use HasFactory;
@@ -24,6 +27,9 @@ class Training extends Model
         'training_start_date',
         'training_end_date',
         'training_category',
+        'approval_status',
+        'rejection_reason',
+        'user_id',
     ];
 
     protected $casts = [
@@ -41,5 +47,5 @@ class Training extends Model
         });
     }
 
-    
+
 }

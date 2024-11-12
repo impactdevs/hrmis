@@ -73,7 +73,7 @@ app('router')->setCompiledRoutes(
         array (
           0 => 
           array (
-            '_route' => 'generated::p2NUe9wPhOsOkLyC',
+            '_route' => 'generated::Z7KG0rdEU1qy0727',
           ),
           1 => NULL,
           2 => 
@@ -93,7 +93,7 @@ app('router')->setCompiledRoutes(
         array (
           0 => 
           array (
-            '_route' => 'generated::mhMm4oTMihKyprQx',
+            '_route' => 'generated::EqJxNJJ2PwpsoL6f',
           ),
           1 => NULL,
           2 => 
@@ -351,6 +351,62 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
+      '/recruitments' => 
+      array (
+        0 => 
+        array (
+          0 => 
+          array (
+            '_route' => 'recruitments.index',
+          ),
+          1 => NULL,
+          2 => 
+          array (
+            'GET' => 0,
+            'HEAD' => 1,
+          ),
+          3 => NULL,
+          4 => false,
+          5 => false,
+          6 => NULL,
+        ),
+        1 => 
+        array (
+          0 => 
+          array (
+            '_route' => 'recruitments.store',
+          ),
+          1 => NULL,
+          2 => 
+          array (
+            'POST' => 0,
+          ),
+          3 => NULL,
+          4 => false,
+          5 => false,
+          6 => NULL,
+        ),
+      ),
+      '/recruitments/create' => 
+      array (
+        0 => 
+        array (
+          0 => 
+          array (
+            '_route' => 'recruitments.create',
+          ),
+          1 => NULL,
+          2 => 
+          array (
+            'GET' => 0,
+            'HEAD' => 1,
+          ),
+          3 => NULL,
+          4 => false,
+          5 => false,
+          6 => NULL,
+        ),
+      ),
       '/appraisals' => 
       array (
         0 => 
@@ -400,6 +456,25 @@ app('router')->setCompiledRoutes(
           array (
             'GET' => 0,
             'HEAD' => 1,
+          ),
+          3 => NULL,
+          4 => false,
+          5 => false,
+          6 => NULL,
+        ),
+      ),
+      '/appraisal/appraisal-approval' => 
+      array (
+        0 => 
+        array (
+          0 => 
+          array (
+            '_route' => 'appraisals.approveOrReject',
+          ),
+          1 => NULL,
+          2 => 
+          array (
+            'POST' => 0,
           ),
           3 => NULL,
           4 => false,
@@ -512,6 +587,45 @@ app('router')->setCompiledRoutes(
           array (
             'GET' => 0,
             'HEAD' => 1,
+          ),
+          3 => NULL,
+          4 => false,
+          5 => false,
+          6 => NULL,
+        ),
+      ),
+      '/training-application' => 
+      array (
+        0 => 
+        array (
+          0 => 
+          array (
+            '_route' => 'apply',
+          ),
+          1 => NULL,
+          2 => 
+          array (
+            'GET' => 0,
+            'HEAD' => 1,
+          ),
+          3 => NULL,
+          4 => false,
+          5 => false,
+          6 => NULL,
+        ),
+      ),
+      '/save-training-application' => 
+      array (
+        0 => 
+        array (
+          0 => 
+          array (
+            '_route' => 'save.apply',
+          ),
+          1 => NULL,
+          2 => 
+          array (
+            'POST' => 0,
           ),
           3 => NULL,
           4 => false,
@@ -687,6 +801,81 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
+      '/save-leave-data' => 
+      array (
+        0 => 
+        array (
+          0 => 
+          array (
+            '_route' => 'save-leave-data',
+          ),
+          1 => NULL,
+          2 => 
+          array (
+            'POST' => 0,
+          ),
+          3 => NULL,
+          4 => false,
+          5 => false,
+          6 => NULL,
+        ),
+      ),
+      '/leave-roster' => 
+      array (
+        0 => 
+        array (
+          0 => 
+          array (
+            '_route' => 'leave-roster.index',
+          ),
+          1 => NULL,
+          2 => 
+          array (
+            'GET' => 0,
+            'HEAD' => 1,
+          ),
+          3 => NULL,
+          4 => false,
+          5 => false,
+          6 => NULL,
+        ),
+        1 => 
+        array (
+          0 => 
+          array (
+            '_route' => 'leave-roster.store',
+          ),
+          1 => NULL,
+          2 => 
+          array (
+            'POST' => 0,
+          ),
+          3 => NULL,
+          4 => false,
+          5 => false,
+          6 => NULL,
+        ),
+      ),
+      '/leave-roster/create' => 
+      array (
+        0 => 
+        array (
+          0 => 
+          array (
+            '_route' => 'leave-roster.create',
+          ),
+          1 => NULL,
+          2 => 
+          array (
+            'GET' => 0,
+            'HEAD' => 1,
+          ),
+          3 => NULL,
+          4 => false,
+          5 => false,
+          6 => NULL,
+        ),
+      ),
       '/leave-types' => 
       array (
         0 => 
@@ -736,6 +925,25 @@ app('router')->setCompiledRoutes(
           array (
             'GET' => 0,
             'HEAD' => 1,
+          ),
+          3 => NULL,
+          4 => false,
+          5 => false,
+          6 => NULL,
+        ),
+      ),
+      '/calender' => 
+      array (
+        0 => 
+        array (
+          0 => 
+          array (
+            '_route' => 'generated::MKcUFn8yn3wHDY7k',
+          ),
+          1 => NULL,
+          2 => 
+          array (
+            'POST' => 0,
           ),
           3 => NULL,
           4 => false,
@@ -1280,6 +1488,25 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
+      '/application/application-approval' => 
+      array (
+        0 => 
+        array (
+          0 => 
+          array (
+            '_route' => 'application.approveOrReject',
+          ),
+          1 => NULL,
+          2 => 
+          array (
+            'POST' => 0,
+          ),
+          3 => NULL,
+          4 => false,
+          5 => false,
+          6 => NULL,
+        ),
+      ),
       '/unst-job-application' => 
       array (
         0 => 
@@ -1382,7 +1609,7 @@ app('router')->setCompiledRoutes(
         array (
           0 => 
           array (
-            '_route' => 'generated::YlaqyM7xbF1eJNLf',
+            '_route' => 'generated::pvtVyE8fBQclpKCv',
           ),
           1 => NULL,
           2 => 
@@ -1419,7 +1646,7 @@ app('router')->setCompiledRoutes(
         array (
           0 => 
           array (
-            '_route' => 'generated::b0sLcx3Vmt5rW8ai',
+            '_route' => 'generated::s3Mp2QqgtN8IhV0O',
           ),
           1 => NULL,
           2 => 
@@ -1455,7 +1682,7 @@ app('router')->setCompiledRoutes(
         array (
           0 => 
           array (
-            '_route' => 'generated::D89Qm0jBbA40tXDv',
+            '_route' => 'generated::6EFYfJ4UCz0KMuBh',
           ),
           1 => NULL,
           2 => 
@@ -1585,7 +1812,7 @@ app('router')->setCompiledRoutes(
         array (
           0 => 
           array (
-            '_route' => 'generated::R7s8OZXVzmfwjIrJ',
+            '_route' => 'generated::1zXoXtj195Xv5Wqg',
           ),
           1 => NULL,
           2 => 
@@ -1642,7 +1869,7 @@ app('router')->setCompiledRoutes(
         array (
           0 => 
           array (
-            '_route' => 'generated::Wdrtjszn1tQeJAdO',
+            '_route' => 'generated::Pca20d7QBBZzHTeo',
           ),
           1 => NULL,
           2 => 
@@ -1660,7 +1887,7 @@ app('router')->setCompiledRoutes(
     ),
     2 => 
     array (
-      0 => '{^(?|/r(?|oles/([^/]++)(?|(*:28)|/(?|edit(*:43)|permissions/(?|add(*:68)|remove(*:81)))|(*:90))|eset\\-password/([^/]++)(*:121))|/p(?|ermissions/([^/]++)(?|(*:157)|/edit(*:170)|(*:178))|ositions/([^/]++)(?|(*:207)|/edit(*:220)|(*:228)))|/users/([^/]++)(?|(*:256)|/edit(*:269)|(*:277))|/e(?|mployees/([^/]++)(?|(*:311)|/edit(*:324)|(*:332))|vents/([^/]++)(?|(*:358)|/edit(*:371)|(*:379))|ntr(?|ies/([^/]++)(?|(*:409)|/edit(*:422)|(*:430))|y\\-update/([^/]++)(*:457)))|/a(?|ppraisals/([^/]++)(?|(*:493)|/edit(*:506)|(*:514))|ttendances/([^/]++)(?|(*:545)|/edit(*:558)|(*:566)))|/trainings/([^/]++)(?|(*:598)|/edit(*:611)|(*:619))|/leave(?|s/([^/]++)(?|(*:650)|/(?|edit(*:666)|status(*:680))|(*:689))|\\-types/([^/]++)(?|(*:717)|/edit(*:730)|(*:738)))|/company\\-jobs/([^/]++)(?|(*:774)|/edit(*:787)|(*:795))|/departments/([^/]++)(?|(*:828)|/edit(*:841)|(*:849))|/f(?|ields/([^/]++)(?|(*:880)|/edit(*:893)|(*:901))|orm(?|\\-builder/([^/]++)(?|(*:937)|/edit(*:950)|(*:958))|s/(?|([^/]++)(?|(*:983)|/e(?|dit(*:999)|ntries(*:1013))|(*:1023))|survey/([^/]++)/([^/]++)(*:1057)|([^/]++)/settings(*:1083))))|/get\\-condition/([^/]++)(*:1119)|/s(?|ections/([^/]++)(?|(*:1152)|/edit(*:1166)|(*:1175))|torage/(.*)(*:1196))|/notifications/(?|([^/]++)(?|(*:1235)|/(?|edit(*:1252)|read(*:1265))|(*:1275))|count(*:1290))|/verify\\-email/([^/]++)/([^/]++)(*:1332))/?$}sDu',
+      0 => '{^(?|/r(?|oles/([^/]++)(?|(*:28)|/(?|edit(*:43)|permissions/(?|add(*:68)|remove(*:81)))|(*:90))|e(?|cruitments/([^/]++)(?|(*:124)|/(?|edit(*:140)|status(*:154))|(*:163))|set\\-password/([^/]++)(*:194)))|/p(?|ermissions/([^/]++)(?|(*:231)|/edit(*:244)|(*:252))|ositions/([^/]++)(?|(*:281)|/edit(*:294)|(*:302)))|/users/([^/]++)(?|(*:330)|/edit(*:343)|(*:351))|/e(?|mployees/([^/]++)(?|(*:385)|/edit(*:398)|(*:406))|vents/([^/]++)(?|(*:432)|/edit(*:445)|(*:453))|ntr(?|ies/([^/]++)(?|(*:483)|/edit(*:496)|(*:504))|y\\-update/([^/]++)(*:531)))|/a(?|ppraisals/([^/]++)(?|(*:567)|/edit(*:580)|(*:588))|ttendances/([^/]++)(?|(*:619)|/edit(*:632)|(*:640)))|/trainings/([^/]++)(?|(*:672)|/(?|edit(*:688)|status(*:702))|(*:711))|/leave(?|s/([^/]++)(?|(*:742)|/(?|edit(*:758)|status(*:772))|(*:781))|\\-(?|roster/([^/]++)(?|(*:813)|/edit(*:826)|(*:834))|types/([^/]++)(?|(*:860)|/edit(*:873)|(*:881))))|/company\\-jobs/([^/]++)(?|(*:918)|/edit(*:931)|(*:939))|/departments/([^/]++)(?|(*:972)|/edit(*:985)|(*:993))|/f(?|ields/([^/]++)(?|(*:1024)|/edit(*:1038)|(*:1047))|orm(?|\\-builder/([^/]++)(?|(*:1084)|/edit(*:1098)|(*:1107))|s/(?|([^/]++)(?|(*:1133)|/e(?|dit(*:1150)|ntries(*:1165))|(*:1175))|survey/([^/]++)/([^/]++)(*:1209)|([^/]++)/settings(*:1235))))|/get\\-condition/([^/]++)(*:1271)|/s(?|ections/([^/]++)(?|(*:1304)|/edit(*:1318)|(*:1327))|torage/(.*)(*:1348))|/notifications/(?|([^/]++)(?|(*:1387)|/(?|edit(*:1404)|read(*:1417))|(*:1427))|count(*:1442))|/verify\\-email/([^/]++)/([^/]++)(*:1484))/?$}sDu',
     ),
     3 => 
     array (
@@ -1796,7 +2023,117 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      121 => 
+      124 => 
+      array (
+        0 => 
+        array (
+          0 => 
+          array (
+            '_route' => 'recruitments.show',
+          ),
+          1 => 
+          array (
+            0 => 'recruitment',
+          ),
+          2 => 
+          array (
+            'GET' => 0,
+            'HEAD' => 1,
+          ),
+          3 => NULL,
+          4 => false,
+          5 => true,
+          6 => NULL,
+        ),
+      ),
+      140 => 
+      array (
+        0 => 
+        array (
+          0 => 
+          array (
+            '_route' => 'recruitments.edit',
+          ),
+          1 => 
+          array (
+            0 => 'recruitment',
+          ),
+          2 => 
+          array (
+            'GET' => 0,
+            'HEAD' => 1,
+          ),
+          3 => NULL,
+          4 => false,
+          5 => false,
+          6 => NULL,
+        ),
+      ),
+      154 => 
+      array (
+        0 => 
+        array (
+          0 => 
+          array (
+            '_route' => 'recruitmentments.approveOrReject',
+          ),
+          1 => 
+          array (
+            0 => 'recruitment',
+          ),
+          2 => 
+          array (
+            'POST' => 0,
+          ),
+          3 => NULL,
+          4 => false,
+          5 => false,
+          6 => NULL,
+        ),
+      ),
+      163 => 
+      array (
+        0 => 
+        array (
+          0 => 
+          array (
+            '_route' => 'recruitments.update',
+          ),
+          1 => 
+          array (
+            0 => 'recruitment',
+          ),
+          2 => 
+          array (
+            'PUT' => 0,
+            'PATCH' => 1,
+          ),
+          3 => NULL,
+          4 => false,
+          5 => true,
+          6 => NULL,
+        ),
+        1 => 
+        array (
+          0 => 
+          array (
+            '_route' => 'recruitments.destroy',
+          ),
+          1 => 
+          array (
+            0 => 'recruitment',
+          ),
+          2 => 
+          array (
+            'DELETE' => 0,
+          ),
+          3 => NULL,
+          4 => false,
+          5 => true,
+          6 => NULL,
+        ),
+      ),
+      194 => 
       array (
         0 => 
         array (
@@ -1819,7 +2156,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      157 => 
+      231 => 
       array (
         0 => 
         array (
@@ -1842,7 +2179,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      170 => 
+      244 => 
       array (
         0 => 
         array (
@@ -1865,7 +2202,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      178 => 
+      252 => 
       array (
         0 => 
         array (
@@ -1907,7 +2244,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      207 => 
+      281 => 
       array (
         0 => 
         array (
@@ -1930,7 +2267,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      220 => 
+      294 => 
       array (
         0 => 
         array (
@@ -1953,7 +2290,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      228 => 
+      302 => 
       array (
         0 => 
         array (
@@ -1995,7 +2332,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      256 => 
+      330 => 
       array (
         0 => 
         array (
@@ -2018,7 +2355,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      269 => 
+      343 => 
       array (
         0 => 
         array (
@@ -2041,7 +2378,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      277 => 
+      351 => 
       array (
         0 => 
         array (
@@ -2083,7 +2420,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      311 => 
+      385 => 
       array (
         0 => 
         array (
@@ -2106,7 +2443,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      324 => 
+      398 => 
       array (
         0 => 
         array (
@@ -2129,7 +2466,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      332 => 
+      406 => 
       array (
         0 => 
         array (
@@ -2171,7 +2508,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      358 => 
+      432 => 
       array (
         0 => 
         array (
@@ -2194,7 +2531,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      371 => 
+      445 => 
       array (
         0 => 
         array (
@@ -2217,7 +2554,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      379 => 
+      453 => 
       array (
         0 => 
         array (
@@ -2259,7 +2596,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      409 => 
+      483 => 
       array (
         0 => 
         array (
@@ -2282,7 +2619,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      422 => 
+      496 => 
       array (
         0 => 
         array (
@@ -2305,7 +2642,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      430 => 
+      504 => 
       array (
         0 => 
         array (
@@ -2347,7 +2684,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      457 => 
+      531 => 
       array (
         0 => 
         array (
@@ -2369,7 +2706,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      493 => 
+      567 => 
       array (
         0 => 
         array (
@@ -2392,7 +2729,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      506 => 
+      580 => 
       array (
         0 => 
         array (
@@ -2415,7 +2752,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      514 => 
+      588 => 
       array (
         0 => 
         array (
@@ -2457,7 +2794,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      545 => 
+      619 => 
       array (
         0 => 
         array (
@@ -2480,7 +2817,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      558 => 
+      632 => 
       array (
         0 => 
         array (
@@ -2503,7 +2840,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      566 => 
+      640 => 
       array (
         0 => 
         array (
@@ -2545,7 +2882,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      598 => 
+      672 => 
       array (
         0 => 
         array (
@@ -2568,7 +2905,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      611 => 
+      688 => 
       array (
         0 => 
         array (
@@ -2591,7 +2928,29 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      619 => 
+      702 => 
+      array (
+        0 => 
+        array (
+          0 => 
+          array (
+            '_route' => 'trainings.approveOrReject',
+          ),
+          1 => 
+          array (
+            0 => 'training',
+          ),
+          2 => 
+          array (
+            'POST' => 0,
+          ),
+          3 => NULL,
+          4 => false,
+          5 => false,
+          6 => NULL,
+        ),
+      ),
+      711 => 
       array (
         0 => 
         array (
@@ -2633,7 +2992,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      650 => 
+      742 => 
       array (
         0 => 
         array (
@@ -2656,7 +3015,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      666 => 
+      758 => 
       array (
         0 => 
         array (
@@ -2679,7 +3038,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      680 => 
+      772 => 
       array (
         0 => 
         array (
@@ -2701,7 +3060,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      689 => 
+      781 => 
       array (
         0 => 
         array (
@@ -2743,7 +3102,95 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      717 => 
+      813 => 
+      array (
+        0 => 
+        array (
+          0 => 
+          array (
+            '_route' => 'leave-roster.show',
+          ),
+          1 => 
+          array (
+            0 => 'leave_roster',
+          ),
+          2 => 
+          array (
+            'GET' => 0,
+            'HEAD' => 1,
+          ),
+          3 => NULL,
+          4 => false,
+          5 => true,
+          6 => NULL,
+        ),
+      ),
+      826 => 
+      array (
+        0 => 
+        array (
+          0 => 
+          array (
+            '_route' => 'leave-roster.edit',
+          ),
+          1 => 
+          array (
+            0 => 'leave_roster',
+          ),
+          2 => 
+          array (
+            'GET' => 0,
+            'HEAD' => 1,
+          ),
+          3 => NULL,
+          4 => false,
+          5 => false,
+          6 => NULL,
+        ),
+      ),
+      834 => 
+      array (
+        0 => 
+        array (
+          0 => 
+          array (
+            '_route' => 'leave-roster.update',
+          ),
+          1 => 
+          array (
+            0 => 'leave_roster',
+          ),
+          2 => 
+          array (
+            'PUT' => 0,
+            'PATCH' => 1,
+          ),
+          3 => NULL,
+          4 => false,
+          5 => true,
+          6 => NULL,
+        ),
+        1 => 
+        array (
+          0 => 
+          array (
+            '_route' => 'leave-roster.destroy',
+          ),
+          1 => 
+          array (
+            0 => 'leave_roster',
+          ),
+          2 => 
+          array (
+            'DELETE' => 0,
+          ),
+          3 => NULL,
+          4 => false,
+          5 => true,
+          6 => NULL,
+        ),
+      ),
+      860 => 
       array (
         0 => 
         array (
@@ -2766,7 +3213,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      730 => 
+      873 => 
       array (
         0 => 
         array (
@@ -2789,7 +3236,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      738 => 
+      881 => 
       array (
         0 => 
         array (
@@ -2831,7 +3278,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      774 => 
+      918 => 
       array (
         0 => 
         array (
@@ -2854,7 +3301,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      787 => 
+      931 => 
       array (
         0 => 
         array (
@@ -2877,7 +3324,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      795 => 
+      939 => 
       array (
         0 => 
         array (
@@ -2919,7 +3366,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      828 => 
+      972 => 
       array (
         0 => 
         array (
@@ -2942,7 +3389,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      841 => 
+      985 => 
       array (
         0 => 
         array (
@@ -2965,7 +3412,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      849 => 
+      993 => 
       array (
         0 => 
         array (
@@ -3007,7 +3454,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      880 => 
+      1024 => 
       array (
         0 => 
         array (
@@ -3030,7 +3477,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      893 => 
+      1038 => 
       array (
         0 => 
         array (
@@ -3053,7 +3500,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      901 => 
+      1047 => 
       array (
         0 => 
         array (
@@ -3095,7 +3542,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      937 => 
+      1084 => 
       array (
         0 => 
         array (
@@ -3118,7 +3565,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      950 => 
+      1098 => 
       array (
         0 => 
         array (
@@ -3141,7 +3588,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      958 => 
+      1107 => 
       array (
         0 => 
         array (
@@ -3183,7 +3630,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      983 => 
+      1133 => 
       array (
         0 => 
         array (
@@ -3206,7 +3653,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      999 => 
+      1150 => 
       array (
         0 => 
         array (
@@ -3229,7 +3676,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      1013 => 
+      1165 => 
       array (
         0 => 
         array (
@@ -3252,7 +3699,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      1023 => 
+      1175 => 
       array (
         0 => 
         array (
@@ -3294,7 +3741,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      1057 => 
+      1209 => 
       array (
         0 => 
         array (
@@ -3318,7 +3765,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      1083 => 
+      1235 => 
       array (
         0 => 
         array (
@@ -3341,7 +3788,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      1119 => 
+      1271 => 
       array (
         0 => 
         array (
@@ -3364,7 +3811,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      1152 => 
+      1304 => 
       array (
         0 => 
         array (
@@ -3387,7 +3834,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      1166 => 
+      1318 => 
       array (
         0 => 
         array (
@@ -3410,7 +3857,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      1175 => 
+      1327 => 
       array (
         0 => 
         array (
@@ -3452,7 +3899,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      1196 => 
+      1348 => 
       array (
         0 => 
         array (
@@ -3475,7 +3922,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      1235 => 
+      1387 => 
       array (
         0 => 
         array (
@@ -3498,7 +3945,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      1252 => 
+      1404 => 
       array (
         0 => 
         array (
@@ -3521,7 +3968,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      1265 => 
+      1417 => 
       array (
         0 => 
         array (
@@ -3543,7 +3990,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      1275 => 
+      1427 => 
       array (
         0 => 
         array (
@@ -3585,7 +4032,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      1290 => 
+      1442 => 
       array (
         0 => 
         array (
@@ -3607,7 +4054,7 @@ app('router')->setCompiledRoutes(
           6 => NULL,
         ),
       ),
-      1332 => 
+      1484 => 
       array (
         0 => 
         array (
@@ -3730,7 +4177,7 @@ app('router')->setCompiledRoutes(
       'waitSeconds' => NULL,
       'withTrashed' => false,
     ),
-    'generated::p2NUe9wPhOsOkLyC' => 
+    'generated::Z7KG0rdEU1qy0727' => 
     array (
       'methods' => 
       array (
@@ -3744,8 +4191,8 @@ app('router')->setCompiledRoutes(
                     \\Illuminate\\Support\\Facades\\Event::dispatch(new \\Illuminate\\Foundation\\Events\\DiagnosingHealth);
 
                     return \\Illuminate\\Support\\Facades\\View::file(\'C:\\\\Users\\\\hp\\\\hrms\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Foundation\\\\Configuration\'.\'/../resources/health-up.blade.php\');
-                }";s:5:"scope";s:54:"Illuminate\\Foundation\\Configuration\\ApplicationBuilder";s:4:"this";N;s:4:"self";s:32:"0000000000000b950000000000000000";}}',
-        'as' => 'generated::p2NUe9wPhOsOkLyC',
+                }";s:5:"scope";s:54:"Illuminate\\Foundation\\Configuration\\ApplicationBuilder";s:4:"this";N;s:4:"self";s:32:"0000000000000bbd0000000000000000";}}',
+        'as' => 'generated::Z7KG0rdEU1qy0727',
       ),
       'fallback' => false,
       'defaults' => 
@@ -3761,7 +4208,7 @@ app('router')->setCompiledRoutes(
       'waitSeconds' => NULL,
       'withTrashed' => false,
     ),
-    'generated::mhMm4oTMihKyprQx' => 
+    'generated::EqJxNJJ2PwpsoL6f' => 
     array (
       'methods' => 
       array (
@@ -3777,13 +4224,13 @@ app('router')->setCompiledRoutes(
         ),
         'uses' => 'O:55:"Laravel\\SerializableClosure\\UnsignedSerializableClosure":1:{s:12:"serializable";O:46:"Laravel\\SerializableClosure\\Serializers\\Native":5:{s:3:"use";a:0:{}s:8:"function";s:50:"function () {
     return \\redirect(\'dashboard\');
-}";s:5:"scope";s:37:"Illuminate\\Routing\\RouteFileRegistrar";s:4:"this";N;s:4:"self";s:32:"0000000000000ba60000000000000000";}}',
+}";s:5:"scope";s:37:"Illuminate\\Routing\\RouteFileRegistrar";s:4:"this";N;s:4:"self";s:32:"0000000000000bce0000000000000000";}}',
         'namespace' => NULL,
         'prefix' => '',
         'where' => 
         array (
         ),
-        'as' => 'generated::mhMm4oTMihKyprQx',
+        'as' => 'generated::EqJxNJJ2PwpsoL6f',
       ),
       'fallback' => false,
       'defaults' => 
@@ -4968,6 +5415,307 @@ app('router')->setCompiledRoutes(
       'waitSeconds' => NULL,
       'withTrashed' => false,
     ),
+    'recruitments.index' => 
+    array (
+      'methods' => 
+      array (
+        0 => 'GET',
+        1 => 'HEAD',
+      ),
+      'uri' => 'recruitments',
+      'action' => 
+      array (
+        'middleware' => 
+        array (
+          0 => 'web',
+          1 => 'auth',
+        ),
+        'as' => 'recruitments.index',
+        'uses' => 'App\\Http\\Controllers\\StaffRecruitmentController@index',
+        'controller' => 'App\\Http\\Controllers\\StaffRecruitmentController@index',
+        'namespace' => NULL,
+        'prefix' => '',
+        'where' => 
+        array (
+        ),
+      ),
+      'fallback' => false,
+      'defaults' => 
+      array (
+      ),
+      'wheres' => 
+      array (
+      ),
+      'bindingFields' => 
+      array (
+      ),
+      'lockSeconds' => NULL,
+      'waitSeconds' => NULL,
+      'withTrashed' => false,
+    ),
+    'recruitments.create' => 
+    array (
+      'methods' => 
+      array (
+        0 => 'GET',
+        1 => 'HEAD',
+      ),
+      'uri' => 'recruitments/create',
+      'action' => 
+      array (
+        'middleware' => 
+        array (
+          0 => 'web',
+          1 => 'auth',
+        ),
+        'as' => 'recruitments.create',
+        'uses' => 'App\\Http\\Controllers\\StaffRecruitmentController@create',
+        'controller' => 'App\\Http\\Controllers\\StaffRecruitmentController@create',
+        'namespace' => NULL,
+        'prefix' => '',
+        'where' => 
+        array (
+        ),
+      ),
+      'fallback' => false,
+      'defaults' => 
+      array (
+      ),
+      'wheres' => 
+      array (
+      ),
+      'bindingFields' => 
+      array (
+      ),
+      'lockSeconds' => NULL,
+      'waitSeconds' => NULL,
+      'withTrashed' => false,
+    ),
+    'recruitments.store' => 
+    array (
+      'methods' => 
+      array (
+        0 => 'POST',
+      ),
+      'uri' => 'recruitments',
+      'action' => 
+      array (
+        'middleware' => 
+        array (
+          0 => 'web',
+          1 => 'auth',
+        ),
+        'as' => 'recruitments.store',
+        'uses' => 'App\\Http\\Controllers\\StaffRecruitmentController@store',
+        'controller' => 'App\\Http\\Controllers\\StaffRecruitmentController@store',
+        'namespace' => NULL,
+        'prefix' => '',
+        'where' => 
+        array (
+        ),
+      ),
+      'fallback' => false,
+      'defaults' => 
+      array (
+      ),
+      'wheres' => 
+      array (
+      ),
+      'bindingFields' => 
+      array (
+      ),
+      'lockSeconds' => NULL,
+      'waitSeconds' => NULL,
+      'withTrashed' => false,
+    ),
+    'recruitments.show' => 
+    array (
+      'methods' => 
+      array (
+        0 => 'GET',
+        1 => 'HEAD',
+      ),
+      'uri' => 'recruitments/{recruitment}',
+      'action' => 
+      array (
+        'middleware' => 
+        array (
+          0 => 'web',
+          1 => 'auth',
+        ),
+        'as' => 'recruitments.show',
+        'uses' => 'App\\Http\\Controllers\\StaffRecruitmentController@show',
+        'controller' => 'App\\Http\\Controllers\\StaffRecruitmentController@show',
+        'namespace' => NULL,
+        'prefix' => '',
+        'where' => 
+        array (
+        ),
+      ),
+      'fallback' => false,
+      'defaults' => 
+      array (
+      ),
+      'wheres' => 
+      array (
+      ),
+      'bindingFields' => 
+      array (
+      ),
+      'lockSeconds' => NULL,
+      'waitSeconds' => NULL,
+      'withTrashed' => false,
+    ),
+    'recruitments.edit' => 
+    array (
+      'methods' => 
+      array (
+        0 => 'GET',
+        1 => 'HEAD',
+      ),
+      'uri' => 'recruitments/{recruitment}/edit',
+      'action' => 
+      array (
+        'middleware' => 
+        array (
+          0 => 'web',
+          1 => 'auth',
+        ),
+        'as' => 'recruitments.edit',
+        'uses' => 'App\\Http\\Controllers\\StaffRecruitmentController@edit',
+        'controller' => 'App\\Http\\Controllers\\StaffRecruitmentController@edit',
+        'namespace' => NULL,
+        'prefix' => '',
+        'where' => 
+        array (
+        ),
+      ),
+      'fallback' => false,
+      'defaults' => 
+      array (
+      ),
+      'wheres' => 
+      array (
+      ),
+      'bindingFields' => 
+      array (
+      ),
+      'lockSeconds' => NULL,
+      'waitSeconds' => NULL,
+      'withTrashed' => false,
+    ),
+    'recruitments.update' => 
+    array (
+      'methods' => 
+      array (
+        0 => 'PUT',
+        1 => 'PATCH',
+      ),
+      'uri' => 'recruitments/{recruitment}',
+      'action' => 
+      array (
+        'middleware' => 
+        array (
+          0 => 'web',
+          1 => 'auth',
+        ),
+        'as' => 'recruitments.update',
+        'uses' => 'App\\Http\\Controllers\\StaffRecruitmentController@update',
+        'controller' => 'App\\Http\\Controllers\\StaffRecruitmentController@update',
+        'namespace' => NULL,
+        'prefix' => '',
+        'where' => 
+        array (
+        ),
+      ),
+      'fallback' => false,
+      'defaults' => 
+      array (
+      ),
+      'wheres' => 
+      array (
+      ),
+      'bindingFields' => 
+      array (
+      ),
+      'lockSeconds' => NULL,
+      'waitSeconds' => NULL,
+      'withTrashed' => false,
+    ),
+    'recruitments.destroy' => 
+    array (
+      'methods' => 
+      array (
+        0 => 'DELETE',
+      ),
+      'uri' => 'recruitments/{recruitment}',
+      'action' => 
+      array (
+        'middleware' => 
+        array (
+          0 => 'web',
+          1 => 'auth',
+        ),
+        'as' => 'recruitments.destroy',
+        'uses' => 'App\\Http\\Controllers\\StaffRecruitmentController@destroy',
+        'controller' => 'App\\Http\\Controllers\\StaffRecruitmentController@destroy',
+        'namespace' => NULL,
+        'prefix' => '',
+        'where' => 
+        array (
+        ),
+      ),
+      'fallback' => false,
+      'defaults' => 
+      array (
+      ),
+      'wheres' => 
+      array (
+      ),
+      'bindingFields' => 
+      array (
+      ),
+      'lockSeconds' => NULL,
+      'waitSeconds' => NULL,
+      'withTrashed' => false,
+    ),
+    'recruitmentments.approveOrReject' => 
+    array (
+      'methods' => 
+      array (
+        0 => 'POST',
+      ),
+      'uri' => 'recruitments/{recruitment}/status',
+      'action' => 
+      array (
+        'middleware' => 
+        array (
+          0 => 'web',
+          1 => 'auth',
+        ),
+        'uses' => 'App\\Http\\Controllers\\StaffRecruitmentController@approveOrReject',
+        'controller' => 'App\\Http\\Controllers\\StaffRecruitmentController@approveOrReject',
+        'namespace' => NULL,
+        'prefix' => '',
+        'where' => 
+        array (
+        ),
+        'as' => 'recruitmentments.approveOrReject',
+      ),
+      'fallback' => false,
+      'defaults' => 
+      array (
+      ),
+      'wheres' => 
+      array (
+      ),
+      'bindingFields' => 
+      array (
+      ),
+      'lockSeconds' => NULL,
+      'waitSeconds' => NULL,
+      'withTrashed' => false,
+    ),
     'appraisals.index' => 
     array (
       'methods' => 
@@ -5217,6 +5965,43 @@ app('router')->setCompiledRoutes(
         'where' => 
         array (
         ),
+      ),
+      'fallback' => false,
+      'defaults' => 
+      array (
+      ),
+      'wheres' => 
+      array (
+      ),
+      'bindingFields' => 
+      array (
+      ),
+      'lockSeconds' => NULL,
+      'waitSeconds' => NULL,
+      'withTrashed' => false,
+    ),
+    'appraisals.approveOrReject' => 
+    array (
+      'methods' => 
+      array (
+        0 => 'POST',
+      ),
+      'uri' => 'appraisal/appraisal-approval',
+      'action' => 
+      array (
+        'middleware' => 
+        array (
+          0 => 'web',
+          1 => 'auth',
+        ),
+        'uses' => 'App\\Http\\Controllers\\AppraisalController@approveOrReject',
+        'controller' => 'App\\Http\\Controllers\\AppraisalController@approveOrReject',
+        'namespace' => NULL,
+        'prefix' => '',
+        'where' => 
+        array (
+        ),
+        'as' => 'appraisals.approveOrReject',
       ),
       'fallback' => false,
       'defaults' => 
@@ -5745,6 +6530,118 @@ app('router')->setCompiledRoutes(
         'where' => 
         array (
         ),
+      ),
+      'fallback' => false,
+      'defaults' => 
+      array (
+      ),
+      'wheres' => 
+      array (
+      ),
+      'bindingFields' => 
+      array (
+      ),
+      'lockSeconds' => NULL,
+      'waitSeconds' => NULL,
+      'withTrashed' => false,
+    ),
+    'apply' => 
+    array (
+      'methods' => 
+      array (
+        0 => 'GET',
+        1 => 'HEAD',
+      ),
+      'uri' => 'training-application',
+      'action' => 
+      array (
+        'middleware' => 
+        array (
+          0 => 'web',
+          1 => 'auth',
+        ),
+        'uses' => 'App\\Http\\Controllers\\TrainingController@apply',
+        'controller' => 'App\\Http\\Controllers\\TrainingController@apply',
+        'namespace' => NULL,
+        'prefix' => '',
+        'where' => 
+        array (
+        ),
+        'as' => 'apply',
+      ),
+      'fallback' => false,
+      'defaults' => 
+      array (
+      ),
+      'wheres' => 
+      array (
+      ),
+      'bindingFields' => 
+      array (
+      ),
+      'lockSeconds' => NULL,
+      'waitSeconds' => NULL,
+      'withTrashed' => false,
+    ),
+    'save.apply' => 
+    array (
+      'methods' => 
+      array (
+        0 => 'POST',
+      ),
+      'uri' => 'save-training-application',
+      'action' => 
+      array (
+        'middleware' => 
+        array (
+          0 => 'web',
+          1 => 'auth',
+        ),
+        'uses' => 'App\\Http\\Controllers\\TrainingController@applyTraining',
+        'controller' => 'App\\Http\\Controllers\\TrainingController@applyTraining',
+        'namespace' => NULL,
+        'prefix' => '',
+        'where' => 
+        array (
+        ),
+        'as' => 'save.apply',
+      ),
+      'fallback' => false,
+      'defaults' => 
+      array (
+      ),
+      'wheres' => 
+      array (
+      ),
+      'bindingFields' => 
+      array (
+      ),
+      'lockSeconds' => NULL,
+      'waitSeconds' => NULL,
+      'withTrashed' => false,
+    ),
+    'trainings.approveOrReject' => 
+    array (
+      'methods' => 
+      array (
+        0 => 'POST',
+      ),
+      'uri' => 'trainings/{training}/status',
+      'action' => 
+      array (
+        'middleware' => 
+        array (
+          0 => 'web',
+          1 => 'auth',
+        ),
+        'uses' => 'App\\Http\\Controllers\\TrainingController@approveOrReject',
+        'controller' => 'App\\Http\\Controllers\\TrainingController@approveOrReject',
+        'namespace' => NULL,
+        'prefix' => '',
+        'where' => 
+        array (
+        ),
+        'as' => 'trainings.approveOrReject',
       ),
       'fallback' => false,
       'defaults' => 
@@ -6552,6 +7449,344 @@ app('router')->setCompiledRoutes(
       'waitSeconds' => NULL,
       'withTrashed' => false,
     ),
+    'leaves.approveOrReject' => 
+    array (
+      'methods' => 
+      array (
+        0 => 'POST',
+      ),
+      'uri' => 'leaves/{leave}/status',
+      'action' => 
+      array (
+        'middleware' => 
+        array (
+          0 => 'web',
+          1 => 'auth',
+        ),
+        'uses' => 'App\\Http\\Controllers\\LeaveController@approveOrReject',
+        'controller' => 'App\\Http\\Controllers\\LeaveController@approveOrReject',
+        'namespace' => NULL,
+        'prefix' => '',
+        'where' => 
+        array (
+        ),
+        'as' => 'leaves.approveOrReject',
+      ),
+      'fallback' => false,
+      'defaults' => 
+      array (
+      ),
+      'wheres' => 
+      array (
+      ),
+      'bindingFields' => 
+      array (
+      ),
+      'lockSeconds' => NULL,
+      'waitSeconds' => NULL,
+      'withTrashed' => false,
+    ),
+    'save-leave-data' => 
+    array (
+      'methods' => 
+      array (
+        0 => 'POST',
+      ),
+      'uri' => 'save-leave-data',
+      'action' => 
+      array (
+        'middleware' => 
+        array (
+          0 => 'web',
+          1 => 'auth',
+        ),
+        'uses' => 'App\\Http\\Controllers\\LeaveRosterController@saveLeaveRosterData',
+        'controller' => 'App\\Http\\Controllers\\LeaveRosterController@saveLeaveRosterData',
+        'namespace' => NULL,
+        'prefix' => '',
+        'where' => 
+        array (
+        ),
+        'as' => 'save-leave-data',
+      ),
+      'fallback' => false,
+      'defaults' => 
+      array (
+      ),
+      'wheres' => 
+      array (
+      ),
+      'bindingFields' => 
+      array (
+      ),
+      'lockSeconds' => NULL,
+      'waitSeconds' => NULL,
+      'withTrashed' => false,
+    ),
+    'leave-roster.index' => 
+    array (
+      'methods' => 
+      array (
+        0 => 'GET',
+        1 => 'HEAD',
+      ),
+      'uri' => 'leave-roster',
+      'action' => 
+      array (
+        'middleware' => 
+        array (
+          0 => 'web',
+          1 => 'auth',
+        ),
+        'as' => 'leave-roster.index',
+        'uses' => 'App\\Http\\Controllers\\LeaveRosterController@index',
+        'controller' => 'App\\Http\\Controllers\\LeaveRosterController@index',
+        'namespace' => NULL,
+        'prefix' => '',
+        'where' => 
+        array (
+        ),
+      ),
+      'fallback' => false,
+      'defaults' => 
+      array (
+      ),
+      'wheres' => 
+      array (
+      ),
+      'bindingFields' => 
+      array (
+      ),
+      'lockSeconds' => NULL,
+      'waitSeconds' => NULL,
+      'withTrashed' => false,
+    ),
+    'leave-roster.create' => 
+    array (
+      'methods' => 
+      array (
+        0 => 'GET',
+        1 => 'HEAD',
+      ),
+      'uri' => 'leave-roster/create',
+      'action' => 
+      array (
+        'middleware' => 
+        array (
+          0 => 'web',
+          1 => 'auth',
+        ),
+        'as' => 'leave-roster.create',
+        'uses' => 'App\\Http\\Controllers\\LeaveRosterController@create',
+        'controller' => 'App\\Http\\Controllers\\LeaveRosterController@create',
+        'namespace' => NULL,
+        'prefix' => '',
+        'where' => 
+        array (
+        ),
+      ),
+      'fallback' => false,
+      'defaults' => 
+      array (
+      ),
+      'wheres' => 
+      array (
+      ),
+      'bindingFields' => 
+      array (
+      ),
+      'lockSeconds' => NULL,
+      'waitSeconds' => NULL,
+      'withTrashed' => false,
+    ),
+    'leave-roster.store' => 
+    array (
+      'methods' => 
+      array (
+        0 => 'POST',
+      ),
+      'uri' => 'leave-roster',
+      'action' => 
+      array (
+        'middleware' => 
+        array (
+          0 => 'web',
+          1 => 'auth',
+        ),
+        'as' => 'leave-roster.store',
+        'uses' => 'App\\Http\\Controllers\\LeaveRosterController@store',
+        'controller' => 'App\\Http\\Controllers\\LeaveRosterController@store',
+        'namespace' => NULL,
+        'prefix' => '',
+        'where' => 
+        array (
+        ),
+      ),
+      'fallback' => false,
+      'defaults' => 
+      array (
+      ),
+      'wheres' => 
+      array (
+      ),
+      'bindingFields' => 
+      array (
+      ),
+      'lockSeconds' => NULL,
+      'waitSeconds' => NULL,
+      'withTrashed' => false,
+    ),
+    'leave-roster.show' => 
+    array (
+      'methods' => 
+      array (
+        0 => 'GET',
+        1 => 'HEAD',
+      ),
+      'uri' => 'leave-roster/{leave_roster}',
+      'action' => 
+      array (
+        'middleware' => 
+        array (
+          0 => 'web',
+          1 => 'auth',
+        ),
+        'as' => 'leave-roster.show',
+        'uses' => 'App\\Http\\Controllers\\LeaveRosterController@show',
+        'controller' => 'App\\Http\\Controllers\\LeaveRosterController@show',
+        'namespace' => NULL,
+        'prefix' => '',
+        'where' => 
+        array (
+        ),
+      ),
+      'fallback' => false,
+      'defaults' => 
+      array (
+      ),
+      'wheres' => 
+      array (
+      ),
+      'bindingFields' => 
+      array (
+      ),
+      'lockSeconds' => NULL,
+      'waitSeconds' => NULL,
+      'withTrashed' => false,
+    ),
+    'leave-roster.edit' => 
+    array (
+      'methods' => 
+      array (
+        0 => 'GET',
+        1 => 'HEAD',
+      ),
+      'uri' => 'leave-roster/{leave_roster}/edit',
+      'action' => 
+      array (
+        'middleware' => 
+        array (
+          0 => 'web',
+          1 => 'auth',
+        ),
+        'as' => 'leave-roster.edit',
+        'uses' => 'App\\Http\\Controllers\\LeaveRosterController@edit',
+        'controller' => 'App\\Http\\Controllers\\LeaveRosterController@edit',
+        'namespace' => NULL,
+        'prefix' => '',
+        'where' => 
+        array (
+        ),
+      ),
+      'fallback' => false,
+      'defaults' => 
+      array (
+      ),
+      'wheres' => 
+      array (
+      ),
+      'bindingFields' => 
+      array (
+      ),
+      'lockSeconds' => NULL,
+      'waitSeconds' => NULL,
+      'withTrashed' => false,
+    ),
+    'leave-roster.update' => 
+    array (
+      'methods' => 
+      array (
+        0 => 'PUT',
+        1 => 'PATCH',
+      ),
+      'uri' => 'leave-roster/{leave_roster}',
+      'action' => 
+      array (
+        'middleware' => 
+        array (
+          0 => 'web',
+          1 => 'auth',
+        ),
+        'as' => 'leave-roster.update',
+        'uses' => 'App\\Http\\Controllers\\LeaveRosterController@update',
+        'controller' => 'App\\Http\\Controllers\\LeaveRosterController@update',
+        'namespace' => NULL,
+        'prefix' => '',
+        'where' => 
+        array (
+        ),
+      ),
+      'fallback' => false,
+      'defaults' => 
+      array (
+      ),
+      'wheres' => 
+      array (
+      ),
+      'bindingFields' => 
+      array (
+      ),
+      'lockSeconds' => NULL,
+      'waitSeconds' => NULL,
+      'withTrashed' => false,
+    ),
+    'leave-roster.destroy' => 
+    array (
+      'methods' => 
+      array (
+        0 => 'DELETE',
+      ),
+      'uri' => 'leave-roster/{leave_roster}',
+      'action' => 
+      array (
+        'middleware' => 
+        array (
+          0 => 'web',
+          1 => 'auth',
+        ),
+        'as' => 'leave-roster.destroy',
+        'uses' => 'App\\Http\\Controllers\\LeaveRosterController@destroy',
+        'controller' => 'App\\Http\\Controllers\\LeaveRosterController@destroy',
+        'namespace' => NULL,
+        'prefix' => '',
+        'where' => 
+        array (
+        ),
+      ),
+      'fallback' => false,
+      'defaults' => 
+      array (
+      ),
+      'wheres' => 
+      array (
+      ),
+      'bindingFields' => 
+      array (
+      ),
+      'lockSeconds' => NULL,
+      'waitSeconds' => NULL,
+      'withTrashed' => false,
+    ),
     'leave-types.index' => 
     array (
       'methods' => 
@@ -6801,6 +8036,43 @@ app('router')->setCompiledRoutes(
         'where' => 
         array (
         ),
+      ),
+      'fallback' => false,
+      'defaults' => 
+      array (
+      ),
+      'wheres' => 
+      array (
+      ),
+      'bindingFields' => 
+      array (
+      ),
+      'lockSeconds' => NULL,
+      'waitSeconds' => NULL,
+      'withTrashed' => false,
+    ),
+    'generated::MKcUFn8yn3wHDY7k' => 
+    array (
+      'methods' => 
+      array (
+        0 => 'POST',
+      ),
+      'uri' => 'calender',
+      'action' => 
+      array (
+        'middleware' => 
+        array (
+          0 => 'web',
+          1 => 'auth',
+        ),
+        'uses' => 'App\\Http\\Controllers\\LeaveRosterController@getcalender',
+        'controller' => 'App\\Http\\Controllers\\LeaveRosterController@getcalender',
+        'namespace' => NULL,
+        'prefix' => '',
+        'where' => 
+        array (
+        ),
+        'as' => 'generated::MKcUFn8yn3wHDY7k',
       ),
       'fallback' => false,
       'defaults' => 
@@ -9115,6 +10387,43 @@ app('router')->setCompiledRoutes(
       'waitSeconds' => NULL,
       'withTrashed' => false,
     ),
+    'application.approveOrReject' => 
+    array (
+      'methods' => 
+      array (
+        0 => 'POST',
+      ),
+      'uri' => 'application/application-approval',
+      'action' => 
+      array (
+        'middleware' => 
+        array (
+          0 => 'web',
+          1 => 'auth',
+        ),
+        'uses' => 'App\\Http\\Controllers\\ApplicationController@approveOrReject',
+        'controller' => 'App\\Http\\Controllers\\ApplicationController@approveOrReject',
+        'namespace' => NULL,
+        'prefix' => '',
+        'where' => 
+        array (
+        ),
+        'as' => 'application.approveOrReject',
+      ),
+      'fallback' => false,
+      'defaults' => 
+      array (
+      ),
+      'wheres' => 
+      array (
+      ),
+      'bindingFields' => 
+      array (
+      ),
+      'lockSeconds' => NULL,
+      'waitSeconds' => NULL,
+      'withTrashed' => false,
+    ),
     'application.survey' => 
     array (
       'methods' => 
@@ -9567,7 +10876,7 @@ app('router')->setCompiledRoutes(
       'waitSeconds' => NULL,
       'withTrashed' => false,
     ),
-    'generated::YlaqyM7xbF1eJNLf' => 
+    'generated::pvtVyE8fBQclpKCv' => 
     array (
       'methods' => 
       array (
@@ -9589,44 +10898,7 @@ app('router')->setCompiledRoutes(
         'where' => 
         array (
         ),
-        'as' => 'generated::YlaqyM7xbF1eJNLf',
-      ),
-      'fallback' => false,
-      'defaults' => 
-      array (
-      ),
-      'wheres' => 
-      array (
-      ),
-      'bindingFields' => 
-      array (
-      ),
-      'lockSeconds' => NULL,
-      'waitSeconds' => NULL,
-      'withTrashed' => false,
-    ),
-    'leaves.approveOrReject' => 
-    array (
-      'methods' => 
-      array (
-        0 => 'POST',
-      ),
-      'uri' => 'leaves/{leave}/status',
-      'action' => 
-      array (
-        'middleware' => 
-        array (
-          0 => 'web',
-          1 => 'auth',
-        ),
-        'uses' => 'App\\Http\\Controllers\\LeaveController@approveOrReject',
-        'controller' => 'App\\Http\\Controllers\\LeaveController@approveOrReject',
-        'namespace' => NULL,
-        'prefix' => '',
-        'where' => 
-        array (
-        ),
-        'as' => 'leaves.approveOrReject',
+        'as' => 'generated::pvtVyE8fBQclpKCv',
       ),
       'fallback' => false,
       'defaults' => 
@@ -9680,7 +10952,7 @@ app('router')->setCompiledRoutes(
       'waitSeconds' => NULL,
       'withTrashed' => false,
     ),
-    'generated::b0sLcx3Vmt5rW8ai' => 
+    'generated::s3Mp2QqgtN8IhV0O' => 
     array (
       'methods' => 
       array (
@@ -9701,7 +10973,7 @@ app('router')->setCompiledRoutes(
         'where' => 
         array (
         ),
-        'as' => 'generated::b0sLcx3Vmt5rW8ai',
+        'as' => 'generated::s3Mp2QqgtN8IhV0O',
       ),
       'fallback' => false,
       'defaults' => 
@@ -9755,7 +11027,7 @@ app('router')->setCompiledRoutes(
       'waitSeconds' => NULL,
       'withTrashed' => false,
     ),
-    'generated::D89Qm0jBbA40tXDv' => 
+    'generated::6EFYfJ4UCz0KMuBh' => 
     array (
       'methods' => 
       array (
@@ -9776,7 +11048,7 @@ app('router')->setCompiledRoutes(
         'where' => 
         array (
         ),
-        'as' => 'generated::D89Qm0jBbA40tXDv',
+        'as' => 'generated::6EFYfJ4UCz0KMuBh',
       ),
       'fallback' => false,
       'defaults' => 
@@ -10096,7 +11368,7 @@ app('router')->setCompiledRoutes(
       'waitSeconds' => NULL,
       'withTrashed' => false,
     ),
-    'generated::R7s8OZXVzmfwjIrJ' => 
+    'generated::1zXoXtj195Xv5Wqg' => 
     array (
       'methods' => 
       array (
@@ -10117,7 +11389,7 @@ app('router')->setCompiledRoutes(
         'where' => 
         array (
         ),
-        'as' => 'generated::R7s8OZXVzmfwjIrJ',
+        'as' => 'generated::1zXoXtj195Xv5Wqg',
       ),
       'fallback' => false,
       'defaults' => 
@@ -10207,7 +11479,7 @@ app('router')->setCompiledRoutes(
       'waitSeconds' => NULL,
       'withTrashed' => false,
     ),
-    'generated::Wdrtjszn1tQeJAdO' => 
+    'generated::Pca20d7QBBZzHTeo' => 
     array (
       'methods' => 
       array (
@@ -10233,7 +11505,7 @@ app('router')->setCompiledRoutes(
         array (
           0 => 'Illuminate\\Foundation\\Http\\Middleware\\VerifyCsrfToken',
         ),
-        'as' => 'generated::Wdrtjszn1tQeJAdO',
+        'as' => 'generated::Pca20d7QBBZzHTeo',
       ),
       'fallback' => false,
       'defaults' => 
@@ -10265,7 +11537,7 @@ app('router')->setCompiledRoutes(
                         $config,
                         $isProduction
                     ))($request, $path);
-                }";s:5:"scope";s:47:"Illuminate\\Filesystem\\FilesystemServiceProvider";s:4:"this";N;s:4:"self";s:32:"0000000000000c690000000000000000";}}',
+                }";s:5:"scope";s:47:"Illuminate\\Filesystem\\FilesystemServiceProvider";s:4:"this";N;s:4:"self";s:32:"0000000000000ca70000000000000000";}}',
         'as' => 'storage.local',
       ),
       'fallback' => false,

@@ -1,26 +1,25 @@
 <x-app-layout>
     <div class="mt-3">
         <h5 class="text-center mt-5">Leave Management</h5>
-
         <!-- Statistics Section -->
         <div class="row mb-4">
             <div class="col-md-4">
                 <div class="card text-center">
                     <div class="card-header bg-info text-white">
-                        Total Leaves Taken
+                        Total Leave Days
                     </div>
                     <div class="card-body">
-                        <h5 class="card-title">{{ $totalLeaves }}</h5>
+                        <h5 class="card-title">{{ $totalLeaveDaysAllocated }}</h5>
                     </div>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="card text-center">
                     <div class="card-header bg-warning text-white">
-                        Total Days Consumed
+                        Leave Days Remained
                     </div>
                     <div class="card-body">
-                        <h5 class="card-title">{{ $totalDays }}</h5>
+                        <h5 class="card-title">{{ $totalLeaveDaysAllocated - $useDays }}</h5>
                     </div>
                 </div>
             </div>
@@ -56,7 +55,7 @@
                         <div class="card border border-info">
                             <div class="card-header position-relative">
 
-                                <h6 class="m-0">{{ optional($leave->employee)->first_name }}</h6>
+                                <h6 class="m-0">{{ optional($leave->employee)->name }}</h6>
                                 <span
                                     class="badge {{ $isExpired ? 'bg-danger' : 'bg-success' }} position-absolute top-0 end-0 m-1">
                                     {{ $isExpired ? 'Expired' : 'Ongoing' }}
@@ -71,7 +70,7 @@
                                 </p>
                                 <p class="card-text"><strong>People to Stand In For Me:</strong></p>
                                 <div>
-                                    @foreach ($leave->my_work_will_be_done_by as $person)
+                                    @foreach (explode(',', $leave->my_work_will_be_done_by['users'] ?? []) as $person)
                                         <span
                                             class="badge badge-info bg-info">{{ $users[$person] ?? 'Unknown User' }}</span>
                                     @endforeach

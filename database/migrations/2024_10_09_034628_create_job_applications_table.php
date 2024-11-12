@@ -15,6 +15,7 @@ return new class extends Migration {
             $table->uuid('company_job_id')->references('company_job_id')->on('company_jobs');
             $table->unsignedBigInteger('entry_id');
             $table->foreign('entry_id')->references(columns: 'id')->on('entries');
+            $table->string('application_status')->nullable();
             $table->timestamps();
         });
     }

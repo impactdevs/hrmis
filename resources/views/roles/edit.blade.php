@@ -6,8 +6,7 @@
             @method('PUT')
             <div class="form-group">
                 <label for="name">Role Name</label>
-                <input type="text" name="name" id="name" class="form-control" value="{{ $role->name }}"
-                    required>
+                <input type="text" name="name" id="name" class="form-control" value="{{ $role->name }}">
             </div>
 
             <h5 class="mt-4">Manage Permissions:</h5>
