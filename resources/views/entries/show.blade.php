@@ -118,12 +118,16 @@
                 let currentType;
 
                 $('.approve-btn').click(function() {
+                    // prevent default
+                    event.preventDefault();
                     const type = $(this).data('type');
                     const id = $(this).data(type + '-id');
                     updateStatus(type, id, 'approve');
                 });
 
                 $('.reject-btn').click(function() {
+                    // prevent default
+                    event.preventDefault();
                     const type = $(this).data('type');
                     currentId = $(this).data(type + '-id');
                     currentType = $(this).data('type');
