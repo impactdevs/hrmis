@@ -14,7 +14,7 @@ class AppraisalController extends Controller
      */
     public function index()
     {
-        $appraisals = Appraisal::latest()->paginate();
+        $appraisals = Appraisal::with('employee')->latest()->paginate();
         return view('appraisals.index', compact('appraisals'));
     }
 
@@ -44,6 +44,10 @@ class AppraisalController extends Controller
         $appraisal->entry_id = $entry->id;
         $appraisal->employee_id = auth()->user()->employee->employee_id;
         $appraisal->save();
+
+        //get the head of department for the logged in user
+        $user = auth()->user();
+        $headOfDepartment = $user->employee->department->head_of_department;
 
         return back()->with('success', 'Appraisal submitted successfully! Thank you for your response.');
     }
@@ -96,9 +100,9 @@ class AppraisalController extends Controller
     public function approveOrReject(Request $request)
     {
         try {
-            $approval_status = request()->input('appraisal_request_status');
-            $appraisal = Appraisal::find(request()->input('appraisal_id'));
-            $appraisal->appraisal_request_status = $approval_status;
+            $approval_status = request()->input('status');
+            $appraisal = Appraisal::find(request()->input('appraisals_id'));
+            $appraisal->approval_status = $approval_status;
             $appraisal->save();
 
             $message = '';
@@ -106,8 +110,10 @@ class AppraisalController extends Controller
             if ($approval_status == 'approve')
                 $message = 'Appraisal request approved successfully.';
 
-            if ($approval_status == 'reject')
+            if ($approval_status == 'reject') {
+                $appraisal->rejection_reason = request()->input('reason');
                 $message = 'Appraisal request rejected successfully.';
+            }
             return response()->json([
                 'status' => 'success',
                 'message' => $message

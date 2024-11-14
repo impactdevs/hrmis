@@ -115,6 +115,17 @@
                                                          placeholder="The responses here should be comma separated"></textarea>
 
                                                  </div>
+                                             @elseif ($field->type === 'file')
+                                                 <div class="mb-3 d-flex flex-column justify-content-between">
+                                                     <div class="d-flex justify-content-between mb-2">
+                                                         <label for="{{ $field->id }}"
+                                                             class="form-label">{{ $i + 1 }}.{{ $key + 1 }}.
+                                                             {{ $field->label }}</label>
+                                                     </div>
+                                                     <input type="file"name="{{ $field->id }}"
+                                                         id="{{ $field->id }}" accept=".pdf">
+
+                                                 </div>
                                              @elseif ($field->type === 'repeater')
                                                  <div class="mb-3 d-flex flex-column justify-content-between">
                                                      <label for="{{ $field->id }}"
@@ -133,8 +144,8 @@
                                                              <tr class="repeater" data-index="0">
                                                                  @foreach ($field->repeater_options as $option)
                                                                      <td><input type="{{ $option['type'] }}"
-                                                                             name="{{ $field->id }}[0][{{ $option['field'] }}]"
-                                                                             required></td>
+                                                                             name="{{ $field->id }}[0][{{ $option['field'] }}]">
+                                                                     </td>
                                                                  @endforeach
                                                                  <td><span class="remove-btn">Remove</span></td>
                                                              </tr>

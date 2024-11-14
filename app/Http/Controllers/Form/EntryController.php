@@ -67,6 +67,10 @@ class EntryController extends Controller
         if (!auth()->check()) {
             return redirect()->route('login');
         }
+
+        //load appraisals
+        $entry->load('appraisals');
+        $entry->load('applications');
         $decodedResponses = json_decode($entry->responses, true); // Decode JSON to associative array
 
         $formattedResponses = [];

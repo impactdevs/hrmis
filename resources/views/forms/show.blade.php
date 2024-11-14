@@ -362,6 +362,46 @@
                                                             </tbody>
                                                         </table>
                                                         <button type="button" id="add-repeater">Add More</button>
+                                                    @elseif ($field->type === 'file')
+                                                        <div class="mb-3 d-flex flex-row justify-content-between">
+                                                            <label for="{{ $field->id }}"
+                                                                class="form-label">{{ $i + 1 }}.{{ $key + 1 }}.
+                                                                {{ $field->label }}</label>
+                                                            <div
+                                                                class="d-flex justify-content-start align-items-center gap-2">
+                                                                <button type="button"
+                                                                    class="btn btn-outline-primary btn-sm d-flex align-items-center"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#editFieldModal" data-mode="edit"
+                                                                    data-id="{{ $field->id }}"
+                                                                    data-label="{{ $field->label }}"
+                                                                    data-type="{{ $field->type }}"
+                                                                    data-options="{{ $field->options }}">
+                                                                    <i class="bi bi-pencil me-1"></i> Edit
+                                                                </button>
+                                                                <form
+                                                                    action="{{ route('fields.destroy', ['form' => $form->id, 'field' => $field->id]) }}"
+                                                                    method="POST" class="d-inline"
+                                                                    id="delete-form-{{ $field->id }}">
+                                                                    @csrf
+                                                                    @method('DELETE')
+                                                                    <button type="submit"
+                                                                        class="btn btn-outline-danger btn-sm d-flex align-items-center btn-delete"
+                                                                        data-id="{{ $field->id }}">
+                                                                        <i class="bi bi-trash me-1"></i> Delete
+                                                                    </button>
+                                                                </form>
+                                                                <button
+                                                                    class="btn btn-outline-secondary btn-sm d-flex align-items-center"
+                                                                    type="button" data-bs-toggle="offcanvas"
+                                                                    data-bs-target="#offcanvasBottom"
+                                                                    data-field-id="{{ $field->id }}"
+                                                                    aria-controls="offcanvasBottom">
+                                                                    <i class="bi bi-gear me-1"></i> Properties
+                                                                </button>
+                                                            </div>
+
+                                                        </div>
                                                     @else
                                                         <div class="mb-3 d-flex flex-row justify-content-between">
                                                             <label for="{{ $field->id }}"

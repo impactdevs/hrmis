@@ -1,4 +1,4 @@
-<div id="repeater-container-{{ $name }}">
+<div id="repeater-container">
     <h5>{{ $label }}</h5>
 
     @php
@@ -11,37 +11,34 @@
         }
     @endphp
 
-    @foreach ($qualifications as $index => $qualification)
-        <div class="item-group d-flex flex-column">
-            <input type="text" name="{{ $name }}[{{ $index }}][title]" placeholder="Title"
+    @foreach ($qualifications as $index_contract => $qualification)
+        <div class="item-group">
+            <input type="text" name="{{ $name }}[{{ $index_contract }}][title]" placeholder="Title"
                 class="form-control mb-2"
-                value="{{ old($name . '.' . $index . '.title', $qualification['title'] ?? '') }}">
+                value="{{ old($name . '.' . $index_contract . '.title', $qualification['title'] ?? '') }}">
 
-            <label for="proof-{{ $name }}-{{ $index }}">
+            <label for="contract-proof-{{ $index_contract }}">
                 @if (!empty($qualification['proof']))
                     @if (strpos($qualification['proof'], '.pdf') !== false)
-                        <div class="pdf-preview mt-3" id="current-proof-{{ $name }}-{{ $index }}">
+                        <div class="pdf-preview mt-3" id="current-proof-contract-{{ $index_contract }}">
                             <img src="{{ asset('assets/img/pdf-icon.png') }}" alt="PDF icon" class="pdf-icon">
                             <span class="pdf-filename">{{ basename($qualification['proof']) }}</span>
                         </div>
                     @else
                         <img src="{{ asset('storage/' . $qualification['proof']) }}" alt="current image"
-                            class="img-fluid mt-3" id="current-proof-{{ $name }}-{{ $index }}">
+                            class="img-fluid mt-3" id="current-proof-contract-{{ $index_contract }}">
                     @endif
                 @else
                     <img src="{{ asset('assets/img/upload.png') }}" alt="upload placeholder" height="70px"
                         width="70px" class="img-fluid upload-icon mt-3"
-                        id="current-proof-{{ $name }}-{{ $index }}">
+                        id="current-proof-contract-{{ $index_contract }}">
                 @endif
             </label>
 
-            <input type="file" name="{{ $name }}[{{ $index }}][proof]"
-                id="proof-{{ $name }}-{{ $index }}" class="form-control-file d-none"
-                accept=".pdf,.jpg,.jpeg,.png,.gif">
+            <input type="file" name="{{ $name }}[{{ $index_contract }}][proof]"
+                id="contract-proof-{{ $index_contract }}" class="form-control-file d-none">
 
-
-            <button type="button" class="btn btn-danger btn-sm remove-item mt-2 w-75">Remove</button>
-            <span>You can upload a pdf, jpg, jpeg, png, or gif file</span>
+            <button type="button" class="btn btn-danger remove-item mt-2">Remove</button>
         </div>
     @endforeach
 </div>
@@ -50,26 +47,24 @@
 @push('scripts')
     <script>
         $(document).ready(function() {
-            //convert $name to a js variable
-            var name = "{{ $name }}";
-            let itemIndex = {{ count($qualifications) }}; // Start from the next index
+            let itemIndexContract = {{ count($qualifications) }}; // Start from the next index
 
             // Function to create a new item group
-            function createNewItemGroup(index) {
+            function createNewItemGroupContract(index) {
                 return `
                 <div class="item-group">
                     <input type="text" name="{{ $name }}[${index}][title]" placeholder="Title" class="form-control mb-2">
-                    <label for="proof-{{ $name }}-${index}">
-                        <img src="{{ asset('assets/img/upload.png') }}" alt="upload placeholder" height="70px" width="70px" class="img-fluid upload-icon mt-3" id="current-proof-{{ $name }}-${index}">
+                    <label for="contract-proof-${index}">
+                        <img src="{{ asset('assets/img/upload.png') }}" alt="upload placeholder" height="70px" width="70px" class="img-fluid upload-icon mt-3" id="current-proof-contract-${index}">
                     </label>
-                    <input type="file" name="{{ $name }}[${index}][proof]" id="proof-{{ $name }}-${index}" class="form-control-file d-none">
+                    <input type="file" name="{{ $name }}[${index}][proof]" id="contract-proof-${index}" class="form-control-file d-none">
                     <button type="button" class="btn btn-danger remove-item mt-2">Remove</button>
                 </div>
             `;
             }
 
             // Function to handle file input changes
-            function handleFileChange(input) {
+            function handleFileChangeContract(input) {
                 const id = input.attr('id');
                 const file = input[0].files[0];
 
@@ -77,18 +72,15 @@
                     const reader = new FileReader();
 
                     reader.onload = function(e) {
-                        console.log('id', id)
-                        const index = id.split('-')[2]; // Extract the index from the ID
+                        const index = id.split('-')[1]; // Extract the index from the ID
                         if (file.type.includes('image')) {
-                            $(`#current-proof-${name}-${index}`).attr('src', e.target
+                            $(`#current-proof-contract-${index}`).attr('src', e.target
                                 .result); // Update image preview
-
-                            console.log('path', `#current-proof-${name}-${index}`)
                         } else if (file.type === 'application/pdf') {
                             // Replace the image with a PDF icon and filename
-                            $(`#current-proof-{{ $name }}-${index}`).replaceWith(`
-                            <div class="pdf-preview mt-3" id="current-proof-{{ $name }}-${index}">
-                                <label for="proof-${index}">
+                            $(`#current-proof-contract-${index}`).replaceWith(`
+                            <div class="pdf-preview mt-3" id="current-proof-contract-${index}">
+                                <label for="contract-proof-${index}">
                                     <img src="{{ asset('assets/img/pdf-icon.png') }}" alt="PDF icon" class="pdf-icon">
                                     <span class="pdf-filename">${file.name}</span>
                                 </label>
@@ -102,20 +94,20 @@
             }
 
             // Remove item group on button click
-            $(`#repeater-container-${name}`).on('click', '.remove-item', function() {
+            $('#repeater-container').on('click', '.remove-item', function() {
                 $(this).closest('.item-group').remove();
             });
 
             // Add new item group on button click
             $('#add-item').on('click', function() {
-                const newItemGroup = createNewItemGroup(itemIndex);
-                $(`#repeater-container-${name}`).append(newItemGroup);
-                itemIndex++;
+                const newItemGroup = createNewItemGroupContract(itemIndexContract);
+                $('#repeater-container').append(newItemGroup);
+                itemIndexContract++;
             });
 
-            // Delegate the change event to the container, handling future inputs usi
-            $(`#repeater-container-${name}`).on('change', 'input[type="file"]', function() {
-                handleFileChange($(this));
+            // Delegate the change event to the container, handling future inputs
+            $('#repeater-container').on('change', 'input[type="file"]', function() {
+                handleFileChangeContract($(this));
             });
         });
     </script>

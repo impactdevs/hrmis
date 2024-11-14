@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Models\Application;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -11,12 +12,14 @@ class ApplicationReceived extends Notification implements ShouldQueue
 {
     use Queueable;
 
+    public Application $application;
+
     /**
      * Create a new notification instance.
      */
-    public function __construct()
+    public function __construct(Application $application)
     {
-        //
+        $this->application = $application;
     }
 
     /**
@@ -35,9 +38,12 @@ class ApplicationReceived extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-                    ->line('The introduction to the notification.')
-                    ->action('Notification Action', url('/'))
-                    ->line('Thank you for using our application!');
+            ->subject('Application Received')
+            ->line('We have received your application.')
+            ->line('for the role: ' . $this->application->company_job->title)
+            ->line('We will give you feedback as soon as possible.')
+            ->line('Thank you!')
+            ->line('UNCST');
     }
 
     /**

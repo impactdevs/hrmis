@@ -32,4 +32,15 @@ class Entry extends Model
     {
         return $this->belongsTo(CompanyJob::class, 'company_job_id', 'company_job_id');
     }
+
+    //an entry belongs to an 0 or appraisals
+    public function appraisals()
+    {
+        return $this->hasMany(Appraisal::class, 'entry_id', 'id');
+    }
+
+    public function applications()
+    {
+        return $this->hasMany(Application::class, 'entry_id', 'id');
+    }
 }

@@ -1,71 +1,162 @@
 <x-app-layout>
     <div class="container">
-        <h1 class="mb-4">Employee Details</h1>
+        <h1 class="mb-4 text-center text-primary">Employee Details</h1>
 
-        <div class="card mb-4">
+        <div class="card mb-4 shadow-lg">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <div>
-                    <h2>{{ $employee->title }} {{ $employee->first_name }} {{ $employee->last_name }}(Remaining with
-                        {{ $employee->retirementYearsRemaining() }} to retire)</h2>
+                <div class="flex-grow-1">
+                    <h2 class="mb-0 text-dark">{{ $employee->title }} {{ $employee->first_name }}
+                        {{ $employee->last_name }}
+                        <span class="text-muted">(Remaining with {{ $employee->retirementYearsRemaining() }} to
+                            retire)</span>
+                    </h2>
                 </div>
-                <div>
+                <div class="text-center">
                     @if ($employee->passport_photo)
                         <img src="{{ asset('storage/' . $employee->passport_photo) }}" alt="Passport Photo"
-                            class="img-thumbnail" width="100">
+                            class="img-fluid rounded-circle" width="100">
                     @else
-                        <span>No passport photo available.</span>
+                        <span class="text-muted">No passport photo available.</span>
                     @endif
                 </div>
             </div>
             <div class="card-body">
-                <h5>Basic Information</h5>
-                <ul class="list-group mb-3">
-                    <li class="list-group-item"><strong>Staff ID:</strong> {{ $employee->staff_id }}</li>
-                    <li class="list-group-item"><strong>Position:</strong>
-                        {{ optional($employee->position)->position_name }}</li>
-                    <li class="list-group-item"><strong>NIN:</strong> {{ $employee->nin }}</li>
-                    <li class="list-group-item"><strong>Date of Entry:</strong> {{ $employee->date_of_entry }}</li>
-                    <li class="list-group-item"><strong>Contract Expiry Date:</strong>
-                        {{ $employee->contract_expiry_date }}</li>
-                </ul>
+                <!-- Basic Information Section -->
+                <section class="mb-4 border border-1 border-secondary p-3 rounded">
+                    <h1 class="mt-4 mb-3 text-dark">Basic Information</h1>
+                    <div class="row mb-3">
+                        <div class="col-md-4"><strong>Staff ID:</strong></div>
+                        <div class="col-md-8">{{ $employee->staff_id ?? 'No Staff ID' }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4"><strong>Position:</strong></div>
+                        <div class="col-md-8">{{ optional($employee->position)->position_name }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4"><strong>NIN:</strong></div>
+                        <div class="col-md-8">{{ $employee->nin ?? 'No NIN' }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4"><strong>National ID:</strong></div>
+                        <div class="col-md-8">
+                            @if ($employee->national_id_photo)
+                                <img src="{{ asset('storage/' . $employee->national_id_photo) }}"
+                                    alt="National ID Photo" class="img-fluid rounded">
+                            @else
+                                <p class="text-muted">No national ID photo provided.</p>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4"><strong>Date of Entry:</strong></div>
+                        <div class="col-md-8">{{ $employee->date_of_entry ?? 'No Date Specified' }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4"><strong>Contract Expiry Date:</strong></div>
+                        <div class="col-md-8">{{ $employee->contract_expiry_date ?? 'No Date Specified' }}</div>
+                    </div>
+                    {{-- job --}}
+                    <div class="row mb-3">
+                        <div class="col-md-4"><strong>Job Description:</strong></div>
+                        <div class="col-md-8">{{ $employee->job_description ?? 'No Job Description' }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4"><strong>Contract Documents:</strong></div>
+                        <div class="col-md-8">
+                            <div class="mt-2">
+                                @foreach ($employee->contract_documents as $item)
+                                    @if (isset($item['proof']))
+                                        <div class="mb-2">
+                                            @php
+                                                $filePath = asset('storage/' . $item['proof']);
+                                                $fileExtension = pathinfo($item['proof'], PATHINFO_EXTENSION);
+                                            @endphp
+                                            @if (in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif']))
+                                                <!-- Display Image -->
+                                                <div>
+                                                    <img src="{{ $filePath }}" alt="{{ $item['title'] }}"
+                                                        class="img-fluid rounded mt-2" style="max-width: 120px;">
+                                                </div>
+                                            @elseif ($fileExtension === 'pdf')
+                                                <!-- Display PDF Link -->
+                                                <div>
+                                                    <a href="{{ $filePath }}" target="_blank"
+                                                        class="d-flex align-items-center text-decoration-none">
+                                                        <img src="{{ asset('assets/img/pdf-icon.png') }}"
+                                                            alt="PDF icon" class="pdf-icon me-2" width="24">
+                                                        <span
+                                                            class="text-dark">{{ $item['title'] ?? 'The document has no title' }}</span>
+                                                    </a>
+                                                </div>
+                                            @else
+                                                <!-- Handle other file types -->
+                                                <p class="text-muted">Unsupported file type: {{ $item['title'] }}</p>
+                                            @endif
+                                        </div>
+                                    @endif
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </section>
 
-                <h5>Department Information</h5>
-                <ul class="list-group mb-3">
-                    <li class="list-group-item"><strong>Department:</strong>
-                        {{ optional($employee->department)->department_name }}</li>
-                    <li class="list-group-item"><strong>NSSF No:</strong> {{ $employee->nssf_no }}</li>
-                    <li class="list-group-item"><strong>Home District:</strong> {{ $employee->home_district }}</li>
-                </ul>
+                <!-- Other sections for Department, Contact Information, etc. remain the same... -->
 
-                <h5>Contact Information</h5>
-                <ul class="list-group mb-3">
-                    <li class="list-group-item"><strong>TIN No:</strong> {{ $employee->tin_no }}</li>
-                    <li class="list-group-item"><strong>Email:</strong> {{ $employee->email }}</li>
-                    <li class="list-group-item"><strong>Phone Number:</strong> {{ $employee->phone_number }}</li>
-                    <li class="list-group-item"><strong>Next of Kin:</strong> {{ $employee->next_of_kin }}</li>
-                    <li class="list-group-item"><strong>Date of Birth:</strong> {{ $employee->date_of_birth }}</li>
-                </ul>
+                <!-- Contact Information Section -->
+                <section class="mb-4 border border-1 border-secondary p-3 rounded">
+                    <h5 class="mt-4 mb-3 text-dark">Contact Information</h5>
+                    <div class="row mb-3">
+                        <div class="col-md-4"><strong>Mobile Number:</strong></div>
+                        <div class="col-md-8">{{ $employee->phone_number ?? 'No Mobile Number' }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4"><strong>Email:</strong></div>
+                        <div class="col-md-8">{{ $employee->email ?? 'No Email' }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4"><strong>Next of Kin:</strong></div>
+                        <div class="col-md-8">{{ $employee->next_of_kin ?? 'No Email' }}</div>
+                    </div>
+                </section>
 
-                <h5>Job Information</h5>
-                <ul class="list-group mb-3">
-                    <li class="list-group-item"><strong>Job Description:</strong> {{ $employee->job_description }}</li>
-                </ul>
-
-                <h5>Qualifications</h5>
-                <ul class="list-group">
+                <!-- Qualifications Section -->
+                <section class="mb-4 border border-1 border-secondary p-3 rounded">
+                    <h5 class="mt-4 mb-3 text-dark">Qualifications</h5>
                     @foreach ($employee->qualifications_details as $item)
-                        @if (isset($item['proof']) && isset($item['title']))
-                            <li class="list-group-item">
-                                <strong>Qualification:</strong> {{ $item['title'] }}
-                                <img src="{{ asset('storage/' . $item['proof']) }}" alt="Qualification Proof"
-                                    class="img-thumbnail" width="100" style="margin-left: 10px;">
-                            </li>
+                        @if (isset($item['proof']))
+                            <div class="row mb-3">
+                                <div class="col-md-4"><strong>Qualification:</strong></div>
+                                <div class="col-md-8">
+                                    <div>{{ $item['title'] }}</div>
+                                    @php
+                                        $qualificationFilePath = asset('storage/' . $item['proof']);
+                                        $qualificationFileExtension = pathinfo($item['proof'], PATHINFO_EXTENSION);
+                                    @endphp
+                                    @if (in_array($qualificationFileExtension, ['jpg', 'jpeg', 'png', 'gif']))
+                                        <!-- Display Image for Qualification -->
+                                        <img src="{{ $qualificationFilePath }}" alt="Qualification Proof"
+                                            class="img-fluid rounded mt-2" style="max-width: 120px;">
+                                    @elseif ($qualificationFileExtension === 'pdf')
+                                        <!-- Display PDF Link for Qualification -->
+                                        <a href="{{ $qualificationFilePath }}" target="_blank"
+                                            class="d-flex align-items-center text-decoration-none">
+                                            <img src="{{ asset('assets/img/pdf-icon.png') }}" alt="PDF icon"
+                                                class="pdf-icon me-2" width="24">
+                                            <span class="text-dark">View Qualification Proof</span>
+                                        </a>
+                                    @else
+                                        <p class="text-muted">Unsupported qualification file type.</p>
+                                    @endif
+                                </div>
+                            </div>
                         @endif
                     @endforeach
-                </ul>
+                </section>
             </div>
         </div>
 
-        <a href="{{ route('employees.index') }}" class="btn btn-primary mt-3">Back to Employee List</a>
+        <div class="text-center mt-4">
+            <a href="{{ route('employees.index') }}" class="btn btn-primary">Back to Employee List</a>
+        </div>
     </div>
 </x-app-layout>

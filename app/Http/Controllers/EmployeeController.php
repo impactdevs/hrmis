@@ -101,6 +101,14 @@ class EmployeeController extends Controller
                 $validatedData['passport_photo'] = $passportPhotoPath;
             }
 
+            // Handle the passport photo upload
+            if ($request->hasFile('national_id_photo')) {
+                // Store the photo and get the path
+                $passportPhotoPath = $request->file('national_id_photo')->store('national_id_photos', 'public');
+                // Add the path to the validated data
+                $validatedData['national_id_photo'] = $passportPhotoPath;
+            }
+
             // Format (qualification details documents
             if (filled($validatedData['qualifications_details'])) {
                 foreach ($validatedData['qualifications_details'] as $key => $value) {
@@ -112,6 +120,22 @@ class EmployeeController extends Controller
 
                         // Update the proof value to the path
                         $validatedData['qualifications_details'][$key]['proof'] = $filePath;
+
+                    }
+                }
+            }
+
+            // Format (qualification details documents
+            if (filled($validatedData['contract_documents'])) {
+                foreach ($validatedData['contract_documents'] as $key => $value) {
+                    // Check if a file is uploaded for this qualification
+                    // Use the correct input name to check for the file
+                    if ($request->hasFile("contract_documents.$key.proof")) {
+                        // Store the file and get the path
+                        $filePath = $request->file("contract_documents.$key.proof")->store('contract_documents', 'public');
+
+                        // Update the proof value to the path
+                        $validatedData['contract_documents'][$key]['proof'] = $filePath;
 
                     }
                 }
@@ -140,7 +164,7 @@ class EmployeeController extends Controller
             return redirect()->route('employees.index')->with('success', 'Employee Registered');
         } catch (Exception $exception) {
             // Log the error for debugging
-            Log::error('Error adding employee: ' . $exception->getMessage());
+            Log::error('Error adding employee: ' . $exception);
 
             // Redirect back with an error message
             return redirect()->back()->with('error', 'Problem Adding the Employee');
@@ -196,6 +220,14 @@ class EmployeeController extends Controller
                 $validatedData['passport_photo'] = $passportPhotoPath;
             }
 
+            // Handle the passport photo upload
+            if ($request->hasFile('national_id_photo')) {
+                // Store the photo and get the path
+                $passportPhotoPath = $request->file('national_id_photo')->store('national_id_photos', 'public');
+                // Add the path to the validated data
+                $validatedData['national_id_photo'] = $passportPhotoPath;
+            }
+
             // Format (qualification details documents
             if (filled($validatedData['qualifications_details'])) {
                 foreach ($validatedData['qualifications_details'] as $key => $value) {
@@ -218,6 +250,29 @@ class EmployeeController extends Controller
                 }
             }
 
+
+            // Format (qualification details documents
+            if (filled($validatedData['contract_documents'])) {
+                foreach ($validatedData['contract_documents'] as $key => $value) {
+                    // Check if the current qualification has a proof file
+                    if ($request->hasFile("contract_documents.$key.proof")) {
+                        // Store the file and get the path
+                        $filePath = $request->file("contract_documents.$key.proof")->store('contract_documents', 'public');
+
+                        // Update the proof value to the path
+                        $qualification_details[$key]['proof'] = $filePath;
+                    }
+
+                    //check if there is title
+                    if (isset($validatedData['contract_documents'][$key]['title'])) {
+                        $qualification_details[$key]['title'] = $validatedData['contract_documents'][$key]['title'];
+                    }
+
+                    // Update the qualification details
+                    $validatedData['contract_documents'] = $qualification_details;
+                }
+            }
+
             // Update the employee record using validated data
             $employee->update($validatedData);
 
@@ -225,7 +280,7 @@ class EmployeeController extends Controller
             return redirect()->route('employees.index')->with('success', 'Employee Updated');
         } catch (Exception $exception) {
             // Log the error for debugging
-            \Log::error('Error updating employee: ' . $exception->getMessage());
+            Log::error('Error updating employee: ' . $exception->getMessage());
 
             // Redirect back with an error message
             return redirect()->back()->with('error', 'Problem Updating the Employee');
@@ -246,7 +301,7 @@ class EmployeeController extends Controller
             return redirect()->route('employees.index')->with('success', 'Employee Deleted');
         } catch (Exception $exception) {
             // Log the error for debugging
-            \Log::error('Error deleting employee: ' . $exception->getMessage());
+            Log::error('Error deleting employee: ' . $exception->getMessage());
 
             // Redirect back with an error message
             return redirect()->back()->with('error', 'Problem Deleting the Employee');

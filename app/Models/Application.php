@@ -28,6 +28,8 @@ class Application extends Model
         'application_id',
         'company_job_id',
         'entry_id',
+        'approval_status',
+        'rejection_reason'
     ];
 
     // Model boot method

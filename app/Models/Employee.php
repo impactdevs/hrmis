@@ -50,12 +50,15 @@ class Employee extends Model
         'next_of_kin',
         'passport_photo',
         'date_of_birth',
-        'user_id'
+        'user_id',
+        'national_id_photo',
+        'contract_documents',
     ];
 
     // If you want to use casts for certain attributes
     protected $casts = [
         'qualifications_details' => 'array', // Automatically convert JSON to array
+        'contract_documents' => 'array',
         'date_of_entry' => 'date',
         'contract_expiry_date' => 'date',
         'date_of_birth' => 'date',

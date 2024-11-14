@@ -14,7 +14,7 @@
     <div class="row mb-3">
         <div class="col-md-6">
             <x-forms.input name="title" label="Title" type="text" id="title"
-                placeholder="Enter Employee Title" value="{{ old('title', $employee->title ?? '') }}" />
+                placeholder="Enter Employee Title eg. MR., DR., Prof." value="{{ old('title', $employee->title ?? '') }}" />
         </div>
         <div class="col-md-6">
             <x-forms.input name="staff_id" label="Staff ID" type="text" id="staff_id"
@@ -23,6 +23,18 @@
         <div class="col-md-6">
             <x-forms.upload name="passport_photo" label="Employee Passport Photo" id="passport_photo"
                 value="{{ old('passport_photo', $employee->passport_photo ?? '') }}" />
+            <div id="passport-photo-preview" class="mt-3"></div> <!-- Preview container -->
+        </div>
+        <div class="col-md-6">
+            <x-forms.upload name="national_id_photo" label="National ID Photo" id="national_id_photo"
+                value="{{ old('national_id_photo', $employee->national_id_photo ?? '') }}" />
+            <div id="national-id-photo-preview" class="mt-3"></div> <!-- Preview container -->
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <x-forms.input name="date_of_birth" label="Date of Birth" type="date" id="date_of_birth"
+                    value="{{ old('date_of_birth', isset($employee) && $employee->date_of_birth ? $employee->date_of_birth->toDateString() : '') }}" />
+            </div>
         </div>
     </div>
 </fieldset>
@@ -52,6 +64,10 @@
                 value="{{ old('contract_expiry_date', isset($employee) && $employee->contract_expiry_date ? $employee->contract_expiry_date->toDateString() : '') }}" />
         </div>
 
+        <div class="col-md-6">
+            <x-forms.repeater name="contract_documents" label="Contract Documents" :values="$employee->contract_documents ?? []" />
+        </div>
+
     </div>
     <div class="row mb-3">
         <div class="col-md-6">
@@ -72,12 +88,24 @@
             <x-forms.input name="nssf_no" label="NSSF Number" type="text" id="nssf_no"
                 placeholder="Employee NSSF Number" value="{{ old('nssf_no', $employee->nssf_no ?? '') }}" />
         </div>
+        <div class="col-md-6">
+            <x-forms.input name="tin_no" label="TIN Number" type="text" id="tin_no"
+                placeholder="Employee TIN Number" value="{{ old('tin_no', $employee->tin_no ?? '') }}" />
+        </div>
     </div>
     <div class="row mb-3">
         <div class="col-md-6">
             <x-forms.input name="home_district" label="Home District" type="text" id="home_district"
                 placeholder="Employee Home District"
                 value="{{ old('home_district', $employee->home_district ?? '') }}" />
+        </div>
+
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <x-forms.input name="next_of_kin" label="Next Of Kin" type="text" id="next_of_kin"
+                placeholder="Employee Next Of Kin" value="{{ old('next_of_kin', $employee->next_of_kin ?? '') }}" />
         </div>
         <div class="col-md-6">
             <x-forms.repeater name="qualifications_details" label="Qualifications" :values="$employee->qualifications_details ?? []" />
@@ -88,12 +116,7 @@
 <!-- Contact Information Group -->
 <fieldset class="border p-2 mb-4">
     <legend class="w-auto">Contact Information</legend>
-    <div class="row mb-3">
-        <div class="col-md-6">
-            <x-forms.input name="tin_no" label="TIN Number" type="text" id="tin_no"
-                placeholder="Employee TIN Number" value="{{ old('tin_no', $employee->tin_no ?? '') }}" />
-        </div>
-    </div>
+
     <div class="row mb-3">
         <div class="col-md-6">
             <x-forms.input name="email" label="Email" type="email" id="email"
@@ -107,25 +130,85 @@
     </div>
 </fieldset>
 
-<!-- Emergency Contact Group -->
-<fieldset class="border p-2 mb-4">
-    <legend class="w-auto">Emergency Contact</legend>
-    <div class="row mb-3">
-        <div class="col-md-6">
-            <x-forms.input name="next_of_kin" label="Next Of Kin" type="text" id="next_of_kin"
-                placeholder="Employee Next Of Kin" value="{{ old('next_of_kin', $employee->next_of_kin ?? '') }}" />
-        </div>
-
-    </div>
-    <div class="row mb-3">
-        <div class="col-md-6">
-            <x-forms.input name="date_of_birth" label="Date of Birth" type="date" id="date_of_birth"
-                value="{{ old('date_of_birth', isset($employee) && $employee->date_of_birth ? $employee->date_of_birth->toDateString() : '') }}" />
-        </div>
-    </div>
-
-</fieldset>
-
 <div class="form-group">
     <input class="btn btn-primary" type="submit" value="{{ $formMode === 'edit' ? 'Update' : 'Create' }}">
 </div>
+
+@push('scripts')
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Handle Passport Photo file selection and preview
+            $('#passport_photo').on('change', function(event) {
+                var input = $(this)[0];
+                var file = input.files[0];
+                var previewContainer = $('#passport-photo-preview');
+                previewContainer.empty(); // Clear previous preview
+
+                if (file) {
+                    var reader = new FileReader();
+                    var fileName = file.name;
+
+                    // If the file is an image, show the image preview
+                    if (file.type.startsWith('image/')) {
+                        reader.onload = function(e) {
+                            var img = $('<img>', {
+                                src: e.target.result,
+                                alt: fileName,
+                                class: 'img-fluid'
+                            });
+                            previewContainer.append(img);
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        // For other file types, show a default placeholder
+                        var img = $('<img>', {
+                            src: "{{ asset('assets/img/upload.png') }}",
+                            alt: "upload placeholder",
+                            height: 70,
+                            width: 70,
+                            class: 'img-fluid upload-icon'
+                        });
+                        previewContainer.append(img);
+                    }
+                }
+            });
+
+            // Handle National ID Photo file selection and preview
+            $('#national_id_photo').on('change', function(event) {
+                var input = $(this)[0];
+                var file = input.files[0];
+                var previewContainer = $('#national-id-photo-preview');
+                previewContainer.empty(); // Clear previous preview
+
+                if (file) {
+                    var reader = new FileReader();
+                    var fileName = file.name;
+
+                    // If the file is an image, show the image preview
+                    if (file.type.startsWith('image/')) {
+                        reader.onload = function(e) {
+                            var img = $('<img>', {
+                                src: e.target.result,
+                                alt: fileName,
+                                class: 'img-fluid'
+                            });
+                            previewContainer.append(img);
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        // For other file types, show a default placeholder
+                        var img = $('<img>', {
+                            src: "{{ asset('assets/img/upload.png') }}",
+                            alt: "upload placeholder",
+                            height: 70,
+                            width: 70,
+                            class: 'img-fluid upload-icon'
+                        });
+                        previewContainer.append(img);
+                    }
+                }
+            });
+        });
+    </script>
+@endpush

@@ -24,12 +24,14 @@ return new class extends Migration {
             $table->string('nssf_no')->nullable();
             $table->string('home_district')->nullable();
             $table->json('qualifications_details')->nullable();
+            $table->json('contract_documents')->nullable();
             $table->string('tin_no')->nullable();
             $table->longText('job_description')->nullable();
             $table->string('email')->unique();
             $table->string('phone_number')->nullable()->unique();
             $table->string('next_of_kin')->nullable();
             $table->string('passport_photo')->nullable();
+            $table->string('national_id_photo')->nullable();
             $table->string('date_of_birth')->nullable();
             $table->unsignedBigInteger('user_id')->nullable()->references('id')->on('users');
             $table->timestamps();

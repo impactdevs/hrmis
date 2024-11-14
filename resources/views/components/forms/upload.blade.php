@@ -19,7 +19,7 @@
                     class="img-fluid upload-icon mt-3">
             </label>
         @endif
-        <input type="file" name="{{ $name }}" id="{{ $id }}" class="form-control-file d-none">
+        <input type="file" name="{{ $name }}" id="{{ $id }}" class="form-control-file d-none" accept=".png, .jpg">
         {{-- show validation errors --}}
         @error($name)
             <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -30,5 +30,3 @@
     </div>
 </div>
 
-@push('scripts')
-@endpush

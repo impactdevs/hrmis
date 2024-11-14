@@ -35,6 +35,7 @@
                                 <th scope="col">First Name</th>
                                 <th scope="col">Last Name</th>
                                 <th scope="col">Job</th>
+                                <th scope="col">Status</th>
                                 <th scope="col">Application Date</th>
                                 <th scope="col">Actions</th>
                             </tr>
@@ -46,7 +47,7 @@
                                         $data = json_decode($application->entry->responses, true);
                                     @endphp
                                     <tr>
-                                        <th scope="row">{{ $application->application_id }}</th>
+                                        <th scope="row">{{ $application->entry->id }}</th>
                                         <td>
 
                                             @if ($application->application_status == 'approve')
@@ -68,24 +69,21 @@
                                             @endif
                                         </td>
                                         <td>{{ $application->job->job_title }}</td>
-                                        <td>Accepted</td>
+                                        <td>
+                                            @if (!is_null($application->approval_status))
+                                                <span
+                                                    class="badge {{ $application->approval_status == 'reject' ? 'text-bg-danger' : 'text-bg-success' }}">
+                                                    {{ $application->approval_status == 'reject' ? 'Rejected' : 'Approved' }}
+                                                </span>
+                                            @else
+                                                <span class="badge text-bg-warning">Pending</span>
+                                            @endif
+                                        </td>
                                         <td>{{ $application->created_at->format('M d, Y') }}</td>
                                         <td>
                                             <a href="{{ url('entries', $application->entry->id) }}"
                                                 class="btn btn-info text-white fs-6">
                                                 <i class="bi bi-eye"></i>
-                                            </a>
-
-                                            <a href="#" class="btn btn-primary text-white fs-6" id="accept"
-                                                data-application-id="{{ $application->application_id }}"
-                                                data-application-request-status="approve">
-                                                <i class="bi bi-check"></i>
-                                            </a>
-
-                                            <a href="#" class="btn btn-danger text-white fs-6" id="reject"
-                                                data-application-id="{{ $application->application_id }}"
-                                                data-application-request-status="reject">
-                                                <i class="bi bi-x"></i>
                                             </a>
                                         </td>
                                     </tr>
@@ -102,50 +100,5 @@
         </div>
     </div>
 
-    @push('scripts')
-        <script>
-            $(document).ready(function() {
-                //accept button
-                $(document).on('click', '#accept', function(e) {
-                    e.preventDefault();
-
-                    var appraisalId = $(this).data('application-id');
-                    var applicationRequestStatus = $(this).data('application-request-status');
-
-                    $.ajax({
-                        url: '/application/application-approval/',
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        data: {
-                            application_id: appraisalId,
-                            application_request_status: applicationRequestStatus
-                        },
-                        success: function(response) {
-                            location.reload();
-                            Toastify({
-                                text: response.message,
-                                duration: 3000,
-                                gravity: "top",
-                                position: "right",
-                                backgroundColor: "linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(121,14,9,1) 35%, rgba(0,212,255,1) 100%)",
-                            }).showToast();
-                        },
-                        error: function(xhr, status, error) {
-                            Toastify({
-                                text: xhr.responseJSON?.error || 'An error occurred',
-                                duration: 3000,
-                                gravity: "top",
-                                position: "right",
-                                backgroundColor: "linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(121,14,9,1) 35%, rgba(0,212,255,1) 100%)",
-                            }).showToast();
-                        }
-                    });
-                });
-
-            });
-        </script>
-    @endpush
 
 </x-app-layout>

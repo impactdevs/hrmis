@@ -144,8 +144,9 @@
                                                     $data = json_decode($appraisal->entry->responses, true); // true for associative array
                                                 @endphp
                                                 <tr>
-                                                    <td>{{ $data[76] }}</td>
-                                                    <td>{{ $data[77] }}</td>
+                                                    <td>{{ $appraisal->employee->first_name . ' ' . $appraisal->employee->first_name }}
+                                                    </td>
+                                                    <td>{{ $appraisal->employee->position->position_name }}</td>
                                                 </tr>
                                             @endforeach
 

@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ApplicationReceivedMail;
 use App\Models\Application;
 use App\Models\CompanyJob;
 use App\Models\Entry;
 use App\Models\Form;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+
 
 class ApplicationController extends Controller
 {
@@ -34,71 +37,57 @@ class ApplicationController extends Controller
 
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        //convert the form fields to json
+        // Initialize cvPath as null
+        $cvPath = null;
+
+        // Handle the passport photo upload (if file is present)
+        if ($request->hasFile('132')) {
+            // Store the photo and get the path
+            $cvPath = $request->file('132')->store('cvs', 'public');
+        }
+
+        // Convert the form fields to JSON, excluding certain keys
         $responses = json_encode($request->except('_token', 'form_id', 'company_job_id'));
+
+        // If cvPath is not null, update the '132' key in responses
+        if ($cvPath) {
+            $responsesArray = json_decode($responses, true);
+            $responsesArray['132'] = $cvPath;
+            $responses = json_encode($responsesArray);
+        }
+
+        // Get the form ID from the request
         $form_id = $request->input('form_id');
 
+        // Create a new entry
         $entry = new Entry();
         $entry->form_id = $form_id;
         $entry->responses = $responses;
-
         $entry->save();
 
+        // Create a new job application
         $job_application = new Application();
         $job_application->company_job_id = $request->input('company_job_id');
         $job_application->entry_id = $entry->id;
         $job_application->save();
 
-        return back()->with('success', 'Application submitted successfully! Thank you for your response.');
+        // Send confirmation email
+        $email = $request->input('97');
+        $name = $request->input('93') ?? "";
+        Mail::to($email)->send(new ApplicationReceivedMail($job_application, $name));
+
+        return back()->with('success', 'Application submitted successfully! You should receive a confirmation email for your application.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
 
     public function survey(Request $request)
     {
-        //appraisal type
+        //application type
         $type = 'application';
 
         $company_jobs = CompanyJob::all();
@@ -111,21 +100,23 @@ class ApplicationController extends Controller
         return view('applications.form', compact('form', 'company_jobs'));
     }
 
-    public function approveOrReject()
+    public function approveOrReject(Request $request)
     {
         try {
-            $approval_status = request()->input('application_request_status');
-            $appraisal = Application::find(request()->input('application_id'));
-            $appraisal->application_status = $approval_status;
-            $appraisal->save();
+            $approval_status = request()->input('status');
+            $application = Application::find(request()->input('applications_id'));
+            $application->approval_status = $approval_status;
+            $application->save();
 
             $message = '';
 
             if ($approval_status == 'approve')
-                $message = 'Appraisal request approved successfully.';
+                $message = 'application request approved successfully.';
 
-            if ($approval_status == 'approve')
-                $message = 'Appraisal request rejected successfully.';
+            if ($approval_status == 'reject') {
+                $application->rejection_reason = request()->input('reason');
+                $message = 'application request rejected successfully.';
+            }
             return response()->json([
                 'status' => 'success',
                 'message' => $message

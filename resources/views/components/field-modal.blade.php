@@ -28,6 +28,7 @@
                             <option value="select">Select</option>
                             <option value="repeater">Repeater</option>
                             <option value="table">Table</option>
+                            <option value="file">File</option>
                         </select>
                     </div>
                     <input type="hidden" name="section_id" value="{{ $section }}" id="section_id">

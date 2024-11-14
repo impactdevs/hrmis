@@ -29,7 +29,8 @@ class Appraisal extends Model
         'entry_id',
         'employee_id',
         'appraisal_type',
-        'appraisal_request_status'
+        'approval_status',
+        'rejection_reason'
     ];
 
     // Model boot method
@@ -46,5 +47,10 @@ class Appraisal extends Model
     public function entry()
     {
         return $this->belongsTo(Entry::class, 'entry_id', 'id');
+    }
+
+    public function employee()
+    {
+        return $this->belongsTo(Employee::class, 'employee_id');
     }
 }
