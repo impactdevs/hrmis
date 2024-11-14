@@ -31,7 +31,7 @@
                     <th scope="col">Actions</th>
                 </tr>
                 <tbody>
-                    @foreach ($trainings as $index => $training)
+                    @forelse ($trainings as $index => $training)
                         <tr class="align-middle">
                             <td>{{ $index + 1 }}</td>
                             <td>{{ $training->training_title }}</td>
@@ -107,7 +107,13 @@
                                 </div>
                             </td>
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr>
+                            <td colspan="8" class="text-center text-danger">
+                                No Training records found for the selected date.
+                            </td>
+                        </tr>
+                    @endforelse
                 </tbody>
 
             </table>

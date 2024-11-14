@@ -25,7 +25,7 @@
                     <th scope="col">Actions</th>
                 </tr>
                 <tbody>
-                    @foreach ($events as $index => $event)
+                    @forelse ($events as $index => $event)
                         <tr class="align-middle">
                             <td>{{ $index + 1 }}</td>
                             <td>{{ $event->event_title }}</td>
@@ -105,7 +105,13 @@
                             </td>
 
                         </tr>
-                    @endforeach
+                        @empty
+                        <tr>
+                            <td colspan="8" class="text-center text-danger">
+                                No events records found for the selected date.
+                            </td>
+                        </tr>
+                        @endforelse
 
                 </tbody>
             </table>
