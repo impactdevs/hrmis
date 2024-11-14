@@ -60,9 +60,12 @@ class RoleController extends Controller
      */
     public function update(Request $request, Role $role)
     {
-        $permissions = $this->convertPermissionsToInt($request->permissions);
+        if (!$request->permissions == null) {
 
-        $role->syncPermissions($permissions);
+            $permissions = $this->convertPermissionsToInt($request->permissions);
+
+            $role->syncPermissions($permissions);
+        }
 
         return redirect()->route('roles.index')->with('success', 'Role updated successfully.');
     }

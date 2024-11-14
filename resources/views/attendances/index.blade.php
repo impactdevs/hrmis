@@ -25,7 +25,7 @@
                         <tr class="align-middle">
                             <th scope="row">
                                 <a href="{{ route('attendances.show', $attendance->attendance_id) }}"
-                                   class="btn btn-outline-primary">
+                                    class="btn btn-outline-primary">
                                     {{ $attendance->employee->staff_id }}
                                 </a>
                             </th>
