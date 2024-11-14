@@ -13,7 +13,7 @@
                                     <span class="text-red-500"> - No answer</span>
                                 @endif
                             </h6>
-                            @if (($key != "CV"))
+                            @if ($key != 'CV')
                                 @if (is_array($field))
                                     <ul class="list-disc pl-5 mt-2">
                                         @foreach ($field as $item)
@@ -38,7 +38,7 @@
                             @else
                                 {{-- show a pdf
                                      --}}
-                                <a href="{{ asset('storage/' . $field)}}" target="_blank"
+                                <a href="{{ asset('storage/' . $field) }}" target="_blank"
                                     class="d-flex align-items-center text-decoration-none">
                                     <img src="{{ asset('assets/img/pdf-icon.png') }}" alt="PDF icon"
                                         class="pdf-icon me-2" width="24">
@@ -75,17 +75,17 @@
                     @php
                         $typeMod = $type == 'appraisals' ? 'appraisal' : 'application';
                     @endphp
-                    <a href="#" class="btn btn-primary text-white fs-6 approve-btn"
+                    <button class="btn btn-primary text-white fs-6 approve-btn"
                         data-{{ $type }}-id="{{ $entry->{$type}[0]->{$typeMod . '_id'} }}"
                         data-{{ $type }}-request-status="approve" data-type="{{ $type }}">
                         <i class="bi bi-check"></i> APPROVE {{ strtoupper($type) }}
-                    </a>
+                    </button>
 
-                    <a href="#" class="btn btn-danger text-white fs-6 reject-btn"
+                    <button class="btn btn-danger text-white fs-6 reject-btn"
                         data-{{ $type }}-id="{{ $entry->{$type}[0]->{$typeMod . '_id'} }}"
                         data-bs-toggle="modal" data-bs-target="#rejectModal" data-type="{{ $type }}">
                         <i class="bi bi-x"></i> REJECT {{ strtoupper($type) }}
-                    </a>
+                </button>
                 </div>
             @endif
         @endforeach
