@@ -17,7 +17,7 @@ return new class extends Migration {
             $table->date('end_date');
             $table->uuid('leave_type_id')->references('leave_type_id')->on('leave_types');
             $table->string('reason');
-            $table->string('leave_request_status')->default('HR');
+            $table->string('leave_request_status')->default('pending');
             $table->json('my_work_will_be_done_by');
             $table->longText('rejection_reason')->nullable();
             $table->timestamps();

@@ -300,7 +300,11 @@
                                                     {{-- Show leave days for this month --}}
                                                     <p class="mb-1">Leave Days: {{ $leaveDays }}</p>
                                                     <p class="mb-1">Leave Days Used:
-                                                        {{ $employee->leaveDaysConsumedPerMonth()->{$employee->leaveRoster->year}->{$monthIndex} ?? 0 }}
+                                                        @if (array_key_exists($monthIndex, $employee->leaveDaysConsumedPerMonth()[$employee->leaveRoster->year]))
+                                                            {{ $employee->leaveDaysConsumedPerMonth()[$employee->leaveRoster->year][$monthIndex] }}
+                                                        @else
+                                                            0
+                                                        @endif
                                                     </p>
                                                 </div>
                                             </div>
