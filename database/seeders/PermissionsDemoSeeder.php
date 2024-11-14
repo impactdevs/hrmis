@@ -18,15 +18,15 @@ class PermissionsDemoSeeder extends Seeder
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
         //create a role
-        $role3 = 'Super Admin';
+        $role3 = 'HR';
 
         //create $role1
         $role1 = Role::create(['name' => $role3]);
         // gets all permissions via Gate::before rule; see AuthServiceProvider
 
         $user = \App\Models\User::factory()->create([
-            'name' => 'NSENGIYUMVA WILBERFORCE',
-            'email' => 'nsengiyumvawilberforce@gmail.com',
+            'name' => 'HUMAN RESOURCE',
+            'email' => 'humanresource@uncst.com',
         ]);
         $user->assignRole($role3);
     }

@@ -22,8 +22,8 @@ class EmployeeScope implements Scope
         $user_role = $roles->first();
 
         switch ($user_role) {
-            case 'Super Admin':
-                // No constraints for Super Admin
+            case 'HR':
+                // No constraints for HR
                 break;
 
             case 'Head of Division':

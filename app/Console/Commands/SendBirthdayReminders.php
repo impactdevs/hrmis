@@ -13,7 +13,7 @@ class SendBirthdayReminders extends Command
 {
     // Command signature and description
     protected $signature = 'reminders:send-birthday';
-    protected $description = 'Send birthday reminders to super admin and employee';
+    protected $description = 'Send birthday reminders to HR and employee';
 
     public function __construct()
     {
@@ -24,18 +24,18 @@ class SendBirthdayReminders extends Command
     {
         // Get today's date
         $today = Carbon::today();
-        // Get tomorrow's date for super admin reminder
+        // Get tomorrow's date for HR reminder
         $tomorrow = Carbon::tomorrow();
 
         // Get all employees whose birthdays are today
         $employeesToday = User::whereDate('date_of_birth', $today)->get();
 
-        // Get all employees whose birthdays are tomorrow (for Super Admin)
+        // Get all employees whose birthdays are tomorrow (for HR)
         $employeesTomorrow = User::whereDate('date_of_birth', $tomorrow)->get();
 
-        // Send reminder to Super Admin for tomorrow's birthdays
+        // Send reminder to HR for tomorrow's birthdays
         foreach ($employeesTomorrow as $employee) {
-            // Assuming you have a Super Admin role or ID in the system
+            // Assuming you have a HR role or ID in the system
             $superAdmin = User::whereRole('super-admin')->first(); // Adjust as needed
 
             Mail::to($superAdmin->email)->send(new BirthdayReminderForAdmin($employee));

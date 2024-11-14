@@ -26,8 +26,8 @@ class DepartmentScope implements Scope
         $user_role = $roles->first();
 
         switch ($user_role) {
-            case 'Super Admin':
-            // No constraints for Super Admin
+            case 'HR':
+            // No constraints for HR
             case 'Executive Secretary':
             // Add logic if needed
             case 'Assistant Executive Secretary':

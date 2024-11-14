@@ -95,7 +95,7 @@ class TrainingController extends Controller
                 $users = User::whereIn('id', $userIds)->get();
             }
 
-            //if request has user_id, send a notification to super admin
+            //if request has user_id, send a notification to HR
             if (!$request->has('user_id')) {
 
                 Notification::send($users, new TrainingPosted($trainingCreated));
@@ -195,9 +195,9 @@ class TrainingController extends Controller
         $training->save();
 
         // Get users with 'super-admin' role
-        $users = User::role('Super Admin')->get();
+        $users = User::role('HR')->get();
 
-        // Send notification to super admin users
+        // Send notification to HR users
         Notification::send($users, new TrainingApplication($training));
 
         // Redirect back with success message
@@ -214,9 +214,9 @@ class TrainingController extends Controller
         $user = auth()->user();
 
         // Update leave request based on the user's role and the input status
-        if ($user->hasRole('Super Admin')) {
+        if ($user->hasRole('HR')) {
             if ($request->input('status') === 'approved') {
-                $training->approval_status = 'Super Admin';
+                $training->approval_status = 'HR';
                 $training->rejection_reason = null; // Clear reason if approved
             } else {
                 $training->approval_status = 'rejected';

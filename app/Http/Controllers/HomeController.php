@@ -193,7 +193,7 @@ class HomeController extends Controller
                     $status = 'Rejected';
                 } else {
                     // Count stages based on status
-                    if ($leave->leave_request_status === 'Super Admin') {
+                    if ($leave->leave_request_status === 'HR') {
                         $progress += 33;
                         $status = 'Awaiting HOD Approval';
                     }
@@ -212,7 +212,7 @@ class HomeController extends Controller
                     'daysRemaining' => $leave->remainingLeaveDays(),
                     'progress' => $progress,
                     'status' => $status,
-                    'hrStatus' => $leave->leave_request_status === 'Super Admin' ? 'Approved' : 'Pending',
+                    'hrStatus' => $leave->leave_request_status === 'HR' ? 'Approved' : 'Pending',
                     'hodStatus' => $leave->leave_request_status === 'Head of Division' ? 'Apprroved' : 'Pending',
                     'esStatus' => $leave->leave_request_status === 'Executive Secretary' ? 'Approved' : 'Pending',
                 ];

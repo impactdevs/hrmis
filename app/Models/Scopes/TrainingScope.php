@@ -28,7 +28,7 @@ class TrainingScope implements Scope
         $user_role = $roles->first();
 
         switch ($user_role) {
-            case 'Super Admin':
+            case 'HR':
             case 'Executive Secretary':
             case 'Assistant Executive Secretary':
                 // No constraints for these roles

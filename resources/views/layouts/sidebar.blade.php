@@ -98,7 +98,7 @@
                 </a>
             </li>
         </ul>
-        @if (auth()->user()->hasRole('Super Admin'))
+        @if (auth()->user()->hasRole('HR'))
             <h6
                 class="text-uppercase px-3 text-body-secondary text-light d-flex justify-content-between align-items-center my-3">
                 <span class="text-light">Settings</span>

@@ -62,7 +62,7 @@ class LeaveController extends Controller
 
         if ($leaveCreated) {
             // Get users with the superadmin role
-            $users = User::role('Super Admin')->get();
+            $users = User::role('HR')->get();
 
             // Send notifications to those users
             Notification::send($users, new LeaveApplied($leaveCreated));
@@ -120,9 +120,9 @@ class LeaveController extends Controller
         $user = auth()->user();
 
         // Update leave request based on the user's role and the input status
-        if ($user->hasRole('Super Admin')) {
+        if ($user->hasRole('HR')) {
             if ($request->input('status') === 'approved') {
-                $leave->leave_request_status = 'Super Admin';
+                $leave->leave_request_status = 'HR';
                 $leave->rejection_reason = null; // Clear reason if approved
             } else {
                 $leave->leave_request_status = 'rejected';

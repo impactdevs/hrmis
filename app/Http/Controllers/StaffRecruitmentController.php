@@ -50,8 +50,8 @@ class StaffRecruitmentController extends Controller
             'approval_status' => 'pending', // Default approval status (adjust as needed)
         ]);
 
-        //get super admin users
-        $users = User::where('role', 'Super Admin')->get();
+        //get HR users
+        $users = User::where('role', 'HR')->get();
 
         Notification::send($users, new StaffRecruitmentApplication($staffRecruitment));
 
@@ -121,9 +121,9 @@ class StaffRecruitmentController extends Controller
         $user = auth()->user();
 
         // Update leave request based on the user's role and the input status
-        if ($user->hasRole('Super Admin')) {
+        if ($user->hasRole('HR')) {
             if ($request->input('status') === 'approved') {
-                $recruitment->approval_status = 'Super Admin';
+                $recruitment->approval_status = 'HR';
                 $recruitment->rejection_reason = null; // Clear reason if approved
             } else {
                 $recruitment->approval_status = 'rejected';
