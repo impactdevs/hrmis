@@ -76,16 +76,26 @@
                                     @endforeach
                                 </div>
                                 <div class="status mt-2">
-                                    @if (Auth::user()->roles->pluck('name')[0] === $leave->leave_request_status)
+
+                                    @if ($leave->leave_request_status[Auth::user()->roles->pluck('name')[0]] ?? '' === 'approved')
                                         <span class="badge bg-success">You Approved this Leave Request.</span>
-                                    @elseif ($leave->leave_request_status === 'rejected')
+                                    @elseif ($leave->leave_request_status[Auth::user()->roles->pluck('name')[0]] ?? '' === 'rejected')
                                         <span class="badge bg-danger">You rejected this Request</span>
                                         <p class="mt-1"><strong>Rejection Reason:</strong>
                                             {{ $leave->rejection_reason }}</p>
                                     @elseif ($leave->leave_request_status === 'approved')
                                         <span class="badge bg-danger">Approved</span>
                                     @else
-                                        <span class="badge bg-warning">Pending</span>
+                                        @if (Auth::user()->roles->pluck('name')[0] == 'Staff')
+                                            @if ($leave->leave_request_status['Executive Secretary'] ?? '' === 'approved')
+                                                <span class="badge bg-success">This leave request was fiully
+                                                    approved</span>
+                                            @elseif($leave->leave_request_status['Executive Secretary'] ?? '' === 'rejected')
+                                                <span class="badge bg-danger">This leave request was rejected</span>
+                                            @else
+                                                <span class="badge bg-warning">Pending</span>
+                                            @endif
+                                        @endif
                                     @endif
                                 </div>
                             </div>
