@@ -2,14 +2,13 @@
 
 namespace App\Console\Commands;
 
-use App\Mail\BirthdayReminderForAdmin;
-use App\Mail\BirthdayReminderForEmployee;
 use App\Models\Employee;
 use App\Models\Scopes\EmployeeScope;
-use Illuminate\Console\Command;
 use App\Models\User;
+use App\Notifications\BirthdayReminder;
+use Illuminate\Console\Command;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 
 class SendBirthdayReminders extends Command
 {
@@ -39,25 +38,24 @@ class SendBirthdayReminders extends Command
             ->whereRaw('DATE_FORMAT(date_of_birth, "%m-%d") = ?', [$tomorrowMonthDay])
             ->get();
 
-        // Send reminder to HR for tomorrow's birthdays
-        foreach ($employeesTomorrow as $employee) {
-            // Get the HR user (you may have more than one HR, this gets the first one)
-            $superAdmin = User::whereRole('HR')->first(); // Adjust role as needed
-
-            if ($superAdmin) {
-                // Send email to HR
-                Mail::to($superAdmin->email)->send(new BirthdayReminderForAdmin($employee));
-            }
-        }
-
-        // Send reminder to employees for today's birthdays
+        // Send reminders to employees for today's birthdays
         foreach ($employeesToday as $employee) {
             // Get the user associated with the employee
             $user = User::find($employee->user_id);
 
             if ($user) {
-                // Send email to employee
-                Mail::to($user->email)->send(new BirthdayReminderForEmployee($user));
+                // Send notification to employee (mail, database, and broadcast)
+                $user->notify(new BirthdayReminder($employee));  // Send to employee
+            }
+        }
+
+        // Send reminders to HR for tomorrow's birthdays
+        foreach ($employeesTomorrow as $employee) {
+            // Get the HR user (assuming one HR user)
+            $superAdmin = User::whereRole('HR')->first();
+            if ($superAdmin) {
+                // Send notification to HR (mail, database, and broadcast)
+                $superAdmin->notify(new BirthdayReminder($employee));  // Send to HR
             }
         }
 

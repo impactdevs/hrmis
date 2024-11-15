@@ -83,7 +83,7 @@
         <div class="content">
             <p>Dear {{ $name }},</p>
 
-            <p>We have successfully received your application for the role of <span class="highlight">{{ $application->job->title }}</span>.</p>
+            <p>We have successfully received your application for the role of <span class="highlight">{{ $application->job->job_title }}</span>.</p>
 
             <p>Thank you for your interest in joining our team at <span class="highlight">UNCST</span>. Our recruitment team will review your application, and we will get back to you as soon as possible with feedback.</p>
 
