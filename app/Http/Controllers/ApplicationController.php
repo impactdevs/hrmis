@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ApplicationAccepted;
 use App\Mail\ApplicationReceivedMail;
 use App\Models\Application;
 use App\Models\CompanyJob;
@@ -110,8 +111,19 @@ class ApplicationController extends Controller
 
             $message = '';
 
-            if ($approval_status == 'approve')
+
+
+            if ($approval_status == 'approve') {
+                $email = json_decode($application->entry->responses)->{'97'} ?? "";
+                $name = json_decode($application->entry->responses)->{'93'} ?? "";
+
+                //check if email is valid and exists
+
+                Mail::to($email)->send(new ApplicationAccepted($application, $name));
                 $message = 'application request approved successfully.';
+
+
+            }
 
             if ($approval_status == 'reject') {
                 $application->rejection_reason = request()->input('reason');

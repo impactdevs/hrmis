@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Scope;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-class ApplicationScope implements Scope
+class AppraisalScope implements Scope
 {
     /**
      * Apply the scope to a given Eloquent query builder.
@@ -30,9 +30,9 @@ class ApplicationScope implements Scope
                 // Get the department_id of the authenticated user
                 $departmentId = DB::table('employees')->where('user_id', $user->id)->value('department_id');
                 if ($departmentId) {
-                    $userIds = DB::table('employees')->where('department_id', $departmentId)->pluck('user_id');
+                    $userIds = DB::table('employees')->where('department_id', $departmentId)->pluck('employee_id');
                     // Only show employees from the user's department
-                    $builder->whereIn('applications.user_id', $userIds);
+                    $builder->whereIn('appraisals.employee_id', $userIds);
                 } else {
                     // If there's no department, don't show anything
                     $builder->whereRaw('1 = 0'); // This condition will always be false
@@ -40,7 +40,8 @@ class ApplicationScope implements Scope
                 break;
 
             case 'Staff':
-                $builder->where('applications.user_id', $user->id);
+                $employeeId = DB::table('employees')->where('user_id', $user->id)->value('employee_id');
+                $builder->where('appraisals.employee_id', $employeeId);
                 break;
 
             case 'Executive Secretary':

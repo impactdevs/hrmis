@@ -55,6 +55,11 @@
                         <div class="col-md-4"><strong>Contract Expiry Date:</strong></div>
                         <div class="col-md-8">{{ $employee->contract_expiry_date ?? 'No Date Specified' }}</div>
                     </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4"><strong>Department</strong></div>
+                        <div class="col-md-8">{{ $employee->department->department_name ?? 'No Department' }}</div>
+                    </div>
                     {{-- job --}}
                     <div class="row mb-3">
                         <div class="col-md-4"><strong>Job Description:</strong></div>

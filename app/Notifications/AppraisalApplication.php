@@ -9,18 +9,22 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 
-class AppraisalApplication extends Notification
+class AppraisalApplication extends Notification implements ShouldQueue
 {
     use Queueable;
 
     public Appraisal $appraisal;
+    public string $name;
+    public string $last_name;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(Appraisal $appraisal)
+    public function __construct(Appraisal $appraisal, string $name, string $last_name)
     {
         $this->appraisal = $appraisal;
+        $this->name = $name;
+        $this->last_name = $last_name;
     }
 
     /**
@@ -41,7 +45,7 @@ class AppraisalApplication extends Notification
         return (new MailMessage)
             ->subject('New Appraisal Application')
             ->line('You have a new appraisal request with the following details.')
-            ->line('Applicant: ' . $this->appraisal->user->name)
+            ->line('Applicant: ' . $this->name)
             ->line('Check appraisal details: ' . url('/appraisals/' . $this->appraisal->appraisal_id))
             ->line('Thank you for using our application!');
     }
@@ -55,8 +59,9 @@ class AppraisalApplication extends Notification
     {
         return [
             'appraisal_id' => $this->appraisal->appraisal_id,
-            'appraisee_first_name' => $this->appraisal->employee->first_name,
-            'appraisee_last_name' => $this->appraisal->employee->last_name,
+            'appraisee_first_name' => $this->name,
+            'appraisee_last_name' => $this->last_name,
+            'message' => 'Appraisal Application from ' . $this->name . ' ' . $this->last_name
         ];
     }
 
@@ -64,9 +69,9 @@ class AppraisalApplication extends Notification
     {
         return new BroadcastMessage([
             'appraisal_id' => $this->appraisal->appraisal_id,
-            'appraisee_first_name' => $this->appraisal->employee->first_name,
-            'appraisee_last_name' => $this->appraisal->employee->last_name,
-            'message' => 'Appraisal Application from ' . $this->appraisal->employee->first_name . ' ' . $this->appraisal->employee->last_name
+            'appraisee_first_name' => $this->name,
+            'appraisee_last_name' => $this->last_name,
+            'message' => 'Appraisal Application from ' . $this->name . ' ' . $this->last_name
         ]);
     }
 }

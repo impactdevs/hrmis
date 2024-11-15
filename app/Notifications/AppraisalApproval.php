@@ -6,20 +6,26 @@ use App\Models\Appraisal;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 
-class AppraisalApproval extends Notification
+class AppraisalApproval extends Notification implements ShouldQueue
 {
     use Queueable;
 
     public Appraisal $appraisal;
 
+    public string $name;
+    public string $last_name;
+
     /**
      * Create a new notification instance.
      */
-    public function __construct(Appraisal $appraisal)
+    public function __construct(Appraisal $appraisal, string $name, string $last_name)
     {
         $this->appraisal = $appraisal;
+        $this->name = $name;
+        $this->last_name = $last_name;
     }
 
     /**
@@ -56,8 +62,9 @@ class AppraisalApproval extends Notification
     {
         return [
             'appraisal_id' => $this->appraisal->appraisal_id,
-            'appraisee_first_name' => $this->appraisal->employee->first_name,
-            'appraisee_last_name' => $this->appraisal->employee->last_name,
+            'appraisee_first_name' => $this->name,
+            'appraisee_last_name' => $this->last_name,
+            'message' => 'Appraisal Application from ' . $this->name . ' ' . $this->last_name
         ];
     }
 
@@ -65,9 +72,9 @@ class AppraisalApproval extends Notification
     {
         return new BroadcastMessage([
             'appraisal_id' => $this->appraisal->appraisal_id,
-            'appraisee_first_name' => $this->appraisal->employee->first_name,
-            'appraisee_last_name' => $this->appraisal->employee->last_name,
-            'message' => 'Appraisal Application from ' . $this->appraisal->employee->first_name . ' ' . $this->appraisal->employee->last_name
+            'appraisee_first_name' => $this->name,
+            'appraisee_last_name' => $this->last_name,
+            'message' => 'Appraisal Application from ' . $this->name . ' ' . $this->last_name
         ]);
     }
 }

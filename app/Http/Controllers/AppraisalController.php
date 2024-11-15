@@ -4,8 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Appraisal;
 use App\Models\Entry;
+use App\Models\User;
+use App\Notifications\AppraisalApplication;
+use App\Notifications\AppraisalApproval;
 use Illuminate\Http\Request;
 use App\Models\Form;
+use Illuminate\Support\Facades\Notification;
 
 class AppraisalController extends Controller
 {
@@ -47,8 +51,11 @@ class AppraisalController extends Controller
 
         //get the head of department for the logged in user
         $user = auth()->user();
-        $headOfDepartment = $user->employee->department->head_of_department;
+        $headOfDepartment = $user->employee->department->department_head;
+        $email = User::where('id', $headOfDepartment)->first();
 
+        //send an email to the head of department
+        Notification::send($email, new AppraisalApplication($appraisal, $user->employee->first_name, $user->employee->last_name));
         return back()->with('success', 'Appraisal submitted successfully! Thank you for your response.');
     }
 
@@ -102,14 +109,20 @@ class AppraisalController extends Controller
         try {
             $approval_status = request()->input('status');
             $appraisal = Appraisal::find(request()->input('appraisals_id'));
+            //load employee
+            $appraisal->load('employee');
             $appraisal->approval_status = $approval_status;
             $appraisal->save();
-
+            $employeeUser = $appraisal->employee->user_id;
+            $email = User::where('id', $employeeUser)->first();
+           
             $message = '';
 
-            if ($approval_status == 'approve')
+            if ($approval_status == 'approve') {
+                //send an email to the head of department
+                Notification::send($email, new AppraisalApproval($appraisal, "Staff", "$appraisal->employee->last_name"));
                 $message = 'Appraisal request approved successfully.';
-
+            }
             if ($approval_status == 'reject') {
                 $appraisal->rejection_reason = request()->input('reason');
                 $message = 'Appraisal request rejected successfully.';
