@@ -50,7 +50,6 @@
             </div>
         </div>
 
-
         <div class="status m-2">
             @if (Auth::user()->roles->pluck('name')[0] === $recruitment->approval_status)
                 <span class="badge bg-success">You Approved this Leave Request.</span>
@@ -64,14 +63,15 @@
                 <span class="badge bg-warning">Pending</span>
             @endif
         </div>
-
-        <div class="form-group">
-            <input class="btn btn-outline-primary btn-large approve-btn" value="Approve" type="button"
-                data-recruitment-id="{{ $recruitment->staff_recruitment_id }}">
-            <input class="btn btn-outline-danger btn-large reject-btn" value="Reject" type="button"
-                data-recruitment-id="{{ $recruitment->staff_recruitment_id }}" data-bs-toggle="modal"
-                data-bs-target="#rejectModal">
-        </div>
+        @can('can approve recruitment')
+            <div class="form-group">
+                <input class="btn btn-outline-primary btn-large approve-btn" value="Approve" type="button"
+                    data-recruitment-id="{{ $recruitment->staff_recruitment_id }}">
+                <input class="btn btn-outline-danger btn-large reject-btn" value="Reject" type="button"
+                    data-recruitment-id="{{ $recruitment->staff_recruitment_id }}" data-bs-toggle="modal"
+                    data-bs-target="#rejectModal">
+            </div>
+        @endcan
 
     </div>
 

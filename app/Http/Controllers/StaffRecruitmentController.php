@@ -50,8 +50,8 @@ class StaffRecruitmentController extends Controller
             'approval_status' => 'pending', // Default approval status (adjust as needed)
         ]);
 
-        //get HR users
-        $users = User::where('role', 'HR')->get();
+        //get HR users using spatie
+        $users = User::role('HR')->get();
 
         Notification::send($users, new StaffRecruitmentApplication($staffRecruitment));
 
