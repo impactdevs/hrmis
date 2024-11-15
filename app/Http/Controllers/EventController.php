@@ -114,13 +114,13 @@ class EventController extends Controller
     public function edit(Event $event)
     {
         $positions = Position::pluck('position_name', 'position_id')->toArray();
-        $department = Department::pluck('department_name', 'department_id')->toArray();
-
-        $selectedOptions = $event->category;
-
-        $options = array_merge($positions, $department);
-
-        return view('events.edit', compact('event', 'options', 'selectedOptions'));
+        $departments = Department::pluck('department_name', 'department_id')->toArray();
+        $users_without_all = User::pluck('name', 'id')->toArray();
+        $allUsersOption = ['0' => 'All'];
+        $users = array_merge($allUsersOption, $users_without_all);
+        //sort users to start with 'All'
+        $options = array_merge($positions, $departments, $users);
+        return view('events.edit', compact('options', 'users', 'positions', 'departments', 'event'));
     }
 
     /**

@@ -60,6 +60,7 @@
                         <th scope="col">Phone Number</th>
                         <th scope="col">Date of Entry</th>
                         <th scope="col">Contract Expiry</th>
+                        <th class="col">No. of Years to Retirement</th>
                         <th scope="col">Actions</th>
                     </tr>
                 </thead>
@@ -75,6 +76,9 @@
                             <td>{{ $employee->phone_number }}</td>
                             <td>{{ $employee->date_of_entry ? $employee->date_of_entry->format('Y-m-d') : 'N/A' }}</td>
                             <td>{{ $employee->contract_expiry_date ? $employee->contract_expiry_date->format('Y-m-d') : 'N/A' }}
+                            </td>
+                            <td>
+                                {{ $employee->retirementYearsRemaining() }}
                             </td>
                             <td class="align-middle">
                                 <div class="dropdown">

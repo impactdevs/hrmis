@@ -115,7 +115,7 @@ class AppraisalController extends Controller
             $appraisal->save();
             $employeeUser = $appraisal->employee->user_id;
             $email = User::where('id', $employeeUser)->first();
-           
+
             $message = '';
 
             if ($approval_status == 'approve') {

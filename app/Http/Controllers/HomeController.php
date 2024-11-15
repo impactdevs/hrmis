@@ -193,29 +193,30 @@ class HomeController extends Controller
                     $status = 'Rejected';
                 } else {
                     // Count stages based on status
-                    if ($leave->leave_request_status === 'HR') {
+                    if ($leave->leave_request_status["HR"] ?? "" === 'approved') {
                         $progress += 33;
                         $status = 'Awaiting HOD Approval';
                     }
-                    if ($leave->leave_request_status === 'Head of Division') {
+                    if ($leave->leave_request_status["Head of Division"] ?? "" === 'approved') {
                         $progress += 33;
                         $status = 'Awaiting Executive Secretary Approval';
                     }
-                    if ($leave->leave_request_status === 'Executive Secretary') {
+                    if ($leave->leave_request_status["Executive Secretary"] ?? "" === 'approved') {
                         $progress += 34;
                         $status = 'Your Leave request has been granted';
                     }
                 }
-
                 $leaveApprovalData[] = [
                     'leave' => $leave,
                     'daysRemaining' => $leave->remainingLeaveDays(),
                     'progress' => $progress,
                     'status' => $status,
-                    'hrStatus' => $leave->leave_request_status === 'HR' ? 'Approved' : 'Pending',
-                    'hodStatus' => $leave->leave_request_status === 'Head of Division' ? 'Apprroved' : 'Pending',
-                    'esStatus' => $leave->leave_request_status === 'Executive Secretary' ? 'Approved' : 'Pending',
+                    'hrStatus' => $leave->leave_request_status["HR"] ?? "" === 'approved' ? 'Approved' : 'Pending',
+                    'hodStatus' => $leave->leave_request_status["Head of Division"] ?? "" === 'approved' ? 'Apprroved' : 'Pending',
+                    'esStatus' => $leave->leave_request_status["Executive Secretary"] ?? "" === 'approved' ? 'Approved' : 'Pending',
                 ];
+
+
 
             }
         }

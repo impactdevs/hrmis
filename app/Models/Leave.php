@@ -34,6 +34,7 @@ class Leave extends Model
         'start_date' => 'date',
         'end_date' => 'date',
         'my_work_will_be_done_by' => 'array',
+        'leave_request_status' => 'array'
     ];
 
     protected static function boot()

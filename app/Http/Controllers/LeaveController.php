@@ -64,6 +64,14 @@ class LeaveController extends Controller
             // Get users with the superadmin role
             $users = User::role('HR')->get();
 
+            //HEAD OF DEPARTMENT
+            $user = auth()->user();
+            $headOfDepartment = $user->employee->department->department_head;
+            $hod = User::where('id', $headOfDepartment)->first();
+
+            //add hod to users array
+            $users->push($hod);
+
             // Send notifications to those users
             Notification::send($users, new LeaveApplied($leaveCreated));
         }
@@ -119,45 +127,57 @@ class LeaveController extends Controller
 
         $user = auth()->user();
 
+        // Retrieve current leave_request_status (it will be an array due to casting)
+        $leaveRequestStatus = $leave->leave_request_status ?: []; // Default to an empty array if null
+
         // Update leave request based on the user's role and the input status
         if ($user->hasRole('HR')) {
             if ($request->input('status') === 'approved') {
-                $leave->leave_request_status = 'HR';
+                // Set HR status to approved
+                $leaveRequestStatus['HR'] = 'approved';
                 $leave->rejection_reason = null; // Clear reason if approved
             } else {
-                $leave->leave_request_status = 'rejected';
+                // Set HR status to rejected
+                $leaveRequestStatus['HR'] = 'rejected';
                 $leave->rejection_reason = $request->input('reason'); // Store rejection reason
             }
         } elseif ($user->hasRole('Head of Division')) {
             if ($request->input('status') === 'approved') {
-                $leave->leave_request_status = 'Head of Division';
+                // Set Head of Division status to approved
+                $leaveRequestStatus['Head of Division'] = 'approved';
                 $leave->rejection_reason = null; // Clear reason if approved
             } else {
-                $leave->leave_request_status = 'rejected';
+                // Set Head of Division status to rejected
+                $leaveRequestStatus['Head of Division'] = 'rejected';
                 $leave->rejection_reason = $request->input('reason'); // Store rejection reason
             }
         } elseif ($user->hasRole('Executive Secretary')) {
             if ($request->input('status') === 'approved') {
-                $leave->leave_request_status = 'approved';
+                // Set leave status as approved for Executive Secretary
+                $leaveRequestStatus['Executive Secretary'] = 'approved';
                 $leave->rejection_reason = null; // Clear reason if approved
             } else {
-                $leave->leave_request_status = 'rejected';
+                // Set rejection status
+                $leaveRequestStatus['Executive Secretary'] = 'rejected';
                 $leave->rejection_reason = $request->input('reason'); // Store rejection reason
             }
 
             // Send notification
             $leaveRequester = User::find($leave->user_id); // Get the user who requested the leave
             $approver = User::find(auth()->user()->id);
-            Notification::send($leaveRequester, new LeaveApproval($leave, $approver));// Notify with the approver
+            Notification::send($leaveRequester, new LeaveApproval($leave, $approver)); // Notify with the approver
         } else {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        // Save the updated leave status
+        // Save the updated leave_request_status
+        $leave->leave_request_status = $leaveRequestStatus;
         $leave->save();
 
         return response()->json(['message' => 'Leave application updated successfully.', 'status' => $leave->leave_request_status]);
     }
+
+
 
 
 
