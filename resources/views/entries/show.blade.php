@@ -13,7 +13,7 @@
                                     <span class="text-red-500"> - No answer</span>
                                 @endif
                             </h6>
-                            @if (($key != "CV"))
+                            @if ($key != 'CV')
                                 @if (is_array($field))
                                     <ul class="list-disc pl-5 mt-2">
                                         @foreach ($field as $item)
@@ -38,7 +38,7 @@
                             @else
                                 {{-- show a pdf
                                      --}}
-                                <a href="{{ asset('storage/' . $field)}}" target="_blank"
+                                <a href="{{ asset('storage/' . $field) }}" target="_blank"
                                     class="d-flex align-items-center text-decoration-none">
                                     <img src="{{ asset('assets/img/pdf-icon.png') }}" alt="PDF icon"
                                         class="pdf-icon me-2" width="24">
@@ -141,8 +141,8 @@
 
                 function updateStatus(type, id, status, reason = null) {
                     console.log(type, id, status, reason);
-                    let route = (type == "appraisals") ? '/appraisal/appraisal-approval/' :
-                        '/application/application-approval/';
+                    let route = (type == "appraisals") ? "{{ url('appraisal/appraisal-approval') }}" :
+                        "{{ url('application/application-approval') }}";
                     $.ajax({
                         url: route,
                         type: 'POST',

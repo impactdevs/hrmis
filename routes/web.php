@@ -46,7 +46,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/recruitments/{recruitment}/status', [StaffRecruitmentController::class, 'approveOrReject'])
         ->name('recruitmentments.approveOrReject');
     Route::resource('appraisals', AppraisalController::class);
-    Route::post('/appraisal/appraisal-approval/', [AppraisalController::class, 'approveOrReject'])
+    Route::post('/appraisal/appraisal-approval', [AppraisalController::class, 'approveOrReject'])
         ->name('appraisals.approveOrReject');
     Route::resource('events', EventController::class);
     Route::resource('trainings', TrainingController::class);
@@ -97,7 +97,7 @@ Route::middleware('auth')->group(function () {
 
     //applications
     Route::get('/applications', [ApplicationController::class, 'index'])->name('applications.index');
-    Route::post('/application/application-approval/', [ApplicationController::class, 'approveOrReject'])
+    Route::post('application/application-approval', [ApplicationController::class, 'approveOrReject'])
         ->name('application.approveOrReject');
     Route::get('/unst-job-application', [ApplicationController::class, 'survey'])->name('application.survey');
     Route::post('/applications', [ApplicationController::class, 'store'])->name('applications.store');
