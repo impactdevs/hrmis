@@ -15,13 +15,13 @@
                     <label for="leave_start_date">
                         <i class="fas fa-clock"></i> Leave Start Date
                     </label>
-                    <p class="border p-2 rounded bg-light">{{ $leave->leave_start_date->toDateString() }}</p>
+                    <p class="border p-2 rounded bg-light">{{ $leave->start_date->toDateString() }}</p>
                 </div>
                 <div class="form-group mb-3">
                     <label for="leave_end_date">
                         <i class="fas fa-clock"></i> Leave End Date
                     </label>
-                    <p class="border p-2 rounded bg-light">{{ $leave->leave_end_date->toDateString() }}</p>
+                    <p class="border p-2 rounded bg-light">{{ $leave->end_date->toDateString() }}</p>
                 </div>
                 <div class="form-group mb-3">
                     <label for="leave_description">
