@@ -52,8 +52,12 @@
                                     @endphp
 
                                     @foreach ($userIds as $id)
+                                    @if($id ==0)
+                                    <span class="badge bg-primary">All Users</span>
+                                    @else
                                         <span
                                             class="badge bg-primary">{{ $options['users'][$id] ?? 'Unknown User' }}</span>
+                                    @endif
                                     @endforeach
 
                                     @foreach ($departmentIds as $id)

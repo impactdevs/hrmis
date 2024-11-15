@@ -36,8 +36,36 @@
                         <i class="fas fa-tags"></i> Event Categories
                     </label>
                     <ul class="list-group">
-                        @foreach ($event->category as $category)
-                            <li class="list-group-item">{{ $category }}</li>
+
+                        @php
+                            // Assume training_category contains comma-separated IDs for each category
+                            $userIds = explode(',', $event->category['users'] ?? '');
+                            $departmentIds = explode(',', $event->category['departments'] ?? '');
+                            $positionIds = explode(',', $event->category['positions'] ?? '');
+
+                        @endphp
+                        @foreach ($userIds as $id)
+                            @if ($id === 'All')
+                                <span class="badge bg-primary">All Users</span>
+                            @elseif (!empty($id) && isset($options['users'][$id]))
+                                <span class="badge bg-primary">{{ $options['users'][$id] ?? 'Unknown User' }}</span>
+                            @endif
+                        @endforeach
+
+
+
+                        @foreach ($departmentIds as $id)
+                            @if (isset($options['users'][$id]))
+                                <span
+                                    class="badge bg-success">{{ $options['departments'][$id] == '' ? '' : $options['departments'][$id] ?? 'Unknown Department' }}</span>
+                            @endif
+                        @endforeach
+
+                        @foreach ($positionIds as $id)
+                            @if (isset($options['users'][$id]))
+                                <span
+                                    class="badge bg-info">{{ $options['positions'][$id] == '' ? '' : $options['positions'][$id] ?? 'Unknown Position' }}</span>
+                            @endif
                         @endforeach
                     </ul>
                 </div>

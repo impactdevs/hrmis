@@ -105,7 +105,20 @@ class EventController extends Controller
      */
     public function show(Event $event)
     {
-        return view('events.show', compact('event'));
+        $positions = Position::pluck('position_name', 'position_id')->toArray();
+        $departments = Department::pluck('department_name', 'department_id')->toArray();
+        $users = User::pluck('name', 'id')->toArray() ?? [];
+
+
+        // Keep the options separate for later use if needed
+        $options = [
+            'positions' => $positions,
+            'departments' => $departments,
+            'users' => $users,
+        ];
+
+        $events = Event::paginate(10);
+        return view('events.show', compact('event', 'options'));
     }
 
     /**

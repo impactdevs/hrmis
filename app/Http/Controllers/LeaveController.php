@@ -82,9 +82,9 @@ class LeaveController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Leave $leave)
+    public function show(Leave $leaf)
     {
-        return view('leaves.show', compact('leave'));
+        return view('leaves.show', compact('leaf'));
     }
 
     /**

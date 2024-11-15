@@ -29,15 +29,13 @@
                     </label>
                     <p class="border p-2 rounded bg-light">{{ $training->training_description }}</p>
                 </div>
-            </div>
-            @if (!is_null($training->training_category))
-                <div class="col-md-6">
-                    <div class="form-group mb-3">
-                        <label for="category">
-                            <i class="fas fa-tags"></i> Training Categories
-                        </label>
-                        <ul class="list-group">
 
+                <div class="form-group mb-3">
+                    <label for="training_description">
+                        <i class="fas fa-info-circle"></i> Training Categories
+                    </label>
+                    <p>
+                        @if (!is_null($training->training_category))
                             @php
                                 // Assume training_category contains comma-separated IDs for each category
                                 $userIds = explode(',', $training->training_category['users'] ?? '');
@@ -46,21 +44,28 @@
                             @endphp
 
                             @foreach ($userIds as $id)
-                                <li>{{ $options['users'][$id] ?? 'Unknown User' }}</li>
+                                @if ($id == 0)
+                                    <span class="">All Users,</span>
+                                @else
+                                    <span class="">{{ $options['users'][$id] ?? 'Unknown User' }},</span>
+                                @endif
                             @endforeach
 
                             @foreach ($departmentIds as $id)
-                                <li>{{ $options['departments'][$id] ?? 'Unknown Department' }}</li>
+                                <span class="">{{ $options['departments'][$id] ?? 'Unknown Department' }},</span>
                             @endforeach
 
                             @foreach ($positionIds as $id)
-                                <li>{{ $options['positions'][$id] ?? 'Unknown Position' }}</li>
+                                <span class="">{{ $options['positions'][$id] ?? 'Unknown Position' }},</span>
                             @endforeach
+                        @else
+                            <span class="">{{ $options['users'][$training->user_id] }},
+                        @endif
+                    </p>
 
-                        </ul>
-                    </div>
                 </div>
-            @endif
+            </div>
+
             @can('approve training')
                 @if (!is_null($training->user_id))
                     <div class="status m-2">
