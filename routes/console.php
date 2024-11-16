@@ -3,4 +3,4 @@
 use Illuminate\Support\Facades\Schedule;
 
 //send birthday reminders
-Schedule::command('reminders:send-birthday')->everyMinute();
+Schedule::command('reminders:send-birthday')->weekly();
