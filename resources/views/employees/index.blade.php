@@ -35,14 +35,18 @@
                             <option value="">Select Department</option>
                             @foreach ($departments as $department)
                                 <option value="{{ $department->department_id }}"
-                                    {{ request()->input('department_id') == $department->department_id ? 'selected' : '' }}>
+                                    {{ request()->input('department') == $department->department_id ? 'selected' : '' }}>
                                     {{ $department->department_name }}
                                 </option>
                             @endforeach
                         </select>
                     </div>
+
                     <div class="col">
-                        <button type="submit" class="btn btn-primary">Filter</button>
+                        <button type="submit" class="btn btn-primary">Apply Filter</button>
+                    </div>
+                    <div class="col">
+                        <a href="{{ route('employees.index') }}" class="btn btn-secondary">Reset Filters</a>
                     </div>
                 </div>
             </form>
@@ -87,7 +91,6 @@
                                         Actions
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-
                                         <li>
                                             <a class="dropdown-item"
                                                 href="{{ route('employees.show', $employee->employee_id) }}">
@@ -125,7 +128,11 @@
             </table>
 
             <div class="pagination-wrapper">
-                {!! $employees->appends(['search' => request()->get('search'), 'position' => request()->get('position')])->render() !!}
+                {!! $employees->appends([
+                        'search' => request()->get('search'),
+                        'position' => request()->get('position'),
+                        'department' => request()->get('department'),
+                    ])->render() !!}
             </div>
         </div>
     </div>

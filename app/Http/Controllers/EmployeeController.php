@@ -21,52 +21,40 @@ class EmployeeController extends Controller
      */
     public function index(Request $request)
     {
-
         $keyword = $request->get('search');
-
         $position_id = $request->get('position');
-
         $department_id = $request->get('department');
-
         $perPage = 25;
 
-        if (!empty($keyword) && !empty($position_id) && !empty($department_id)) {
-            $employees = Employee::where('first_name', 'LIKE', "%$keyword%")
-                ->orWhere('last_name', 'LIKE', "%$keyword%")
-                ->orWhere('position_id', '=', $position_id)
-                ->orWhere('department_id', '=', $department_id)
-                ->latest()->paginate($perPage);
-        } else if (!empty($keyword) && !empty($position_id)) {
-            $employees = Employee::where('first_name', 'LIKE', "%$keyword%")
-                ->orWhere('last_name', 'LIKE', "%$keyword%")
-                ->orWhere('position_id', '=', $position_id)
-                ->latest()->paginate($perPage);
-        } else if (!empty($keyword) && !empty($department_id)) {
-            $employees = Employee::where('first_name', 'LIKE', "%$keyword%")
-                ->orWhere('last_name', 'LIKE', "%$keyword%")
-                ->orWhere('department_id', '=', $department_id)
-                ->latest()->paginate($perPage);
-        } else if (!empty($keyword)) {
-            $employees = Employee::where('first_name', 'LIKE', "%$keyword%")
-                ->orWhere('last_name', 'LIKE', "%$keyword%")
-                ->latest()->paginate($perPage);
-        } else if (!empty($position_id)) {
-            $employees = Employee::where('first_name', 'LIKE', "%$keyword%")
-                ->orWhere('last_name', 'LIKE', "%$keyword%")
-                ->latest()->paginate($perPage);
-        } else if (!empty($department_id)) {
-            $employees = Employee::where('first_name', 'LIKE', "%$keyword%")
-                ->orWhere('last_name', 'LIKE', "%$keyword%")
-                ->latest()->paginate($perPage);
-        } else {
-            $employees = Employee::latest()->paginate($perPage);
+        $query = Employee::query();
+
+        // Apply the filters to the query
+        if (!empty($keyword)) {
+            $query->where(function($q) use ($keyword) {
+                $q->where('first_name', 'LIKE', "%$keyword%")
+                  ->orWhere('last_name', 'LIKE', "%$keyword%");
+            });
         }
-        //positions
+
+        if (!empty($position_id)) {
+            $query->where('position_id', '=', $position_id);
+        }
+
+        if (!empty($department_id)) {
+            $query->where('department_id', '=', $department_id);
+        }
+
+        // Paginate the results
+        $employees = $query->latest()->paginate($perPage);
+
+        // Get positions and departments for the filter dropdowns
         $positions = Position::select('position_id', 'position_name')->get();
         $departments = Department::select('department_id', 'department_name')->get();
 
+        // Return the view with the filtered results and filter options
         return view('employees.index', compact('employees', 'keyword', 'positions', 'departments'));
     }
+
 
 
     /**
