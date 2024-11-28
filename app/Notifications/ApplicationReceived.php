@@ -43,7 +43,8 @@ class ApplicationReceived extends Notification implements ShouldQueue
             ->line('for the role: ' . $this->application->company_job->title)
             ->line('We will give you feedback as soon as possible.')
             ->line('Thank you!')
-            ->line('UNCST');
+            ->line('UNCST')
+            ->line('do not reply to this email!!');
     }
 
     /**

@@ -32,11 +32,14 @@
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $recruitment->position }}</td>
                                     <td>{{ $recruitment->department->department_name }}</td>
-                                    <td>
-                                        <span
-                                            class="badge bg-{{ $recruitment->approval_status === 'HR' ? 'warning' : 'success' }}">
-                                            {{ $recruitment->approval_status }}
-                                        </span>
+                                    <td class="align-middle">
+                                        @if (!is_null($recruitment->approval_status))
+                                            @foreach ($recruitment->approval_status as $key => $status)
+                                                <span>{{ $key . '-' . ucfirst($status) }}</span>
+                                            @endforeach
+                                        @else
+                                            <span class="badge bg-warning">Pending</span>
+                                        @endif
                                     </td>
                                     <td>
                                         <div class="dropdown">

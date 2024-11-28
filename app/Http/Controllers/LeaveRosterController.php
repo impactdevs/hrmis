@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Department;
+use App\Models\Employee;
 use App\Models\LeaveRoster;
+use App\Models\LeaveType;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class LeaveRosterController extends Controller
@@ -12,17 +16,15 @@ class LeaveRosterController extends Controller
      */
     public function index()
     {
-        // Get the first day of the month and determine what day of the week it starts on
-        $firstDayOfMonth = \Carbon\Carbon::createFromDate(date('Y'), date('m'), 1)->dayOfWeek;
-        $daysInMonth = \Carbon\Carbon::createFromDate(date('Y'), date('m'), 1)->daysInMonth; // Total days in the month
-        $day = 1; // Starting day of the month
-        $weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-        $weeksInMonth = ceil($daysInMonth / 7);
-        $year = date('Y');
-        $month = date('m');
-        //get Departments
-        $departments = \App\Models\Department::with('employees', 'employees.leaveRoster', 'employees')->get();
-        return view('leave-roster.index', compact('firstDayOfMonth', 'daysInMonth', 'day', 'weekdays', 'weeksInMonth', 'departments', 'year', 'month'));
+        $user_id = auth()->user()->id;
+        $leaveTypes = LeaveType::pluck('leave_type_name', 'leave_type_id')->toArray();
+        $existingValuesArray = [];
+        $users = User::pluck('name', 'id')->toArray();
+
+        //departments
+        $departments = Department::pluck('department_name', 'department_id')->toArray();
+
+        return view('leave-roster.index', compact('leaveTypes', 'user_id', 'existingValuesArray', 'users', 'departments'));
     }
 
     /**
@@ -38,8 +40,78 @@ class LeaveRosterController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $employee_id = auth()->user()->employee->employee_id;
+        $leaveRosterAdded = LeaveRoster::create([
+            'employee_id' => $employee_id,
+            'start_date' => $request->input('start_date'),
+            'end_date' => $request->input('end_date'),
+            'leave_title' => $request->input('leave_title'),
+        ]);
+
+        //load employee
+        $leaveRosterAdded->load('employee');
+
+        if ($leaveRosterAdded) {
+            return response()->json(['success' => true, 'message' => 'Leave Roster added successfully', 'data' => $leaveRosterAdded]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Failed to add Leave Roster']);
     }
+
+    /*
+     *get leave roster calendar data
+     */
+    public function leaveRosterCalendarData(Request $request)
+    {
+
+        $employee_id = auth()->user()->employee->employee_id;
+
+        // Get the filters from the request, defaulting to 'all'
+        $approvalStatus = $request->input('approval_status', 'all');
+        $department = $request->input('department', 'all');
+
+        // Start with the query to get the leave roster
+        $leaveRosterQuery = LeaveRoster::with('employee'); // Eager load employee relationship
+
+        // Filter by booking_approval_status status (Approved, Pending, Rejected)
+        if ($approvalStatus !== 'all') {
+            // Adjusting the approval status filtering logic based on the 'booking_approval_status' field
+            if ($approvalStatus === 'Approved') {
+                $leaveRosterQuery->where('booking_approval_status', 'Approved');
+            } elseif ($approvalStatus === 'Rejected') {
+                $leaveRosterQuery->where('booking_approval_status', 'Rejected');
+            } elseif ($approvalStatus === 'Pending') {
+                $leaveRosterQuery->where('booking_approval_status', 'Pending');
+            }
+        }
+
+        // Filter by department if selected
+        if ($department !== 'all') {
+            $employeeIds = Employee::where('department_id', $department)->pluck('employee_id');
+            $leaveRosterQuery->whereIn('employee_id', $employeeIds);
+        }
+
+        // Retrieve the filtered leave roster
+        $leaveRoster = $leaveRosterQuery->get()->map(function ($leave) {
+            return [
+                'leave_roster_id' => $leave->leave_roster_id,
+                'title' => $leave->leave_title,
+                'start' => $leave->start_date->toIso8601String(),
+                'end' => $leave->end_date->toIso8601String(),
+                'bookingApprovalRequest' => $leave->booking_approval_status,  // This will show Approved, Pending, or Rejected
+                'staffId' => $leave->employee->staff_id ?? null,
+                'first_name' => $leave->employee->first_name ?? null,
+                'last_name' => $leave->employee->last_name ?? null,
+                // Add additional employee or leave-related data if necessary
+            ];
+        });
+
+        // Return the filtered leave roster data
+        return response()->json(['success' => true, 'data' => $leaveRoster]);
+    }
+
+
+
 
     /**
      * Display the specified resource.
@@ -62,7 +134,12 @@ class LeaveRosterController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $leaveRoster = LeaveRoster::findOrFail($id);  // Find the event by its leave_roster_id
+
+        //only update what was modified
+        $leaveRoster->update($request->all());
+
+        return response()->json(['success' => true, 'data' => $leaveRoster]);
     }
 
     /**
@@ -70,14 +147,16 @@ class LeaveRosterController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $leaveRoster = LeaveRoster::findOrFail($id);  // Find the event by its leave_roster_id
+        $leaveRoster->delete();
+
+        return response()->json(['success' => true]);
     }
+
 
     public function saveLeaveRosterData()
     {
         try {
-
-
             $data = request()->validate([
                 'month' => 'required|integer|min:1|max:12',
                 'employee_id' => 'required|exists:employees,employee_id',
@@ -106,32 +185,4 @@ class LeaveRosterController extends Controller
             return response()->json(['success' => false, 'error' => 'failed to save leave data', 'message' => $e->getMessage()]);
         }
     }
-
-    public function getcalender(Request $request)
-    {
-        $user = auth()->user();
-        $employee_id = $user->employee->employee_id;
-        $leaveRoster = LeaveRoster::where('employee_id', $employee_id)->first();
-
-        // Initialize an array to store the total leave days for each month
-        $leaveDaysPerMonth = array_fill(1, 12, 0); // Initialize with 0 for each month
-
-        // Loop through the months and calculate the total leave days for each month
-        foreach ($leaveRoster->months as $year => $months) {
-            foreach ($months as $month => $days) {
-                // Add the leave days for this month to the total (days is an array)
-                $leaveDaysPerMonth[$month] += $days; // Count the number of leave days for this month
-            }
-        }
-
-        // Return the leave days data
-        return response()->json([
-            'leaveDaysPerMonth' => $leaveDaysPerMonth // Include total leave days for each month
-        ]);
-    }
-
-
-
-
-
 }

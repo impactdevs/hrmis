@@ -32,6 +32,7 @@ class StoreStaffRecruitmentRequest extends FormRequest
             'sourcing_method' => 'required|in:internal,external', // Either internal or external
             'employment_basis' => 'required|in:Contract,Part-time,Fulltime', // Contract, Part-time, or Fulltime
             'justification' => 'required|string|min:10', // Justification must be at least 10 characters
+            'funding_budget' => 'required|in:governement of uganda,project',
         ];
     }
 
@@ -58,6 +59,8 @@ class StoreStaffRecruitmentRequest extends FormRequest
             'employment_basis.in' => 'The employment basis must be Contract, Part-time, or Fulltime.',
             'justification.required' => 'Please provide a justification for the recruitment.',
             'justification.min' => 'The justification must be at least 10 characters long.',
+            'funding_budget.required' => 'Please select a funding budget.',
+            'funding_budget.in' => 'The funding budget must be either governement of uganda or project.',
         ];
     }
 }

@@ -23,9 +23,9 @@ class PermissionsDemoSeeder extends Seeder
         $role3 = 'HR';
         $role4 = 'Head of Division';
         $role5 = 'Assistant Executive Secretary';
-        $role1 = Role::create(['name' => $role3]);
-        $role2 = Role::create(['name' => $role2]);
-        $role3 = Role::create(['name' => $role3]);
+        $role1 = Role::create(['name' => $role1]);
+        // $role2 = Role::create(['name' => $role2]);
+        // $role3 = Role::create(['name' => $role3]);
         $role4 = Role::create(['name' => $role4]);
         $role5 = Role::create(['name' => $role5]);
         // gets all permissions via Gate::before rule; see AuthServiceProvider

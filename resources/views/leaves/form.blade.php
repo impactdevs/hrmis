@@ -1,11 +1,21 @@
 <div class="row mb-3">
     <div class="col-md-6">
-        <x-forms.input name="start_date" label="Leave Start Date" type="date" id="start_date"
-            value="{{ old('start_date', isset($leave) && $leave->start_date ? $leave->start_date->toDateString() : '') }}" />
+        @if (!isset($leaveRoster))
+            <x-forms.input name="start_date" label="Leave Start Date" type="date" id="start_date"
+                value="{{ old('start_date', isset($leave) && $leave->start_date ? $leave->start_date->toDateString() : '') }}" />
+        @else
+            <x-forms.input name="start_date" label="Leave Start Date" type="date" id="start_date"
+                value="{{ old('start_date', $leaveRoster->start_date->toDateString()) }}" />
+        @endif
     </div>
     <div class="col-md-6">
-        <x-forms.input name="end_date" label="Leave End Date" type="date" id="end_date"
-            value="{{ old('end_date', isset($leave) && $leave->end_date ? $leave->end_date->toDateString() : '') }}" />
+        @if (!isset($leaveRoster))
+            <x-forms.input name="end_date" label="Leave End Date" type="date" id="end_date"
+                value="{{ old('end_date', isset($leave) && $leave->end_date ? $leave->end_date->toDateString() : '') }}" />
+        @else
+            <x-forms.input name="end_date" label="Leave End Date" type="date" id="end_date"
+                value="{{ old('end_date', $leaveRoster->end_date->toDateString()) }}" />
+        @endif
     </div>
 </div>
 

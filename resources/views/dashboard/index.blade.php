@@ -287,7 +287,7 @@
                             <div class="card info-card sales-card">
 
                                 <div class="card-body">
-                                    <h5 class="card-title">Leaves</h5>
+                                    <h5 class="card-title">Leave Days Allocated</h5>
 
                                     <div class="d-flex align-items-center">
                                         <div
@@ -308,7 +308,7 @@
                             <div class="card info-card revenue-card">
 
                                 <div class="card-body">
-                                    <h5 class="card-title">Leave Days Used <span>| This Year</span></h5>
+                                    <h5 class="card-title">Leave Utilized <span>| This Year</span></h5>
 
                                     <div class="d-flex align-items-center">
                                         <div

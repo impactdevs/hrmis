@@ -90,6 +90,8 @@
             <p>We appreciate the time and effort you’ve put into your application, and we look forward to connecting with you soon.</p>
 
             <p>Thank you once again for applying!</p>
+
+            <p class="bold ">Do not reply to this email</p>
         </div>
 
         <!-- Footer Section -->

@@ -18,7 +18,7 @@ return new class extends Migration {
             $table->date('training_start_date');
             $table->date('training_end_date');
             $table->json('training_category')->nullable();
-            $table->string('approval_status')->nullable();
+            $table->json('leave_request_status')->nullable();
             $table->longText('rejection_reason')->nullable();
             $table->uuid('user_id')->nullable()->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();

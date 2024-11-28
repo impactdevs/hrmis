@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(PermissionsDemoSeeder::class);
+        // $this->call(PermissionsDemoSeeder::class);
 
         $positions = [
             ['position_id' => Str::uuid(), 'position_name' => 'Manager'],

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appraisal;
+use App\Models\Employee;
 use App\Models\Entry;
+use App\Models\Scopes\EmployeeScope;
 use App\Models\User;
 use App\Notifications\AppraisalApplication;
 use App\Notifications\AppraisalApproval;
@@ -109,22 +111,24 @@ class AppraisalController extends Controller
         try {
             $approval_status = request()->input('status');
             $appraisal = Appraisal::find(request()->input('appraisals_id'));
-            //load employee
-            $appraisal->load('employee');
+            //logeed in employee
+            $loggedInEmployee = auth()->user()->employee;
+            $employee = Employee::withoutGlobalScope(EmployeeScope::class)->where('employee_id', $appraisal->employee_id)->first();
             $appraisal->approval_status = $approval_status;
             $appraisal->save();
-            $employeeUser = $appraisal->employee->user_id;
+            $employeeUser = $employee->user_id;
             $email = User::where('id', $employeeUser)->first();
 
             $message = '';
 
             if ($approval_status == 'approve') {
                 //send an email to the head of department
-                Notification::send($email, new AppraisalApproval($appraisal, "Staff", "$appraisal->employee->last_name"));
+                Notification::send($email, new AppraisalApproval($appraisal, $loggedInEmployee ->first_name, $loggedInEmployee ->last_name));
                 $message = 'Appraisal request approved successfully.';
             }
             if ($approval_status == 'reject') {
                 $appraisal->rejection_reason = request()->input('reason');
+                Notification::send($email, new AppraisalApproval($appraisal, $loggedInEmployee ->first_name, $loggedInEmployee ->last_name));
                 $message = 'Appraisal request rejected successfully.';
             }
             return response()->json([

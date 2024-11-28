@@ -41,9 +41,9 @@
             </div>
         </div>
 
-        <div class="mt-3">
+        {{-- <div class="mt-3">
             <a href="{{ route('leaves.create') }}" class="btn btn-success">Add a Leave</a>
-        </div>
+        </div> --}}
 
         <div class="mt-3">
             <div class="row" id="leaveCards">
@@ -70,7 +70,7 @@
                                 </p>
                                 <p class="card-text"><strong>People to Stand In For Me:</strong></p>
                                 <div>
-                                    @foreach (explode(',', $leave->my_work_will_be_done_by['users'] ?? "") as $person)
+                                    @foreach (explode(',', $leave->my_work_will_be_done_by['users'] ?? '') as $person)
                                         <span
                                             class="badge badge-info bg-info">{{ $users[$person] ?? 'Unknown User' }}</span>
                                     @endforeach

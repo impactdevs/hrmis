@@ -288,6 +288,24 @@ class EmployeeController extends Controller
 
     }
 
+    // In EmployeeController.php
+    public function updateEntitledLeaveDays(Request $request, $id)
+    {
+        $employee = Employee::findOrFail($id);
+
+        // Validate the input
+        $validated = $request->validate([
+            'entitled_leave_days' => 'required|numeric|min:0',
+        ]);
+
+        // Update the employee's entitled leave days
+        $employee->entitled_leave_days = $request->input('entitled_leave_days');
+        $employee->save();
+
+        return response()->json(['success' => true]);
+    }
+
+
     /**
      * Remove the specified resource from storage.
      */

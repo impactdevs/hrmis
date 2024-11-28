@@ -28,6 +28,7 @@ class Leave extends Model
         'reason',
         'leave_request_status',
         'my_work_will_be_done_by',
+        'leave_roster_id'
     ];
 
     protected $casts = [
@@ -74,6 +75,12 @@ class Leave extends Model
 
         // Calculate the remaining days
         return $currentDate->diffInDays($endDate); // Remaining days
+    }
+
+    //every leave belongs to a leave roster
+    public function leaveRoster()
+    {
+        return $this->belongsTo(LeaveRoster::class, 'leave_roster_id', 'leave_roster_id');
     }
 
 

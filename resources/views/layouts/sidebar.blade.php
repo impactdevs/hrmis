@@ -30,6 +30,16 @@
                 </a>
             </li>
 
+            @if (auth()->user()->isAdminOrSecretary())
+                <li class="nav-item">
+                    <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('leave-management')) bg-secondary @endif"
+                        href="{{ route('leave-management') }}">
+                        <i class="bi bi-card-checklist"></i>
+                        Leave Management
+                    </a>
+                </li>
+            @endif
+
             <li class="nav-item">
                 <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('appraisals.index')) bg-secondary @endif"
                     href="{{ route('appraisals.index') }}">
@@ -51,6 +61,10 @@
                         request()->routeIs('trainings.show') ||
                         request()->routeIs('trainings.edit') ||
                         request()->routeIs('trainings.create') ||
+                        request()->routeIs('out-of-station-trainings.index') ||
+                        request()->routeIs('out-of-station-trainings.create') ||
+                        request()->routeIs('out-of-station-trainings.edit') ||
+                        request()->routeIs('out-of-station-trainings.show') ||
                         request()->routeIs('apply')) bg-secondary @endif"
                     href="{{ route('trainings.index') }}">
                     <i class="bi bi-eyedropper"></i>
@@ -85,18 +99,19 @@
                         Applications
                     </a>
                 </li>
-            @endif
 
-            <li class="nav-item">
-                <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('recruitments.index') ||
-                        request()->routeIs('recruitments.show') ||
-                        request()->routeIs('recruitments.edit') ||
-                        request()->routeIs('recruitments.create')) bg-secondary @endif"
-                    href="{{ route('recruitments.index') }}">
-                    <i class="bi bi-bank2"></i>
-                    Staff Recruitment
-                </a>
-            </li>
+
+                <li class="nav-item">
+                    <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('recruitments.index') ||
+                            request()->routeIs('recruitments.show') ||
+                            request()->routeIs('recruitments.edit') ||
+                            request()->routeIs('recruitments.create')) bg-secondary @endif"
+                        href="{{ route('recruitments.index') }}">
+                        <i class="bi bi-bank2"></i>
+                        Staff Recruitment
+                    </a>
+                </li>
+            @endif
         </ul>
         @if (auth()->user()->hasRole('HR'))
             <h6

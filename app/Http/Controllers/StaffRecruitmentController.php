@@ -47,7 +47,8 @@ class StaffRecruitmentController extends Controller
             'sourcing_method' => $request->input('sourcing_method'),
             'employment_basis' => $request->input('employment_basis'),
             'justification' => $request->input('justification'),
-            'approval_status' => 'pending', // Default approval status (adjust as needed)
+            'funding_budget' => $request->input('funding_budget'),
+            'user_id' => auth()->user()->id
         ]);
 
         //get HR users using spatie
@@ -120,29 +121,38 @@ class StaffRecruitmentController extends Controller
 
         $user = auth()->user();
 
+        // Retrieve current leave_request_status (it will be an array due to casting)
+        $recruitmentRequestStatus = $recruitment->approval_status ?: []; // Default to an empty array if null
+
         // Update leave request based on the user's role and the input status
         if ($user->hasRole('HR')) {
             if ($request->input('status') === 'approved') {
-                $recruitment->approval_status = 'HR';
+                // Set HR status to approved
+                $recruitmentRequestStatus['HR'] = 'approved';
                 $recruitment->rejection_reason = null; // Clear reason if approved
             } else {
-                $recruitment->approval_status = 'rejected';
+                // Set HR status to rejected
+                $recruitmentRequestStatus['HR'] = 'rejected';
                 $recruitment->rejection_reason = $request->input('reason'); // Store rejection reason
             }
         } elseif ($user->hasRole('Head of Division')) {
             if ($request->input('status') === 'approved') {
-                $recruitment->approval_status = 'Head of Division';
+                // Set Head of Division status to approved
+                $recruitmentRequestStatus['Head of Division'] = 'approved';
                 $recruitment->rejection_reason = null; // Clear reason if approved
             } else {
-                $recruitment->approval_status = 'rejected';
+                // Set Head of Division status to rejected
+                $recruitmentRequestStatus['Head of Division'] = 'rejected';
                 $recruitment->rejection_reason = $request->input('reason'); // Store rejection reason
             }
         } elseif ($user->hasRole('Executive Secretary')) {
             if ($request->input('status') === 'approved') {
-                $recruitment->approval_status = 'approved';
+                // Set leave status as approved for Executive Secretary
+                $recruitmentRequestStatus['Executive Secretary'] = 'approved';
                 $recruitment->rejection_reason = null; // Clear reason if approved
             } else {
-                $recruitment->approval_status = 'rejected';
+                // Set rejection status
+                $recruitmentRequestStatus['Executive Secretary'] = 'rejected';
                 $recruitment->rejection_reason = $request->input('reason'); // Store rejection reason
             }
 
@@ -150,11 +160,13 @@ class StaffRecruitmentController extends Controller
             $leaveRequester = User::find($recruitment->user_id); // Get the user who requested the leave
             $approver = User::find(auth()->user()->id);
             Notification::send($leaveRequester, new StaffRecruitmentApproval($recruitment, $approver));
+
         } else {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
-
-
+        // Save the updated leave_request_status
+        $recruitment->approval_status = $recruitmentRequestStatus;
+        $recruitment->save();
 
         // Save the updated leave status
         $recruitment->save();

@@ -74,22 +74,24 @@
                 {{--  @can('approve application')  or @can('approve appraisal') --}}
                 @if (auth()->user()->hasPermissionTo('can approve application') ||
                         auth()->user()->hasPermissionTo('can approve appraisal'))
-                    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 pt-3">
-                        @php
-                            $typeMod = $type == 'appraisals' ? 'appraisal' : 'application';
-                        @endphp
-                        <a href="#" class="btn btn-primary text-white fs-6 approve-btn"
-                            data-{{ $type }}-id="{{ $entry->{$type}[0]->{$typeMod . '_id'} }}"
-                            data-{{ $type }}-request-status="approve" data-type="{{ $type }}">
-                            <i class="bi bi-check"></i> APPROVE {{ strtoupper($type) }}
-                        </a>
+                    @if ($type == 'appraisals')
+                        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 pt-3">
+                            @php
+                                $typeMod = $type == 'appraisals' ? 'appraisal' : 'application';
+                            @endphp
+                            <a href="#" class="btn btn-primary text-white fs-6 approve-btn"
+                                data-{{ $type }}-id="{{ $entry->{$type}[0]->{$typeMod . '_id'} }}"
+                                data-{{ $type }}-request-status="approve" data-type="{{ $type }}">
+                                <i class="bi bi-check"></i> APPROVE {{ strtoupper($type) }}
+                            </a>
 
-                        <a href="#" class="btn btn-danger text-white fs-6 reject-btn"
-                            data-{{ $type }}-id="{{ $entry->{$type}[0]->{$typeMod . '_id'} }}"
-                            data-bs-toggle="modal" data-bs-target="#rejectModal" data-type="{{ $type }}">
-                            <i class="bi bi-x"></i> REJECT {{ strtoupper($type) }}
-                        </a>
-                    </div>
+                            <a href="#" class="btn btn-danger text-white fs-6 reject-btn"
+                                data-{{ $type }}-id="{{ $entry->{$type}[0]->{$typeMod . '_id'} }}"
+                                data-bs-toggle="modal" data-bs-target="#rejectModal" data-type="{{ $type }}">
+                                <i class="bi bi-x"></i> REJECT {{ strtoupper($type) }}
+                            </a>
+                        </div>
+                    @endif
                 @endif
             @endif
         @endforeach

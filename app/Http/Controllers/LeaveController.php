@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Employee;
 use App\Models\Leave;
+use App\Models\LeaveRoster;
 use App\Models\LeaveType;
 use App\Models\User;
 use App\Notifications\LeaveApplied;
@@ -33,7 +34,7 @@ class LeaveController extends Controller
         //current year
         $currentYear = Carbon::now()->year;
         $employee = Employee::where('user_id', $user)->first();
-        $totalLeaveDaysAllocated = $employee->leaveRoster->totalLeaveDays();
+        $totalLeaveDaysAllocated = $employee->totalLeaveRosterDays();
         $useDays = $employee->totalLeaveDays();
         return view('leaves.index', compact('leaves', 'totalLeaves', 'totalDays', 'leavesPerCategory', 'users', 'totalLeaveDaysAllocated', 'useDays'));
     }
@@ -49,6 +50,20 @@ class LeaveController extends Controller
         $existingValuesArray = [];
         $users = User::pluck('name', 'id')->toArray();
         return view('leaves.create', compact('leaveTypes', 'user_id', 'existingValuesArray', 'users'));
+
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function applyForLeave(LeaveRoster $leaveRoster)
+    {
+        //get the logged in user email
+        $user_id = auth()->user()->id;
+        $leaveTypes = LeaveType::pluck('leave_type_name', 'leave_type_id')->toArray();
+        $existingValuesArray = [];
+        $users = User::pluck('name', 'id')->toArray();
+        return view('leaves.create', compact('leaveTypes', 'user_id', 'existingValuesArray', 'users', 'leaveRoster'));
 
     }
 
@@ -102,7 +117,10 @@ class LeaveController extends Controller
      */
     public function update(Request $request, Leave $leave)
     {
+
         $leave->update($request->all());
+
+
 
         return redirect()->route('leaves.index')->with('success', 'Leave updated successfully.');
     }
@@ -116,6 +134,7 @@ class LeaveController extends Controller
 
         return redirect()->route('leaves.index')->with('success', 'Leave deleted successfully.');
     }
+
 
 
     public function approveOrReject(Request $request, Leave $leave)
@@ -175,6 +194,50 @@ class LeaveController extends Controller
         $leave->save();
 
         return response()->json(['message' => 'Leave application updated successfully.', 'status' => $leave->leave_request_status]);
+    }
+
+    public function leaveManagement()
+    {
+        //get all employees
+        $employees = Employee::latest()->paginate();
+        return view('leaves.leave-management', compact('employees'));
+    }
+    public function getLeaveManagementData(Request $request)
+    {
+        // Get search parameter from the request
+        $search = $request->get('search', '');
+        // Get pagination parameters from the request
+        $page = $request->get('offset', 0) / 10 + 1;  // This is the current page
+        $limit = $request->get('limit', 10);  // Number of records per page
+
+        // Query the Employee model with search functionality
+        $employees = Employee::where('first_name', 'like', "%{$search}%")
+            ->orWhere('last_name', 'like', "%{$search}%")
+            ->latest()
+            ->paginate($limit);  // Use the limit from the request to paginate results
+
+        // Add numeric IDs and calculate total leave days and balance for each employee
+        $startIndex = ($employees->currentPage() - 1) * $employees->perPage() + 1;
+
+        $employees->getCollection()->transform(function ($employee, $index) use ($startIndex) {
+            $totalLeaveDays = $employee->totalLeaveDays();
+            $totalLeaveRosterDays = $employee->totalLeaveRosterDays();
+
+            $balance = $totalLeaveRosterDays-$totalLeaveDays;
+
+            $employee->numeric_id = $startIndex + $index; // Add sequential numeric ID
+            $employee->total_leave_days = $totalLeaveDays;
+            $employee->total_leave_roster_days = $totalLeaveRosterDays;
+            $employee->leave_balance = $balance;
+
+            return $employee;
+        });
+
+        // Return the paginated response in the required format for the table
+        return response()->json([
+            'total' => $employees->total(),
+            'rows' => $employees->items(),
+        ]);
     }
 
 

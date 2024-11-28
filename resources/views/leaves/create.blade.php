@@ -4,6 +4,9 @@
         <form method="POST" action="{{ route('leaves.store') }}" accept-charset="UTF-8" class="form-horizontal"
             enctype="multipart/form-data">
             @csrf
+            @if (!is_null($leaveRoster))
+                <input type="hidden" name="leave_roster_id" value="{{ $leaveRoster->leave_roster_id }}">
+            @endif
             @include ('leaves.form', ['formMode' => 'create'])
         </form>
     </div>

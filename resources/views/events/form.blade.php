@@ -23,7 +23,7 @@
     <p>Select what user categories should be attached to this Event</p>
 
     <div class="mb-3 col">
-        <label for="usertokenfield" class="form-label">Users</label>
+        <label for="usertokenfield" class="form-label">Participants</label>
         <input type="text" class="form-control" id="usertokenfield" />
         <input type="hidden" name="category[users]" id="user_ids" value="All" />
     </div>

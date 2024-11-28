@@ -4,9 +4,9 @@
             <h5 class="ms-3">Trainings/Travel Management</h5>
 
             <div class="d-flex justify-content-between align-items-center">
-                <a href="{{ route('apply') }}" class="btn border-t-neutral-50 btn-primary me-1">
-                    <i class="bi bi-book"></i>
-                    Apply for Training
+                <a href="{{ route('out-of-station-trainings.index') }}" class="btn border-t-neutral-50 btn-primary me-1">
+                    <i class="bi bi-airplane"></i>
+                    Travel Clearance
                 </a>
                 @can('can add a training')
                     <a href="{{ route('trainings.create') }}" class="btn border-t-neutral-50 btn-primary">
@@ -52,12 +52,12 @@
                                     @endphp
 
                                     @foreach ($userIds as $id)
-                                    @if($id ==0)
-                                    <span class="badge bg-primary">All Users</span>
-                                    @else
-                                        <span
-                                            class="badge bg-primary">{{ $options['users'][$id] ?? 'Unknown User' }}</span>
-                                    @endif
+                                        @if ($id == 0)
+                                            <span class="badge bg-primary">All Users</span>
+                                        @else
+                                            <span
+                                                class="badge bg-primary">{{ $options['users'][$id] ?? 'Unknown User' }}</span>
+                                        @endif
                                     @endforeach
 
                                     @foreach ($departmentIds as $id)

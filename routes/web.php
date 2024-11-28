@@ -17,6 +17,7 @@ use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\LeaveRosterController;
 use App\Http\Controllers\LeaveTypesController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\OutOfStationTrainingController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\ProfileController;
@@ -42,6 +43,8 @@ Route::middleware('auth')->group(function () {
 
 
     Route::resource('employees', EmployeeController::class);
+    Route::get('/leave-management/data', [LeaveController::class, 'getLeaveManagementData']);
+    Route::post('update-entitled-leave-days/{id}', [EmployeeController::class, 'updateEntitledLeaveDays'])->name('update-entitled-leave-days');
     Route::resource('recruitments', StaffRecruitmentController::class);
     Route::post('/recruitments/{recruitment}/status', [StaffRecruitmentController::class, 'approveOrReject'])
         ->name('recruitmentments.approveOrReject');
@@ -50,6 +53,9 @@ Route::middleware('auth')->group(function () {
         ->name('appraisals.approveOrReject');
     Route::resource('events', EventController::class);
     Route::resource('trainings', TrainingController::class);
+    Route::resource('out-of-station-trainings', OutOfStationTrainingController::class);
+    Route::post('/out-of-station-trainings/{training}/status', [OutOfStationTrainingController::class, 'approveOrReject'])
+    ->name('out-of-station-trainings.approveOrReject');
     Route::get('training-application', [TrainingController::class, 'apply'])->name('apply');
     Route::post('save-training-application', [TrainingController::class, 'applyTraining'])->name('save.apply');
     Route::post('/trainings/{training}/status', [TrainingController::class, 'approveOrReject'])
@@ -62,8 +68,11 @@ Route::middleware('auth')->group(function () {
         ->name('leaves.approveOrReject');
     Route::post('save-leave-data', [LeaveRosterController::class, 'saveLeaveRosterData'])->name('save-leave-data');
     Route::resource('leave-roster', LeaveRosterController::class);
+    Route::get('/leave-roster-calendar-data', [LeaveRosterController::class, 'leaveRosterCalendarData'])->name('leave-roster.calendarData');
     Route::resource('leave-types', LeaveTypesController::class);
     Route::post('calender', [leaveRosterController::class, 'getcalender']);
+    Route::get('leave-management', [LeaveController::class, 'leaveManagement'])->name('leave-management');
+    Route::get('apply-for-leave/{leaveRoster}', [LeaveController::class, 'applyForLeave'])->name('apply-for-leave');
     Route::resource('company-jobs', CompanyJobController::class);
     Route::resource('departments', DepartmentController::class);
 

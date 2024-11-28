@@ -64,7 +64,7 @@ class AppraisalApproval extends Notification implements ShouldQueue
             'appraisal_id' => $this->appraisal->appraisal_id,
             'appraisee_first_name' => $this->name,
             'appraisee_last_name' => $this->last_name,
-            'message' => 'Appraisal Application from ' . $this->name . ' ' . $this->last_name
+            'message' =>$this->appraisal->status == 'Rejected' ? 'Appraisal Rejected' : 'Appraisal Approved by '.$this->name.' '.$this->last_name
         ];
     }
 
@@ -74,7 +74,7 @@ class AppraisalApproval extends Notification implements ShouldQueue
             'appraisal_id' => $this->appraisal->appraisal_id,
             'appraisee_first_name' => $this->name,
             'appraisee_last_name' => $this->last_name,
-            'message' => 'Appraisal Application from ' . $this->name . ' ' . $this->last_name
+            'message' => $this->appraisal->status == 'Rejected' ? 'Appraisal Rejected' : 'Appraisal Approved by '. $this->name.' '.$this->last_name
         ]);
     }
 }

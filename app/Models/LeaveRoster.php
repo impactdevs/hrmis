@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\LeaveRosterScope;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 
+
+#[ScopedBy([LeaveRosterScope::class])]
 class LeaveRoster extends Model
 {
     // Specify the primary key
@@ -21,13 +24,17 @@ class LeaveRoster extends Model
     protected $fillable = [
         'leave_roster_id',
         'employee_id',
-        'months',
-        'year',
+        'start_date',
+        'end_date',
+        'booking_approval_status',
+        'leave_title',
+        'rejection_reason'
     ];
 
     // If you want to use casts for certain attributes
     protected $casts = [
-        'months' => 'json',
+        'start_date' => 'date',
+        'end_date' => 'date'
     ];
 
     // Model boot method
@@ -46,18 +53,16 @@ class LeaveRoster extends Model
         return $this->belongsTo(Employee::class, 'employee_id', 'employee_id');
     }
 
-    //get total leave days that an employee has taken
-    public function totalLeaveDays()
+    //check if the leave roster has been approved, if pending, return null, if rejected, false, if approved, true
+    public function isApproved()
     {
-        //get the sum for all the month
-        $months = $this->months;
-        //current year
-        $currentYear = Carbon::now()->year;
-        $totalLeaveDays = 0;
-        $leaveRosterMonths = $months[$currentYear] ?? [];
-        foreach ($leaveRosterMonths as $leaveRosterMonth) {
-            $totalLeaveDays += $leaveRosterMonth;
+        if ($this->booking_approval_status == 'Approved') {
+            return true;
+        } elseif ($this->booking_approval_status == 'Rejected') {
+            return false;
+        } else {
+            return null;
         }
-        return $totalLeaveDays;
     }
+
 }

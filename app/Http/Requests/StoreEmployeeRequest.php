@@ -60,6 +60,7 @@ class StoreEmployeeRequest extends FormRequest
             'next_of_kin' => 'nullable|string|max:255',
             'passport_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'date_of_birth' => 'nullable|date|before:today',
+            'entitled_leave_days' => 'nullable|integer',
         ];
     }
 
@@ -86,6 +87,7 @@ class StoreEmployeeRequest extends FormRequest
             'email.required' => 'Email is required.',
             'phone_number.unique' => 'Phone number must be unique.',
             'date_of_birth.before' => 'Date of birth must be a date before today.',
+            'entitled_leave_days.integer' => 'Entitled leave days must be an integer.',
         ];
     }
 }

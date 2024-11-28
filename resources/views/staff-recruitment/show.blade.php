@@ -39,25 +39,36 @@
                     <label class="font-weight-bold">Justification:</label>
                     <p class="lead text-muted">{{ $recruitment->justification }}</p>
                 </div>
+
+                <div class="mb-4">
+                    <label for="" class="font-weight-bold">Funding Budget:</label>
+                    <p class="lead text-muted">{{ $recruitment->funding_budget }}</p>
+                </div>
             </div>
 
             {{-- approval status --}}
             <div class="col-md-12">
                 <div class="mb-4">
                     <label class="font-weight-bold">Approval Status:</label>
-                    <p class="lead text-muted">{{ $recruitment->approval_status }}</p>
+                    <p class="lead text-muted">
+                        @if (!is_null($recruitment->approval_status))
+                            @foreach ($recruitment->approval_status as $key => $status)
+                                <span>{{ $key . '-' . ucfirst($status) }}</span>
+                            @endforeach
+                        @else
+                            <span class="badge bg-warning">Pending</span>
+                        @endif
+                    </p>
                 </div>
             </div>
         </div>
 
         <div class="status m-2">
-            @if (Auth::user()->roles->pluck('name')[0] === $recruitment->approval_status)
-                <span class="badge bg-success">You Approved this Leave Request.</span>
-            @elseif ($recruitment->approval_status === 'rejected')
+            @if (isset($recruitment->approval_status[Auth::user()->roles->pluck('name')[0]]) && ($recruitment->approval_status[Auth::user()->roles->pluck('name')[0]] === 'rejected'))
                 <span class="badge bg-danger">You rejected this Request</span>
                 <p class="mt-1"><strong>Rejection Reason:</strong>
                     {{ $recruitment->rejection_reason }}</p>
-            @elseif ($recruitment->approval_status === 'approved')
+            @elseif (isset($recruitment->approval_status[Auth::user()->roles->pluck('name')[0]]) && ($recruitment->approval_status[Auth::user()->roles->pluck('name')[0]] === 'approved'))
                 <span class="badge bg-danger">Approved</span>
             @else
                 <span class="badge bg-warning">Pending</span>

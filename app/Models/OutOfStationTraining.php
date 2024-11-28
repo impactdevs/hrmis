@@ -4,18 +4,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
+use Str;
 
-class StaffRecruitment extends Model
+class OutOfStationTraining extends Model
 {
     use HasFactory;
 
     // Specify the table if it doesn't follow Laravel's naming convention
-    protected $table = 'staff_recruitments';
+    protected $table = 'out_station_trainings';
 
     //primary key is employee_id
     // Specify the primary key
-    protected $primaryKey = 'staff_recruitment_id';
+    protected $primaryKey = 'training_id';
 
     // Indicate that the primary key is not an auto-incrementing integer
     public $incrementing = false;
@@ -25,25 +25,30 @@ class StaffRecruitment extends Model
 
     // The attributes that are mass assignable
     protected $fillable = [
-        'staff_recruitment_id',
-        'position',
-        'department_id',
-        'number_of_staff',
-        'date_of_recruitment',
-        'sourcing_method',
-        'employment_basis',
-        'justification',
-        'approval_status',
-        'funding_budget',
+        'training_id',
+        'destination',
+        'travel_purpose',
+        'relevant_documents',
+        'departure_date',
+        'return_date',
+        'sponsor',
+        'hotel',
+        'email',
+        'tel',
+        'my_work_will_be_done_by',
+        'training_request_status',
+        'rejection_reason',
         'user_id',
     ];
 
     // If you want to use casts for certain attributes
     protected $casts = [
-        'date_of_recruitment' => 'date',
-        'approval_status' => 'array'
+        'relevant_documents' => 'array',
+        'my_work_will_be_done_by' => 'array',
+        'training_request_status' => 'array',
+        'departure_date' => 'date',
+        'return_date' => 'date',
     ];
-
 
     // Model boot method
     protected static function boot()
@@ -51,16 +56,14 @@ class StaffRecruitment extends Model
         parent::boot();
 
         // Automatically generate a UUID when creating a new Employee
-        static::creating(function ($staffRecruitment) {
-            $staffRecruitment->staff_recruitment_id = (string) Str::uuid();
+        static::creating(function ($training) {
+            $training->training_id = (string) Str::uuid();
         });
-
     }
 
-    //every staff recruitment belongs to a department
-    public function department()
+    public function user()
     {
-        return $this->belongsTo(Department::class, 'department_id', 'department_id');
+        return $this->belongsTo(User::class);
     }
 
 }

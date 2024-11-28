@@ -6,6 +6,7 @@ export default defineConfig({
         laravel({
             input: [
                 'resources/css/app.css',
+                'resources/css/fullcalendarcss.css',
                 'resources/js/app.js',
                 'resources/js/custom-dashboard.js',
                 'resources/js/custom-js.js'

@@ -18,8 +18,9 @@ return new class extends Migration {
             $table->date('date_of_recruitment');
             $table->string('sourcing_method');
             $table->string('employment_basis');
+            $table->string('funding_budget');
             $table->longText('justification');
-            $table->string('approval_status');
+            $table->json('approval_status')->nullable();
             $table->longText('rejection_reason')->nullable();
             $table->uuid('user_id')->nullable()->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();

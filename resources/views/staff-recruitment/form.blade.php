@@ -48,6 +48,26 @@
         </div>
     </div>
 
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <p class="h5 font-weight-bold">Funding Budget</p>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="funding_budget" id="government"
+                    value="governement of uganda"
+                    {{ old('funding_budget', isset($staffRecruitment) ? $staffRecruitment->funding_budget : '') == 'governement of uganda' ? 'checked' : '' }} />
+                <label class="form-check-label" for="government">Government of Uganda</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="funding_budget" id="project" value="project"
+                    {{ old('funding_budget', isset($staffRecruitment) ? $staffRecruitment->funding_budget : '') == 'project' ? 'checked' : '' }} />
+                <label class="form-check-label" for="project">Project</label>
+            </div>
+            @error('funding_budget')
+                <div class="text-danger">{{ $message }}</div>
+            @enderror
+        </div>
+    </div>
+
     <!-- Employment Basis Row -->
     <div class="row mb-4">
         <div class="col-md-12">

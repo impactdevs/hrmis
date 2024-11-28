@@ -20,6 +20,7 @@ return new class extends Migration {
             $table->json('leave_request_status')->nullable();
             $table->json('my_work_will_be_done_by');
             $table->longText('rejection_reason')->nullable();
+            $table->uuid('leave_roster_id')->references('leave_roster_id')->on('leave_rosters');
             $table->timestamps();
         });
     }
