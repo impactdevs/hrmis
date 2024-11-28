@@ -159,9 +159,10 @@
                 </section>
             </div>
         </div>
-
+        @can('can delete an employee')
         <div class="text-center mt-4">
             <a href="{{ route('employees.index') }}" class="btn btn-primary">Back to Employee List</a>
         </div>
+        @endcan
     </div>
 </x-app-layout>

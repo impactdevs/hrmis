@@ -98,6 +98,7 @@
                                         @endif
                                     @endif
                                     <p>Who has approved</p>
+                                    @if(!is_null($leave->leave_request_status))
                                     {{-- who approved --}}
                                     @foreach ($leave->leave_request_status as $person => $status)
                                         @if ($status === 'approved')
@@ -112,6 +113,9 @@
                                             -<span class="badge bg-warning">Pending by {{ $person }}</span>
                                         @endif
                                     @endforeach
+                                    @else
+                                    <span class="badge bg-warning">No Approval Yet</span>
+                                    @endif
                                 </div>
                             </div>
                             @can('can approve a leave')
