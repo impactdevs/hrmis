@@ -98,30 +98,31 @@
                 </div>
             </div>
 
+            @can('approve training')
+                @if (!is_null($training->user_id))
+                    <div class="status m-2">
+                        @if (isset($training->training_request_status[Auth::user()->roles->pluck('name')[0]]) &&
+                                $training->training_request_status[Auth::user()->roles->pluck('name')[0]] === 'rejected')
+                            <span class="badge bg-danger">You rejected this Request</span>
+                            <p class="mt-1"><strong>Rejection Reason:</strong>
+                                {{ $training->rejection_reason }}</p>
+                        @elseif (isset($training->training_request_status[Auth::user()->roles->pluck('name')[0]]) &&
+                                $training->training_request_status[Auth::user()->roles->pluck('name')[0]] === 'approved')
+                            <span class="badge bg-success">Approved</span>
+                        @else
+                            <span class="badge bg-warning">Pending</span>
+                        @endif
+                    </div>
 
-            @if (!is_null($training->training_request_status))
-                <div class="status m-2">
-                    @if (isset($training->training_request_status[Auth::user()->roles->pluck('name')[0]]) &&
-                            $training->training_request_status[Auth::user()->roles->pluck('name')[0]] === 'rejected')
-                        <span class="badge bg-danger">You rejected this Request</span>
-                        <p class="mt-1"><strong>Rejection Reason:</strong>
-                            {{ $training->rejection_reason }}</p>
-                    @elseif (isset($training->training_request_status[Auth::user()->roles->pluck('name')[0]]) &&
-                            $training->training_request_status[Auth::user()->roles->pluck('name')[0]] === 'approved')
-                        <span class="badge bg-success">Approved</span>
-                    @else
-                        <span class="badge bg-warning">Pending</span>
-                    @endif
-                </div>
-
-                <div class="form-group">
-                    <input class="btn btn-outline-primary btn-large approve-btn" value="Approve" type="button"
-                        data-training-id="{{ $training->training_id }}">
-                    <input class="btn btn-outline-danger btn-large reject-btn" value="Reject" type="button"
-                        data-training-id="{{ $training->training_id }}" data-bs-toggle="modal"
-                        data-bs-target="#rejectModal">
-                </div>
-            @endif
+                    <div class="form-group">
+                        <input class="btn btn-outline-primary btn-large approve-btn" value="Approve" type="button"
+                            data-training-id="{{ $training->training_id }}">
+                        <input class="btn btn-outline-danger btn-large reject-btn" value="Reject" type="button"
+                            data-training-id="{{ $training->training_id }}" data-bs-toggle="modal"
+                            data-bs-target="#rejectModal">
+                    </div>
+                @endif
+            @endcan
 
         </div>
     </div>
