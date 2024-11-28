@@ -42,7 +42,7 @@ class LeaveRosterController extends Controller
     {
         $employee_id = auth()->user()->employee->employee_id;
         $leaveRosterAdded = LeaveRoster::create([
-            'employee_id' => $employee_id,
+                'employee_id' => $employee_id,
             'start_date' => $request->input('start_date'),
             'end_date' => $request->input('end_date'),
             'leave_title' => $request->input('leave_title'),
@@ -102,6 +102,7 @@ class LeaveRosterController extends Controller
                 'staffId' => $leave->employee->staff_id ?? null,
                 'first_name' => $leave->employee->first_name ?? null,
                 'last_name' => $leave->employee->last_name ?? null,
+                'isApproved' => $leave->isApproved(),
                 // Add additional employee or leave-related data if necessary
             ];
         });

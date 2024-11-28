@@ -35,7 +35,6 @@
                                 <th scope="col">First Name</th>
                                 <th scope="col">Last Name</th>
                                 <th scope="col">Job</th>
-                                <th scope="col">Status</th>
                                 <th scope="col">Application Date</th>
                                 <th scope="col">Actions</th>
                             </tr>
@@ -69,16 +68,7 @@
                                             @endif
                                         </td>
                                         <td>{{ $application->job->job_title }}</td>
-                                        <td>
-                                            @if (!is_null($application->approval_status))
-                                                <span
-                                                    class="badge {{ $application->approval_status == 'reject' ? 'text-bg-danger' : 'text-bg-success' }}">
-                                                    {{ $application->approval_status == 'reject' ? 'Rejected' : 'Approved' }}
-                                                </span>
-                                            @else
-                                                <span class="badge text-bg-warning">Pending</span>
-                                            @endif
-                                        </td>
+                                        
                                         <td>{{ $application->created_at->format('M d, Y') }}</td>
                                         <td>
                                             <a href="{{ url('entries', $application->entry->id) }}"
