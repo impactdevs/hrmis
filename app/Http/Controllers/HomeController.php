@@ -170,7 +170,7 @@ class HomeController extends Controller
 
         //get the current leave requests
         $leaves = Leave::with('employee', 'leaveCategory')
-        ->where('end_date', '>', Carbon::today())
+        ->where('end_date', '>=', Carbon::today())
         ->where('user_id', auth()->user()->id)
         ->get();
 
