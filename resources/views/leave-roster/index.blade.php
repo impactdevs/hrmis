@@ -1,34 +1,34 @@
 <x-app-layout>
 
     <div id="calendar-container">
-        @if (auth()->user()->isAdminOrSecretary())
-            {{-- Filters --}}
-            <div class="d-flex align-items-center mb-3">
-                {{-- Approval Status Filter --}}
-                <div class="form-check form-check-inline">
-                    <input type="radio" class="btn-check" id="btn-check-4" checked autocomplete="off"
-                        name="approval_status" value="all">
-                    <label class="btn btn-outline-primary" for="btn-check-4">All</label>
-                </div>
 
-                <div class="form-check form-check-inline">
-                    <input type="radio" class="btn-check" id="btn-check-5" autocomplete="off" name="approval_status"
-                        value="Pending">
-                    <label class="btn btn-outline-primary" for="btn-check-5">Pending</label>
-                </div>
+        {{-- Filters --}}
+        <div class="d-flex align-items-center mb-3">
+            {{-- Approval Status Filter --}}
+            <div class="form-check form-check-inline">
+                <input type="radio" class="btn-check" id="btn-check-4" checked autocomplete="off" name="approval_status"
+                    value="all">
+                <label class="btn btn-outline-primary" for="btn-check-4">All</label>
+            </div>
 
-                <div class="form-check form-check-inline">
-                    <input type="radio" class="btn-check" id="btn-check-6" autocomplete="off" name="approval_status"
-                        value="Approved">
-                    <label class="btn btn-outline-primary" for="btn-check-6">Approved</label>
-                </div>
+            <div class="form-check form-check-inline">
+                <input type="radio" class="btn-check" id="btn-check-5" autocomplete="off" name="approval_status"
+                    value="Pending">
+                <label class="btn btn-outline-primary" for="btn-check-5">Pending</label>
+            </div>
 
-                <div class="form-check form-check-inline">
-                    <input type="radio" class="btn-check" id="btn-check-7" autocomplete="off" name="approval_status"
-                        value="Rejected">
-                    <label class="btn btn-outline-primary" for="btn-check-7">Rejected</label>
-                </div>
+            <div class="form-check form-check-inline">
+                <input type="radio" class="btn-check" id="btn-check-6" autocomplete="off" name="approval_status"
+                    value="Approved">
+                <label class="btn btn-outline-primary" for="btn-check-6">Approved</label>
+            </div>
 
+            <div class="form-check form-check-inline">
+                <input type="radio" class="btn-check" id="btn-check-7" autocomplete="off" name="approval_status"
+                    value="Rejected">
+                <label class="btn btn-outline-primary" for="btn-check-7">Rejected</label>
+            </div>
+            @if (auth()->user()->isAdminOrSecretary())
                 {{-- Department Filter --}}
                 <div class="ms-3">
                     <select class="form-select form-select-sm rounded" id="departmentSelect" style="max-width: 180px;"
@@ -39,8 +39,10 @@
                         @endforeach
                     </select>
                 </div>
-            </div>
-        @endif
+
+            @endif
+        </div>
+
 
         {{-- Calendar --}}
         <div id="calendar"></div>
@@ -462,7 +464,6 @@
                                 'eventOffCanvas'));
                             offcanvas.hide();
                             calendar.getEventById(currentEvent.id).remove()
-                            console.log('Event deleted successfully');
                         },
                         error: function(xhr, status, error) {
                             console.error('Error deleting event:', error);

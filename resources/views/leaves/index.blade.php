@@ -88,7 +88,7 @@
                                     @else
                                         @if (Auth::user()->roles->pluck('name')[0] == 'Staff')
                                             @if ($leave->leave_request_status['Executive Secretary'] ?? '' === 'approved')
-                                                <span class="badge bg-success">This leave request was fiully
+                                                <span class="badge bg-success">This leave request was fully
                                                     approved</span>
                                             @elseif($leave->leave_request_status['Executive Secretary'] ?? '' === 'rejected')
                                                 <span class="badge bg-danger">This leave request was rejected</span>
@@ -97,6 +97,21 @@
                                             @endif
                                         @endif
                                     @endif
+                                    <p>Who has approved</p>
+                                    {{-- who approved --}}
+                                    @foreach ($leave->leave_request_status as $person => $status)
+                                        @if ($status === 'approved')
+                                            -<span class="badge bg-success">Approved by {{ $person }}</span>
+                                        @endif
+
+                                        @if ($status === 'rejected')
+                                            -<span class="badge bg-danger">Rejected by {{ $person }}</span>
+                                        @endif
+
+                                        @if ($status === null)
+                                            -<span class="badge bg-warning">Pending by {{ $person }}</span>
+                                        @endif
+                                    @endforeach
                                 </div>
                             </div>
                             @can('can approve a leave')
