@@ -99,7 +99,7 @@
             </div>
 
 
-            @if (!is_null($training->user_id))
+            @if (!is_null($training->training_request_status))
                 <div class="status m-2">
                     @if (isset($training->training_request_status[Auth::user()->roles->pluck('name')[0]]) &&
                             $training->training_request_status[Auth::user()->roles->pluck('name')[0]] === 'rejected')

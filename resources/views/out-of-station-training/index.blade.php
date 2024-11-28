@@ -4,7 +4,7 @@
             <h5 class="ms-3 font-weight-bold">Travel Clearance</h5>
 
             <div class="d-flex justify-content-between align-items-center">
-                <a href="{{ route('trainings.create') }}" class="btn border-t-neutral-50 btn-primary me-1">
+                <a href="{{ route('trainings.index') }}" class="btn border-t-neutral-50 btn-primary me-1">
                     <i class="bi bi-skip-backward-fill"></i>Trainings
                 </a>
                 <a href="{{ route('out-of-station-trainings.create') }}" class="btn border-t-neutral-50 btn-primary">
@@ -53,13 +53,15 @@
                                 @endif
                             </td>
                             <td>
-                                @if (!is_null($training->user_id))
+                                @if (!is_null($training->training_request_status))
                                     <div class="status m-2">
                                         @foreach ($training->training_request_status as $key => $status)
                                             <span
                                                 class="status-{{ $key }}">{{ $key }}-{{ $status }}</span>
                                         @endforeach
                                     </div>
+                                @else
+                                    <span class="badge bg-warning">Pending</span>
                                 @endif
                             </td>
                             <td>

@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\OutOfStationScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Str;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 
+#[ScopedBy([OutOfStationScope::class])]
 class OutOfStationTraining extends Model
 {
     use HasFactory;
