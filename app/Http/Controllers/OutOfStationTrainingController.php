@@ -65,7 +65,7 @@ class OutOfStationTrainingController extends Controller
         $data['user_id'] = auth()->user()->id;
         $training = OutOfStationTraining::create($data);
 
-        return redirect()->route('out-of-station-trainings.index')->with('success', 'Training created successfully.');
+        return redirect()->route('out-of-station-trainings.index')->with('success', 'Travel Clearance created successfully.');
     }
 
     /**

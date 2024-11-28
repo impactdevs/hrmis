@@ -66,7 +66,7 @@
         <div class="offcanvas-body">
             <!-- Event Details Section -->
             <div class="mb-4">
-                <h6 class="text-muted">Event Details</h6>
+                <h6 class="text-muted">Roster Details</h6>
 
                 <!-- Start and End Dates -->
                 <div class="d-flex justify-content-between mb-2">
@@ -93,7 +93,6 @@
                 <!-- Rejection Reason Section -->
                 <div id="rejectionReasonSection" class="mt-3" style="display: none;">
                     <strong class="text-danger">Rejection Reason:</strong>
-                    <p id="rejectionReasonText" class="text-muted">No rejection reason provided</p>
                 </div>
             </div>
 
@@ -208,7 +207,7 @@
 
                         if (arg.event.extendedProps.isApproved === null) {
                             approvalStatusText = 'Pending';
-                            statusColor = 'yellow'; // You can use a color name or hex code
+                            statusColor = 'violet'; // You can use a color name or hex code
                             statusIcon = '<i class="bi bi-clock"></i>'; // Bootstrap clock icon for pending
                         } else if (arg.event.extendedProps.isApproved === true) {
                             approvalStatusText = 'Approved';
@@ -392,6 +391,8 @@
                 $('#rejectRoster').click(function() {
                     // Show rejection reason textarea
                     $('#rejectionReasonSection').show();
+                    //show input for rejection reason
+                    $('#rejectionReasonSectionInput').show();
                 });
 
                 //approve roster
@@ -440,7 +441,7 @@
                                 offcanvas.hide();
                                 $('#rejectionReasonSection').hide();
                                 $('#rejectionReason').val('');
-                                console.log('Event rejected successfully');
+                                calendar.refetchEvents();
                             },
                             error: function(xhr, status, error) {
                                 console.error('Error rejecting event:', error);
