@@ -1,44 +1,46 @@
 <x-app-layout>
 
     <div id="calendar-container">
-        {{-- Filters --}}
-        <div class="d-flex align-items-center mb-3">
-            {{-- Approval Status Filter --}}
-            <div class="form-check form-check-inline">
-                <input type="radio" class="btn-check" id="btn-check-4" checked autocomplete="off" name="approval_status"
-                    value="all">
-                <label class="btn btn-outline-primary" for="btn-check-4">All</label>
-            </div>
+        @if (auth()->user()->isAdminOrSecretary())
+            {{-- Filters --}}
+            <div class="d-flex align-items-center mb-3">
+                {{-- Approval Status Filter --}}
+                <div class="form-check form-check-inline">
+                    <input type="radio" class="btn-check" id="btn-check-4" checked autocomplete="off"
+                        name="approval_status" value="all">
+                    <label class="btn btn-outline-primary" for="btn-check-4">All</label>
+                </div>
 
-            <div class="form-check form-check-inline">
-                <input type="radio" class="btn-check" id="btn-check-5" autocomplete="off" name="approval_status"
-                    value="Pending">
-                <label class="btn btn-outline-primary" for="btn-check-5">Pending</label>
-            </div>
+                <div class="form-check form-check-inline">
+                    <input type="radio" class="btn-check" id="btn-check-5" autocomplete="off" name="approval_status"
+                        value="Pending">
+                    <label class="btn btn-outline-primary" for="btn-check-5">Pending</label>
+                </div>
 
-            <div class="form-check form-check-inline">
-                <input type="radio" class="btn-check" id="btn-check-6" autocomplete="off" name="approval_status"
-                    value="Approved">
-                <label class="btn btn-outline-primary" for="btn-check-6">Approved</label>
-            </div>
+                <div class="form-check form-check-inline">
+                    <input type="radio" class="btn-check" id="btn-check-6" autocomplete="off" name="approval_status"
+                        value="Approved">
+                    <label class="btn btn-outline-primary" for="btn-check-6">Approved</label>
+                </div>
 
-            <div class="form-check form-check-inline">
-                <input type="radio" class="btn-check" id="btn-check-7" autocomplete="off" name="approval_status"
-                    value="Rejected">
-                <label class="btn btn-outline-primary" for="btn-check-7">Rejected</label>
-            </div>
+                <div class="form-check form-check-inline">
+                    <input type="radio" class="btn-check" id="btn-check-7" autocomplete="off" name="approval_status"
+                        value="Rejected">
+                    <label class="btn btn-outline-primary" for="btn-check-7">Rejected</label>
+                </div>
 
-            {{-- Department Filter --}}
-            <div class="ms-3">
-                <select class="form-select form-select-sm rounded" id="departmentSelect" style="max-width: 180px;"
-                    name="department">
-                    <option value="all">All Departments</option>
-                    @foreach ($departments as $department_id => $department)
-                        <option value="{{ $department_id }}">{{ $department }}</option>
-                    @endforeach
-                </select>
+                {{-- Department Filter --}}
+                <div class="ms-3">
+                    <select class="form-select form-select-sm rounded" id="departmentSelect" style="max-width: 180px;"
+                        name="department">
+                        <option value="all">All Departments</option>
+                        @foreach ($departments as $department_id => $department)
+                            <option value="{{ $department_id }}">{{ $department }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
-        </div>
+        @endif
 
         {{-- Calendar --}}
         <div id="calendar"></div>
@@ -46,66 +48,93 @@
 
 
 
-    <!-- Off-Canvas for Event Options -->
     <div class="offcanvas offcanvas-end" tabindex="-1" id="eventOffCanvas" aria-labelledby="eventOffCanvasLabel">
-        <div class="offcanvas-header">
-            <div class="d-flex w-100 justify-content-between align-items-center">
-                <h5 id="eventOffCanvasLabel">Roster Options</h5>
-                <button type="button" class="btn-close btn-sm" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        <div class="offcanvas-header d-flex justify-content-between align-items-center">
+            <h5 id="eventOffCanvasLabel" class="fs-5 fw-bold">Roster Options</h5>
+            <div class="btn-group">
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="applyLeave" title="Apply for leave">
+                    <i class="bi bi-pencil"></i> Apply Leave
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-danger" id="deleteEvent" title="Delete event">
+                    <i class="bi bi-trash"></i> Delete
+                </button>
             </div>
-            <button type="button" class="btn" id="applyLeave">
-                <i class="bi bi-pencil"></i>
-            </button>
-
-
-            <button type="button" class="btn" id="deleteEvent">
-                <i class="bi bi-trash"></i>
-            </button>
         </div>
+
         <div class="offcanvas-body">
-            {{-- <form id="eventForm">
-                <div class="form-group m-2 border p-3 rounded">
-                    <label for="eventTitle">Event Title</label>
-                    <input type="text" class="form-control title-primary font-weight-bold mb-3" id="eventTitle"
-                        placeholder="Enter new title">
+            <!-- Event Details Section -->
+            <div class="mb-4">
+                <h6 class="text-muted">Event Details</h6>
 
-                    <button type="button" class="btn-outline btn-outline-success btn-sm ms-3" id="renameEvent">
-                        <i class="bi bi-pencil"></i> Rename Event
-                    </button>
+                <!-- Start and End Dates -->
+                <div class="d-flex justify-content-between mb-2">
+                    <strong class="text-secondary">Start Date:</strong>
+                    <span id="eventStartDate" class="text-dark">2024-12-01 10:00 AM</span>
                 </div>
-            </form> --}}
-
-            <div class="border border-primary m-2 rounded">
-                <div class="fs-6 text-center">
-                    ROSTER
+                <div class="d-flex justify-content-between mb-3">
+                    <strong class="text-secondary">End Date:</strong>
+                    <span id="eventEndDate" class="text-dark">2024-12-05 05:00 PM</span>
                 </div>
 
-                <div class="d-flex flex-row justify-content-between p-1 m-3">
-                    <button type="button" class="btn btn-sm btn-outline btn-outline-success" id="approveRoster">
-                        Approve Roster
-                    </button>
-
-                    <button type="button" class="btn btn-sm btn-outline btn-outline-danger" id="rejectRoster">
-                        Reject Roster
-                    </button>
+                <!-- Staff Info -->
+                <div class="d-flex justify-content-between mb-2">
+                    <strong class="text-secondary">Staff:</strong>
+                    <span id="eventStaffName" class="text-dark">John Doe</span>
                 </div>
 
-                <!-- Rejection Reason (Initially Hidden) -->
+                <!-- Approval Status -->
+                <div class="d-flex justify-content-between mb-3">
+                    <strong class="text-secondary">Approval Status:</strong>
+                    <span id="eventApprovalStatusText" class="badge text-bg-primary">Pending</span>
+                </div>
+
+                <!-- Rejection Reason Section -->
                 <div id="rejectionReasonSection" class="mt-3" style="display: none;">
-                    <label for="rejectionReason">Rejection Reason</label>
-                    <textarea class="form-control" id="rejectionReason" rows="3" placeholder="Enter rejection reason"></textarea>
+                    <strong class="text-danger">Rejection Reason:</strong>
+                    <p id="rejectionReasonText" class="text-muted">No rejection reason provided</p>
+                </div>
+            </div>
 
-                    <div class="d-flex justify-content-end mt-3">
-                        <button type="button" class="btn btn-danger btn-sm" id="submitRejection">
-                            Submit Rejection
+            <!-- Action Buttons (Admin) -->
+            @can('approve leave roster')
+                <div class="border-top pt-3 mt-4">
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-sm btn-outline-success" id="approveRoster"
+                            title="Approve the roster">
+                            <i class="bi bi-check-circle"></i> Approve Roster
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-danger" id="rejectRoster"
+                            title="Reject the roster">
+                            <i class="bi bi-x-circle"></i> Reject Roster
                         </button>
                     </div>
+
+                    <!-- Rejection Reason Input (Initially Hidden) -->
+                    <div id="rejectionReasonSectionInput" class="mt-3" style="display: none;">
+                        <label for="rejectionReason" class="form-label">Rejection Reason</label>
+                        <textarea class="form-control" id="rejectionReason" rows="3" placeholder="Enter rejection reason"></textarea>
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="button" class="btn btn-danger btn-sm" id="submitRejection"
+                                title="Submit rejection reason">
+                                Submit Rejection
+                            </button>
+                        </div>
+                    </div>
                 </div>
+            @endcan
+
+            <!-- Hint Section -->
+            <div class="text-muted mt-5 border-top pt-3">
+                <p class="mb-1">To apply for leave, click the <i class="bi bi-pencil"></i> icon on the top right
+                    corner of this card.</p>
+                <p class="mb-0"><strong>Note:</strong> The option to apply for leave only appears if your roster has
+                    been approved.</p>
             </div>
         </div>
-
-
     </div>
+
+
+
 
     {{-- apply modal --}}
     <div class="modal fade" id="applyModal" tabindex="-1" aria-labelledby="applyModalLabel" aria-hidden="true">
@@ -277,19 +306,44 @@
                     editable: true,
                     droppable: true,
                     eventClick: function(info) {
+                        // Get the event data
                         currentEvent = info.event;
-                        $('#eventTitle').val(currentEvent.title);
+
+                        $('#eventStartDate').text(moment(currentEvent.start).format(
+                            'YYYY-MM-DD HH:mm')); // Display formatted start date
+                        $('#eventEndDate').text(moment(currentEvent.end).format(
+                            'YYYY-MM-DD HH:mm')); // Display formatted end date
+                        $('#eventStaffName').text(currentEvent.extendedProps.first_name + ' ' + currentEvent
+                            .extendedProps.last_name); // Display staff name
 
                         // Check if the event is approved, and show/hide the "Apply Leave" button accordingly
                         if (currentEvent.extendedProps.isApproved === true) {
-                            $('#applyLeave').show(); // Show button if approved
+                            $('#applyLeave').show(); // Show the apply leave button if approved
                         } else {
-                            $('#applyLeave').hide(); // Hide button if not approved
+                            $('#applyLeave').hide(); // Hide the apply leave button if not approved
                         }
 
+                        // Display the event's approval status in the offcanvas
+                        var approvalStatus = currentEvent.extendedProps.isApproved === true ? 'Approved' :
+                            (currentEvent.extendedProps.isApproved === false ? 'Rejected' : 'Pending');
+                        $('#eventApprovalStatusText').text(
+                            approvalStatus); // Display approval status
+
+                        // Show the rejection reason section if the event is rejected
+                        if (currentEvent.extendedProps.isApproved === false) {
+                            $('#rejectionReasonSection').show();
+                            $('#rejectionReasonText').text(currentEvent.extendedProps.rejection_reason ||
+                                'No rejection reason provided.');
+                        } else {
+                            $('#rejectionReasonSection')
+                                .hide(); // Hide rejection reason section if not rejected
+                        }
+
+                        // Trigger the offcanvas to show
                         var offcanvas = new bootstrap.Offcanvas(document.getElementById('eventOffCanvas'));
                         offcanvas.show();
                     }
+
                 });
 
                 calendar.render();
@@ -393,6 +447,27 @@
                     } else {
                         alert("Please enter a rejection reason.");
                     }
+                });
+
+                //delete leave roster
+                $('#deleteEvent').click(function() {
+                    $.ajax({
+                        url: "{{ route('leave-roster.destroy', '') }}/" + currentEvent.id,
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function(response) {
+                            var offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById(
+                                'eventOffCanvas'));
+                            offcanvas.hide();
+                            calendar.getEventById(currentEvent.id).remove()
+                            console.log('Event deleted successfully');
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error deleting event:', error);
+                        }
+                    });
                 });
 
                 // apply leave

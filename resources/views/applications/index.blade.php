@@ -68,7 +68,7 @@
                                             @endif
                                         </td>
                                         <td>{{ $application->job->job_title }}</td>
-                                        
+
                                         <td>{{ $application->created_at->format('M d, Y') }}</td>
                                         <td>
                                             <a href="{{ url('entries', $application->entry->id) }}"
