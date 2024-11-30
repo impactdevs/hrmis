@@ -252,7 +252,7 @@ class TrainingController extends Controller
         // Save the updated leave status
         $training->save();
 
-        return response()->json(['message' => 'Leave application updated successfully.', 'status' => $training->approval_status]);
+        return response()->json(['message' => 'Training application updated successfully.', 'status' => $training->approval_status]);
     }
 
 

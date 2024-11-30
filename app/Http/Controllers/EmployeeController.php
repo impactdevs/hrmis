@@ -24,9 +24,13 @@ class EmployeeController extends Controller
         $keyword = $request->get('search');
         $position_id = $request->get('position');
         $department_id = $request->get('department');
+        $contract_expiry_filter = (int)$request->get('contract_expiry');
         $perPage = 25;
 
         $query = Employee::query();
+
+        // Initialize the applied filters message
+        $appliedFiltersMessage = [];
 
         // Apply the filters to the query
         if (!empty($keyword)) {
@@ -34,26 +38,43 @@ class EmployeeController extends Controller
                 $q->where('first_name', 'LIKE', "%$keyword%")
                   ->orWhere('last_name', 'LIKE', "%$keyword%");
             });
+            $appliedFiltersMessage[] = "Name: $keyword";
         }
 
         if (!empty($position_id)) {
             $query->where('position_id', '=', $position_id);
+            $appliedFiltersMessage[] = "Position: " . Position::find($position_id)->position_name;
         }
 
         if (!empty($department_id)) {
             $query->where('department_id', '=', $department_id);
+            $appliedFiltersMessage[] = "Department: " . Department::find($department_id)->department_name;
         }
 
-        // Paginate the results
-        $employees = $query->latest()->paginate($perPage);
+        if (!empty($contract_expiry_filter)) {
+            $currentDate = now();
+            $filterDate = now()->addMonths($contract_expiry_filter); // Calculate the date based on selected months
+            $query->whereDate('contract_expiry_date', '<=', $currentDate);
+            $appliedFiltersMessage[] = "Contract expiring in $contract_expiry_filter months";
+        }
 
-        // Get positions and departments for the filter dropdowns
+        // Get the count of the filtered results
+        $employeeCount = $query->count();
+
+        // Paginate the results
+        $employees = $query->latest()->get();
+
+        // Get positions, departments, and the available contract expiry options
         $positions = Position::select('position_id', 'position_name')->get();
         $departments = Department::select('department_id', 'department_name')->get();
+        $expiryOptions = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
-        // Return the view with the filtered results and filter options
-        return view('employees.index', compact('employees', 'keyword', 'positions', 'departments'));
+        // Return the view with the filtered results, employee count, filter options, and filter message
+        return view('employees.index', compact('employees', 'keyword', 'positions', 'departments', 'expiryOptions', 'employeeCount', 'appliedFiltersMessage'));
     }
+
+
+
 
 
 

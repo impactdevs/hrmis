@@ -29,7 +29,6 @@
                             @endforeach
                         </select>
                     </div>
-
                     <div class="col">
                         <select name="department" class="form-select">
                             <option value="">Select Department</option>
@@ -43,6 +42,18 @@
                     </div>
 
                     <div class="col">
+                        <input list="expiry-options" id="contract_expiry" name="contract_expiry" class="form-control"
+                            placeholder="Select or enter contract expiry (in months)"
+                            value="{{ request()->input('contract_expiry') }}">
+                        <datalist id="expiry-options">
+                            <option value="">Select or enter contract expiry (in months)</option>
+                            @foreach ($expiryOptions as $months)
+                                <option value="{{ $months }}">Expiring in {{ $months }} months</option>
+                            @endforeach
+                        </datalist>
+                    </div>
+
+                    <div class="col">
                         <button type="submit" class="btn btn-primary">Apply Filter</button>
                     </div>
                     <div class="col">
@@ -52,8 +63,23 @@
             </form>
         </div>
 
+        <!-- Display the number of filtered results -->
+        <div class="mt-3">
+            @if ($employeeCount > 0)
+                <p><strong>{{ $employeeCount }}</strong> employees found based on the applied filters.</p>
+            @else
+                <p>No employees found with the applied filters.</p>
+            @endif
+
+            @if (count($appliedFiltersMessage) > 0)
+                <p>Filters applied: {{ implode(', ', $appliedFiltersMessage) }}.</p>
+            @endif
+        </div>
+
         <div class="table-wrapper">
-            <table class="table table-striped">
+            <table class="table table-striped" data-toggle="table" data-show-columns="true" data-sortable="true"
+                data-show-export="true" data-show-pagination-switch="true"
+                data-page-list="[20, 25, 50, 100, 500, 1000, 2000, 10000, all]" data-pagination="true">
                 <thead>
                     <tr>
                         <th scope="col">#</th>
@@ -71,8 +97,12 @@
                 <tbody>
                     @foreach ($employees as $index => $employee)
                         <tr class="align-middle">
-                            <th scope="row"><a href="#"
-                                    class="btn btn-outline-danger">{{ $employee->staff_id }}</a></th>
+                            <th scope="row">
+                                <a href="#"
+                                    class="btn {{ $employee->contract_expiry_date && $employee->contract_expiry_date->isPast() ? 'btn-outline-danger' : 'btn-outline-primary' }}">
+                                    {{ $employee->staff_id }}
+                                </a>
+                            </th>
                             <td>{{ $employee->first_name }}</td>
                             <td>{{ $employee->last_name }}</td>
                             <td>{{ optional($employee->position)->position_name ?? 'N/A' }}</td>
@@ -81,9 +111,7 @@
                             <td>{{ $employee->date_of_entry ? $employee->date_of_entry->format('Y-m-d') : 'N/A' }}</td>
                             <td>{{ $employee->contract_expiry_date ? $employee->contract_expiry_date->format('Y-m-d') : 'N/A' }}
                             </td>
-                            <td>
-                                {{ $employee->retirementYearsRemaining() }}
-                            </td>
+                            <td>{{ $employee->retirementYearsRemaining() }}</td>
                             <td class="align-middle">
                                 <div class="dropdown">
                                     <button class="btn btn-secondary btn-sm dropdown-toggle" type="button"
@@ -121,19 +149,45 @@
                                     </ul>
                                 </div>
                             </td>
-
                         </tr>
                     @endforeach
                 </tbody>
             </table>
 
-            <div class="pagination-wrapper">
+            {{-- <div class="pagination-wrapper">
                 {!! $employees->appends([
                         'search' => request()->get('search'),
                         'position' => request()->get('position'),
                         'department' => request()->get('department'),
+                        'contract_expiry' => request()->get('contract_expiry'),
                     ])->render() !!}
-            </div>
+            </div> --}}
         </div>
     </div>
+
+    @push('scripts')
+        <script>
+            $(document).ready(function() {
+                const input = $('#contract_expiry');
+                const datalist = $('#expiry-options');
+
+                // Listen for the 'input' event when the user types
+                input.on('input', function() {
+                    const filter = input.val().toLowerCase();
+
+                    // Loop through each option and show/hide based on input
+                    datalist.find('option').each(function() {
+                        const option = $(this);
+                        const optionText = option.val().toLowerCase();
+
+                        if (optionText.indexOf(filter) !== -1 || filter === "") {
+                            option.show(); // Show matching option
+                        } else {
+                            option.hide(); // Hide non-matching option
+                        }
+                    });
+                });
+            });
+        </script>
+    @endpush
 </x-app-layout>

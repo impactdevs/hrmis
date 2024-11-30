@@ -1,6 +1,7 @@
 <x-app-layout>
 
     <div id="calendar-container">
+        <h1 class="text-center m-3 fs-1 text-primary font-weight-bold">{{ strtoupper(auth()->user()->isAdminOrSecretary() ? 'Leave Roster' : 'My Leave Roster') }}</h1>
 
         {{-- Filters --}}
         <div class="d-flex align-items-center mb-3">

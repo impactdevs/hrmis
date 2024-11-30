@@ -169,6 +169,6 @@ class OutOfStationTrainingController extends Controller
         $training->training_request_status = $trainingRequestStatus;
         $training->save();
 
-        return response()->json(['message' => 'Leave application updated successfully.', 'status' => $training->training_request_status]);
+        return response()->json(['message' => 'Travel Clearance approved successfully.', 'status' => $training->training_request_status]);
     }
 }
