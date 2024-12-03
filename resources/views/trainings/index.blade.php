@@ -50,9 +50,8 @@
                                         );
                                         $positionIds = explode(',', $training->training_category['positions'] ?? '');
                                     @endphp
-
                                     @foreach ($userIds as $id)
-                                        @if ($id == 0)
+                                        @if ($id == '')
                                             <span class="badge bg-primary">All Users</span>
                                         @else
                                             <span
@@ -61,13 +60,17 @@
                                     @endforeach
 
                                     @foreach ($departmentIds as $id)
-                                        <span
-                                            class="badge bg-success">{{ $options['departments'][$id] ?? 'Unknown Department' }}</span>
+                                        @if (!($id == ''))
+                                            <span
+                                                class="badge bg-success">{{ $options['departments'][$id] ?? 'Unknown Department' }}</span>
+                                        @endif
                                     @endforeach
 
                                     @foreach ($positionIds as $id)
-                                        <span
-                                            class="badge bg-info">{{ $options['positions'][$id] ?? 'Unknown Position' }}</span>
+                                        @if (!($id == ''))
+                                            <span
+                                                class="badge bg-info">{{ $options['positions'][$id] ?? 'Unknown Position' }}</span>
+                                        @endif
                                     @endforeach
                                 @else
                                     <span class="badge bg-secondary">{{ $options['users'][$training->user_id] }}

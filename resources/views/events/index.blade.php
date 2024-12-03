@@ -50,8 +50,6 @@
                                     @endif
                                 @endforeach
 
-
-
                                 @foreach ($departmentIds as $id)
                                     @if (isset($options['users'][$id]))
                                         <span
