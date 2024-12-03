@@ -1,47 +1,59 @@
 <x-app-layout>
 
     <div id="calendar-container">
-        <h1 class="text-center m-3 fs-1 text-primary font-weight-bold">{{ strtoupper(auth()->user()->isAdminOrSecretary() ? 'Leave Roster' : 'My Leave Roster') }}</h1>
+        <h1 class="text-center m-3 fs-1 text-primary font-weight-bold">
+            {{ strtoupper(auth()->user()->isAdminOrSecretary() ? 'Leave Roster' : 'My Leave Roster') }}</h1>
 
         {{-- Filters --}}
-        <div class="d-flex align-items-center mb-3">
-            {{-- Approval Status Filter --}}
-            <div class="form-check form-check-inline">
-                <input type="radio" class="btn-check" id="btn-check-4" checked autocomplete="off" name="approval_status"
-                    value="all">
-                <label class="btn btn-outline-primary" for="btn-check-4">All</label>
-            </div>
-
-            <div class="form-check form-check-inline">
-                <input type="radio" class="btn-check" id="btn-check-5" autocomplete="off" name="approval_status"
-                    value="Pending">
-                <label class="btn btn-outline-primary" for="btn-check-5">Pending</label>
-            </div>
-
-            <div class="form-check form-check-inline">
-                <input type="radio" class="btn-check" id="btn-check-6" autocomplete="off" name="approval_status"
-                    value="Approved">
-                <label class="btn btn-outline-primary" for="btn-check-6">Approved</label>
-            </div>
-
-            <div class="form-check form-check-inline">
-                <input type="radio" class="btn-check" id="btn-check-7" autocomplete="off" name="approval_status"
-                    value="Rejected">
-                <label class="btn btn-outline-primary" for="btn-check-7">Rejected</label>
-            </div>
-            @if (auth()->user()->isAdminOrSecretary())
-                {{-- Department Filter --}}
-                <div class="ms-3">
-                    <select class="form-select form-select-sm rounded" id="departmentSelect" style="max-width: 180px;"
-                        name="department">
-                        <option value="all">All Departments</option>
-                        @foreach ($departments as $department_id => $department)
-                            <option value="{{ $department_id }}">{{ $department }}</option>
-                        @endforeach
-                    </select>
+        <div class="d-flex align-items-center mb-3 justify-between">
+            <div class="d-flex">
+                {{-- Approval Status Filter --}}
+                <div class="form-check form-check-inline">
+                    <input type="radio" class="btn-check" id="btn-check-4" checked autocomplete="off"
+                        name="approval_status" value="all">
+                    <label class="btn btn-outline-primary" for="btn-check-4">All</label>
                 </div>
 
-            @endif
+                <div class="form-check form-check-inline">
+                    <input type="radio" class="btn-check" id="btn-check-5" autocomplete="off" name="approval_status"
+                        value="Pending">
+                    <label class="btn btn-outline-primary" for="btn-check-5">Pending</label>
+                </div>
+
+                <div class="form-check form-check-inline">
+                    <input type="radio" class="btn-check" id="btn-check-6" autocomplete="off" name="approval_status"
+                        value="Approved">
+                    <label class="btn btn-outline-primary" for="btn-check-6">Approved</label>
+                </div>
+
+                <div class="form-check form-check-inline">
+                    <input type="radio" class="btn-check" id="btn-check-7" autocomplete="off" name="approval_status"
+                        value="Rejected">
+                    <label class="btn btn-outline-primary" for="btn-check-7">Rejected</label>
+                </div>
+                @if (auth()->user()->isAdminOrSecretary())
+                    {{-- Department Filter --}}
+                    <div class="ms-3">
+                        <select class="form-select form-select-sm rounded" id="departmentSelect"
+                            style="max-width: 180px;" name="department">
+                            <option value="all">All Departments</option>
+                            @foreach ($departments as $department_id => $department)
+                                <option value="{{ $department_id }}">{{ $department }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                @endif
+            </div>
+
+            <div class="d-flex align-items-center mb-3">
+                {{-- Add Leave Roster --}}
+                <button class="btn btn-primary btn-sm mt-3 ms-1 font-weight-bold" id="addLeaveRoster" type="button"
+                    style="max-height: 40px; font-size: 12px">
+                    <i class="bi bi-plus-circle"></i> Add Leave Roster</button>
+            </div>
+
+
         </div>
 
 
@@ -138,34 +150,51 @@
 
 
 
-    {{-- apply modal --}}
+    <!-- Modal -->
     <div class="modal fade" id="applyModal" tabindex="-1" aria-labelledby="applyModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="applyModalLabel">Apply for Leave</h5>
+                    <h5 class="modal-title" id="applyModalLabel">
+                        <i class="bi bi-calendar-plus"></i> Add Leave Roster
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form method="POST" action="{{ route('leaves.store') }}" accept-charset="UTF-8"
-                        class="form-horizontal" enctype="multipart/form-data">
+                    <form method="POST" action="{{ route('leave-roster.store') }}" accept-charset="UTF-8"
+                        class="form-horizontal" enctype="multipart/form-data" id="leaveRosterForm">
                         @csrf
-                        @include ('leaves.form', ['formMode' => 'create'])
+                        <div class="mb-3">
+                            <label for="start_date" class="form-label">Start Date</label>
+                            <input type="date" class="form-control" id="start_date" name="start_date" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="end_date" class="form-label">End Date</label>
+                            <input type="date" class="form-control" id="end_date" name="end_date" required>
+                        </div>
+
+                        <!-- Hidden input for leave title -->
+                        <input type="hidden" name="leave_title" value="New Leave">
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Apply</button>
+                    <button type="button" class="btn btn-primary" id="applyButton"
+                        data-bs-dismiss="modal">Apply</button>
                 </div>
             </div>
         </div>
     </div>
 
+
+
+
     @push('scripts')
         <link href='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.10.1/main.min.css' rel='stylesheet' />
         <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
         <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/bootstrap5@6.1.15/index.global.min.js"></script>
-        <script>
+        <script type="module">
             $(document).ready(function() {
                 $('#tokenfield').tokenfield({
                     autocomplete: {
@@ -477,6 +506,84 @@
                 $('#applyLeave').click(function() {
                     //navigate to apply for leave with leave roster id current event.id
                     window.location.href = "/apply-for-leave/" + currentEvent.id;
+                });
+
+                //addLeaveRoster
+                $('#addLeaveRoster').click(function() {
+                    // show applyModal
+                    $('#applyModal').modal('show');
+
+                });
+
+                $('#applyButton').click(function() {
+                    // Extract form values
+                    var start_date = $('#start_date').val();
+                    var end_date = $('#end_date').val();
+                    var leave_title = $("input[name='leave_title']").val();
+
+                    // Send the data via AJAX POST request
+
+                    $.ajax({
+                        url: "{{ route('leave-roster.store') }}",
+                        method: 'POST',
+                        data: {
+                            start_date: start_date,
+                            end_date: end_date,
+                            leave_title: leave_title,
+                        },
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function(response) {
+                            console.log(response);
+                            calendar.addEvent({
+                                title: 'New Leave',
+                                start: response.data.start_date,
+                                end: response.data.end_date,
+                                backgroundColor: 'yellow',
+                                borderColor: 'orange',
+                                textColor: 'black',
+                                id: response.data.leave_roster_id,
+                                first_name: response.data.employee.first_name,
+                                last_name: response.data.employee.last_name,
+                            });
+
+                            //close the modal
+                            $('#applyModal').modal('hide');
+
+                            Toastify({
+                                text: response.message,
+                                duration: 3000,
+                                destination: "",
+                                newWindow: true,
+                                close: true,
+                                gravity: "top", // `top` or `bottom`
+                                position: "right", // `left`, `center` or `right`
+                                stopOnFocus: true, // Prevents dismissing of toast on hover
+                                style: {
+                                    background: "linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(121,14,9,1) 35%, rgba(0,212,255,1) 100%);",
+                                },
+                                onClick: function() {} // Callback after click
+                            }).showToast();
+                        },
+                        error: function(xhr, status, error) {
+                            Toastify({
+                                text: xhr.responseJSON?.error || 'An error occurred',
+                                duration: 3000,
+                                destination: "",
+                                newWindow: true,
+                                close: true,
+                                gravity: "top", // `top` or `bottom`
+                                position: "right", // `left`, `center` or `right`
+                                stopOnFocus: true, // Prevents dismissing of toast on hover
+                                style: {
+                                    background: "linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(121,14,9,1) 35%, rgba(0,212,255,1) 100%);",
+                                },
+                                onClick: function() {} // Callback after click
+                            }).showToast();
+
+                        }
+                    });
                 });
             });
         </script>
