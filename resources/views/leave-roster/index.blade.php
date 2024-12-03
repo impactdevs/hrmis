@@ -178,7 +178,7 @@
                 })
                 var calendarEl = $('#calendar');
                 var currentEvent = null;
-
+                var listTitle = @json(auth()->user()->isAdminOrSecretary() ? 'Leave Roster' : 'My Leave Roster');
                 var calendar = new FullCalendar.Calendar(calendarEl[0], {
                     initialView: 'multiMonthYear',
                     headerToolbar: {
@@ -194,7 +194,7 @@
                         timeGridWeek: 'Week',
                         timeGridDay: 'Day',
                         today: 'Today',
-                        listYear: 'List'
+                        listYear: listTitle
                     },
                     eventContent: function(arg) {
                         var firstName = arg.event.extendedProps.first_name;
