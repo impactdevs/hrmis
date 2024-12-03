@@ -196,15 +196,7 @@
         <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/bootstrap5@6.1.15/index.global.min.js"></script>
         <script type="module">
             $(document).ready(function() {
-                $('#tokenfield').tokenfield({
-                    autocomplete: {
-                        source: ['red', 'blue', 'green', 'yellow', 'violet', 'brown', 'purple', 'black',
-                            'white'
-                        ],
-                        delay: 100
-                    },
-                    showAutocompleteOnFocus: true
-                })
+
                 var calendarEl = $('#calendar');
                 var currentEvent = null;
                 var listTitle = @json(auth()->user()->isAdminOrSecretary() ? 'Leave Roster' : 'My Leaves');
@@ -224,6 +216,8 @@
                         timeGridDay: 'Day',
                         today: 'Today',
                         listYear: listTitle
+                    },
+                    views: {
                     },
                     eventContent: function(arg) {
                         var firstName = arg.event.extendedProps.first_name;
@@ -273,6 +267,8 @@
                             },
                             success: function(response) {
                                 var events = response.data.map(function(event) {
+
+                                    //event
                                     return {
                                         id: event.leave_roster_id,
                                         title: event.title,
@@ -282,11 +278,12 @@
                                         last_name: event.last_name,
                                         isApproved: event.isApproved,
                                         end: event.end,
-                                        color: 'blue'
+                                        color: 'blue',
+                                        fullDay: true
+
                                     };
                                 });
 
-                                console.log(events);
 
                                 successCallback(events);
                             },
@@ -443,6 +440,7 @@
                                 'eventOffCanvas'));
                             offcanvas.hide();
                             console.log('Event approved successfully');
+                            calendar.refetchEvents();
                         },
                         error: function(xhr, status, error) {
                             console.error('Error approving event:', error);

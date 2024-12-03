@@ -164,4 +164,12 @@
   /* Space between icon and text */
 }
 
+.fc-list-event-time {
+  display:none;
+}
+
+.fc-event-title{
+  color: #2980b9;
+}
+
 

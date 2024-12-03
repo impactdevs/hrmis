@@ -24,6 +24,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\StaffRecruitmentController;
 use App\Http\Controllers\TrainingController;
+use App\Http\Controllers\UploadEmployees;
 use App\Http\Controllers\UsersController;
 use App\Models\StaffRecruitment;
 use Illuminate\Support\Facades\Route;
@@ -33,6 +34,7 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', [HomeController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/upload-employee', [UploadEmployees::class, 'process_csv_for_arrears']);
 
 Route::middleware('auth')->group(function () {
     Route::resource('roles', RoleController::class);

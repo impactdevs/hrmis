@@ -24,7 +24,7 @@ class EmployeeController extends Controller
         $keyword = $request->get('search');
         $position_id = $request->get('position');
         $department_id = $request->get('department');
-        $contract_expiry_filter = (int)$request->get('contract_expiry');
+        $contract_expiry_filter = (int) $request->get('contract_expiry');
         $perPage = 25;
 
         $query = Employee::query();
@@ -34,9 +34,9 @@ class EmployeeController extends Controller
 
         // Apply the filters to the query
         if (!empty($keyword)) {
-            $query->where(function($q) use ($keyword) {
+            $query->where(function ($q) use ($keyword) {
                 $q->where('first_name', 'LIKE', "%$keyword%")
-                  ->orWhere('last_name', 'LIKE', "%$keyword%");
+                    ->orWhere('last_name', 'LIKE', "%$keyword%");
             });
             $appliedFiltersMessage[] = "Name: $keyword";
         }
