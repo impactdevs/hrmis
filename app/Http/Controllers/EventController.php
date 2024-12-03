@@ -66,20 +66,19 @@ class EventController extends Controller
             $eventCreated = Event::create($validatedData);
 
             // Process training category to send notifications to them
-            $users = array_map('trim', explode(',', $eventCreated->category['users'] ?? []));
+            $users = array_map('trim', explode(',', $eventCreated->category['users'] ?? ''));
 
             // If $users has '0' then send notification to all users
             if (in_array('0', $users)) {
                 $users = User::all(); // Get all User instances
             } else {
-                // Departments
-                $departments = array_map('trim', explode(',', $eventCreated->category['departments'] ?? []));
+                $departments = array_map('trim', explode(',', $eventCreated->category['departments'] ?? ''));
 
                 // Get users that belong to these departments by getting user_id where department_id is in $departments from employees table
                 $department_users = Employee::whereIn('department_id', $departments)->pluck('user_id')->toArray();
 
                 // Positions
-                $positions = array_map('trim', explode(',', $eventCreated->category['positions'] ?? []));
+                $positions = array_map('trim', explode(',', $eventCreated->category['positions'] ?? ''));
                 // Get users that belong to these positions by getting user_id where position_id is in $positions from employees table
                 $position_users = Employee::whereIn('position_id', $positions)->pluck('user_id')->toArray();
 
