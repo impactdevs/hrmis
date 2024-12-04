@@ -52,13 +52,14 @@
                     style="max-height: 40px; font-size: 12px">
                     <i class="bi bi-plus-circle"></i> Add Leave Roster</button>
             </div>
-
-            <div class="d-flex align-items-center mb-3">
-                {{-- Tabular view --}}
-                <a class="btn btn-primary btn-sm mt-3 ms-1 font-weight-bold" style="max-height: 40px; font-size: 12px"
-                    href="{{ route('leave-roster-tabular.index') }}">
-                    <i class="bi bi-eye"></i>Tabular View</a>
-            </div>
+            @if (auth()->user()->isAdminOrSecretary())
+                <div class="d-flex align-items-center mb-3">
+                    {{-- Tabular view --}}
+                    <a class="btn btn-primary btn-sm mt-3 ms-1 font-weight-bold"
+                        style="max-height: 40px; font-size: 12px" href="{{ route('leave-roster-tabular.index') }}">
+                        <i class="bi bi-eye"></i>Tabular View</a>
+                </div>
+            @endif
 
 
         </div>
