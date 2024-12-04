@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\RosterUpdate;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\LeaveRoster;
@@ -104,11 +105,13 @@ class LeaveRosterController extends Controller
             'end_date' => $request->input('end_date'),
             'leave_title' => $request->input('leave_title'),
         ]);
-
         //load employee
         $leaveRosterAdded->load('employee');
 
         if ($leaveRosterAdded) {
+            $entitledDays = auth()->user()->employee->entitled_leave_days??0;
+            $scheduledDays = auth()->user()->employee->overallRosterDays();
+            RosterUpdate::dispatch($employee_id, $entitledDays, $scheduledDays);
             return response()->json(['success' => true, 'message' => 'Leave Roster added successfully', 'data' => $leaveRosterAdded]);
         }
 

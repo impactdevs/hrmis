@@ -164,6 +164,16 @@ class Employee extends Model
         return $totalDays;
     }
 
+    //overall roster days for an employee
+    public function overallRosterDays()
+    {
+        $leaves = LeaveRoster::where('employee_id', $this->employee_id)->get();
+        $totalDays = $leaves->sum(function ($leave) {
+            return Carbon::parse($leave->start_date)->diffInDays(Carbon::parse($leave->end_date)) + 1;
+        });
+        return $totalDays;
+    }
+
     public function leaveDaysConsumedPerMonth()
     {
         // Get all leave records for the employee (assuming $this->user_id is the employee ID)

@@ -62,12 +62,16 @@
             @endif
 
             {{-- leave days entitlement info --}}
+            {{-- leave days entitlement info --}}
             <div class="d-flex align-items-center mb-3">
                 <div class="d-flex align-items-center">
-                    <p><span class="fw-bold me-1">Total Leave Days Entitled:
+                    <p><span class="fw-bold me-1" id="totalLeaveDaysEntitled">Total Leave Days Entitled:
                             {{ auth()->user()->employee->leave_days_entitled ?? 0 }}</span><br>
-                        <span class="fw-bold me-1">Total Leave Days Scheduled:
-                            {{ auth()->user()->employee->leave_days_entitled ?? 0 }}</span>
+                        <span class="fw-bold me-1" id="totalLeaveDaysScheduled">Total Leave Days Scheduled:
+                            {{ auth()->user()->employee->overallRosterDays() ?? 0 }}</span><br>
+                        {{-- balance to schedule --}}
+                        <span class="fw-bold me-1" id="balanceToSchedule">Balance to Schedule:
+                            {{ auth()->user()->employee->leave_days_entitled - auth()->user()->employee->overallRosterDays() ?? 0 }}</span>
                     <p>
                 </div>
             </div>
@@ -216,6 +220,19 @@
         <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/bootstrap5@6.1.15/index.global.min.js"></script>
         <script type="module">
             $(document).ready(function() {
+                var employeeId = @json(auth()->user()->employee->employee_id);
+                Echo.private(`roster.${employeeId}`)
+                    .listen('RosterUpdate', (e) => {
+                        var totalLeaveDaysEntitled = e.total_leave_days_entitled;
+                        var totalLeaveDaysScheduled = e.total_leave_days_scheduled;
+                        var balanceToSchedule = Number(totalLeaveDaysEntitled) - Number(totalLeaveDaysScheduled);
+
+                        // Update the values in the HTML
+                        $('#totalLeaveDaysEntitled').text('Total Leave Days Entitled: ' + totalLeaveDaysEntitled);
+                        $('#totalLeaveDaysScheduled').text('Total Leave Days Scheduled: ' +
+                            totalLeaveDaysScheduled);
+                        $('#balanceToSchedule').text('Balance to Schedule: ' + balanceToSchedule);
+                    });
 
                 var calendarEl = $('#calendar');
                 var currentEvent = null;
