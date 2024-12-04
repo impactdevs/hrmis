@@ -62,17 +62,29 @@
             @endif
 
             {{-- leave days entitlement info --}}
-            {{-- leave days entitlement info --}}
-            <div class="d-flex align-items-center mb-3">
-                <div class="d-flex align-items-center">
-                    <p><span class="fw-bold me-1" id="totalLeaveDaysEntitled">Total Leave Days Entitled:
-                            {{ auth()->user()->employee->leave_days_entitled ?? 0 }}</span><br>
-                        <span class="fw-bold me-1" id="totalLeaveDaysScheduled">Total Leave Days Scheduled:
-                            {{ auth()->user()->employee->overallRosterDays() ?? 0 }}</span><br>
-                        {{-- balance to schedule --}}
-                        <span class="fw-bold me-1" id="balanceToSchedule">Balance to Schedule:
-                            {{ auth()->user()->employee->leave_days_entitled - auth()->user()->employee->overallRosterDays() ?? 0 }}</span>
-                    <p>
+            <div class="d-flex flex-column mb-4 p-3 rounded-3 shadow-sm"
+                style="background-color: #f4f7fc; border: 1px solid #e0e4e8;">
+                <div class="d-flex flex-column">
+                    <!-- Total Leave Days Entitled -->
+                    <p class="text-primary fw-bold fs-5 mb-2" id="totalLeaveDaysEntitled">Total Leave Days Entitled:
+                        <span class="text-dark" style="font-weight: 400;">
+                            {{ auth()->user()->employee->leave_days_entitled ?? 0 }}
+                        </span>
+                    </p>
+
+                    <!-- Total Leave Days Scheduled -->
+                    <p class="text-secondary fw-bold fs-5 mb-2" id="totalLeaveDaysScheduled">Total Leave Days Scheduled:
+                        <span class="text-dark" style="font-weight: 400;">
+                            {{ auth()->user()->employee->overallRosterDays() ?? 0 }}
+                        </span>
+                    </p>
+
+                    <!-- Balance to Schedule -->
+                    <p class="fw-bold fs-5 mb-2" id="balanceToSchedule">Balance to Schedule:
+                        <span class="balance-text text-dark" style="font-weight: 400;">
+                            {{ auth()->user()->employee->leave_days_entitled - auth()->user()->employee->overallRosterDays() ?? 0 }}
+                        </span>
+                    </p>
                 </div>
             </div>
 
@@ -600,6 +612,27 @@
                 });
             });
         </script>
+        <style>
+            /* Custom styling for balance color */
+            .balance-text {
+                font-weight: bold;
+            }
+
+            /* Add hover effect on hover of the leave days section */
+            .d-flex:hover {
+                background-color: #e8eff7;
+            }
+
+            /* Shadow for better contrast */
+            .shadow-sm {
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            }
+
+            /* Ensure spacing around elements */
+            .p-3 {
+                padding: 1.5rem;
+            }
+        </style>
     @endpush
 
 
