@@ -1,14 +1,17 @@
 <x-app-layout>
     <div class="mt-3">
-        <div class="d-flex flex-row flex-1 justify-content-between">
-            <!-- Updated Title Style for Leave Management -->
-            <h5 class="ms-3 leave-management-title">Leave Management</h5>
+        <div class="d-flex flex-row flex-1 justify-content-between align-items-center">
+            <h5 class="ms-3 leave-roster-title">Leave Roster</h5>
+
         </div>
-        <div class="table-wrapper">
-            <table class="table table-striped" id="leave-management-table" data-toggle="table" data-search="true"
-                data-show-columns="true" data-sortable="true" data-pagination="true" data-show-export="true"
-                data-show-pagination-switch="true" data-page-list="[10, 25, 50, 100, 500, 1000, 2000, 10000, all]"
-                data-side-pagination="server" data-url="{{ url('/leave-management/data') }}"> <!-- New AJAX route -->
+
+        <div class="table-wrapper mt-4">
+            <table class="table table-striped table-hover table-responsive" id="leave-management-table" data-toggle="table"
+                data-search="true" data-show-columns="true" data-sortable="true" data-pagination="true"
+                data-show-export="true" data-show-pagination-switch="true"
+                data-page-list="[10, 25, 50, 100, 500, 1000, 2000, 10000, all]" data-side-pagination="server"
+                data-url="{{ url('/leave-roster-tabular/data') }}">
+                <!-- Table Data -->
             </table>
         </div>
     </div>
@@ -63,43 +66,59 @@
                 function initTable() {
                     $table.bootstrapTable('destroy').bootstrapTable({
                         columns: [{
-                            field: 'numeric_id',
-                            title: 'ID',
+                            field: 'staff_id',
+                            title: 'STAFF ID',
+                            sortable: true,
                             formatter: function(value) {
                                 return `<button class="btn btn-outline-primary btn-sm">${value}</button>`;
+                            },
+                            headerFormatter: function() {
+                                return '<span class="text-uppercase font-weight-bold">Staff ID</span>';
                             }
                         }, {
                             field: 'first_name',
-                            title: 'First Name',
+                            title: 'FIRST NAME',
                             sortable: true,
                             class: 'text-primary',
                             formatter: function(value) {
                                 return value.toUpperCase(); // Make names uppercase
+                            },
+                            headerFormatter: function() {
+                                return '<span class="text-uppercase font-weight-bold">First Name</span>';
                             }
                         }, {
                             field: 'last_name',
-                            title: 'Last Name',
+                            title: 'LAST NAME',
                             sortable: true,
                             class: 'text-primary',
                             formatter: function(value) {
                                 return value.toUpperCase(); // Make names uppercase
+                            },
+                            headerFormatter: function() {
+                                return '<span class="text-uppercase font-weight-bold">Last Name</span>';
                             }
                         }, {
                             field: 'total_leave_roster_days',
-                            title: 'Entitled Days',
-                            sortable: true
+                            title: 'NO. OF DAYS APPLIED FOR',
+                            sortable: true,
+                            formatter: function(value) {
+                                return `<span class="badge bg-success">${value}</span>`;
+                            },
+                            headerFormatter: function() {
+                                return '<span class="text-uppercase font-weight-bold">Entitled Days</span>';
+                            }
                         }, {
-                            field: 'total_leave_days',
-                            title: 'Used',
-                            sortable: true
-                        }, {
-                            field: 'leave_balance',
-                            title: 'Balance',
-                            sortable: true
+                            field: 'leave_roster',
+                            title: 'LEAVE SCHEDULE',
+                            sortable: true,
+                            formatter: leaveRosterFormatter,
+                            headerFormatter: function() {
+                                return '<span class="text-uppercase font-weight-bold">Leave Schedule</span>';
+                            }
                         }],
-                        rowAttributes: function(row, index) {
+                        rowAttributes: function(row) {
                             return {
-                                'data-employee-id': row.employee_id // Attach employee_id to each row
+                                'data-employee-id': row.employee_id
                             };
                         },
                         pagination: true,
@@ -109,7 +128,31 @@
                     });
                 }
 
-                // Initialize the table
+                function leaveRosterFormatter(value) {
+                    if (value) {
+                        var formattedValue = '<ul class="list-unstyled">';
+                        value.forEach(function(item) {
+                            var startDate = new Date(item.start_date).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                            });
+                            var endDate = new Date(item.end_date).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                            });
+                            var status = item.booking_approval_status;
+                            formattedValue +=
+                                `<li><span class="text-info">${startDate} - ${endDate}</span> <span class="badge bg-${status === 'Approved' ? 'success' : 'danger'}">${status}</span></li>`;
+                        });
+                        formattedValue += '</ul>';
+                        return formattedValue;
+                    }
+                    return '';
+                }
+
+                // Initialize table
                 initTable();
 
                 // Add row hover effect for better UI
@@ -123,37 +166,29 @@
     @endpush
 
     <style>
-        /* Styling for Leave Management Title */
-        .leave-management-title {
+                /* Styling for Leave Roster Title */
+                .leave-roster-title {
             font-family: 'Arial', sans-serif;
             font-weight: bold;
             font-size: 2.5rem;
-            color: #fff;
-            /* White text for contrast */
-            background: linear-gradient(90deg, #4CAF50, #81C784);
-            /* Green gradient */
+            color: #fff;  /* White text for contrast */
+            background: linear-gradient(90deg, #4CAF50, #81C784);  /* Green gradient */
             padding: 10px 20px;
             border-radius: 8px;
             text-transform: uppercase;
             letter-spacing: 2px;
-            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.2);
-            /* Subtle shadow */
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.2); /* Subtle shadow */
             margin-bottom: 20px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
-            /* Soft shadow for depth */
-            transition: all 0.3s ease;
-            /* Smooth transition for hover effect */
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15); /* Soft shadow for depth */
+            transition: all 0.3s ease; /* Smooth transition for hover effect */
         }
 
         /* Hover Effect */
-        .leave-management-title:hover {
-            transform: scale(1.05);
-            /* Slight zoom effect */
-            box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.3);
-            /* Enhanced shadow on hover */
+        .leave-roster-title:hover {
+            transform: scale(1.05);  /* Slight zoom effect */
+            box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.3);  /* Enhanced shadow on hover */
             cursor: pointer;
         }
-
         /* Styling for table headers */
         th {
             font-family: 'Arial', sans-serif;
@@ -177,11 +212,6 @@
         /* Add some padding to table cells */
         td {
             padding: 8px;
-        }
-
-        /* Styling for table row hover effect */
-        tr.table-active {
-            background-color: #f1f1f1;
         }
     </style>
 </x-app-layout>

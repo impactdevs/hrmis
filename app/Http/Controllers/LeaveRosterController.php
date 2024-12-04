@@ -27,6 +27,63 @@ class LeaveRosterController extends Controller
         return view('leave-roster.index', compact('leaveTypes', 'user_id', 'existingValuesArray', 'users', 'departments'));
     }
 
+    public function getLeaveRoster(Request $request)
+    {
+        return view('leave-roster.tabular');
+    }
+
+
+    public function getLeaveRosterData(Request $request)
+    {
+        // Get search parameter from the request
+        $search = $request->get('search', '');
+
+        // Get pagination parameters (offset and limit)
+        $offset = $request->get('offset', 0);  // Number of records to skip
+        $limit = $request->get('limit', 100);   // Number of records per page
+
+        // Query the Employee model with search functionality and manual offset/limit
+        $employees = Employee::with('leaveRoster')
+            ->where('first_name', 'like', "%{$search}%")
+            ->orWhere('last_name', 'like', "%{$search}%")
+            ->orderBy('first_name', 'asc')
+            ->skip($offset)  // Skip the number of records specified by offset
+            ->take($limit)   // Take the number of records specified by limit
+            ->get();  // Execute the query to fetch the employees
+
+        // Add numeric IDs and calculate total leave days and balance for each employee
+        $startIndex = $offset + 1;
+
+        $employees->transform(function ($employee, $index) use ($startIndex) {
+            $totalLeaveDays = $employee->totalLeaveDays();
+            $totalLeaveRosterDays = $employee->totalLeaveRosterDays();
+
+            $balance = $totalLeaveRosterDays - $totalLeaveDays;
+
+            $employee->numeric_id = $startIndex + $index; // Add sequential numeric ID
+            $employee->total_leave_days = $totalLeaveDays;
+            $employee->total_leave_roster_days = $totalLeaveRosterDays;
+            $employee->leave_balance = $balance;
+
+            return $employee;
+        });
+
+        // Get the total number of records (for pagination)
+        $total = Employee::with('leaveRoster')
+            ->where('first_name', 'like', "%{$search}%")
+            ->orWhere('last_name', 'like', "%{$search}%")
+            ->count();  // Count the total number of records matching the search
+
+        // Return the response in the format expected by the table
+        return response()->json([
+            'total' => $total,   // Total number of records (for pagination)
+            'rows' => $employees, // Records for the current page
+        ]);
+    }
+
+
+
+
     /**
      * Show the form for creating a new resource.
      */
@@ -152,38 +209,5 @@ class LeaveRosterController extends Controller
         $leaveRoster->delete();
 
         return response()->json(['success' => true]);
-    }
-
-
-    public function saveLeaveRosterData()
-    {
-        try {
-            $data = request()->validate([
-                'month' => 'required|integer|min:1|max:12',
-                'employee_id' => 'required|exists:employees,employee_id',
-                'year' => 'integer|required',  // Ensure year is required
-                'number_of_leave_days' => 'required|integer',
-            ]);
-
-            // Find the leave roster record for the employee
-            $leaveRoster = LeaveRoster::where('employee_id', $data['employee_id'])->first();
-
-            //you have to first get this as a variable
-            $months = $leaveRoster->months;
-            // Ensure the month exists in the year, if not initialize it
-
-            $months[$data['year']] = $months[$data['year']] ?? [];
-
-            $months[$data['year']][$data['month']] = $data['number_of_leave_days'];
-
-            $leaveRoster->months = $months;
-            // Save the updated leave roster
-            $leaveRoster->save();
-
-            return response()->json(['success' => true, 'message' => 'Leave data saved successfully']);
-
-        } catch (\Exception $e) {
-            return response()->json(['success' => false, 'error' => 'failed to save leave data', 'message' => $e->getMessage()]);
-        }
     }
 }

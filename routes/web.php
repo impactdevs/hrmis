@@ -57,7 +57,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('trainings', TrainingController::class);
     Route::resource('out-of-station-trainings', OutOfStationTrainingController::class);
     Route::post('/out-of-station-trainings/{training}/status', [OutOfStationTrainingController::class, 'approveOrReject'])
-    ->name('out-of-station-trainings.approveOrReject');
+        ->name('out-of-station-trainings.approveOrReject');
     Route::get('training-application', [TrainingController::class, 'apply'])->name('apply');
     Route::post('save-training-application', [TrainingController::class, 'applyTraining'])->name('save.apply');
     Route::post('/trainings/{training}/status', [TrainingController::class, 'approveOrReject'])
@@ -71,6 +71,8 @@ Route::middleware('auth')->group(function () {
     Route::post('save-leave-data', [LeaveRosterController::class, 'saveLeaveRosterData'])->name('save-leave-data');
     Route::resource('leave-roster', LeaveRosterController::class);
     Route::get('/leave-roster-calendar-data', [LeaveRosterController::class, 'leaveRosterCalendarData'])->name('leave-roster.calendarData');
+    Route::get('/leave-roster-tabular', [LeaveRosterController::class, 'getLeaveRoster'])->name('leave-roster-tabular.index');
+    Route::get('/leave-roster-tabular/data', [LeaveRosterController::class, 'getLeaveRosterData'])->name('leave-roster-tabular.data');
     Route::resource('leave-types', LeaveTypesController::class);
     Route::post('calender', [leaveRosterController::class, 'getcalender']);
     Route::get('leave-management', [LeaveController::class, 'leaveManagement'])->name('leave-management');

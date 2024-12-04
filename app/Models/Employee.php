@@ -138,10 +138,10 @@ class Employee extends Model
     }
 
 
-    //each employee has a leave roster
+    //each employee has 0 or more leave rosters
     public function leaveRoster()
     {
-        return $this->hasOne(LeaveRoster::class, 'employee_id', 'employee_id');
+        return $this->hasMany(LeaveRoster::class, 'employee_id', 'employee_id');
     }
 
     public function totalLeaveDays()

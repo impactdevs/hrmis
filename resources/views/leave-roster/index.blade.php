@@ -53,6 +53,13 @@
                     <i class="bi bi-plus-circle"></i> Add Leave Roster</button>
             </div>
 
+            <div class="d-flex align-items-center mb-3">
+                {{-- Tabular view --}}
+                <a class="btn btn-primary btn-sm mt-3 ms-1 font-weight-bold" style="max-height: 40px; font-size: 12px"
+                    href="{{ route('leave-roster-tabular.index') }}">
+                    <i class="bi bi-eye"></i>Tabular View</a>
+            </div>
+
 
         </div>
 
@@ -217,8 +224,7 @@
                         today: 'Today',
                         listYear: listTitle
                     },
-                    views: {
-                    },
+                    views: {},
                     eventContent: function(arg) {
                         var firstName = arg.event.extendedProps.first_name;
                         var lastName = arg.event.extendedProps.last_name;
@@ -245,12 +251,19 @@
                                 '<i class="bi bi-x-circle"></i>'; // Bootstrap x-circle icon for rejected
                         }
 
-                        // Return the title with the status icon and color
                         return {
-                            html: `<div class="fc-event-title">${title}</div>
-               <div class="fc-event-status" style="color: ${statusColor};">
-                   ${statusIcon} ${approvalStatusText}
-               </div>`
+                            html: '<div class="d-flex align-items-center">' +
+                                '<div class="me-2">' +
+                                '<span class="text-' +
+                                statusColor +
+                                '">' +
+                                statusIcon +
+                                '</span>' +
+                                '</div>' +
+                                '<div class="flex-grow-1">' +
+                                title +
+                                '</div>' +
+                                '</div>'
                         };
                     },
 
@@ -385,34 +398,6 @@
                     calendar.refetchEvents(); // Re-fetch events based on the new filter
                 });
 
-                // Handle the Rename button
-                $('#renameEvent').click(function() {
-                    var newTitle = $('#eventTitle').val();
-                    if (newTitle) {
-                        currentEvent.setProp('title', newTitle);
-                        $.ajax({
-                            url: "{{ route('leave-roster.update', '') }}/" + currentEvent.id,
-                            method: 'PUT',
-                            data: {
-                                leave_title: newTitle
-                            },
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            },
-                            success: function(response) {
-                                var offcanvas = bootstrap.Offcanvas.getInstance(document
-                                    .getElementById('eventOffCanvas'));
-                                offcanvas.hide();
-                                console.log('Event updated successfully');
-                            },
-                            error: function(xhr, status, error) {
-                                console.error('Error updating event:', error);
-                            }
-                        });
-                    } else {
-                        alert("Please enter a title.");
-                    }
-                });
 
                 // Handle the Reject button
                 $('#rejectRoster').click(function() {

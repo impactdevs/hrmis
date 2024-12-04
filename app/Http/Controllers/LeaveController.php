@@ -204,40 +204,49 @@ class LeaveController extends Controller
     }
     public function getLeaveManagementData(Request $request)
     {
-        // Get search parameter from the request
-        $search = $request->get('search', '');
-        // Get pagination parameters from the request
-        $page = $request->get('offset', 0) / 10 + 1;  // This is the current page
-        $limit = $request->get('limit', 10);  // Number of records per page
+           // Get search parameter from the request
+           $search = $request->get('search', '');
 
-        // Query the Employee model with search functionality
-        $employees = Employee::where('first_name', 'like', "%{$search}%")
-            ->orWhere('last_name', 'like', "%{$search}%")
-            ->latest()
-            ->paginate($limit);  // Use the limit from the request to paginate results
+           // Get pagination parameters (offset and limit)
+           $offset = $request->get('offset', 0);  // Number of records to skip
+           $limit = $request->get('limit', 10);   // Number of records per page
 
-        // Add numeric IDs and calculate total leave days and balance for each employee
-        $startIndex = ($employees->currentPage() - 1) * $employees->perPage() + 1;
+           // Query the Employee model with search functionality and manual offset/limit
+           $employees = Employee::where('first_name', 'like', "%{$search}%")
+               ->orWhere('last_name', 'like', "%{$search}%")
+               ->orderBy('first_name', 'asc')
+               ->skip($offset)  // Skip the number of records specified by offset
+               ->take($limit)   // Take the number of records specified by limit
+               ->get();  // Execute the query to fetch the employees
 
-        $employees->getCollection()->transform(function ($employee, $index) use ($startIndex) {
-            $totalLeaveDays = $employee->totalLeaveDays();
-            $totalLeaveRosterDays = $employee->totalLeaveRosterDays();
+           // Add numeric IDs and calculate total leave days and balance for each employee
+           $startIndex = $offset + 1;
 
-            $balance = $totalLeaveRosterDays-$totalLeaveDays;
+           $employees->transform(function ($employee, $index) use ($startIndex) {
+               $totalLeaveDays = $employee->totalLeaveDays();
+               $totalLeaveRosterDays = $employee->totalLeaveRosterDays();
 
-            $employee->numeric_id = $startIndex + $index; // Add sequential numeric ID
-            $employee->total_leave_days = $totalLeaveDays;
-            $employee->total_leave_roster_days = $totalLeaveRosterDays;
-            $employee->leave_balance = $balance;
+               $balance = $totalLeaveRosterDays - $totalLeaveDays;
 
-            return $employee;
-        });
+               $employee->numeric_id = $startIndex + $index; // Add sequential numeric ID
+               $employee->total_leave_days = $totalLeaveDays;
+               $employee->total_leave_roster_days = $totalLeaveRosterDays;
+               $employee->leave_balance = $balance;
 
-        // Return the paginated response in the required format for the table
-        return response()->json([
-            'total' => $employees->total(),
-            'rows' => $employees->items(),
-        ]);
+               return $employee;
+           });
+
+           // Get the total number of records (for pagination)
+           $total = Employee::with('leaveRoster')
+               ->where('first_name', 'like', "%{$search}%")
+               ->orWhere('last_name', 'like', "%{$search}%")
+               ->count();  // Count the total number of records matching the search
+
+           // Return the response in the format expected by the table
+           return response()->json([
+               'total' => $total,   // Total number of records (for pagination)
+               'rows' => $employees, // Records for the current page
+           ]);
     }
 
 
