@@ -19,8 +19,9 @@
                 // Make the "Entitled Days" cell editable on click
                 $(document).on('click', '.entitled-days-text', function() {
                     var $inputField = $(this).next('.entitled-days-input');
-                    $inputField.show();
-                    $inputField.focus();
+
+                    $inputField.show().focus(); // Show the input field and focus on it
+                    console.log($inputField)
                     $(this).hide(); // Hide the text when editing starts
                 });
 
@@ -31,9 +32,26 @@
                     var $row = $inputField.closest('tr');
                     var employeeId = $row.data('employee-id');
 
-                    // Perform validation
-                    if (isNaN(newValue) || newValue < 0) {
-                        alert('Invalid number of leave days');
+                    //check if the value did not change and is empty
+                    if (newValue === $row.find('.entitled-days-text').text()) {
+                        //just keep the value
+                        $row.find('.entitled-days-text').show();
+                        $inputField.hide();
+                        return;
+                    }
+
+                    //if the value is empty toastify that its empty and return
+                    if (newValue === '') {
+                        Toastify({
+                            text: 'Please enter a value',
+                            duration: 3000,
+                            gravity: "top",
+                            position: "right",
+                            backgroundColor: "linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(121,14,9,1) 35%, rgba(0,212,255,1) 100%)",
+                        }).showToast();
+                        $row.find('.entitled-days-text').show();
+                        //hide
+                        $inputField.hide();
                         return;
                     }
 
@@ -52,7 +70,15 @@
                             $inputField.hide();
                         },
                         error: function() {
-                            alert('Failed to update');
+
+                            Toastify({
+                                text: 'Failed to update',
+                                duration: 3000,
+                                gravity: "top",
+                                position: "right",
+                                backgroundColor: "linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(121,14,9,1) 35%, rgba(0,212,255,1) 100%)",
+                            }).showToast();
+
                         }
                     });
                 });
@@ -70,7 +96,7 @@
                             }
                         }, {
                             field: 'first_name',
-                            title: 'First Name',
+                            title: 'FIRST NAME',
                             sortable: true,
                             class: 'text-primary',
                             formatter: function(value) {
@@ -78,23 +104,31 @@
                             }
                         }, {
                             field: 'last_name',
-                            title: 'Last Name',
+                            title: 'LAST NAME',
                             sortable: true,
                             class: 'text-primary',
                             formatter: function(value) {
                                 return value.toUpperCase(); // Make names uppercase
                             }
                         }, {
+                            field: 'entitled_leave_days',
+                            title: 'ENTITLED LEAVE DAYS',
+                            sortable: true,
+                            formatter: function(value) {
+                                return `<span class="entitled-days-text">${value ?? 0}</span>
+                            <input type="number" class="entitled-days-input form-control form-control-sm" style="display: none;" value="${value}">`;
+                            }
+                        }, {
                             field: 'total_leave_roster_days',
-                            title: 'Entitled Days',
+                            title: 'TOTAL DAYS APPLIED FOR',
                             sortable: true
                         }, {
                             field: 'total_leave_days',
-                            title: 'Used',
+                            title: 'USED LEAVE DAYS',
                             sortable: true
                         }, {
                             field: 'leave_balance',
-                            title: 'Balance',
+                            title: 'BALANCE DAYS',
                             sortable: true
                         }],
                         rowAttributes: function(row, index) {

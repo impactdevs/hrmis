@@ -98,23 +98,23 @@
                                         @endif
                                     @endif
                                     <p>Who has approved</p>
-                                    @if(!is_null($leave->leave_request_status))
-                                    {{-- who approved --}}
-                                    @foreach ($leave->leave_request_status as $person => $status)
-                                        @if ($status === 'approved')
-                                            -<span class="badge bg-success">Approved by {{ $person }}</span>
-                                        @endif
+                                    @if (!is_null($leave->leave_request_status))
+                                        {{-- who approved --}}
+                                        @foreach ($leave->leave_request_status as $person => $status)
+                                            @if ($status === 'approved')
+                                                -<span class="badge bg-success">Approved by {{ $person }}</span>
+                                            @endif
 
-                                        @if ($status === 'rejected')
-                                            -<span class="badge bg-danger">Rejected by {{ $person }}</span>
-                                        @endif
+                                            @if ($status === 'rejected')
+                                                -<span class="badge bg-danger">Rejected by {{ $person }}</span>
+                                            @endif
 
-                                        @if ($status === null)
-                                            -<span class="badge bg-warning">Pending by {{ $person }}</span>
-                                        @endif
-                                    @endforeach
+                                            @if ($status === null)
+                                                -<span class="badge bg-warning">Pending by {{ $person }}</span>
+                                            @endif
+                                        @endforeach
                                     @else
-                                    <span class="badge bg-warning">No Approval Yet</span>
+                                        <span class="badge bg-warning">No Approval Yet</span>
                                     @endif
                                 </div>
                             </div>

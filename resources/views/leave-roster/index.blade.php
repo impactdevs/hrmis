@@ -61,6 +61,18 @@
                 </div>
             @endif
 
+            {{-- leave days entitlement info --}}
+            <div class="d-flex align-items-center mb-3">
+                <div class="d-flex align-items-center">
+                    <p><span class="fw-bold me-1">Total Leave Days Entitled:
+                            {{ auth()->user()->employee->leave_days_entitled ?? 0 }}</span><br>
+                        <span class="fw-bold me-1">Total Leave Days Scheduled:
+                            {{ auth()->user()->employee->leave_days_entitled ?? 0 }}</span>
+                    <p>
+                </div>
+            </div>
+
+
 
         </div>
 

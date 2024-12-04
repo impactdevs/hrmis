@@ -120,9 +120,6 @@ class LeaveRosterController extends Controller
      */
     public function leaveRosterCalendarData(Request $request)
     {
-
-        $employee_id = auth()->user()->employee->employee_id;
-
         // Get the filters from the request, defaulting to 'all'
         $approvalStatus = $request->input('approval_status', 'all');
         $department = $request->input('department', 'all');
