@@ -146,7 +146,7 @@ class Employee extends Model
 
     public function totalLeaveDays()
     {
-        //get leaves where the employee id matches employee id and were created in the current year
+        //get leaves where the employee id matches employee id and were created in the current year that were confirmed by the executive secretary
         $leaves = Leave::where('user_id', $this->user_id)->whereYear('created_at', Carbon::now()->year)->get();
         $totalDays = $leaves->sum(function ($leave) {
             return Carbon::parse($leave->start_date)->diffInDays(Carbon::parse($leave->end_date)) + 1;
@@ -157,9 +157,9 @@ class Employee extends Model
     //get the total leave roster days for an employee where booking_approval_status is Approved
     public function totalLeaveRosterDays()
     {
-        $leaves = LeaveRoster::where('employee_id', $this->employee_id)->where('booking_approval_status', 'Approved')->get();
+        $leaves = LeaveRoster::where('employee_id', $this->employee_id)->get();
         $totalDays = $leaves->sum(function ($leave) {
-            return Carbon::parse($leave->start_date)->diffInDays(Carbon::parse($leave->end_date)) + 1;
+            return Carbon::parse($leave->start_date)->diffInDays(Carbon::parse($leave->end_date));
         });
         return $totalDays;
     }

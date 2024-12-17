@@ -13,11 +13,9 @@ return new class extends Migration
     {
         Schema::create('leave_rosters', function (Blueprint $table) {
             $table->uuid('leave_roster_id')->primary();
-            $table->uuid('employee_id')->references('employee_id')->on('employees');
+            $table->uuid('employee_id')->references('employee_id')->on('employees')->onDelete('casacade');
             $table->date('start_date');
             $table->date('end_date');
-            $table->string('booking_approval_status')->default('Pending');
-            $table->longText('rejection_reason')->nullable();
             $table->string('leave_title');
             $table->timestamps();
         });

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Leave;
 use App\Models\LeaveRoster;
@@ -36,7 +37,9 @@ class LeaveController extends Controller
         $employee = Employee::where('user_id', $user)->first();
         $totalLeaveDaysAllocated = $employee->totalLeaveRosterDays();
         $useDays = $employee->totalLeaveDays();
-        return view('leaves.index', compact('leaves', 'totalLeaves', 'totalDays', 'leavesPerCategory', 'users', 'totalLeaveDaysAllocated', 'useDays'));
+        //departments
+        $departments = Department::pluck('department_name', 'department_id')->toArray();
+        return view('leaves.index', compact('leaves', 'totalLeaves', 'totalDays', 'leavesPerCategory', 'users', 'totalLeaveDaysAllocated', 'useDays', 'departments'));
     }
 
     /**
@@ -183,7 +186,7 @@ class LeaveController extends Controller
 
             // Send notification
             $leaveRequester = User::find($leave->user_id); // Get the user who requested the leave
-            $approver = User::find(auth()->user()->id);
+            $approver = User::where('id', auth()->user()->id)->first();
             Notification::send($leaveRequester, new LeaveApproval($leave, $approver)); // Notify with the approver
         } else {
             return response()->json(['error' => 'Unauthorized'], 403);
@@ -204,49 +207,49 @@ class LeaveController extends Controller
     }
     public function getLeaveManagementData(Request $request)
     {
-           // Get search parameter from the request
-           $search = $request->get('search', '');
+        // Get search parameter from the request
+        $search = $request->get('search', '');
 
-           // Get pagination parameters (offset and limit)
-           $offset = $request->get('offset', 0);  // Number of records to skip
-           $limit = $request->get('limit', 10);   // Number of records per page
+        // Get pagination parameters (offset and limit)
+        $offset = $request->get('offset', 0);  // Number of records to skip
+        $limit = $request->get('limit', 10);   // Number of records per page
 
-           // Query the Employee model with search functionality and manual offset/limit
-           $employees = Employee::where('first_name', 'like', "%{$search}%")
-               ->orWhere('last_name', 'like', "%{$search}%")
-               ->orderBy('first_name', 'asc')
-               ->skip($offset)  // Skip the number of records specified by offset
-               ->take($limit)   // Take the number of records specified by limit
-               ->get();  // Execute the query to fetch the employees
+        // Query the Employee model with search functionality and manual offset/limit
+        $employees = Employee::where('first_name', 'like', "%{$search}%")
+            ->orWhere('last_name', 'like', "%{$search}%")
+            ->orderBy('first_name', 'asc')
+            ->skip($offset)  // Skip the number of records specified by offset
+            ->take($limit)   // Take the number of records specified by limit
+            ->get();  // Execute the query to fetch the employees
 
-           // Add numeric IDs and calculate total leave days and balance for each employee
-           $startIndex = $offset + 1;
+        // Add numeric IDs and calculate total leave days and balance for each employee
+        $startIndex = $offset + 1;
 
-           $employees->transform(function ($employee, $index) use ($startIndex) {
-               $totalLeaveDays = $employee->totalLeaveDays();
-               $totalLeaveRosterDays = $employee->totalLeaveRosterDays();
+        $employees->transform(function ($employee, $index) use ($startIndex) {
+            $totalLeaveDays = $employee->totalLeaveDays();
+            $totalLeaveRosterDays = $employee->entitled_leave_days;
 
-               $balance = $totalLeaveRosterDays - $totalLeaveDays;
+            $balance = $totalLeaveRosterDays - $totalLeaveDays;
 
-               $employee->numeric_id = $startIndex + $index; // Add sequential numeric ID
-               $employee->total_leave_days = $totalLeaveDays;
-               $employee->total_leave_roster_days = $totalLeaveRosterDays;
-               $employee->leave_balance = $balance;
+            $employee->numeric_id = $startIndex + $index; // Add sequential numeric ID
+            $employee->total_leave_days = $totalLeaveDays;
+            $employee->total_leave_roster_days = $totalLeaveRosterDays;
+            $employee->leave_balance = $balance;
 
-               return $employee;
-           });
+            return $employee;
+        });
 
-           // Get the total number of records (for pagination)
-           $total = Employee::with('leaveRoster')
-               ->where('first_name', 'like', "%{$search}%")
-               ->orWhere('last_name', 'like', "%{$search}%")
-               ->count();  // Count the total number of records matching the search
+        // Get the total number of records (for pagination)
+        $total = Employee::with('leaveRoster')
+            ->where('first_name', 'like', "%{$search}%")
+            ->orWhere('last_name', 'like', "%{$search}%")
+            ->count();  // Count the total number of records matching the search
 
-           // Return the response in the format expected by the table
-           return response()->json([
-               'total' => $total,   // Total number of records (for pagination)
-               'rows' => $employees, // Records for the current page
-           ]);
+        // Return the response in the format expected by the table
+        return response()->json([
+            'total' => $total,   // Total number of records (for pagination)
+            'rows' => $employees, // Records for the current page
+        ]);
     }
 
 

@@ -1,9 +1,5 @@
 <x-app-layout>
     <div class="mt-3">
-        <div class="d-flex flex-row flex-1 justify-content-between">
-            <!-- Updated Title Style for Leave Management -->
-            <h5 class="ms-3 leave-management-title">Leave Management</h5>
-        </div>
         <div class="table-wrapper">
             <table class="table table-striped" id="leave-management-table" data-toggle="table" data-search="true"
                 data-show-columns="true" data-sortable="true" data-pagination="true" data-show-export="true"
@@ -16,72 +12,72 @@
     @push('scripts')
         <script>
             $(document).ready(function() {
-                // Make the "Entitled Days" cell editable on click
-                $(document).on('click', '.entitled-days-text', function() {
-                    var $inputField = $(this).next('.entitled-days-input');
+                // // Make the "Entitled Days" cell editable on click
+                // $(document).on('click', '.entitled-days-text', function() {
+                //     var $inputField = $(this).next('.entitled-days-input');
 
-                    $inputField.show().focus(); // Show the input field and focus on it
-                    console.log($inputField)
-                    $(this).hide(); // Hide the text when editing starts
-                });
+                //     $inputField.show().focus(); // Show the input field and focus on it
+                //     console.log($inputField)
+                //     $(this).hide(); // Hide the text when editing starts
+                // });
 
                 // Handle "Entitled Days" updates on blur
-                $(document).on('blur', '.entitled-days-input', function() {
-                    var $inputField = $(this);
-                    var newValue = $inputField.val();
-                    var $row = $inputField.closest('tr');
-                    var employeeId = $row.data('employee-id');
+                // $(document).on('blur', '.entitled-days-input', function() {
+                //     var $inputField = $(this);
+                //     var newValue = $inputField.val();
+                //     var $row = $inputField.closest('tr');
+                //     var employeeId = $row.data('employee-id');
 
-                    //check if the value did not change and is empty
-                    if (newValue === $row.find('.entitled-days-text').text()) {
-                        //just keep the value
-                        $row.find('.entitled-days-text').show();
-                        $inputField.hide();
-                        return;
-                    }
+                //     //check if the value did not change and is empty
+                //     if (newValue === $row.find('.entitled-days-text').text()) {
+                //         //just keep the value
+                //         $row.find('.entitled-days-text').show();
+                //         $inputField.hide();
+                //         return;
+                //     }
 
-                    //if the value is empty toastify that its empty and return
-                    if (newValue === '') {
-                        Toastify({
-                            text: 'Please enter a value',
-                            duration: 3000,
-                            gravity: "top",
-                            position: "right",
-                            backgroundColor: "linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(121,14,9,1) 35%, rgba(0,212,255,1) 100%)",
-                        }).showToast();
-                        $row.find('.entitled-days-text').show();
-                        //hide
-                        $inputField.hide();
-                        return;
-                    }
+                //     //if the value is empty toastify that its empty and return
+                //     if (newValue === '') {
+                //         Toastify({
+                //             text: 'Please enter a value',
+                //             duration: 3000,
+                //             gravity: "top",
+                //             position: "right",
+                //             backgroundColor: "linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(121,14,9,1) 35%, rgba(0,212,255,1) 100%)",
+                //         }).showToast();
+                //         $row.find('.entitled-days-text').show();
+                //         //hide
+                //         $inputField.hide();
+                //         return;
+                //     }
 
-                    // AJAX request to update data
-                    $.ajax({
-                        url: '/update-entitled-leave-days/' + employeeId,
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        data: {
-                            entitled_leave_days: newValue
-                        },
-                        success: function(response) {
-                            $row.find('.entitled-days-text').text(newValue).show();
-                            $inputField.hide();
-                        },
-                        error: function() {
+                //     // AJAX request to update data
+                //     $.ajax({
+                //         url: '/update-entitled-leave-days/' + employeeId,
+                //         method: 'POST',
+                //         headers: {
+                //             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                //         },
+                //         data: {
+                //             entitled_leave_days: newValue
+                //         },
+                //         success: function(response) {
+                //             $row.find('.entitled-days-text').text(newValue).show();
+                //             $inputField.hide();
+                //         },
+                //         error: function() {
 
-                            Toastify({
-                                text: 'Failed to update',
-                                duration: 3000,
-                                gravity: "top",
-                                position: "right",
-                                backgroundColor: "linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(121,14,9,1) 35%, rgba(0,212,255,1) 100%)",
-                            }).showToast();
+                //             Toastify({
+                //                 text: 'Failed to update',
+                //                 duration: 3000,
+                //                 gravity: "top",
+                //                 position: "right",
+                //                 backgroundColor: "linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(121,14,9,1) 35%, rgba(0,212,255,1) 100%)",
+                //             }).showToast();
 
-                        }
-                    });
-                });
+                //         }
+                //     });
+                // });
 
                 var $table = $('#leave-management-table');
 
@@ -118,10 +114,6 @@
                                 return `<span class="entitled-days-text">${value ?? 0}</span>
                             <input type="number" class="entitled-days-input form-control form-control-sm" style="display: none;" value="${value}">`;
                             }
-                        }, {
-                            field: 'total_leave_roster_days',
-                            title: 'TOTAL DAYS APPLIED FOR',
-                            sortable: true
                         }, {
                             field: 'total_leave_days',
                             title: 'USED LEAVE DAYS',

@@ -1,8 +1,100 @@
 <!-- ======= Header ======= -->
 <header id="header" class="navbar sticky-top header fixed-top d-flex align-items-center">
     <p class="text-primary fw-bold fs-4">
-        {{ config('app.name') }}
+        @php
+            $title = '';
+
+            if (request()->routeIs('dashboard')) {
+                $title = 'Dashboard';
+            }
+
+            if (request()->routeIs('leaves.index')) {
+                $title = auth()->user()->isAdminOrSecretary() ? 'Leaves' : 'Apply For Leave';
+            }
+
+            if (request()->routeIs('leave-roster.index') || request()->routeIs('leave-roster-tabular.index')) {
+                $title = auth()->user()->isAdminOrSecretary() ? 'Leave Roster' : 'My Leave Roster';
+            }
+
+            if (request()->routeIs('leave-management')) {
+                $title = 'Leave Management';
+            }
+
+            if (request()->routeIs('appraisals.index')) {
+                $title = auth()->user()->isAdminOrSecretary() ? 'Appraisals' : 'My Appraisals';
+            }
+
+            if (request()->routeIs('attendances.index')) {
+                $title = auth()->user()->isAdminOrSecretary() ? 'Attendances' : 'My Attendance History';
+            }
+
+            if (
+                request()->routeIs('trainings.index') ||
+                request()->routeIs('trainings.show') ||
+                request()->routeIs('trainings.edit') ||
+                request()->routeIs('trainings.create') ||
+                request()->routeIs('out-of-station-trainings.index') ||
+                request()->routeIs('out-of-station-trainings.create') ||
+                request()->routeIs('out-of-station-trainings.edit') ||
+                request()->routeIs('out-of-station-trainings.show') ||
+                request()->routeIs('apply')
+            ) {
+                $title = 'Trainings/Travels';
+            }
+
+            if (request()->routeIs('events.index') || request()->routeIs('events.show')) {
+                $title = 'Events';
+            }
+
+            if (request()->routeIs('employees.index') || request()->routeIs('employees.show')) {
+                $title = auth()->user()->isAdminOrSecretary() ? 'Employees' : 'About Me';
+            }
+
+            if (request()->routeIs('applications.index')) {
+                $title = 'Applications';
+            }
+
+            if (
+                request()->routeIs('recruitments.index') ||
+                request()->routeIs('recruitments.show') ||
+                request()->routeIs('recruitments.edit') ||
+                request()->routeIs('recruitments.create')
+            ) {
+                $title = 'Staff Recruitment';
+            }
+
+            if (request()->routeIs('leave-types.index')) {
+                $title = 'Leave Types';
+            }
+
+            if (request()->routeIs('company-jobs.index')) {
+                $title = 'Company Jobs';
+            }
+
+            if (request()->routeIs('positions.index')) {
+                $title = 'Positions';
+            }
+
+            if (request()->routeIs('roles.index')) {
+                $title = 'Roles';
+            }
+
+            if (request()->routeIs('permissions.index')) {
+                $title = 'Permissions';
+            }
+
+            if (request()->routeIs('users.index')) {
+                $title = 'User Management';
+            }
+
+            if (request()->routeIs('departments.index')) {
+                $title = 'Departments';
+            }
+        @endphp
+
+        {{ $title }}
     </p>
+
     <nav class="header-nav ms-auto">
         <ul class="d-flex align-items-center">
             <li class="nav-item dropdown">

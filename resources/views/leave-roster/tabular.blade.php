@@ -144,7 +144,7 @@
                             });
                             var status = item.booking_approval_status;
                             formattedValue +=
-                                `<li><span class="text-info">${startDate} - ${endDate}</span> <span class="badge bg-${status === 'Approved' ? 'success' : 'danger'}">${status}</span></li>`;
+                                `<li><span class="text-info">${startDate} - ${endDate}</span></li>`;
                         });
                         formattedValue += '</ul>';
                         return formattedValue;
@@ -166,29 +166,37 @@
     @endpush
 
     <style>
-                /* Styling for Leave Roster Title */
-                .leave-roster-title {
+        /* Styling for Leave Roster Title */
+        .leave-roster-title {
             font-family: 'Arial', sans-serif;
             font-weight: bold;
             font-size: 2.5rem;
-            color: #fff;  /* White text for contrast */
-            background: linear-gradient(90deg, #4CAF50, #81C784);  /* Green gradient */
+            color: #fff;
+            /* White text for contrast */
+            background: linear-gradient(90deg, #4CAF50, #81C784);
+            /* Green gradient */
             padding: 10px 20px;
             border-radius: 8px;
             text-transform: uppercase;
             letter-spacing: 2px;
-            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.2);
+            /* Subtle shadow */
             margin-bottom: 20px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15); /* Soft shadow for depth */
-            transition: all 0.3s ease; /* Smooth transition for hover effect */
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+            /* Soft shadow for depth */
+            transition: all 0.3s ease;
+            /* Smooth transition for hover effect */
         }
 
         /* Hover Effect */
         .leave-roster-title:hover {
-            transform: scale(1.05);  /* Slight zoom effect */
-            box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.3);  /* Enhanced shadow on hover */
+            transform: scale(1.05);
+            /* Slight zoom effect */
+            box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.3);
+            /* Enhanced shadow on hover */
             cursor: pointer;
         }
+
         /* Styling for table headers */
         th {
             font-family: 'Arial', sans-serif;

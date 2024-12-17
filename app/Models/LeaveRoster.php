@@ -5,8 +5,7 @@ namespace App\Models;
 use App\Models\Scopes\LeaveRosterScope;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Attributes\ScopedBy;
-
+use Illuminate\Support\Str;
 
 #[ScopedBy([LeaveRosterScope::class])]
 class LeaveRoster extends Model
@@ -26,15 +25,14 @@ class LeaveRoster extends Model
         'employee_id',
         'start_date',
         'end_date',
-        'booking_approval_status',
         'leave_title',
-        'rejection_reason'
+        'rejection_reason',
     ];
 
     // If you want to use casts for certain attributes
     protected $casts = [
         'start_date' => 'date',
-        'end_date' => 'date'
+        'end_date' => 'date',
     ];
 
     // Model boot method
@@ -42,27 +40,21 @@ class LeaveRoster extends Model
     {
         parent::boot();
 
+        // Automatically generate a UUID for the primary key when creating a new leave roster
         static::creating(function ($leaveRoster) {
-            $leaveRoster->leave_roster_id = (string) \Illuminate\Support\Str::uuid();
+            $leaveRoster->leave_roster_id = (string) Str::uuid();
         });
     }
 
-    //a leave roster belongs to an employee
+    // A leave roster belongs to an employee
     public function employee()
     {
         return $this->belongsTo(Employee::class, 'employee_id', 'employee_id');
     }
 
-    //check if the leave roster has been approved, if pending, return null, if rejected, false, if approved, true
-    public function isApproved()
+    // A leave roster belongs to 0 or 1 leave
+    public function leave()
     {
-        if ($this->booking_approval_status == 'Approved') {
-            return true;
-        } elseif ($this->booking_approval_status == 'Rejected') {
-            return false;
-        } else {
-            return null;
-        }
+        return $this->belongsTo(Leave::class, 'leave_roster_id', 'leave_roster_id')->withDefault();
     }
-
 }

@@ -57,7 +57,7 @@ class LeaveRosterController extends Controller
 
         $employees->transform(function ($employee, $index) use ($startIndex) {
             $totalLeaveDays = $employee->totalLeaveDays();
-            $totalLeaveRosterDays = $employee->totalLeaveRosterDays();
+            $totalLeaveRosterDays = 10;
 
             $balance = $totalLeaveRosterDays - $totalLeaveDays;
 
@@ -83,16 +83,6 @@ class LeaveRosterController extends Controller
     }
 
 
-
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
     /**
      * Store a newly created resource in storage.
      */
@@ -109,7 +99,7 @@ class LeaveRosterController extends Controller
         $leaveRosterAdded->load('employee');
 
         if ($leaveRosterAdded) {
-            $entitledDays = auth()->user()->employee->entitled_leave_days??0;
+            $entitledDays = auth()->user()->employee->entitled_leave_days ?? 0;
             $scheduledDays = auth()->user()->employee->overallRosterDays();
             RosterUpdate::dispatch($employee_id, $entitledDays, $scheduledDays);
             return response()->json(['success' => true, 'message' => 'Leave Roster added successfully', 'data' => $leaveRosterAdded]);
@@ -118,30 +108,12 @@ class LeaveRosterController extends Controller
         return response()->json(['success' => false, 'message' => 'Failed to add Leave Roster']);
     }
 
-    /*
-     *get leave roster calendar data
-     */
     public function leaveRosterCalendarData(Request $request)
     {
-        // Get the filters from the request, defaulting to 'all'
-        $approvalStatus = $request->input('approval_status', 'all');
         $department = $request->input('department', 'all');
 
         // Start with the query to get the leave roster
-        $leaveRosterQuery = LeaveRoster::with('employee'); // Eager load employee relationship
-
-        // Filter by booking_approval_status status (Approved, Pending, Rejected)
-        if ($approvalStatus !== 'all') {
-            // Adjusting the approval status filtering logic based on the 'booking_approval_status' field
-            if ($approvalStatus === 'Approved') {
-                $leaveRosterQuery->where('booking_approval_status', 'Approved');
-            } elseif ($approvalStatus === 'Rejected') {
-                $leaveRosterQuery->where('booking_approval_status', 'Rejected');
-            } elseif ($approvalStatus === 'Pending') {
-                $leaveRosterQuery->where('booking_approval_status', 'Pending');
-            }
-        }
-
+        $leaveRosterQuery = LeaveRoster::with('employee', 'leave'); // Eager load employee relationship
         // Filter by department if selected
         if ($department !== 'all') {
             $employeeIds = Employee::where('department_id', $department)->pluck('employee_id');
@@ -149,43 +121,25 @@ class LeaveRosterController extends Controller
         }
 
         // Retrieve the filtered leave roster
-        $leaveRoster = $leaveRosterQuery->get()->map(function ($leave) {
+        $leaveRoster = $leaveRosterQuery->get()->map(function ($leave, $index) { // $index is the numeric ID
             return [
+                'numeric_id' => $index + 1, // Add a numeric ID starting from 1
                 'leave_roster_id' => $leave->leave_roster_id,
                 'title' => $leave->leave_title,
                 'start' => $leave->start_date->toIso8601String(),
                 'end' => $leave->end_date->toIso8601String(),
-                'bookingApprovalRequest' => $leave->booking_approval_status,  // This will show Approved, Pending, or Rejected
                 'staffId' => $leave->employee->staff_id ?? null,
                 'first_name' => $leave->employee->first_name ?? null,
                 'last_name' => $leave->employee->last_name ?? null,
-                'isApproved' => $leave->isApproved(),
-                // Add additional employee or leave-related data if necessary
+                'leave' => $leave->leave
             ];
         });
-
         // Return the filtered leave roster data
         return response()->json(['success' => true, 'data' => $leaveRoster]);
     }
 
 
 
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
