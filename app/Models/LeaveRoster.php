@@ -6,6 +6,7 @@ use App\Models\Scopes\LeaveRosterScope;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 
 #[ScopedBy([LeaveRosterScope::class])]
 class LeaveRoster extends Model
