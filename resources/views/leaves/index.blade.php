@@ -187,6 +187,7 @@
                 var totalLeaveDaysScheduled = @json(auth()->user()->employee->overallRosterDays());
                 var balanceToSchedule = totalLeaveDaysEntitled - totalLeaveDaysScheduled;
                 var percentageUsed = Math.min((totalLeaveDaysScheduled / totalLeaveDaysEntitled) * 100, 100);
+                var canApproveLeave = @json(auth()->user()->can('approve-leave'));
                 // Update the progress bar
                 $('#leaveProgressBar').css('width', percentageUsed + '%')
                     .attr('aria-valuenow', percentageUsed)
@@ -510,8 +511,9 @@
                                                     </div>
                                                 `;
 
-                                                    } else {
-                                                        row[4] = `
+                                        } else {
+                                            if (canApproveLeave) {
+                                                row[4] = `
                                                     <div class="dropdown">
                                                         <button class="btn btn-secondary btn-sm dropdown-toggle d-flex align-items-center gap-1" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                                                             <i class="bi bi-three-dots-vertical"></i> Actions
@@ -527,9 +529,30 @@
                                                                     <i class="bi bi-x-circle"></i> Reject
                                                                 </a>
                                                             </li>
+                                                              <li>
+                                                                <a class="dropdown-item apply-btn" href="/leaves/${event.leave.leave_id}" title="Apply">
+                                                                    <i class="bi bi-pencil"></i> View Details
+                                                                </a>
+                                                            </li>
                                                         </ul>
                                                     </div>
                                                 `;
+                                            } else {
+                                                row[4] = `
+                                                <div class="dropdown">
+                                                        <button class="btn btn-secondary btn-sm dropdown-toggle d-flex align-items-center gap-1" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                                            <i class="bi bi-three-dots-vertical"></i> Actions
+                                                        </button>
+                                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                              <li>
+                                                                <a class="dropdown-item apply-btn" href="/leaves/${event.leave.leave_id}" title="Apply">
+                                                                    <i class="bi bi-pencil"></i> View
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>`
+                                            }
+
 
                                         }
                                         // Add the row to the table
