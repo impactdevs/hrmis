@@ -295,7 +295,7 @@
                                             <i class="bi bi-person"></i>
                                         </div>
                                         <div class="ps-3">
-                                            <h6>{{ auth()->user()->employee->totalLeaveRosterDays() }}</h6>
+                                            <h6>{{ auth()->user()->employee->entitled_leave_days }}</h6>
                                         </div>
                                     </div>
                                 </div>
