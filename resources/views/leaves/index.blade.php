@@ -323,42 +323,127 @@
                                             {
                                                 targets: 3,
                                                 render: function(data, type, row) {
-                                                    return row[3].length == 0 ?
-                                                        "No Application" :
-                                                        "Pending";
-                                                }
+                                                    let status = '';
 
+                                                    // Initialize the status div
+                                                    let statusDiv =
+                                                        '<div class="status mt-2">';
+
+                                                    // Check if there is a leave request status
+                                                    if (row[3] && row[3]
+                                                        .leave_request_status) {
+                                                        var role =
+                                                            @json(Auth::user()->roles->pluck('name')[0] ?? '');
+
+                                                        // Check if role exists in the leave request status
+                                                        if (row[3]
+                                                            .leave_request_status[
+                                                                role] ===
+                                                            'approved') {
+                                                            statusDiv +=
+                                                                '<span class="badge bg-success">You Approved this Leave Request.</span>';
+                                                        } else if (row[3]
+                                                            .leave_request_status[
+                                                                role] ===
+                                                            'rejected') {
+                                                            statusDiv +=
+                                                                '<span class="badge bg-danger">You rejected this Request</span>';
+                                                            if (row[3]
+                                                                .rejection_reason
+                                                            ) {
+                                                                statusDiv +=
+                                                                    '<p class="mt-1"><strong>Rejection Reason:</strong> ' +
+                                                                    row[3]
+                                                                    .rejection_reason +
+                                                                    '</p>';
+                                                            }
+                                                        } else {
+                                                            // If the status is neither approved nor rejected
+                                                            if (role ===
+                                                                'Staff' && row[
+                                                                    3]
+                                                                .leave_request_status[
+                                                                    'Executive Secretary'
+                                                                ]) {
+                                                                const
+                                                                    executiveStatus =
+                                                                    row[3]
+                                                                    .leave_request_status[
+                                                                        'Executive Secretary'
+                                                                    ];
+                                                                if (executiveStatus ===
+                                                                    'approved'
+                                                                ) {
+                                                                    statusDiv +=
+                                                                        '<span class="badge bg-success">This leave request was fully approved</span>';
+                                                                } else if (
+                                                                    executiveStatus ===
+                                                                    'rejected'
+                                                                ) {
+                                                                    statusDiv +=
+                                                                        '<span class="badge bg-danger">This leave request was rejected</span>';
+                                                                } else {
+                                                                    statusDiv +=
+                                                                        '<span class="badge bg-warning">Pending</span>';
+                                                                }
+                                                            } else {
+                                                                statusDiv +=
+                                                                    '<span class="badge bg-warning">Pending</span>';
+                                                            }
+                                                        }
+                                                    } else {
+                                                        statusDiv +=
+                                                            '<span class="badge bg-warning">No Application</span>';
+                                                    }
+
+                                                    statusDiv +=
+                                                        '<p>Who has approved</p>';
+
+                                                    // Add who approved section
+                                                    if (row[3] && row[3]
+                                                        .leave_request_status) {
+                                                        // Loop through the leave request status and display the approval/rejection status
+                                                        for (const person in
+                                                                row[3]
+                                                                .leave_request_status) {
+                                                            const status = row[
+                                                                    3]
+                                                                .leave_request_status[
+                                                                    person];
+                                                            if (status ===
+                                                                'approved') {
+                                                                statusDiv +=
+                                                                    '-<span class="badge bg-success">Approved by ' +
+                                                                    person +
+                                                                    '</span>';
+                                                            } else if (
+                                                                status ===
+                                                                'rejected') {
+                                                                statusDiv +=
+                                                                    '-<span class="badge bg-danger">Rejected by ' +
+                                                                    person +
+                                                                    '</span>';
+                                                            } else if (
+                                                                status === null
+                                                            ) {
+                                                                statusDiv +=
+                                                                    '-<span class="badge bg-warning">Pending by ' +
+                                                                    person +
+                                                                    '</span>';
+                                                            }
+                                                        }
+                                                    } else {
+                                                        statusDiv +=
+                                                            '<span class="badge bg-warning">No Approval Yet</span>';
+                                                    }
+
+                                                    statusDiv +=
+                                                        '</div>'; // Close the status div
+
+                                                    return statusDiv;
+                                                }
                                             },
-                                            {
-                                                // Action Buttons Column (Assumed Index 4)
-                                                targets: 4,
-                                                render: function(data, type, row) {
-                                                    return `
-                                                    <div class="dropdown">
-                                                        <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                                            Actions
-                                                        </button>
-                                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                            <li>
-                                                                <button class="dropdown-item apply-btn" href="#" data-leave-roster-id="${row[0]}" title="Apply">
-                                                                    <i class="bi bi-pencil me-1"></i> Apply
-                                                                </button>
-                                                            </li>
-                                                            <li>
-                                                                <button class="dropdown-item approve-btn" data-leave-id="${row[3].leave_id}" title="Approve">
-                                                                    <i class="bi bi-check-circle me-1"></i> Approve
-                                                                </button>
-                                                            </li>
-                                                            <li>
-                                                                <button class="dropdown-item reject-btn" href="#" data-leave-id="${row[0].leave_id}" title="Reject">
-                                                                    <i class="bi bi-x-circle me-1"></i> Reject
-                                                                </button>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                        `;
-                                                },
-                                            },
+
                                             {
                                                 targets: 1, // Assuming the first column is the employee name
                                                 render: function(data, type, row) {
@@ -409,7 +494,44 @@
                                             ' - ' + formatDate(event.end);
                                         row[3] = event.leave;
 
+                                        if (event.leave.length == 0) {
+                                            row[4] = `
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-secondary btn-sm dropdown-toggle d-flex align-items-center gap-1" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                                            <i class="bi bi-three-dots-vertical"></i> Actions
+                                                        </button>
+                                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                            <li>
+                                                                <a class="dropdown-item apply-btn" href="/apply-for-leave/${event.leave_roster_id}" title="Apply">
+                                                                    <i class="bi bi-pencil"></i> Apply
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                `;
 
+                                                    } else {
+                                                        row[4] = `
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-secondary btn-sm dropdown-toggle d-flex align-items-center gap-1" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                                            <i class="bi bi-three-dots-vertical"></i> Actions
+                                                        </button>
+                                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                            <li>
+                                                                <a class="dropdown-item approve-btn" href="#" data-leave-id="${event.leave.leave_id}" title="Approve">
+                                                                    <i class="bi bi-check-circle"></i> Approve
+                                                                </a>
+                                                            </li>
+                                                            <li>
+                                                                <a class="dropdown-item reject-btn" href="#" data-leave-id="${event.leave.leave_id}" title="Reject" data-bs-toggle="modal" data-bs-target="#rejectModal">
+                                                                    <i class="bi bi-x-circle"></i> Reject
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                `;
+
+                                        }
                                         // Add the row to the table
                                         rows.push(row);
                                     });
@@ -436,6 +558,33 @@
 
                                 // Add the rows to the DataTable
                                 table.clear().rows.add(rows).draw();
+
+                                //leave approval, rejection and application
+                                let currentLeaveId;
+
+                                $('.approve-btn').click(function() {
+                                    //prevent default
+                                    console.log("testing.......")
+                                    const leaveId = $(this).data('leave-id');
+                                    updateLeaveStatus(leaveId, 'approved');
+                                });
+
+                                $('.reject-btn').click(function() {
+                                    currentLeaveId = $(this).data('leave-id');
+                                    console.log('Leave Id:', currentLeaveId);
+                                });
+
+                                $('#confirmReject').click(function() {
+                                    const reason = $('#rejectionReason').val();
+                                    if (reason) {
+                                        updateLeaveStatus(currentLeaveId, 'rejected',
+                                            reason);
+                                        $('#rejectModal').modal(
+                                            'hide'); // Hide the modal
+                                    } else {
+                                        alert('Please enter a rejection reason.');
+                                    }
+                                });
                             },
                             error: function(xhr, status, error) {
                                 console.error('There was an error fetching events:', error);
@@ -678,30 +827,7 @@
                 });
 
 
-                //leave approval, rejection and application
-                let currentLeaveId;
 
-                $('.approve-btn').click(function() {
-                    //prevent default
-                    console.log("testing.......")
-                    const leaveId = $(this).data('leave-id');
-                    updateLeaveStatus(leaveId, 'approved');
-                });
-
-                $('.reject-btn').click(function() {
-                    currentLeaveId = $(this).data('leave-id');
-                    console.log('Leave Id:', currentLeaveId);
-                });
-
-                $('#confirmReject').click(function() {
-                    const reason = $('#rejectionReason').val();
-                    if (reason) {
-                        updateLeaveStatus(currentLeaveId, 'rejected', reason);
-                        $('#rejectModal').modal('hide'); // Hide the modal
-                    } else {
-                        alert('Please enter a rejection reason.');
-                    }
-                });
 
 
             });
