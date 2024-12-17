@@ -129,6 +129,10 @@ Route::middleware('auth')->group(function () {
 
 
 
+
+
 });
+
+Route::get('/import', [EmployeeController::class, 'import_employees']);
 
 require __DIR__ . '/auth.php';

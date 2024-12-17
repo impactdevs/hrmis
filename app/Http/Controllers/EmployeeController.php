@@ -334,4 +334,45 @@ class EmployeeController extends Controller
             return redirect()->back()->with('error', 'Problem Deleting the Employee');
         }
     }
+
+    public function import_employees()
+    {
+        //read from a csv file
+        ini_set('max_execution_time', 2000);
+        ini_set('memory_limit', '-1');
+        //get column names from the csv
+        $file = public_path('uploads/employees_created.csv');
+        $csv = array_map('str_getcsv', file($file));
+
+        //set excution time to 5 minutes
+        for ($i = 54; $i < count($csv); $i++) {
+            try {
+
+                $employee = new Employee();
+                $employee->staff_id = $csv[$i][0];
+                $employee->title = $csv[$i][1];
+                $employee->first_name = $csv[$i][2];
+                $employee->last_name = $csv[$i][3];
+                $employee->email = $csv[$i][4];
+
+                $user = DB::table('users')->where('email', $csv[$i][4])->doesntExist();
+                if ($user) {
+                    //create a user
+                    $user = new User();
+                    $user->email = $csv[$i][4];
+                    $user->name = $csv[$i][2] . ' ' . $csv[$i][3];
+                    $user->password = Hash::make($csv[$i][5]);
+                    $user->save();
+                    $user->assignRole('Staff'); // Ensure the role exists
+                }
+
+                $employee->user_id = $user->id;
+
+                $employee->save();
+            } catch (Exception $e) {
+                return response()->json(['error' => 'Failed to process CSV. Please ensure the file format is correct.', 'exception' => $e->getMessage()], 400);
+            }
+
+        }
+    }
 }
