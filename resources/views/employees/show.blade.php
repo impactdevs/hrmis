@@ -132,6 +132,7 @@
                 <!-- Qualifications Section -->
                 <section class="mb-4 border border-1 border-secondary p-3 rounded">
                     <h5 class="mt-4 mb-3 text-dark">Qualifications</h5>
+                    @if(!is_null($employee->qualifications_details))
                     @foreach ($employee->qualifications_details as $item)
                         @if (isset($item['proof']))
                             <div class="row mb-3">
@@ -161,6 +162,9 @@
                             </div>
                         @endif
                     @endforeach
+                    @else
+                        <p>No qualifications</p>
+                    @endif
                 </section>
             </div>
         </div>
