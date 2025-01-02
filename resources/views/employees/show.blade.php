@@ -68,39 +68,44 @@
                     <div class="row mb-3">
                         <div class="col-md-4"><strong>Contract Documents:</strong></div>
                         <div class="col-md-8">
-                            <div class="mt-2">
-                                @foreach ($employee->contract_documents as $item)
-                                    @if (isset($item['proof']))
-                                        <div class="mb-2">
-                                            @php
-                                                $filePath = asset('storage/' . $item['proof']);
-                                                $fileExtension = pathinfo($item['proof'], PATHINFO_EXTENSION);
-                                            @endphp
-                                            @if (in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif']))
-                                                <!-- Display Image -->
-                                                <div>
-                                                    <img src="{{ $filePath }}" alt="{{ $item['title'] }}"
-                                                        class="img-fluid rounded mt-2" style="max-width: 120px;">
-                                                </div>
-                                            @elseif ($fileExtension === 'pdf')
-                                                <!-- Display PDF Link -->
-                                                <div>
-                                                    <a href="{{ $filePath }}" target="_blank"
-                                                        class="d-flex align-items-center text-decoration-none">
-                                                        <img src="{{ asset('assets/img/pdf-icon.png') }}"
-                                                            alt="PDF icon" class="pdf-icon me-2" width="24">
-                                                        <span
-                                                            class="text-dark">{{ $item['title'] ?? 'The document has no title' }}</span>
-                                                    </a>
-                                                </div>
-                                            @else
-                                                <!-- Handle other file types -->
-                                                <p class="text-muted">Unsupported file type: {{ $item['title'] }}</p>
-                                            @endif
-                                        </div>
-                                    @endif
-                                @endforeach
-                            </div>
+                            @if (!is_null($employee->contract_documents))
+                                <div class="mt-2">
+                                    @foreach ($employee->contract_documents as $item)
+                                        @if (isset($item['proof']))
+                                            <div class="mb-2">
+                                                @php
+                                                    $filePath = asset('storage/' . $item['proof']);
+                                                    $fileExtension = pathinfo($item['proof'], PATHINFO_EXTENSION);
+                                                @endphp
+                                                @if (in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif']))
+                                                    <!-- Display Image -->
+                                                    <div>
+                                                        <img src="{{ $filePath }}" alt="{{ $item['title'] }}"
+                                                            class="img-fluid rounded mt-2" style="max-width: 120px;">
+                                                    </div>
+                                                @elseif ($fileExtension === 'pdf')
+                                                    <!-- Display PDF Link -->
+                                                    <div>
+                                                        <a href="{{ $filePath }}" target="_blank"
+                                                            class="d-flex align-items-center text-decoration-none">
+                                                            <img src="{{ asset('assets/img/pdf-icon.png') }}"
+                                                                alt="PDF icon" class="pdf-icon me-2" width="24">
+                                                            <span
+                                                                class="text-dark">{{ $item['title'] ?? 'The document has no title' }}</span>
+                                                        </a>
+                                                    </div>
+                                                @else
+                                                    <!-- Handle other file types -->
+                                                    <p class="text-muted">Unsupported file type: {{ $item['title'] }}
+                                                    </p>
+                                                @endif
+                                            </div>
+                                        @endif
+                                    @endforeach
+                                </div>
+                            @else
+                                <p>No contract documents</p>
+                            @endif
                         </div>
                     </div>
                 </section>
@@ -160,9 +165,9 @@
             </div>
         </div>
         @can('can delete an employee')
-        <div class="text-center mt-4">
-            <a href="{{ route('employees.index') }}" class="btn btn-primary">Back to Employee List</a>
-        </div>
+            <div class="text-center mt-4">
+                <a href="{{ route('employees.index') }}" class="btn btn-primary">Back to Employee List</a>
+            </div>
         @endcan
     </div>
 </x-app-layout>
