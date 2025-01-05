@@ -1,7 +1,6 @@
 .fc-toolbar-title {
   color: brown;
 }
-
 /* Make the toolbar background more stylish */
 .fc-toolbar {
   background-color: #2a3d66;
@@ -134,29 +133,6 @@
   /* Light background change */
 }
 
-/* Update Button */
-#renameEvent {
-  background-color: #2ecc71;
-  /* Green background */
-  color: #fff;
-  /* White text */
-  border-radius: 6px;
-  /* Rounded corners */
-  font-size: 1rem;
-  /* Standard font size */
-  padding: 10px 20px;
-  /* Padding for a more clickable look */
-  border: none;
-  transition: all 0.3s ease;
-}
-
-#renameEvent:hover {
-  background-color: #27ae60;
-  /* Darker green on hover */
-  cursor: pointer;
-  /* Hand cursor on hover */
-}
-
 /* Style for the icons inside buttons */
 #deleteEvent i,
 #renameEvent i {
@@ -165,11 +141,9 @@
 }
 
 .fc-list-event-time {
-  display:none;
+  display: none;
 }
 
-.fc-event-title{
+.fc-event-title {
   color: #2980b9;
 }
-
-

@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // $this->call(PermissionsDemoSeeder::class);
+        $this->call(PermissionsDemoSeeder::class);
 
         $positions = [
             ['position_id' => Str::uuid(), 'position_name' => 'Manager'],
@@ -41,12 +41,23 @@ class DatabaseSeeder extends Seeder
 
         DB::table('departments')->insert($departments);
 
+        //leave types
+        $leaveTypes = [
+            ['leave_type_id' => Str::uuid(), 'leave_type_name' => 'Annual Leave'],
+            ['leave_type_id' => Str::uuid(), 'leave_type_name' => 'Sick Leave'],
+            ['leave_type_id' => Str::uuid(), 'leave_type_name' => 'Maternity Leave'],
+            ['leave_type_id' => Str::uuid(), 'leave_type_name' => 'Paternity Leave'],
+            ['leave_type_id' => Str::uuid(), 'leave_type_name' => 'Study Leave'],
+        ];
+
+        DB::table('leave_types')->insert($leaveTypes);
+
 
         $this->call(EmployeeSeeder::class);
 
-        $this->call(TrainingSeeder::class);
+        // $this->call(TrainingSeeder::class);
 
-        $this->call(EventsSeeder::class);
+        // $this->call(EventsSeeder::class);
 
         $this->call(AttendanceSeeder::class);
     }

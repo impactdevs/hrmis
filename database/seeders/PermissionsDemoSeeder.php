@@ -29,34 +29,79 @@ class PermissionsDemoSeeder extends Seeder
         $role4 = Role::create(['name' => $role4]);
         $role5 = Role::create(['name' => $role5]);
         // gets all permissions via Gate::before rule; see AuthServiceProvider
-        // $user1 = \App\Models\User::factory()->create([
-        //     'name' => 'STAFF USER',
-        //     'email' => 'staff@uncst.com',
-        // ]);
-        // $user1->assignRole($role1);
+        $user1 = \App\Models\User::factory()->create([
+            'name' => 'STAFF USER',
+            'email' => 'staff@uncst.com',
+        ]);
+        $user1->assignRole($role1);
 
-        // $user2 = \App\Models\User::factory()->create([
-        //     'name' => 'EXECUTIVE SECRETARY',
-        //     'email' => 'executivesecretary@uncst.com',
-        // ]);
-        // $user2->assignRole($role2);
+        $user2 = \App\Models\User::factory()->create([
+            'name' => 'EXECUTIVE SECRETARY',
+            'email' => 'executivesecretary@uncst.com',
+        ]);
+        $user2->assignRole($role2);
 
-        // $user3 = \App\Models\User::factory()->create([
-        //     'name' => 'HUMAN RESOURCE',
-        //     'email' => 'humanresource@uncst.com',
-        // ]);
-        // $user3->assignRole($role3);
+        $user3 = \App\Models\User::factory()->create([
+            'name' => 'HUMAN RESOURCE',
+            'email' => 'humanresource@uncst.com',
+        ]);
+        $user3->assignRole($role3);
 
-        // $user4 = \App\Models\User::factory()->create([
-        //     'name' => 'HEAD OF DIVISION',
-        //     'email' => 'headofdivision@uncst.com',
-        // ]);
-        // $user4->assignRole($role4);
+        $user4 = \App\Models\User::factory()->create([
+            'name' => 'HEAD OF DIVISION',
+            'email' => 'headofdivision@uncst.com',
+        ]);
+        $user4->assignRole($role4);
 
-        // $user5 = \App\Models\User::factory()->create([
-        //     'name' => 'Assistant Executive Secretary',
-        //     'email' => 'assistantexecutivesecretary@uncst.com',
-        // ]);
-        // $user5->assignRole($role5);
+        $user5 = \App\Models\User::factory()->create([
+            'name' => 'Assistant Executive Secretary',
+            'email' => 'assistantexecutivesecretary@uncst.com',
+        ]);
+        $user5->assignRole($role5);
+
+
+        ///create corresponding employees
+        $employee1 = \App\Models\Employee::factory()->create([
+            'email' => $user1->email,
+            'first_name' => 'STAFF',
+            'last_name' => 'USER',
+            'phone_number' => '0700000000',
+            'user_id' => $user1->id,
+        ]);
+
+        $employee2 = \App\Models\Employee::factory()->create([
+            'email' => $user2->email,
+            'first_name' => 'EXECUTIVE',
+            'last_name' => 'SECRETARY',
+            'phone_number' => '0700000001',
+            'user_id' => $user2->id,
+        ]);
+
+        $employee3 = \App\Models\Employee::factory()->create([
+            'email' => $user3->email,
+            'first_name' => 'HUMAN',
+            'last_name' => 'RESOURCE',
+            'phone_number' => '0700000002',
+            'user_id' => $user3->id,
+        ]);
+
+
+        $employee4 = \App\Models\Employee::factory()->create([
+            'email' => $user4->email,
+            'first_name' => 'HEAD OF',
+            'last_name' => 'DIVISION',
+            'phone_number' => '0700000003',
+            'user_id' => $user4->id,
+        ]);
+
+        $employee5 = \App\Models\Employee::factory()->create([
+            'email' => $user5->email,
+            'first_name' => 'Assistant Executive',
+            'last_name' => 'Secretary',
+            'phone_number' => '0700000004',
+            'user_id' => $user5->id,
+        ]);
+
+
     }
 }

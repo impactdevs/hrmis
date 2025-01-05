@@ -2,15 +2,15 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
- */
 class UserFactory extends Factory
 {
+    protected $model = User::class;
+
     /**
      * The current password being used by the factory.
      */
@@ -30,6 +30,16 @@ class UserFactory extends Factory
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
         ];
+    }
+
+    /**
+     * Assign the "Staff" role to the created user.
+     */
+    public function withStaffRole(): static
+    {
+        return $this->afterCreating(function (User $user) {
+            $user->assignRole('Staff'); // Assign the "Staff" role
+        });
     }
 
     /**

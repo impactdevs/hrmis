@@ -27,9 +27,6 @@ class EmployeeFactory extends Factory
             'department_id' => Department::inRandomOrder()->value('department_id'), // Get a random department_id
             'nssf_no' => $this->faker->unique()->numerify('NSSF####'),
             'home_district' => $this->faker->city,
-            'qualifications_details' => json_encode([
-                ['title' => $this->faker->word, 'proof' => null],
-            ]),
             'tin_no' => $this->faker->unique()->numerify('TIN####'),
             'job_description' => $this->faker->paragraph,
             'email' => $this->faker->unique()->safeEmail,
