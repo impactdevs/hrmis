@@ -19,7 +19,7 @@
                 <div class="col-12">
                     {{-- logo --}}
                     <div class="text-center">
-                        <img src="{{ asset('assets/img/logo.png') }}" alt="company logo"
+                        <img src="{{ asset('assets/img/quotient.png') }}" alt="company logo"
                         class="object-fit-contain border rounded img-fluid" style="max-width: 100%; height: auto;">
                     </div>
                 </div>
