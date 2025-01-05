@@ -1,7 +1,7 @@
 <div class="sidebar bg-primary border-start border-start-5 shadow rounded-start-5 border-dashed"
     style="position: sticky; top: 0; height: 100vh; overflow-y: auto;">
     <div class="border-bottom border-bottom-5 h-25 d-flex align-items-center justify-content-center">
-        <img src="{{ asset('assets/img/logo.png') }}" alt="company logo"
+        <img src="{{ asset('assets/img/quotient.png') }}" alt="company logo"
             class="object-fit-contain border rounded img-fluid" style="max-width: 100%; height: auto;">
     </div>
     <div class="d-md-flex flex-column p-0 pt-lg-3">
