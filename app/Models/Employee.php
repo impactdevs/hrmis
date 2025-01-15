@@ -195,8 +195,7 @@ class Employee extends Model
                     return !$date->isWeekend() && !in_array($date->toDateString(), $publicHolidays);
                 }, Carbon::parse($leave->end_date));
         });
-
-        return $totalDays;
+        return $totalDays+1;
     }
 
     public function leaveDaysConsumedPerMonth()
