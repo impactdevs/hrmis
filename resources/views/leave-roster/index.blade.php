@@ -345,6 +345,7 @@
                                         scrollY: 'calc(100vh - 350px)',
                                         lengthMenu: [15, 25, 50, 75, 100],
                                         // other DataTable initialization options
+                                        ordering: false, // Disable ordering globally
                                         dom: 'Bfrtip',
                                         language: {
                                             search: "_INPUT_", // Customize the search input box

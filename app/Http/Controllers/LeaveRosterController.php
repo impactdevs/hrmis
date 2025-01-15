@@ -9,6 +9,7 @@ use App\Models\LeaveRoster;
 use App\Models\LeaveType;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class LeaveRosterController extends Controller
 {
@@ -57,7 +58,7 @@ class LeaveRosterController extends Controller
 
         $employees->transform(function ($employee, $index) use ($startIndex) {
             $totalLeaveDays = $employee->totalLeaveDays();
-            $totalLeaveRosterDays = 10;
+            $totalLeaveRosterDays = $employee->overallRosterDays();
 
             $balance = $totalLeaveRosterDays - $totalLeaveDays;
 

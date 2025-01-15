@@ -168,9 +168,21 @@ class Employee extends Model
     public function overallRosterDays()
     {
         $leaves = LeaveRoster::where('employee_id', $this->employee_id)->get();
-        $totalDays = $leaves->sum(function ($leave) {
-            return Carbon::parse($leave->start_date)->diffInDays(Carbon::parse($leave->end_date)) + 1;
+
+        // Fetch all public holidays as an array of dates
+        $publicHolidays = PublicHoliday::pluck('holiday_date')->toArray();
+
+        $publicHolidays = array_map(function ($date) {
+            return Carbon::parse($date)->toDateString();
+        }, $publicHolidays);
+
+        $totalDays = $leaves->sum(function ($leave) use ($publicHolidays) {
+            return Carbon::parse($leave->start_date)
+                ->diffInDaysFiltered(function (Carbon $date) use ($publicHolidays) {
+                    return !$date->isWeekend() && !in_array($date->toDateString(), $publicHolidays);
+                }, Carbon::parse($leave->end_date));
         });
+
         return $totalDays;
     }
 

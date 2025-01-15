@@ -21,6 +21,7 @@ use App\Http\Controllers\OutOfStationTrainingController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PublicHolidayController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\StaffRecruitmentController;
 use App\Http\Controllers\TrainingController;
@@ -36,7 +37,7 @@ Route::get('/', function () {
 Route::get('/dashboard', [HomeController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 Route::get('/upload-employee', [UploadEmployees::class, 'process_csv_for_arrears']);
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('roles', RoleController::class);
     Route::resource('permissions', PermissionController::class);
     Route::resource('users', UsersController::class);
@@ -74,6 +75,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/leave-roster-tabular', [LeaveRosterController::class, 'getLeaveRoster'])->name('leave-roster-tabular.index');
     Route::get('/leave-roster-tabular/data', [LeaveRosterController::class, 'getLeaveRosterData'])->name('leave-roster-tabular.data');
     Route::resource('leave-types', LeaveTypesController::class);
+    Route::resource('public_holidays', PublicHolidayController::class);
     Route::post('calender', [leaveRosterController::class, 'getcalender']);
     Route::get('leave-management', [LeaveController::class, 'leaveManagement'])->name('leave-management');
     Route::get('apply-for-leave/{leaveRoster}', [LeaveController::class, 'applyForLeave'])->name('apply-for-leave');
