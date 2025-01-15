@@ -99,7 +99,7 @@
                             }
                         }, {
                             field: 'total_leave_roster_days',
-                            title: 'NO. OF DAYS APPLIED FOR',
+                            title: 'LEAVE DAYS ENTITLED',
                             sortable: true,
                             formatter: function(value) {
                                 return `<span class="badge bg-success">${value}</span>`;

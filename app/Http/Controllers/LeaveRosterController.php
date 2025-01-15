@@ -64,7 +64,7 @@ class LeaveRosterController extends Controller
 
             $employee->numeric_id = $startIndex + $index; // Add sequential numeric ID
             $employee->total_leave_days = $totalLeaveDays;
-            $employee->total_leave_roster_days = $totalLeaveRosterDays;
+            $employee->total_leave_roster_days = $employee->entitled_leave_days;
             $employee->leave_balance = $balance;
 
             return $employee;
