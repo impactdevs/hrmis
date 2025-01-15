@@ -13,7 +13,7 @@
             }
 
             if (request()->routeIs('leave-roster.index') || request()->routeIs('leave-roster-tabular.index')) {
-                $title = auth()->user()->isAdminOrSecretary() ? 'Leave Roster' : 'My Leave Roster';
+                $title = auth()->user()->isAdminOrSecretary() ? 'Leave Roster' : 'My Leave Schedule';
             }
 
             if (request()->routeIs('leave-management')) {
