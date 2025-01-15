@@ -18,7 +18,7 @@
                 <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('leave-roster.index') || request()->routeIs('leave-roster-tabular.index')) bg-secondary @endif"
                     href="{{ route('leave-roster.index') }}">
                     <i class="bi bi-calendar-plus"></i>
-                    {{ auth()->user()->isAdminOrSecretary() ? 'Leave Roster' : 'My Leave Roster' }}
+                    {{ auth()->user()->isAdminOrSecretary() ? 'Leave Roster' : 'My Leave Schedule' }}
                 </a>
             </li>
 

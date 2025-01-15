@@ -86,7 +86,7 @@
                             {{-- Add Leave Roster --}}
                             <button class="btn btn-primary btn-sm mt-3 ms-1 font-weight-bold" id="addLeaveRoster"
                                 type="button" style="max-height: 40px; font-size: 12px">
-                                <i class="bi bi-plus-circle"></i> Add Leave Roster</button>
+                                <i class="bi bi-plus-circle"></i> Add Leave Days</button>
                         </div>
 
                         @if (auth()->user()->isAdminOrSecretary())
@@ -103,7 +103,7 @@
                 <div class="col-12">
                     <div class="card recent-sales overflow-auto vh-100">
                         <div class="card-body">
-                            <h5 class="card-title">Leave Plan</h5>
+                            <h5 class="card-title">My Leave Plan</h5>
 
                             <table class="table table-striped table-bordered" id="leavePlan" cellspacing="0"
                                 width="100%">
