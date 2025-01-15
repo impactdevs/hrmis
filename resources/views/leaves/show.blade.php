@@ -24,6 +24,33 @@
                     </label>
                     <p class="border p-2 rounded bg-light">{{ $leaf->reason }}</p>
                 </div>
+
+                <div class="form-group mb-3">
+                    <label for="leave_type">
+                        <i class="fas fa-info-circle"></i> Leave Type
+                    </label>
+                    <p class="border p-2 rounded bg-light">{{ $leaf->leaveCategory->leave_type_name }}</p>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="leave_address">
+                        <i class="fas fa-map-marker-alt"></i> Leave Address
+                        </label>
+                        <p class="border p-2 rounded bg-light">{{ $leaf->leave_address }}</p>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="contact_number">
+                        <i class="fas fa-phone"></i> Contact Number
+                    </label>
+                    <p class="border p-2 rounded bg-light">{{ $leaf->phone_number }}</p>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="other_contact_details">
+                        <i class="fas fa-info-circle"></i> Other Contact Details
+                    </label>
+                    <p class="border p-2 rounded bg-light">{{ $leaf->other_contact_details }}</p>
             </div>
         </div>
     </div>

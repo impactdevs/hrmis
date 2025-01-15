@@ -28,7 +28,10 @@ class Leave extends Model
         'reason',
         'leave_request_status',
         'my_work_will_be_done_by',
-        'leave_roster_id'
+        'leave_roster_id',
+        'leave_address',
+        'phone_number',
+        'other_contact_details',
     ];
 
     protected $casts = [

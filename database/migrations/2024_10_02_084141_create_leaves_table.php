@@ -21,6 +21,9 @@ return new class extends Migration {
             $table->json('my_work_will_be_done_by');
             $table->longText('rejection_reason')->nullable();
             $table->uuid('leave_roster_id')->references('leave_roster_id')->on('leave_rosters');
+            $table->longText('leave_address')->nullable();
+            $table->string('phone_number')->nullable();
+            $table->longText('other_contact_details')->nullable();
             $table->timestamps();
         });
     }

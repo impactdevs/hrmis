@@ -37,6 +37,26 @@
     <input type="hidden" name="my_work_will_be_done_by[users]" id="user_ids" />
 </div>
 
+{{-- leave adress --}}
+<div class="row mb-3">
+    <div class="col-md-6">
+        <x-forms.input name="leave_address" label="Leave Address" type="text" id="leave_address"
+            value="{{ old('leave_address', $leave->leave_address ?? '') }}" />
+    </div>
+    <div class="col-md-6">
+        <x-forms.input name="contact_number" label="Contact Number" type="text" id="contact_number"
+            value="{{ old('phone_number', $leave->phone_number ?? '') }}" />
+    </div>
+</div>
+
+{{-- textarea for other contact details --}}
+<div class="row mb-3">
+    <div class="col-md-12">
+        <x-forms.text-area name="other_contact_details" label="Other Contact Details" id="other_contact_details"
+            :value="old('other_contact_details', $leave->other_contact_details ?? '')" />
+    </div>
+</div>
+
 <div class="form-group">
     <input class="btn btn-primary" type="submit" value="{{ $formMode === 'edit' ? 'Update' : 'Create' }}">
 </div>

@@ -147,9 +147,22 @@ class Employee extends Model
     public function totalLeaveDays()
     {
         //get leaves where the employee id matches employee id and were created in the current year that were confirmed by the executive secretary
-        $leaves = Leave::where('user_id', $this->user_id)->whereYear('created_at', Carbon::now()->year)->get();
-        $totalDays = $leaves->sum(function ($leave) {
-            return Carbon::parse($leave->start_date)->diffInDays(Carbon::parse($leave->end_date)) + 1;
+        $leaves = Leave::where('user_id', $this->user_id)->whereYear('created_at', Carbon::now()->year)
+        ->whereJsonContains('leave_request_status', ['Executive Secretary' => 'approved'])
+            ->get();
+
+        //calculate the total leave days excluding weekends and public holidays
+        $publicHolidays = PublicHoliday::pluck('holiday_date')->toArray();
+
+        $publicHolidays = array_map(function ($date) {
+            return Carbon::parse($date)->toDateString();
+        }, $publicHolidays);
+
+        $totalDays = $leaves->sum(function ($leave) use ($publicHolidays) {
+            return Carbon::parse($leave->start_date)
+                ->diffInDaysFiltered(function (Carbon $date) use ($publicHolidays) {
+                    return !$date->isWeekend() && !in_array($date->toDateString(), $publicHolidays);
+                }, Carbon::parse($leave->end_date));
         });
         return $totalDays;
     }
