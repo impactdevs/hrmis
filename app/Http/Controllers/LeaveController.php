@@ -94,7 +94,7 @@ class LeaveController extends Controller
             Notification::send($users, new LeaveApplied($leaveCreated));
         }
 
-        return redirect()->route('leaves.index')->with('success', 'Leave created successfully.');
+        return redirect()->route('leaves.index')->with('success', 'Leave submitted successfully.');
     }
 
     /**
