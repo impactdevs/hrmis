@@ -38,7 +38,7 @@
                                 </p>
 
                                 <!-- Total Leave Days Scheduled -->
-                                <p class="text-secondary fw-bold fs-5 mb-2" id="totalLeaveDaysScheduled">Total Leave
+                                <p class="text-secondary fw-bold fs-5 mb-2" id="totalLeaveDaysScheduled">Leave
                                     Days
                                     Scheduled:
                                     <span class="text-dark" style="font-weight: 400;">
@@ -47,7 +47,7 @@
                                 </p>
 
                                 <!-- Balance to Schedule -->
-                                <p class="fw-bold fs-5 mb-2" id="balanceToSchedule">Balance to Schedule:
+                                <p class="fw-bold fs-5 mb-2" id="balanceToSchedule">Balance:
                                     <span class="balance-text text-dark" style="font-weight: 400;">
                                         {{ auth()->user()->employee->entitled_leave_days - auth()->user()->employee->overallRosterDays() ?? 0 }}
                                     </span>
