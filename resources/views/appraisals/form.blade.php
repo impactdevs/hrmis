@@ -3,7 +3,7 @@
         <div class="col-md-12 card card-body">
             <div class="intro row justify-content-center text-light bg-primary py-5">
                 <div class="col-12 text-center mb-4">
-                    <img src="{{ asset('assets/img/quotient.png') }}" style="max-height: 80px; width: auto;" class="rounded-lg"
+                    <img src="{{ asset('assets/img/logo.png') }}" style="max-height: 80px; width: auto;" class="rounded-lg"
                         alt="{{ config('zeus.site_title', config('app.name', 'Laravel')) }}">
                 </div>
 

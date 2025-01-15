@@ -31,31 +31,31 @@ class PermissionsDemoSeeder extends Seeder
         // gets all permissions via Gate::before rule; see AuthServiceProvider
         $user1 = \App\Models\User::factory()->create([
             'name' => 'STAFF USER',
-            'email' => 'staff@quotient.com',
+            'email' => 'staff@uncst.com',
         ]);
         $user1->assignRole($role1);
 
         $user2 = \App\Models\User::factory()->create([
             'name' => 'EXECUTIVE SECRETARY',
-            'email' => 'executivesecretary@quotient.com',
+            'email' => 'executivesecretary@uncst.com',
         ]);
         $user2->assignRole($role2);
 
         $user3 = \App\Models\User::factory()->create([
             'name' => 'HUMAN RESOURCE',
-            'email' => 'humanresource@quotient.com',
+            'email' => 'humanresource@uncst.com',
         ]);
         $user3->assignRole($role3);
 
         $user4 = \App\Models\User::factory()->create([
             'name' => 'HEAD OF DIVISION',
-            'email' => 'headofdivision@quotient.com',
+            'email' => 'headofdivision@uncst.com',
         ]);
         $user4->assignRole($role4);
 
         $user5 = \App\Models\User::factory()->create([
             'name' => 'Assistant Executive Secretary',
-            'email' => 'assistantexecutivesecretary@quotient.com',
+            'email' => 'assistantexecutivesecretary@uncst.com',
         ]);
         $user5->assignRole($role5);
 

@@ -315,6 +315,7 @@
                                         columnDefs: [{
                                                 targets: 2, // Assuming the duration is in the second column (index 1)
                                                 render: function(data, type, row) {
+                                                    console.log(data);
                                                     // Use Bootstrap badge and apply styles for duration
                                                     return '<span class="badge bg-info text-dark">' +
                                                         data +
@@ -393,8 +394,13 @@
                                                             }
                                                         }
                                                     } else {
-                                                        statusDiv +=
-                                                            '<span class="badge bg-warning">No Application</span>';
+                                                        if (row[3].leave_id) {
+                                                            statusDiv +=
+                                                                '<span class="badge bg-success">Application review in progress</span>';
+                                                        } else {
+                                                            statusDiv +=
+                                                                '<span class="badge bg-warning">No Application</span>';
+                                                        }
                                                     }
 
                                                     statusDiv +=
@@ -457,23 +463,27 @@
                                         ],
                                         fixedHeader: true, // Sticky header for large tables
                                         responsive: true, // Ensures the table is mobile-friendly
+                                        ordering: false, // Disable ordering globally
+
 
                                     });
                                 }
-                                var rows = [];
+                                var rows1 = [];
                                 var groupedByStaff = {};
 
                                 // Group events by staff_id
-                                response.data.forEach(function(event) {
-                                    if (!groupedByStaff[event.staffId]) {
-                                        groupedByStaff[event.staffId] = [];
+                                response.data.forEach(function(item) {
+                                    if (!groupedByStaff[item.staffId]) {
+                                        groupedByStaff[item.staffId] = [];
                                     }
-                                    groupedByStaff[event.staffId].push(event);
+                                    groupedByStaff[item.staffId].push(item);
                                 });
+
 
                                 // Iterate over each staff group and create rows
                                 Object.keys(groupedByStaff).forEach(function(staffId) {
                                     var eventsForStaff = groupedByStaff[staffId];
+                                    //events for staff ..
                                     var rowspan = eventsForStaff
                                         .length; // Calculate rowspan for the name cell
 
@@ -556,9 +566,10 @@
 
                                         }
                                         // Add the row to the table
-                                        rows.push(row);
+                                        rows1.push(row);
                                     });
                                 });
+
 
                                 // Return the events to FullCalendar
                                 var events = [];
@@ -578,23 +589,21 @@
                                 });
 
                                 successCallback(events);
-
                                 // Add the rows to the DataTable
-                                table.clear().rows.add(rows).draw();
+                                console.log(rows1);
+                                table.clear().rows.add(rows1).draw();
 
                                 //leave approval, rejection and application
                                 let currentLeaveId;
 
                                 $('.approve-btn').click(function() {
                                     //prevent default
-                                    console.log("testing.......")
                                     const leaveId = $(this).data('leave-id');
                                     updateLeaveStatus(leaveId, 'approved');
                                 });
 
                                 $('.reject-btn').click(function() {
                                     currentLeaveId = $(this).data('leave-id');
-                                    console.log('Leave Id:', currentLeaveId);
                                 });
 
                                 $('#confirmReject').click(function() {

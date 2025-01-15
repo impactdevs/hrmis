@@ -36,6 +36,10 @@
                                     <h5 class="card-title">Attendees <span>| Today</span></h5>
 
                                     <div class="d-flex align-items-center">
+                                        <div
+                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                            <i class="bi bi-person"></i>
+                                        </div>
                                         <div class="ps-3">
                                             <h6>{{ $attendances }}</h6>
                                         </div>
@@ -60,6 +64,29 @@
                                         </div>
                                         <div class="ps-3">
                                             <h6>{{ $available_leave }}</h6>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div><!-- End Customers Card -->
+
+                        <!-- Customers Card -->
+                        <div class="col-xxl-3 col-xl-12">
+
+                            <div class="card info-card customers-card">
+
+                                <div class="card-body">
+                                    <h5 class="card-title">Birthdays <span>| Today</span></h5>
+
+                                    <div class="d-flex align-items-center">
+                                        <div
+                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                            <i class="bi bi-people"></i>
+                                        </div>
+                                        <div class="ps-3">
+                                            <h6>5</h6>
                                         </div>
                                     </div>
 
@@ -158,7 +185,7 @@
                             </div>
                         </div><!-- End Top Selling -->
 
-                        <div class="col-12">
+                        {{-- <div class="col-12">
                             <div class="card">
 
 
@@ -166,7 +193,7 @@
 
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
 
                     </div>
                 </div><!-- End Left side columns -->
@@ -263,6 +290,13 @@
                                         </p>
                                     </div>
                                 @endforeach
+
+                                {{-- if events and or trainings are empty, display a message --}}
+                                @if (count($events) == 0 && count($trainings) == 0)
+                                    <div class="text-center text-danger">
+                                        <h4 class="title-danger">No events or trainings available</h4>
+                                    </div>
+                                @endif
 
                             </div><!-- End sidebar recent posts-->
 
@@ -495,16 +529,11 @@
 
                         </div>
                     </div><!-- End Events & Trainings -->
-
-
-
-
                 </div><!-- End Right side columns -->
 
             </div>
         @endif
     </section>
-
 
     @push('scripts')
         @vite(['resources/js/custom-dashboard.js'])
