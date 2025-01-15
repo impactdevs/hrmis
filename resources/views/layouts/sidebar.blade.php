@@ -26,7 +26,7 @@
                 <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('leaves.index')) bg-secondary @endif"
                     href="{{ route('leaves.index') }}">
                     <i class="bi bi-bus-front"></i>
-                    {{ auth()->user()->isAdminOrSecretary() ? 'Leaves' : 'Apply For Leave' }}
+                    {{ auth()->user()->isAdminOrSecretary() ? 'Staff Leave Requests' : 'Apply For Leave' }}
                 </a>
             </li>
 

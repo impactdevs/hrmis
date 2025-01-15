@@ -24,7 +24,7 @@
                 <div class="col-12">
                     <div class="card recent-sales overflow-auto vh-100">
                         <div class="card-body">
-                            <h5 class="card-title">Leave Schedules</h5>
+                            <h5 class="card-title">Staff Leave Requests</h5>
 
                             <table class="table table-striped table-bordered" id="leavePlan" cellspacing="0"
                                 width="100%">

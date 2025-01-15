@@ -9,7 +9,7 @@
             }
 
             if (request()->routeIs('leaves.index')) {
-                $title = auth()->user()->isAdminOrSecretary() ? 'Leaves' : 'Apply For Leave';
+                $title = auth()->user()->isAdminOrSecretary() ? 'Staff Leave Requests' : 'Apply For Leave';
             }
 
             if (request()->routeIs('leave-roster.index') || request()->routeIs('leave-roster-tabular.index')) {
