@@ -13,6 +13,7 @@ use App\Notifications\LeaveApproval;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Notification;
+use Spatie\Permission\Models\Role;
 
 class LeaveController extends Controller
 {
@@ -23,6 +24,9 @@ class LeaveController extends Controller
     {
         $leaves = Leave::with('employee', 'leaveCategory')->get();
         $totalLeaves = $leaves->count();
+        //get all the roles in the system except Staff
+        $roles = Role::whereNotIn('name', ['Assistant Executive Secretary','Staff'])->pluck('name')->toArray();
+
         $totalDays = $leaves->sum(function ($leave) {
             return Carbon::parse($leave->start_date)->diffInDays(Carbon::parse($leave->end_date)) + 1;
         });
@@ -39,7 +43,7 @@ class LeaveController extends Controller
         $useDays = $employee->totalLeaveDays();
         //departments
         $departments = Department::pluck('department_name', 'department_id')->toArray();
-        return view('leaves.index', compact('leaves', 'totalLeaves', 'totalDays', 'leavesPerCategory', 'users', 'totalLeaveDaysAllocated', 'useDays', 'departments'));
+        return view('leaves.index', compact('leaves', 'totalLeaves', 'totalDays', 'leavesPerCategory', 'users', 'totalLeaveDaysAllocated', 'useDays', 'departments', 'roles'));
     }
 
     /**
