@@ -407,7 +407,7 @@
                                                     }
 
                                                     statusDiv +=
-                                                        '<p>Who has approved</p>';
+                                                        '<p>Leave Approved By:</p>';
                                                     if (row[4] && row[4]
                                                         .leave_request_status) {
                                                         roles.forEach((
