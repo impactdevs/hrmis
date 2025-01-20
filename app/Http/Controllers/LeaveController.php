@@ -279,7 +279,10 @@ class LeaveController extends Controller
 
         // Query to get the leave roster with employee and leave relationships
         $leaveRosterQuery = LeaveRoster::with(['employee', 'leave', 'leave.leaveCategory'])
-            ->whereHas('leave');
+        ->whereHas('leave', function($query) {
+            $query->where('end_date', '>=', now());
+        });
+
 
         // Filter by department if selected
         if ($department !== 'all') {
