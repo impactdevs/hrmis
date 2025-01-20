@@ -371,10 +371,11 @@
                                                                     '</p>';
                                                             }
                                                         } else {
+                                                            console.log(row[4])
                                                             // If the status is neither approved nor rejected
                                                             if (role ===
                                                                 'Staff' && row[
-                                                                    3]
+                                                                    4]
                                                                 .leave_request_status[
                                                                     'Executive Secretary'
                                                                 ]) {
