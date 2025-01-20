@@ -41,23 +41,23 @@
                 </li>
             @endif
 
-            <li class="nav-item">
+            {{-- <li class="nav-item">
                 <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('appraisals.index')) bg-secondary @endif"
                     href="{{ route('appraisals.index') }}">
                     <i class="bi bi-arrow-bar-up"></i>
                     {{ auth()->user()->isAdminOrSecretary() ? 'Appraisals' : 'My Appraisals' }}
                 </a>
-            </li>
+            </li> --}}
 
-            <li class="nav-item">
+            {{-- <li class="nav-item">
                 <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('attendances.index')) bg-secondary @endif"
                     href="{{ route('attendances.index') }}">
                     <i class="bi bi-check2-all"></i>
                     {{ auth()->user()->isAdminOrSecretary() ? 'Attendances' : 'My Attendance History' }}
                 </a>
-            </li>
+            </li> --}}
 
-            <li class="nav-item">
+            {{-- <li class="nav-item">
                 <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('trainings.index') ||
                         request()->routeIs('trainings.show') ||
                         request()->routeIs('trainings.edit') ||
@@ -71,15 +71,15 @@
                     <i class="bi bi-eyedropper"></i>
                     Trainings/Travels
                 </a>
-            </li>
+            </li> --}}
 
-            <li class="nav-item">
+            {{-- <li class="nav-item">
                 <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('events.index') || request()->routeIs('events.show')) bg-secondary @endif"
                     href="{{ route('events.index') }}">
                     <i class="bi bi-calendar-check"></i>
                     Events
                 </a>
-            </li>
+            </li> --}}
 
 
             <li class="nav-item">
