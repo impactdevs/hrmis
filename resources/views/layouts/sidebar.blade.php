@@ -102,7 +102,7 @@
                 </li>
 
 
-                <li class="nav-item">
+                {{-- <li class="nav-item">
                     <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('recruitments.index') ||
                             request()->routeIs('recruitments.show') ||
                             request()->routeIs('recruitments.edit') ||
@@ -111,7 +111,7 @@
                         <i class="bi bi-bank2"></i>
                         Staff Recruitment
                     </a>
-                </li>
+                </li> --}}
             @endif
         </ul>
         @if (auth()->user()->hasRole('HR'))
