@@ -40,6 +40,7 @@
                                     <tr>
                                         <th scope="col">#</th>
                                         <th scope="col">FULL NAME</th>
+                                        <th scope="col">LEAVE TYPE</th>
                                         <th scope="col">DURATION</th>
                                         <th class="col">ACTIONS</th>
                                         <th scope="col">STATUS</th>
@@ -324,7 +325,7 @@
                                             ); // Add Bootstrap class to the search box
                                         },
                                         columnDefs: [{
-                                                targets: 2, // Assuming the duration is in the second column (index 1)
+                                                targets: 3, // Assuming the duration is in the second column (index 1)
                                                 render: function(data, type, row) {
                                                     console.log(data);
                                                     // Use Bootstrap badge and apply styles for duration
@@ -334,7 +335,7 @@
                                                 }
                                             },
                                             {
-                                                targets: 4,
+                                                targets: 5,
                                                 render: function(data, type, row) {
                                                     let status = '';
 
@@ -343,45 +344,45 @@
                                                         '<div class="status mt-2">';
 
                                                     // Check if there is a leave request status
-                                                    if (row[4] && row[4]
+                                                    if (row[5] && row[5]
                                                         .leave_request_status) {
                                                         var role =
                                                             @json(Auth::user()->roles->pluck('name')[0] ?? '');
 
                                                         // Check if role exists in the leave request status
-                                                        if (row[4]
+                                                        if (row[5]
                                                             .leave_request_status[
                                                                 role] ===
                                                             'approved') {
                                                             statusDiv +=
                                                                 '<span class="badge bg-success">You Approved this Leave Request.</span>';
-                                                        } else if (row[4]
+                                                        } else if (row[5]
                                                             .leave_request_status[
                                                                 role] ===
                                                             'rejected') {
                                                             statusDiv +=
                                                                 '<span class="badge bg-danger">You rejected this Request</span>';
-                                                            if (row[4]
+                                                            if (row[5]
                                                                 .rejection_reason
                                                             ) {
                                                                 statusDiv +=
                                                                     '<p class="mt-1"><strong>Rejection Reason:</strong> ' +
-                                                                    row[4]
+                                                                    row[5]
                                                                     .rejection_reason +
                                                                     '</p>';
                                                             }
                                                         } else {
-                                                            console.log(row[4])
+                                                            console.log(row[5])
                                                             // If the status is neither approved nor rejected
                                                             if (role ===
                                                                 'Staff' && row[
-                                                                    4]
+                                                                    5]
                                                                 .leave_request_status[
                                                                     'Executive Secretary'
                                                                 ]) {
                                                                 const
                                                                     executiveStatus =
-                                                                    row[4]
+                                                                    row[5]
                                                                     .leave_request_status[
                                                                         'Executive Secretary'
                                                                     ];
@@ -406,7 +407,7 @@
                                                             }
                                                         }
                                                     } else {
-                                                        if (row[4].leave_id) {
+                                                        if (row[5].leave_id) {
                                                             statusDiv +=
                                                                 '<span class="badge bg-success">Application review in progress</span>';
                                                         } else {
@@ -417,13 +418,13 @@
 
                                                     statusDiv +=
                                                         '<p>Leave Approved By:</p>';
-                                                    if (row[4] && row[4]
+                                                    if (row[5] && row[5]
                                                         .leave_request_status) {
                                                         roles.forEach((
                                                             role) => {
                                                             const
                                                                 status =
-                                                                row[4]
+                                                                row[5]
                                                                 .leave_request_status[
                                                                     role
                                                                 ];
@@ -525,12 +526,16 @@
 
                                         // Fill other columns
                                         row[0] = event.numeric_id;
-                                        row[2] = formatDate(event.start) +
+                                        console.log("Leave:", event);
+                                        row[2] = event.leave.leave_category
+                                            .leave_type_name + "(" + event
+                                            .duration + ")";
+                                        row[3] = formatDate(event.start) +
                                             ' - ' + formatDate(event.end);
-                                        row[4] = event.leave;
+                                        row[5] = event.leave;
 
                                         if (event.leave.length == 0) {
-                                            row[3] = `
+                                            row[4] = `
                                                     <div class="dropdown">
                                                         <button class="btn btn-secondary btn-sm dropdown-toggle d-flex align-items-center gap-1" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                                                             <i class="bi bi-three-dots-vertical"></i> Actions
@@ -547,7 +552,7 @@
 
                                         } else {
                                             if (canApproveLeave) {
-                                                row[3] = `
+                                                row[4] = `
                                                     <div class="dropdown">
                                                         <button class="btn btn-secondary btn-sm dropdown-toggle d-flex align-items-center gap-1" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                                                             <i class="bi bi-three-dots-vertical"></i> Actions
@@ -572,7 +577,7 @@
                                                     </div>
                                                 `;
                                             } else {
-                                                row[3] = `
+                                                row[4] = `
                                                 <div class="dropdown">
                                                         <button class="btn btn-secondary btn-sm dropdown-toggle d-flex align-items-center gap-1" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                                                             <i class="bi bi-three-dots-vertical"></i> Actions

@@ -7,6 +7,7 @@ use App\Models\Employee;
 use App\Models\Leave;
 use App\Models\LeaveRoster;
 use App\Models\LeaveType;
+use App\Models\PublicHoliday;
 use App\Models\User;
 use App\Notifications\LeaveApplied;
 use App\Notifications\LeaveApproval;
@@ -54,9 +55,10 @@ class LeaveController extends Controller
         //get the logged in user email
         $user_id = auth()->user()->id;
         $leaveTypes = LeaveType::pluck('leave_type_name', 'leave_type_id')->toArray();
+        $holidays = PublicHoliday::pluck('holiday_date')->toArray();
         $existingValuesArray = [];
         $users = User::pluck('name', 'id')->toArray();
-        return view('leaves.create', compact('leaveTypes', 'user_id', 'existingValuesArray', 'users'));
+        return view('leaves.create', compact('leaveTypes', 'user_id', 'existingValuesArray', 'users', 'holidays'));
 
     }
 
@@ -276,7 +278,7 @@ class LeaveController extends Controller
         $department = $request->input('department', 'all');
 
         // Query to get the leave roster with employee and leave relationships
-        $leaveRosterQuery = LeaveRoster::with(['employee', 'leave'])
+        $leaveRosterQuery = LeaveRoster::with(['employee', 'leave', 'leave.leaveCategory'])
             ->whereHas('leave');
 
         // Filter by department if selected
@@ -296,7 +298,9 @@ class LeaveController extends Controller
                 'staffId' => $leave->employee->staff_id ?? null,
                 'first_name' => $leave->employee->first_name ?? null,
                 'last_name' => $leave->employee->last_name ?? null,
-                'leave' => $leave->leave
+                'leave' => $leave->leave,
+                // Add duration by calling the durationForLeave method
+                'duration' => $leave->durationForLeave() // This will return the duration excluding weekends and holidays
             ];
         });
 
@@ -315,14 +319,18 @@ class LeaveController extends Controller
                     'staffId' => $leave->employee->staff_id ?? null,
                     'first_name' => $leave->employee->first_name ?? null,
                     'last_name' => $leave->employee->last_name ?? null,
-                    'leave' => $leave
+                    'leave' => $leave,
+                    // Add duration for orphaned leaves as well
+                    'duration' => $leave->durationForLeave()
                 ];
             });
+
         // Combine the leaveRoster and orphanedLeaves
         $combinedLeaves = $leaveRoster->merge($orphanedLeaves);
 
         // Return the combined leave data
         return response()->json(['success' => true, 'data' => $combinedLeaves]);
     }
+
 
 }

@@ -58,4 +58,19 @@ class LeaveRoster extends Model
     {
         return $this->belongsTo(Leave::class, 'leave_roster_id', 'leave_roster_id')->withDefault();
     }
+
+    public function durationForLeave()
+    {
+        //exclude all weekends and public holidays
+        $publicHolidays = PublicHoliday::pluck('holiday_date')->toArray();
+
+        $publicHolidays = array_map(function ($date) {
+            return Carbon::parse($date)->toDateString();
+        }, $publicHolidays);
+
+        return Carbon::parse($this->start_date)
+            ->diffInDaysFiltered(function (Carbon $date) use ($publicHolidays) {
+                return !$date->isWeekend() && !in_array($date->toDateString(), $publicHolidays);
+            }, Carbon::parse($this->end_date));
+    }
 }

@@ -50,6 +50,9 @@
                 value="{{ old('end_date', $leaveRoster->end_date->toDateString()) }}" />
         @endif
     </div>
+    <div class="col-md-12 mt-3">
+        <p><strong>Difference in Days(Excluding Weekends and Holidays):</strong> <span id="days-difference">0</span></p>
+    </div>
 </div>
 
 <x-forms.hidden name="user_id" id="user_id" value="{{ $user_id }}" />
@@ -89,6 +92,8 @@
     <script>
         $(document).ready(function() {
             const users = @json($users);
+            const holidays = @json($holidays);
+            console.log(holidays);
             const userSource = Object.entries(users).map(([id, name]) => ({
                 id,
                 name
@@ -109,6 +114,35 @@
                     $('#user_ids').val(currentIds.join(','));
                 }
             });
+
+            function calculateWeekdayDifference() {
+                const startDate = new Date($('#start_date').val());
+                const endDate = new Date($('#end_date').val());
+
+                if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
+                    let totalDays = 0;
+
+                    // Convert holiday strings to Date objects
+                    const holidayDates = holidays.map(holiday => new Date(holiday).toISOString().split('T')[0]);
+
+                    for (let date = new Date(startDate); date <= endDate; date.setDate(date.getDate() + 1)) {
+                        const day = date.getDay(); // 0 = Sunday, 6 = Saturday
+                        const dateString = date.toISOString().split('T')[0]; // Get date as YYYY-MM-DD string
+
+                        // Exclude weekends and holidays
+                        if (day !== 0 && day !== 6 && !holidayDates.includes(dateString)) {
+                            totalDays++;
+                        }
+                    }
+
+                    $('#days-difference').text(totalDays >= 0 ? totalDays : 0);
+                } else {
+                    $('#days-difference').text(0);
+                }
+            }
+
+            // Bind event listeners to the date inputs
+            $('#start_date, #end_date').on('change', calculateWeekdayDifference);
         });
     </script>
 @endpush
