@@ -72,6 +72,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('save-leave-data', [LeaveRosterController::class, 'saveLeaveRosterData'])->name('save-leave-data');
     Route::resource('leave-roster', LeaveRosterController::class);
     Route::get('/leave-roster-calendar-data', [LeaveRosterController::class, 'leaveRosterCalendarData'])->name('leave-roster.calendarData');
+    Route::get('/leave-data', [LeaveController::class, 'leaveData'])->name('leave.data');
     Route::get('/leave-roster-tabular', [LeaveRosterController::class, 'getLeaveRoster'])->name('leave-roster-tabular.index');
     Route::get('/leave-roster-tabular/data', [LeaveRosterController::class, 'getLeaveRosterData'])->name('leave-roster-tabular.data');
     Route::resource('leave-types', LeaveTypesController::class);
@@ -128,11 +129,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/notifications/count', [NotificationController::class, 'getUnreadCount'])->name('notifications.count');
 
     Route::get('/get-count', [NotificationController::class, 'getCount']);
-
-
-
-
-
 });
 
 Route::get('/import', [EmployeeController::class, 'import_employees']);

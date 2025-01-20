@@ -32,6 +32,8 @@ class Leave extends Model
         'leave_address',
         'phone_number',
         'other_contact_details',
+        'handover_note_file',
+        'handover_note',
     ];
 
     protected $casts = [
@@ -52,7 +54,7 @@ class Leave extends Model
 
     public function employee()
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        return $this->belongsTo(Employee::class, 'user_id', 'user_id');
     }
 
     public function leaveCategory()

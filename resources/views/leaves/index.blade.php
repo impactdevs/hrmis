@@ -24,7 +24,15 @@
                 <div class="col-12">
                     <div class="card recent-sales overflow-auto vh-100">
                         <div class="card-body">
-                            <h5 class="card-title">Staff Leave Requests</h5>
+                            <div class="d-flex align-items-center">
+                                <h5 class="card-title">Staff Leave Requests</h5>
+                                <a class="btn btn-primary btn-sm ms-auto px-3 py-1" href="{{ route('leaves.create') }}"
+                                    style="font-size: 14px;">
+                                    <i class="bi bi-plus" style="font-size: 12px;"></i> Apply
+                                </a>
+                            </div>
+
+
 
                             <table class="table table-striped table-bordered" id="leavePlan" cellspacing="0"
                                 width="100%">
@@ -285,7 +293,7 @@
                         var department = $('#departmentSelect').val(); // Get selected department
 
                         $.ajax({
-                            url: '{{ route('leave-roster.calendarData') }}',
+                            url: '{{ route('leave.data') }}',
                             type: 'GET',
                             data: {
                                 approval_status: approvalStatus, // Pass the selected approval status filter

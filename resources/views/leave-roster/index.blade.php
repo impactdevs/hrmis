@@ -30,8 +30,7 @@
 
                             <div class="d-flex justify-between">
                                 <!-- Total Leave Days Entitled -->
-                                <p class="text-primary fw-bold fs-5 mb-2" id="totalLeaveDaysEntitled">Total Leave Days
-                                    Entitled:
+                                <p class="text-primary fw-bold fs-5 mb-2" id="totalLeaveDaysEntitled">Annual Leave Days:
                                     <span class="text-dark" style="font-weight: 400;">
                                         {{ auth()->user()->employee->entitled_leave_days }}
                                     </span>
@@ -97,6 +96,12 @@
                                     href="{{ route('leave-roster-tabular.index') }}">
                                     <i class="bi bi-eye"></i>Tabular View</a>
                             </div>
+                        @else
+                        <div class="d-flex align-items-center mb-1 ms-2">
+                            {{-- Tabular view --}}
+                            <p id="exceededDays" class="text-danger fw-bold"> </p>
+
+                        </div>
                         @endif
                     </div>
                 </div>
@@ -225,12 +230,17 @@
                 var totalLeaveDaysScheduled = @json(auth()->user()->employee->overallRosterDays());
                 var balanceToSchedule = totalLeaveDaysEntitled - totalLeaveDaysScheduled;
                 var percentageUsed = Math.min((totalLeaveDaysScheduled / totalLeaveDaysEntitled) * 100, 100);
+                var canSelect = balanceToSchedule > 0;
                 // Update the progress bar
                 $('#leaveProgressBar').css('width', percentageUsed + '%')
                     .attr('aria-valuenow', percentageUsed)
                     .text(Math.round(percentageUsed) + '%');
                 // Update label with the number of scheduled days
                 $('#scheduledDaysText').text(totalLeaveDaysScheduled + ' days scheduled');
+                // if canSelect is false, show the exceeded days
+                if (!canSelect) {
+                    $('#exceededDays').text('Annual leave days exceeded');
+                }
 
                 Echo.private(`roster.${employeeId}`)
                     .listen('RosterUpdate', (e) => {
@@ -243,10 +253,17 @@
                             100);
 
                         // Update the text values in the HTML
-                        $('#totalLeaveDaysEntitled').text('Total Leave Days Entitled: ' + totalLeaveDaysEntitled);
-                        $('#totalLeaveDaysScheduled').text('Total Leave Days Scheduled: ' +
+                        $('#totalLeaveDaysEntitled').text('Annual Leave Days: ' + totalLeaveDaysEntitled);
+                        $('#totalLeaveDaysScheduled').text('Leave Days Scheduled: ' +
                             totalLeaveDaysScheduled);
-                        $('#balanceToSchedule').text('Balance to Schedule: ' + balanceToSchedule);
+                        $('#balanceToSchedule').text('Balance: ' + balanceToSchedule);
+                        //update canSelect
+                        canSelect = balanceToSchedule > 0;
+
+                        //if canSelect is false, show the exceeded days
+                        if (!canSelect) {
+                            $('#exceededDays').text('Annual Leave Days Exceeded');
+                        }
 
                         // Update the progress bar
                         $('#leaveProgressBar').css('width', percentageUsed + '%')
@@ -446,7 +463,7 @@
                     },
 
 
-                    selectable: true,
+                    selectable: canSelect,
                     select: function(info) {
                         const startDate = info.start;
                         const endDate = info.end;
@@ -588,6 +605,46 @@
                 });
 
                 $('#applyButton').click(function() {
+                    //do date validation #
+                    // Prevent form submission until validation passes
+                    const startDate = new Date($('#start_date').val());
+                    const endDate = new Date($('#end_date').val());
+
+                    if (!startDate || !endDate) {
+                        Toastify({
+                            text: "Please fill in both the Start Date and End Date.",
+                            duration: 3000,
+                            destination: "",
+                            newWindow: true,
+                            close: true,
+                            gravity: "top", // `top` or `bottom`
+                            position: "right", // `left`, `center` or `right`
+                            stopOnFocus: true, // Prevents dismissing of toast on hover
+                            style: {
+                                background: "red",
+                            },
+                            onClick: function() {} // Callback after click
+                        }).showToast();
+                        return; // Stop execution here
+                    }
+
+                    if (startDate >= endDate) {
+                        Toastify({
+                            text: "The Start Date must be earlier than the End Date.Please try again with valid date range",
+                            duration: 3000,
+                            destination: "",
+                            newWindow: true,
+                            close: true,
+                            gravity: "top", // `top` or `bottom`
+                            position: "right", // `left`, `center` or `right`
+                            stopOnFocus: true, // Prevents dismissing of toast on hover
+                            style: {
+                                background: "red",
+                            },
+                            onClick: function() {} // Callback after click
+                        }).showToast();
+                        return; // Stop execution here
+                    }
                     // Extract form values
                     var start_date = $('#start_date').val();
                     var end_date = $('#end_date').val();

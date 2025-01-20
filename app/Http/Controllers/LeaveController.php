@@ -25,7 +25,7 @@ class LeaveController extends Controller
         $leaves = Leave::with('employee', 'leaveCategory')->get();
         $totalLeaves = $leaves->count();
         //get all the roles in the system except Staff
-        $roles = Role::whereNotIn('name', ['Assistant Executive Secretary','Staff'])->pluck('name')->toArray();
+        $roles = Role::whereNotIn('name', ['Assistant Executive Secretary', 'Staff'])->pluck('name')->toArray();
 
         $totalDays = $leaves->sum(function ($leave) {
             return Carbon::parse($leave->start_date)->diffInDays(Carbon::parse($leave->end_date)) + 1;
@@ -79,8 +79,20 @@ class LeaveController extends Controller
      */
     public function store(Request $request)
     {
+
+        $requestData = $request->all();
+
+
+        // Check if the handover_note_file is present in the request
+        if ($request->hasFile('handover_note_file')) {
+            // Store the file and get the file path
+            $filePath = $request->file('handover_note_file')->store('handover_notes', 'public');
+
+            // Add the file path to the validated data
+            $requestData['handover_note_file'] = $filePath;
+        }
         // Create the leave record
-        $leaveCreated = Leave::create($request->all());
+        $leaveCreated = Leave::create($requestData);
 
         if ($leaveCreated) {
             // Get users with the superadmin role
@@ -256,8 +268,57 @@ class LeaveController extends Controller
         ]);
     }
 
+    public function leaveData(Request $request)
+    {
+        $department = $request->input('department', 'all');
 
+        // Query to get the leave roster with employee and leave relationships
+        $leaveRosterQuery = LeaveRoster::with('employee', 'leave');
 
+        // Filter by department if selected
+        if ($department !== 'all') {
+            $employeeIds = Employee::where('department_id', $department)->pluck('employee_id');
+            $leaveRosterQuery->whereIn('employee_id', $employeeIds);
+        }
 
+        // Retrieve the filtered leave roster
+        $leaveRoster = $leaveRosterQuery->get()->map(function ($leave, $index) {
+            return [
+                'numeric_id' => $index + 1,
+                'leave_roster_id' => $leave->leave_roster_id,
+                'title' => $leave->leave_title,
+                'start' => $leave->start_date->toIso8601String(),
+                'end' => $leave->end_date->toIso8601String(),
+                'staffId' => $leave->employee->staff_id ?? null,
+                'first_name' => $leave->employee->first_name ?? null,
+                'last_name' => $leave->employee->last_name ?? null,
+                'leave' => $leave->leave
+            ];
+        });
+
+        // Query to find leaves that are not in the leave roster
+        $orphanedLeaves = Leave::whereNull('leave_roster_id')
+            ->with('employee')
+            ->get()
+            ->map(function ($leave, $index) use ($leaveRoster) {
+                $indexOffset = $leaveRoster->count(); // Continue numeric ID from leaveRoster
+                return [
+                    'numeric_id' => $indexOffset + $index + 1,
+                    'leave_roster_id' => null, // Not in leave roster
+                    'title' => $leave->leave_title,
+                    'start' => $leave->start_date->toIso8601String(),
+                    'end' => $leave->end_date->toIso8601String(),
+                    'staffId' => $leave->employee->staff_id ?? null,
+                    'first_name' => $leave->employee->first_name ?? null,
+                    'last_name' => $leave->employee->last_name ?? null,
+                    'leave' => $leave
+                ];
+            });
+        // Combine the leaveRoster and orphanedLeaves
+        $combinedLeaves = $leaveRoster->merge($orphanedLeaves);
+
+        // Return the combined leave data
+        return response()->json(['success' => true, 'data' => $combinedLeaves]);
+    }
 
 }

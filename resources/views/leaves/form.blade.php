@@ -1,5 +1,38 @@
 <div class="row mb-3">
     <div class="col-md-6">
+        <div class="form-group">
+            <label for="leave_type_id">Leave Type</label>
+
+            <select name="leave_type_id" id="leave_type_id"
+                class="form-control @error('leave_type_id') is-invalid @enderror">
+                @foreach ($leaveTypes as $value => $text)
+                    <option value="{{ $value }}" {{ old('leave_type_id') == $value ? 'selected' : '' }}>
+                        {{ $text }}</option>
+                @endforeach
+            </select>
+
+            @error('leave_type_id')
+                <div class="invalid-feedback">
+                    {{ $message }}
+                </div>
+            @enderror
+        </div>
+    </div>
+    <div class="col-md-6">
+        <x-forms.text-area name="handover_note" label="Hand Over Note" id="handover_note" :value="old('handover_note', $leave->handover_note ?? '')" />
+
+        <div style="margin-bottom: 1rem;">
+            <label for="handover_note_file" style="font-weight: bold; display: block; margin-bottom: 0.5rem;">Upload
+                Handover Notes</label>
+            <input type="file" name="handover_note_file" id="handover_note_file" accept="application/pdf"
+                style="padding: 0.5rem; border: 1px solid #ccc; border-radius: 5px; display: block; width: 100%; max-width: 400px; font-size: 0.9rem;">
+            <span style="font-size: 0.85rem; color: #555; margin-top: 0.5rem; display: inline-block;">
+                If your handover notes are lengthy, please upload a PDF file.
+            </span>
+        </div>
+
+    </div>
+    <div class="col-md-6">
         @if (!isset($leaveRoster))
             <x-forms.input name="start_date" label="Leave Start Date" type="date" id="start_date"
                 value="{{ old('start_date', isset($leave) && $leave->start_date ? $leave->start_date->toDateString() : '') }}" />
@@ -21,15 +54,6 @@
 
 <x-forms.hidden name="user_id" id="user_id" value="{{ $user_id }}" />
 
-<div class="row mb-3">
-    <div class="col-md-6">
-        <x-forms.text-area name="reason" label="Reason" id="reason" :value="old('reason', $leave->reason ?? '')" />
-    </div>
-    <div class="col-md-6">
-        <x-forms.dropdown name="leave_type_id" label="Leave Type" id="leave_type_id" :options="$leaveTypes"
-            :selected="$leave->leave_type_id ?? ''" />
-    </div>
-</div>
 
 <div class="mb-3 col">
     <label for="usertokenfield" class="form-label">The following do my work</label>
@@ -44,7 +68,7 @@
             value="{{ old('leave_address', $leave->leave_address ?? '') }}" />
     </div>
     <div class="col-md-6">
-        <x-forms.input name="contact_number" label="Contact Number" type="text" id="contact_number"
+        <x-forms.input name="phone_number" label="Contact Number" type="text" id="phone_number"
             value="{{ old('phone_number', $leave->phone_number ?? '') }}" />
     </div>
 </div>

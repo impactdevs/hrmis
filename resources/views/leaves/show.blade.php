@@ -1,6 +1,6 @@
 <x-app-layout>
     <div class="container mt-5">
-        <h5 class="mb-4">
+        <h5 class="mb-4 fs-3 text-primary">
             <i class="fas fa-calendar-alt"></i> Leave Details
         </h5>
         <div class="row">
@@ -20,9 +20,13 @@
                 </div>
                 <div class="form-group mb-3">
                     <label for="leave_description">
-                        <i class="fas fa-info-circle"></i> Leave Description
+                        <i class="fas fa-info-circle"></i> Handover Notes
                     </label>
-                    <p class="border p-2 rounded bg-light">{{ $leaf->reason }}</p>
+                    <p class="border p-2 rounded bg-light">{{ $leaf->handover_note }}</p>
+                    @if ($leaf->handover_note_file)
+                        <a href="{{ asset('storage/' . $leaf->handover_note_file) }}" target="_blank"
+                            class="btn btn-primary mt-2">View Handover File</a>
+                    @endif
                 </div>
 
                 <div class="form-group mb-3">
@@ -35,8 +39,8 @@
                 <div class="form-group mb-3">
                     <label for="leave_address">
                         <i class="fas fa-map-marker-alt"></i> Leave Address
-                        </label>
-                        <p class="border p-2 rounded bg-light">{{ $leaf->leave_address }}</p>
+                    </label>
+                    <p class="border p-2 rounded bg-light">{{ $leaf->leave_address }}</p>
                 </div>
 
                 <div class="form-group mb-3">
@@ -51,7 +55,7 @@
                         <i class="fas fa-info-circle"></i> Other Contact Details
                     </label>
                     <p class="border p-2 rounded bg-light">{{ $leaf->other_contact_details }}</p>
+                </div>
             </div>
         </div>
-    </div>
 </x-app-layout>

@@ -89,6 +89,13 @@ class LeaveRosterController extends Controller
      */
     public function store(Request $request)
     {
+        //validate, the request, the start date should be less than the end date
+        $request->validate([
+            'start_date' => 'required|date|before:end_date',
+            'end_date' => 'required|date',
+            'leave_title' => 'required|string',
+        ]);
+
         $employee_id = auth()->user()->employee->employee_id;
         $leaveRosterAdded = LeaveRoster::create([
             'employee_id' => $employee_id,
@@ -138,9 +145,6 @@ class LeaveRosterController extends Controller
         // Return the filtered leave roster data
         return response()->json(['success' => true, 'data' => $leaveRoster]);
     }
-
-
-
 
     /**
      * Update the specified resource in storage.

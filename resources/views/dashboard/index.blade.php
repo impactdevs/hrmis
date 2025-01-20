@@ -321,7 +321,7 @@
                             <div class="card info-card sales-card">
 
                                 <div class="card-body">
-                                    <h5 class="card-title">Leave Days Allocated</h5>
+                                    <h5 class="card-title">Annual Leave Days</h5>
 
                                     <div class="d-flex align-items-center">
                                         <div
@@ -359,7 +359,7 @@
                         </div><!-- End Revenue Card -->
 
                         <!-- Customers Card -->
-                        <div class="col-xxl-4 col-xl-12">
+                        {{-- <div class="col-xxl-4 col-xl-12">
 
                             <div class="card info-card customers-card">
 
@@ -379,16 +379,17 @@
                                 </div>
                             </div>
 
-                        </div><!-- End Customers Card -->
+                        </div> --}}
+                        <!-- End Customers Card -->
                         @if (count($leaveApprovalData) > 0)
                             <!-- Leave Approval Progress -->
                             <div class="col-xxl-12 col-md-12">
                                 <div class="card info-card leave-approval-card border border-5 border-primary">
                                     <div class="card-body">
-                                        @foreach ($leaveApprovalData as $leaveData)
-                                            <div class="leave-approval-item">
-                                                <h6>Leave Requests</h6>
+                                        <h6 class="mb-2">Leave Requests</h6>
 
+                                        @foreach ($leaveApprovalData as $leaveData)
+                                            <div class="leave-approval-item mb-3">
                                                 @if ($leaveData['esStatus'] === 'Approved')
                                                     <!-- Hide progress area -->
                                                     <div class="congratulations-message">
