@@ -449,7 +449,7 @@
                                 @if ($daysUntilExpiry < 0)
                                     <div class="alert alert-danger">
                                         <h5>Contract Expired</h5>
-                                        <p>Your contract expired <strong>{{ abs($daysUntilExpiry) }} days
+                                        <p>Your contract expired <strong>{{ abs($daysUntilExpiry??0) }} days
                                                 ago</strong>.</p>
                                     </div>
                                 @endif

@@ -95,6 +95,9 @@ class LeaveController extends Controller
         $leaveCreated = Leave::create($requestData);
 
         if ($leaveCreated) {
+            //notify people who will stand in for the person on leave, $leaveCreated->my_work_will_be_done_by is a string separated by commas
+            $myWorkWillBeDoneBy = explode(',', $leaveCreated->my_work_will_be_done_by['users']);
+            $doneBy = User::whereIn('id', $myWorkWillBeDoneBy)->get();
             // Get users with the superadmin role
             $users = User::role('HR')->get();
 
@@ -105,7 +108,7 @@ class LeaveController extends Controller
 
             //add hod to users array
             $users->push($hod);
-
+            $users->push($doneBy);
             // Send notifications to those users
             Notification::send($users, new LeaveApplied($leaveCreated));
         }
