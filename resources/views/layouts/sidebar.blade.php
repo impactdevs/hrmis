@@ -93,13 +93,13 @@
                 </a>
             </li>
             @if (auth()->user()->isAdminOrSecretary())
-                <li class="nav-item">
+                {{-- <li class="nav-item">
                     <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('applications.index')) bg-secondary @endif"
                         href="{{ route('applications.index') }}">
                         <i class="bi bi-activity"></i>
                         Applications
                     </a>
-                </li>
+                </li> --}}
 
 
                 {{-- <li class="nav-item">
