@@ -529,7 +529,7 @@
                                         // Fill other columns
                                         row[0] = event.numeric_id;
                                         console.log("Leave:", event);
-                                        if (event.leave.length > 0) {
+                                        if (event.leave.length != 0) {
                                             row[2] = event.leave.leave_category
                                                 .leave_type_name + "(" + event
                                                 .duration + ")";
