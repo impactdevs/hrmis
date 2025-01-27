@@ -278,10 +278,7 @@ class LeaveController extends Controller
         $department = $request->input('department', 'all');
 
         // Query to get the leave roster with employee and leave relationships
-        $leaveRosterQuery = LeaveRoster::with(['employee', 'leave', 'leave.leaveCategory'])
-        ->whereHas('leave', function($query) {
-            $query->where('end_date', '>=', now());
-        });
+        $leaveRosterQuery = LeaveRoster::with(['employee', 'leave', 'leave.leaveCategory']);
 
 
         // Filter by department if selected
@@ -308,7 +305,7 @@ class LeaveController extends Controller
         });
 
         // Query to find leaves that are not in the leave roster
-        $orphanedLeaves = Leave::whereNull('leave_roster_id')
+        $orphanedLeaves = Leave::with('leaveCategory')->whereNull('leave_roster_id')
             ->with('employee')
             ->get()
             ->map(function ($leave, $index) use ($leaveRoster) {
@@ -329,10 +326,10 @@ class LeaveController extends Controller
             });
 
         // Combine the leaveRoster and orphanedLeaves
-        $combinedLeaves = $leaveRoster->merge($orphanedLeaves);
+        // $combinedLeaves = $leaveRoster->merge($orphanedLeaves);
 
         // Return the combined leave data
-        return response()->json(['success' => true, 'data' => $combinedLeaves]);
+        return response()->json(['success' => true, 'data' => $leaveRoster]);
     }
 
 

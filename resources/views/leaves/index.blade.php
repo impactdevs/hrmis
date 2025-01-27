@@ -527,9 +527,13 @@
                                         // Fill other columns
                                         row[0] = event.numeric_id;
                                         console.log("Leave:", event);
-                                        row[2] = event.leave.leave_category
-                                            .leave_type_name + "(" + event
-                                            .duration + ")";
+                                        if (event.leave.length > 0) {
+                                            row[2] = event.leave.leave_category
+                                                .leave_type_name + "(" + event
+                                                .duration + ")";
+                                        } else {
+                                            row[2] = "N/A";
+                                        }
                                         row[3] = formatDate(event.start) +
                                             ' - ' + formatDate(event.end);
                                         row[5] = event.leave;
