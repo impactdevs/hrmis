@@ -70,9 +70,10 @@ class LeaveController extends Controller
         //get the logged in user email
         $user_id = auth()->user()->id;
         $leaveTypes = LeaveType::pluck('leave_type_name', 'leave_type_id')->toArray();
+        $holidays = PublicHoliday::pluck('holiday_date')->toArray();
         $existingValuesArray = [];
         $users = User::pluck('name', 'id')->toArray();
-        return view('leaves.create', compact('leaveTypes', 'user_id', 'existingValuesArray', 'users', 'leaveRoster'));
+        return view('leaves.create', compact('leaveTypes', 'user_id', 'existingValuesArray', 'users', 'leaveRoster', 'holidays'));
 
     }
 

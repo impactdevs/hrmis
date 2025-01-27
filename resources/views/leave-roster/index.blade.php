@@ -163,7 +163,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-primary" id="applyButton"
-                        data-bs-dismiss="modal">Apply</button>
+                        data-bs-dismiss="modal">Submit</button>
                 </div>
             </div>
         </div>
