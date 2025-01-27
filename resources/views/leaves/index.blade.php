@@ -25,7 +25,9 @@
                     <div class="card recent-sales overflow-auto vh-100">
                         <div class="card-body">
                             <div class="d-flex align-items-center">
-                                <h5 class="card-title">Staff Leave Requests</h5>
+                                <h5 class="card-title">
+                                    {{ auth()->user()->isAdminOrSecretary() ? 'Leave Requests' : 'My Leave Requests' }}
+                                </h5>
                                 <a class="btn btn-primary btn-sm ms-auto px-3 py-1" href="{{ route('leaves.create') }}"
                                     style="font-size: 14px;">
                                     <i class="bi bi-plus" style="font-size: 12px;"></i> Apply
