@@ -330,10 +330,10 @@ class LeaveController extends Controller
             });
 
         // Combine the leaveRoster and orphanedLeaves
-        // $combinedLeaves = $leaveRoster->merge($orphanedLeaves);
+        $combinedLeaves = collect($leaveRoster)->merge($orphanedLeaves);
 
         // Return the combined leave data
-        return response()->json(['success' => true, 'data' => $leaveRoster]);
+        return response()->json(['success' => true, 'data' => $combinedLeaves]);
     }
 
 
