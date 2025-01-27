@@ -277,10 +277,14 @@ class LeaveController extends Controller
     {
         $department = $request->input('department', 'all');
 
-        // Query to get the leave roster with employee and leave relationships
-        $leaveRosterQuery = LeaveRoster::with(['employee', 'leave', 'leave.leaveCategory']);
+        if (auth()->user()->isAdminOrSecretary()) {
+            // Query to get the leave roster with employee and leave relationships
+            $leaveRosterQuery = LeaveRoster::with(['employee', 'leave', 'leave.leaveCategory'])
+                ->whereHas('leave');
+        } else {
 
-
+            $leaveRosterQuery = LeaveRoster::with(['employee', 'leave', 'leave.leaveCategory']);
+        }
         // Filter by department if selected
         if ($department !== 'all') {
             $employeeIds = Employee::where('department_id', $department)->pluck('employee_id');
