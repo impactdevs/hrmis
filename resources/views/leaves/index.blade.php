@@ -26,12 +26,15 @@
                         <div class="card-body">
                             <div class="d-flex align-items-center">
                                 <h5 class="card-title">
-                                    {{ auth()->user()->isAdminOrSecretary() ? 'Leave Requests' : 'My Leave Requests' }}
+                                    {{ auth()->user()->isAdminOrSecretary() ? 'UNCST Leave Requests' : 'My Leave Requests' }}
                                 </h5>
-                                <a class="btn btn-primary btn-sm ms-auto px-3 py-1" href="{{ route('leaves.create') }}"
-                                    style="font-size: 14px;">
-                                    <i class="bi bi-plus" style="font-size: 12px;"></i> Apply
-                                </a>
+                                {{-- check if role is HR and dont show the button --}}
+                                @if (!auth()->user()->hasRole('HR'))
+                                    <a class="btn btn-primary btn-sm ms-auto px-3 py-1"
+                                        href="{{ route('leaves.create') }}" style="font-size: 14px;">
+                                        <i class="bi bi-plus" style="font-size: 12px;"></i> Apply
+                                    </a>
+                                @endif
                             </div>
 
 

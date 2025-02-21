@@ -218,9 +218,6 @@ class HomeController extends Controller
                     'hodStatus' => $leave->leave_request_status["Head of Division"] ?? "" === 'approved' ? 'Apprroved' : 'Pending',
                     'esStatus' => $leave->leave_request_status["Executive Secretary"] ?? "" === 'approved' ? 'Approved' : 'Pending',
                 ];
-
-
-
             }
         }
 
