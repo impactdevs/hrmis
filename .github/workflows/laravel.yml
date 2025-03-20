@@ -25,8 +25,8 @@ jobs:
           username: ${{ secrets.DO_USERNAME }}
           key: ${{ secrets.DO_SSH_KEY }}
           script: |
-            sudo chown -R ${{ secrets.DO_USERNAME }}:www-data /var/www/hrmis.go.ug
-            sudo chmod -R g+rwX /var/www/hrmis.go.ug
+            chown -R ${{ secrets.DO_USERNAME }}:www-data /var/www/hrmis.go.ug
+            chmod -R g+rwX /var/www/hrmis.go.ug
       - name: Upload files using Rsync
         uses: up9cloud/action-rsync@master # Verified version
         with:
@@ -60,8 +60,8 @@ jobs:
           username: ${{ secrets.DO_USERNAME }}
           key: ${{ secrets.DO_SSH_KEY }}
           script: |
-            sudo chgrp -R www-data /var/www/hrmis.go.ug/storage /var/www/hrmis.go.ug/bootstrap/cache
-            sudo chmod -R ug+rwx /var/www/hrmis.go.ug/storage /var/www/hrmis.go.ug/bootstrap/cache
+            chgrp -R www-data /var/www/hrmis.go.ug/storage /var/www/hrmis.go.ug/bootstrap/cache
+            chmod -R ug+rwx /var/www/hrmis.go.ug/storage /var/www/hrmis.go.ug/bootstrap/cache
 
       # set right permissions for images directory in public, make sure its readable and writable
       - name: Set proper permissions for public directory
@@ -71,4 +71,4 @@ jobs:
           username: ${{ secrets.DO_USERNAME }}
           key: ${{ secrets.DO_SSH_KEY }}
           script: |
-            sudo chgrp -R www-data /var/www/hrmis.go.ug/public
+            chgrp -R www-data /var/www/hrmis.go.ug/public
