@@ -28,7 +28,7 @@ jobs:
             sudo chown -R ${{ secrets.DO_USERNAME }}:www-data /var/www/hrmis.go.ug
             sudo chmod -R g+rwX /var/www/hrmis.go.ug
       - name: Upload files using Rsync
-        uses: appleboy/rsync-action@v0.7.0  # Verified version
+        uses: up9cloud/action-rsync@master # Verified version
         with:
           host: ${{ secrets.DO_HOST }}
           username: ${{ secrets.DO_USERNAME }}
