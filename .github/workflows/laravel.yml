@@ -18,14 +18,28 @@ jobs:
         run: |
           composer install --no-dev --prefer-dist --optimize-autoloader
 
-      - name: Upload files to DigitalOcean
-        uses: appleboy/scp-action@master
+      - name: Prepare Target Directory Permissions
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.DO_HOST }}
           username: ${{ secrets.DO_USERNAME }}
           key: ${{ secrets.DO_SSH_KEY }}
-          source: "."
-          target: "/var/www/hrmis.go.ug"
+          script: |
+            sudo chown -R ${{ secrets.DO_USERNAME }}:www-data /var/www/hrmis.go.ug
+            sudo chmod -R g+rwX /var/www/hrmis.go.ug
+
+      - name: Upload files using Rsync
+        uses: appleboy/rsync-action@master
+        with:
+          host: ${{ secrets.DO_HOST }}
+          username: ${{ secrets.DO_USERNAME }}
+          key: ${{ secrets.DO_SSH_KEY }}
+          source: ./
+          target: /var/www/hrmis.go.ug/
+          recursive: true
+          delete: true
+          options: -v
+          strip_components: 0
 
       - name: Run migrations, optimize, and restart Supervisor
         uses: appleboy/ssh-action@master
