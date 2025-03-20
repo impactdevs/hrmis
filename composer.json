@@ -7,7 +7,6 @@
     "require": {
         "php": "^8.2",
         "hotwired-laravel/turbo-laravel": "2.0.0",
-        "kreait/firebase-php": "^7.15",
         "laravel-notification-channels/fcm": "^4.3",
         "laravel/breeze": "^2.2",
         "laravel/framework": "^11.9",
