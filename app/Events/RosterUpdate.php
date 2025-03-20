@@ -42,6 +42,7 @@ class RosterUpdate implements ShouldBroadcast
 
     public function broadcastWith(): array
     {
+        //broadcast certificate data
         return [
             'total_leave_days_entitled' => $this->total_leave_days_entitled,
             'total_leave_days_scheduled' => $this->total_leave_days_scheduled
