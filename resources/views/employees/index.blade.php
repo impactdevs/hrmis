@@ -78,20 +78,20 @@
 
         <div class="table-wrapper">
             <table class="table table-striped" data-toggle="table" data-show-columns="true" data-sortable="true"
-                data-show-export="true" data-show-pagination-switch="true"
+                id="employees" data-show-export="true" data-show-pagination-switch="true"
                 data-page-list="[20, 25, 50, 100, 500, 1000, 2000, 10000, all]" data-pagination="true">
                 <thead>
                     <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">First Name</th>
-                        <th scope="col">Last Name</th>
-                        <th scope="col">Position</th>
-                        <th scope="col">Department</th>
-                        <th scope="col">Phone Number</th>
-                        <th scope="col">Date of Entry</th>
-                        <th scope="col">Contract Expiry</th>
-                        <th class="col">No. of Years to Retirement</th>
-                        <th scope="col">Actions</th>
+                        <th scope="col" data-field="id">#</th>
+                        <th scope="col" data-field="first_name">First Name</th>
+                        <th scope="col" data-field="last_name">Last Name</th>
+                        <th scope="col" data-field="position">Position</th>
+                        <th scope="col" data-field="department">Department</th>
+                        <th scope="col" data-field="phone_number">Phone Number</th>
+                        <th scope="col" data-field="date_of_entry">Date of Entry</th>
+                        <th scope="col" data-field="contract_expiry">Contract Expiry</th>
+                        <th class="col" data-field="retirement_years">Retirement Yrs</th>
+                        <th scope="col" data-field="actions">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -170,6 +170,7 @@
             $(document).ready(function() {
                 const input = $('#contract_expiry');
                 const datalist = $('#expiry-options');
+                const $table = $('#employees');
 
                 // Listen for the 'input' event when the user types
                 input.on('input', function() {
@@ -187,6 +188,10 @@
                         }
                     });
                 });
+
+                $table.bootstrapTable('hideColumn', 'contract_expiry')
+                $table.bootstrapTable('hideColumn', 'position')
+                $table.bootstrapTable('hideColumn', 'phone_number')
             });
         </script>
     @endpush

@@ -588,19 +588,19 @@
                         radius: ['40%', '70%'],
                         avoidLabelOverlap: false,
                         label: {
-                            show: true,
+                            show: false,
                             position: 'outside'
                         },
-                        emphasis: {
-                            label: {
-                                show: true,
-                                fontSize: '18',
-                                fontWeight: 'bold'
-                            }
-                        },
-                        labelLine: {
-                            show: true
-                        },
+                        // emphasis: {
+                        //     label: {
+                        //         show: true,
+                        //         fontSize: '18',
+                        //         fontWeight: 'bold'
+                        //     }
+                        // },
+                        // labelLine: {
+                        //     show: true
+                        // },
                         data: employeeData
                     }]
                 });

@@ -18,6 +18,10 @@ body {
 .sidebar {
   width: 20%;
   /* Set a fixed width for the sidebar */
+  min-width: 250px;
+  /* Optional, ensures it doesn’t shrink below 250px */
+  flex-shrink: 0;
+  /* Prevent the sidebar from shrinking */
 }
 
 @media (max-width: 768px) {
@@ -26,6 +30,37 @@ body {
     /* Adjust the width for smaller screens if needed */
   }
 }
+
+/* give main the max-width */
+#main {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+table {
+  width: auto; /* Uses only the available width */
+  max-width: 100%; /* Prevents the table from exceeding the container */
+  table-layout: auto; /* Allows columns to adjust based on content */
+}
+
+@media (min-width: 768px) {
+
+  /* Tablets and larger */
+  #main {
+    max-width: calc(100vw - 250px);
+    /* Adjust based on sidebar width */
+  }
+}
+
+@media (min-width: 1200px) {
+
+  /* Larger screens */
+  #main {
+    max-width: calc(100vw - 300px);
+    /* Adjust based on sidebar width */
+  }
+}
+
 
 
 @media only screen and (-webkit-min-device-pixel-ratio: 0) and (min-device-width: 1025px) {
@@ -542,7 +577,8 @@ body {
 .description {
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2; /* Limit to 2 lines */
+  -webkit-line-clamp: 2;
+  /* Limit to 2 lines */
   overflow: hidden;
   text-overflow: ellipsis;
 }
