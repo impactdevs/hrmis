@@ -48,9 +48,9 @@ jobs:
             php artisan migrate --force
             php artisan optimize:clear
             php artisan optimize
-            sudo supervisorctl reread
-            sudo supervisorctl update
-            sudo supervisorctl restart all
+            supervisorctl reread
+            supervisorctl update
+            supervisorctl restart all
 
       - name: Set proper permissions for storage and cache
         uses: appleboy/ssh-action@master
