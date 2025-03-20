@@ -34,7 +34,7 @@ jobs:
           HOST: ${{ secrets.DO_HOST }}
           username: ${{ secrets.DO_USERNAME }}
           KEY: ${{ secrets.DO_SSH_KEY }}
-          target: "/var/www/hrmis.go.ug"
+          TRAGET: "/var/www/hrmis.go.ug"
 
       - name: Run migrations, optimize, and restart Supervisor
         uses: appleboy/ssh-action@master
