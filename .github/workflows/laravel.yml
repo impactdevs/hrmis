@@ -30,13 +30,10 @@ jobs:
       - name: Upload files using Rsync
         uses: up9cloud/action-rsync@master # Verified version
         with:
-          host: ${{ secrets.DO_HOST }}
+          HOST: ${{ secrets.DO_HOST }}
           username: ${{ secrets.DO_USERNAME }}
-          key: ${{ secrets.DO_SSH_KEY }}
-          source: "./"
+          KEY: ${{ secrets.DO_SSH_KEY }}
           target: "/var/www/hrmis.go.ug"
-          delete: true
-          options: -avz
 
       - name: Run migrations, optimize, and restart Supervisor
         uses: appleboy/ssh-action@master
