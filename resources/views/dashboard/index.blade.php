@@ -564,10 +564,10 @@
                         type: 'pie',
                         radius: ['40%', '70%'],
                         avoidLabelOverlap: false,
-                        label: {
-                            show: false,
-                            position: 'outside'
-                        },
+                        // label: {
+                        //     show: false,
+                        //     position: 'outside'
+                        // },
                         // emphasis: {
                         //     label: {
                         //         show: true,
