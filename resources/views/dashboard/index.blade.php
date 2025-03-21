@@ -578,10 +578,10 @@
                     tooltip: {
                         trigger: 'item'
                     },
-                    legend: {
-                        top: '5%',
-                        left: 'center'
-                    },
+                    // legend: {
+                    //     top: '5%',
+                    //     left: 'center'
+                    // },
                     series: [{
                         name: 'Employees by Department',
                         type: 'pie',
