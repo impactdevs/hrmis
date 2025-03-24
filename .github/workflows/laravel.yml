@@ -41,7 +41,6 @@ jobs:
             supervisorctl reread
             sudo supervisorctl update
             sudo supervisorctl restart all
-            php artisan sitemap:generate
 
       - name: Set proper permissions for storage and cache
         uses: appleboy/ssh-action@master
