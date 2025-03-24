@@ -38,9 +38,9 @@ jobs:
             php artisan optimize:clear
             php artisan optimize
             php artisan storage:link
-            sudo supervisorctl reread
-            sudo supervisorctl update
-            sudo supervisorctl restart all
+            supervisorctl reread
+            supervisorctl update
+            supervisorctl restart all
             php artisan sitemap:generate
 
       - name: Set proper permissions for storage and cache
