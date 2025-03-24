@@ -38,7 +38,7 @@ jobs:
             php artisan optimize:clear
             php artisan optimize
             php artisan storage:link
-            supervisorctl reread
+            sudo supervisorctl reread
             sudo supervisorctl update
             sudo supervisorctl restart all
 
