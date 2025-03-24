@@ -25,8 +25,8 @@ jobs:
           username: ${{ secrets.DO_USERNAME }}
           key: ${{ secrets.DO_SSH_KEY }}
           script: |
-            chown -R ${{ secrets.DO_USERNAME }}:www-data /var/www/hrmis.go.ug
-            chmod -R g+rwX /var/www/hrmis.go.ug
+            chown -R ${{ secrets.DO_USERNAME }}:www-data /var/www/hrmis.uncst.go.ug
+            chmod -R g+rwX /var/www/hrmis.uncst.go.ug
 
       - name: Upload files to DigitalOcean
         uses: appleboy/scp-action@master
@@ -35,7 +35,7 @@ jobs:
           username: ${{ secrets.DO_USERNAME }}
           key: ${{ secrets.DO_SSH_KEY }}
           source: "."
-          target: "/var/www/hrmis.go.ug"
+          target: "/var/www/hrmis.uncst.go.ug"
 
       - name: Run migrations, optimize, and restart Supervisor
         uses: appleboy/ssh-action@master
@@ -44,7 +44,7 @@ jobs:
           username: ${{ secrets.DO_USERNAME }}
           key: ${{ secrets.DO_SSH_KEY }}
           script: |
-            cd /var/www/hrmis.go.ug
+            cd /var/www/hrmis.uncst.go.ug
             php artisan migrate --force
             php artisan optimize:clear
             php artisan optimize
@@ -59,8 +59,8 @@ jobs:
           username: ${{ secrets.DO_USERNAME }}
           key: ${{ secrets.DO_SSH_KEY }}
           script: |
-            chgrp -R www-data /var/www/hrmis.go.ug/storage /var/www/hrmis.go.ug/bootstrap/cache
-            chmod -R ug+rwx /var/www/hrmis.go.ug/storage /var/www/hrmis.go.ug/bootstrap/cache
+            chgrp -R www-data /var/www/hrmis.uncst.go.ug/storage /var/www/hrmis.uncst.go.ug/bootstrap/cache
+            chmod -R ug+rwx /var/www/hrmis.uncst.go.ug/storage /var/www/hrmis.uncst.go.ug/bootstrap/cache
 
       # set right permissions for images directory in public, make sure its readable and writable
       - name: Set proper permissions for public directory
@@ -70,4 +70,4 @@ jobs:
           username: ${{ secrets.DO_USERNAME }}
           key: ${{ secrets.DO_SSH_KEY }}
           script: |
-            chgrp -R www-data /var/www/hrmis.go.ug/public
+            chgrp -R www-data /var/www/hrmis.uncst.go.ug/public
