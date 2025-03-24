@@ -53,8 +53,8 @@ jobs:
             chgrp -R ${{ secrets.DO_USERNAME }}:www-data /var/www/hrmis.uncst.go.ug/storage /var/www/hrmis.uncst.go.ug/bootstrap/cache
             chmod -R ug+rwx /var/www/hrmis.uncst.go.ug/storage /var/www/hrmis.uncst.go.ug/bootstrap/cache
             # set right permissions for images directory in public, make sure its readable and writable
-            chown -R ${{ secrets.DO_USERNAME }}:www-data /var/www/hrmis.uncst.go.ug/public/images
-            chmod -R ug+rwx /var/www/hrmis.uncst.go.ug/public/images
+            chown -R ${{ secrets.DO_USERNAME }}:www-data /var/www/hrmis.uncst.go.ug/public
+            chmod -R ug+rwx /var/www/hrmis.uncst.go.ug/public
 
       - name: Set proper permissions for images directory
         uses: appleboy/ssh-action@master
