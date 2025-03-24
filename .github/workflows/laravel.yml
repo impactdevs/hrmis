@@ -38,9 +38,10 @@ jobs:
             php artisan optimize:clear
             php artisan optimize
             php artisan storage:link
-            sudo supervisorctl reread
-            sudo supervisorctl update
-            sudo supervisorctl restart all
+            echo ${{ secrets.DO_PASSWORD }} | sudo -S supervisorctl reread
+            echo ${{ secrets.DO_PASSWORD }} | sudo -S supervisorctl update
+            echo ${{ secrets.DO_PASSWORD }} | sudo -S supervisorctl restart all
+
 
       - name: Set proper permissions for storage and cache
         uses: appleboy/ssh-action@master
