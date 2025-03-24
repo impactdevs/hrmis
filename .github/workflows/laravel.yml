@@ -1,10 +1,9 @@
-name: Deploy UNCST
+name: DEPLOYMENT OF UNCST HRMS TO PRODUCTION
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches:
+      - master
 
 jobs:
   deploy:
@@ -17,16 +16,6 @@ jobs:
       - name: Install dependencies
         run: |
           composer install --no-dev --prefer-dist --optimize-autoloader
-
-      - name: Prepare Target Directory Permissions
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.DO_HOST }}
-          username: ${{ secrets.DO_USERNAME }}
-          key: ${{ secrets.DO_SSH_KEY }}
-          script: |
-            sudo chown -R ${{ secrets.DO_USERNAME }}:www-data /var/www/hrmis.uncst.go.ug
-            sudo chmod -R g+rwX /var/www/hrmis.uncst.go.ug
 
       - name: Upload files to DigitalOcean
         uses: appleboy/scp-action@master
@@ -48,9 +37,11 @@ jobs:
             php artisan migrate --force
             php artisan optimize:clear
             php artisan optimize
-            supervisorctl reread
-            supervisorctl update
-            supervisorctl restart all
+            php artisan storage:link
+            sudo supervisorctl reread
+            sudo supervisorctl update
+            sudo supervisorctl restart all
+            php artisan sitemap:generate
 
       - name: Set proper permissions for storage and cache
         uses: appleboy/ssh-action@master
@@ -59,15 +50,16 @@ jobs:
           username: ${{ secrets.DO_USERNAME }}
           key: ${{ secrets.DO_SSH_KEY }}
           script: |
-            chgrp -R www-data /var/www/hrmis.uncst.go.ug/storage /var/www/hrmis.uncst.go.ug/bootstrap/cache
-            chmod -R ug+rwx /var/www/hrmis.uncst.go.ug/storage /var/www/hrmis.uncst.go.ug/bootstrap/cache
+            sudo chgrp -R www-data /var/www/hrmis.uncst.go.ug/storage /var/www/hrmis.uncst.go.ug/bootstrap/cache
+            sudo chmod -R ug+rwx /var/www/hrmis.uncst.go.ug/storage /var/www/hrmis.uncst.go.ug/bootstrap/cache
+            # set right permissions for images directory in public, make sure its readable and writable
 
-      # set right permissions for images directory in public, make sure its readable and writable
-      - name: Set proper permissions for public directory
+      - name: Set proper permissions for images directory
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.DO_HOST }}
           username: ${{ secrets.DO_USERNAME }}
           key: ${{ secrets.DO_SSH_KEY }}
           script: |
-            chgrp -R www-data /var/www/hrmis.uncst.go.ug/public
+            sudo chgrp -R www-data /var/www/hrmis.uncst.go.ug/public/storage
+            sudo chmod -R ug+rwx /var/www/hrmis.uncst.go.ug/public/storage
