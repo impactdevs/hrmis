@@ -20,7 +20,7 @@
                         <tr>
                             <td>{{ $holiday->id }}</td>
                             <td>{{ $holiday->holiday_name }}</td>
-                            <td>{{ $holiday->holiday_date }}</td>
+                            <td>{{ \Carbon\Carbon::parse($holiday->holiday_date)->format('F j, Y') }}</td>
                             <td>
                                 <a href="{{ route('public_holidays.edit', $holiday->id) }}"
                                     class="btn btn-primary">Edit</a>

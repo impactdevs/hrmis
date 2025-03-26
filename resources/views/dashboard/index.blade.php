@@ -598,10 +598,6 @@
                 });
 
                 echarts.init(document.querySelector("#trafficChart")).setOption({
-                    title: {
-                        text: 'Number of Employees per Department',
-                        left: 'center'
-                    },
                     tooltip: {
                         trigger: 'item'
                     },
