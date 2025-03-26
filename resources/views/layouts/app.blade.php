@@ -70,7 +70,8 @@
     <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.23.2/dist/bootstrap-table.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tableexport.jquery.plugin@1.29.0/tableExport.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.23.2/dist/extensions/export/bootstrap-table-export.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.23.2/dist/extensions/export/bootstrap-table-export.min.js">
+    </script>
     <!-- Vendor JS Files -->
 
     @if (session()->has('success'))
@@ -169,6 +170,11 @@
                     const newCount = badgeCount + 1;
                     currentHeader.text(newCount + ' new notifications');
                 });
+
+            //toggling sidebar
+            document.getElementById('sidebarToggle').addEventListener('click', function() {
+                document.querySelector('.mobile-menu').classList.toggle('active');
+            });
         });
     </script>
     @stack('scripts')

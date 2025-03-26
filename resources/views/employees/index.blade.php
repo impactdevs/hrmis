@@ -1,16 +1,5 @@
 <x-app-layout>
     <div class="mt-3">
-        <div class="d-flex flex-row flex-1 justify-content-between">
-            <h5 class="ms-3">Employee Management</h5>
-            @can('add an employee')
-                <div>
-                    <a href="{{ route('employees.create') }}" class="btn border-t-neutral-50 btn-primary">
-                        <i class="bi bi-database-add me-2"></i>Add Employee
-                    </a>
-                </div>
-            @endcan
-        </div>
-
         <div class="mt-3">
             <form method="get" action="{{ route('employees.index') }}" class="mb-3">
                 <div class="row">
@@ -59,6 +48,14 @@
                     <div class="col">
                         <a href="{{ route('employees.index') }}" class="btn btn-secondary">Reset Filters</a>
                     </div>
+
+                    @can('add an employee')
+                        <div class="col">
+                            <a href="{{ route('employees.create') }}" class="btn border-t-neutral-50 btn-primary">
+                                <i class="bi bi-database-add me-2"></i>Add Employee
+                            </a>
+                        </div>
+                    @endcan
                 </div>
             </form>
         </div>
@@ -98,9 +95,9 @@
                     @foreach ($employees as $index => $employee)
                         <tr class="align-middle">
                             <th scope="row">
-                                <a href="#"
+                                <a href="{{ route('employees.show', $employee->employee_id) }}"
                                     class="btn {{ $employee->contract_expiry_date && $employee->contract_expiry_date->isPast() ? 'btn-outline-danger' : 'btn-outline-primary' }}">
-                                    {{ $employee->staff_id }}
+                                    {{ $employee->staff_id??'STAFF0000' }}
                                 </a>
                             </th>
                             <td>{{ $employee->first_name }}</td>
@@ -153,15 +150,6 @@
                     @endforeach
                 </tbody>
             </table>
-
-            {{-- <div class="pagination-wrapper">
-                {!! $employees->appends([
-                        'search' => request()->get('search'),
-                        'position' => request()->get('position'),
-                        'department' => request()->get('department'),
-                        'contract_expiry' => request()->get('contract_expiry'),
-                    ])->render() !!}
-            </div> --}}
         </div>
     </div>
 

@@ -38,9 +38,12 @@ body {
 }
 
 table {
-  width: auto; /* Uses only the available width */
-  max-width: 100%; /* Prevents the table from exceeding the container */
-  table-layout: auto; /* Allows columns to adjust based on content */
+  width: auto;
+  /* Uses only the available width */
+  max-width: 100%;
+  /* Prevents the table from exceeding the container */
+  table-layout: auto;
+  /* Allows columns to adjust based on content */
 }
 
 @media (min-width: 768px) {
@@ -581,4 +584,30 @@ table {
   /* Limit to 2 lines */
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Custom CSS for mobile sidebar */
+@media (max-width: 767.98px) {
+  .mobile-menu {
+    position: fixed !important;
+    left: -100%;
+    top: 0;
+    transition: all 0.3s;
+    z-index: 1000;
+  }
+
+  .mobile-menu.active {
+    left: 0;
+  }
+
+  /* Optional: Add backdrop */
+  .sidebar-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 999;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
 }
