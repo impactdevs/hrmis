@@ -52,7 +52,7 @@
                     @can('add an employee')
                         <div class="col">
                             <a href="{{ route('employees.create') }}" class="btn border-t-neutral-50 btn-primary">
-                                <i class="bi bi-database-add me-2"></i>Add Employee
+                                <i class="bi bi-database-add me-2"></i>Add
                             </a>
                         </div>
                     @endcan
