@@ -79,23 +79,17 @@
 
         // On radio button click, check conditions again
         $('input[type="radio"]').on("click", function() {
-            console.log("clicking");
             let selectedRadioId = $(this).attr("id"); // The clicked radio button ID
-            console.log(selectedRadioId);
             let selectedValue = $(this).val(); // The selected value of the radio button
-            console.log(selectedValue);
             // Iterate through all fields with conditional visibility
             $(".question[data-radio-field]").each(function() {
                 let controllingFieldId = $(this).data("radio-field"); // The field controlling visibility
-                console.log("controlling field:", controllingFieldId);
                 let triggerValue = $(this).data("trigger-value"); // The value that triggers visibility
-                console.log("trigger value:", triggerValue);
                 //remove _value from selectedRadioId like 3_1_value to 3
                 selectedRadioId = selectedRadioId.split("_")[0];
                 // Check if the clicked radio button controls this field
 
                 if (controllingFieldId == selectedRadioId) {
-                    console.log("found controlling field");
                     if (selectedValue.trim() === triggerValue.trim()) {
                         $(this).show();
 

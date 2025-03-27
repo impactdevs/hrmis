@@ -56,7 +56,7 @@
                     $title = auth()->user()->isAdminOrSecretary() ? 'Employees' : 'About Me';
                 }
 
-                if ( request()->routeIs('employees.show')) {
+                if (request()->routeIs('employees.show')) {
                     $title = auth()->user()->isAdminOrSecretary() ? 'Employees' : 'About Me';
                 }
 
