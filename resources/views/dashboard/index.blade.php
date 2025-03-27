@@ -7,7 +7,7 @@
                 <div class="col-lg-8">
                     <div class="row">
 
-                        <!-- Sales Card -->
+                        <!-- Employees Card -->
                         <div class="col-xxl-3 col-md-6">
                             <div class="card info-card sales-card">
 
@@ -26,7 +26,7 @@
                                 </div>
 
                             </div>
-                        </div><!-- End Sales Card -->
+                        </div><!-- End Employees Card -->
 
                         @if (count($todayBirthdays))
                         <div class="toast-container position-fixed bottom-0 start-50 translate-middle-x p-3 text-bg-primary"
@@ -52,7 +52,7 @@
                         </div>
                     @endif
 
-                        <!-- Revenue Card -->
+                        <!-- Attendees Card -->
                         <div class="col-xxl-3 col-md-6">
                             <div class="card info-card revenue-card">
 
@@ -71,9 +71,9 @@
                                 </div>
 
                             </div>
-                        </div><!-- End Revenue Card -->
+                        </div><!-- End Attendees Card -->
 
-                        <!-- Customers Card -->
+                        <!-- Leaves Card -->
                         <div class="col-xxl-3 col-xl-12">
 
                             <div class="card info-card customers-card">
@@ -94,9 +94,9 @@
                                 </div>
                             </div>
 
-                        </div><!-- End Customers Card -->
+                        </div><!-- End Leaves Card -->
 
-                        <!-- Customers Card -->
+                        <!-- Birthdays Card -->
                         <div class="col-xxl-3 col-xl-12">
 
                             <div class="card info-card customers-card">
@@ -117,7 +117,7 @@
                                 </div>
                             </div>
 
-                        </div><!-- End Customers Card -->
+                        </div><!-- End Birthdays Card -->
 
                         <!-- Reports -->
                         <div class="col-12">
@@ -134,7 +134,7 @@
                             </div>
                         </div><!-- End Reports -->
 
-                        <!-- RApplications -->
+                        <!-- Applications -->
                         {{-- <div class="col-12">
                             <div class="card recent-sales overflow-auto">
                                 <div class="card-body">
