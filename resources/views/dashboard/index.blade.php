@@ -238,7 +238,7 @@
 
                 <!-- Right side columns -->
                 <div class="col-lg-4">
-                    <!-- Website Traffic -->
+                    <!-- Employee Distribution -->
                     <div class="card">
                         <div class="filter">
                             <a class="icon" href="#" data-bs-toggle="dropdown"><i
