@@ -1,5 +1,5 @@
 <?php
-namespace app\View\Components\Forms;
+namespace App\View\Components\Forms;
 
 use Closure;
 use Illuminate\Contracts\View\View;
