@@ -1,7 +1,5 @@
 <x-app-layout>
     <div class="container">
-        <h1 class="mb-4 text-center text-primary">Employee Details</h1>
-
         <div class="card mb-4 shadow-lg">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <div class="flex-grow-1">

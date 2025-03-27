@@ -52,7 +52,11 @@
                     $title = 'Events';
                 }
 
-                if (request()->routeIs('employees.index') || request()->routeIs('employees.show')) {
+                if (request()->routeIs('employees.index')) {
+                    $title = auth()->user()->isAdminOrSecretary() ? 'Employees' : 'About Me';
+                }
+
+                if ( request()->routeIs('employees.show')) {
                     $title = auth()->user()->isAdminOrSecretary() ? 'Employees' : 'About Me';
                 }
 
@@ -122,7 +126,7 @@
 
             <li class="nav-item dropdown pe-3">
                 <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-                    <img src="/assets/img/profile-img.jpg" alt="Profile" class="rounded-circle">
+                    <img src="/assets/img/profile.jpg" alt="Profile" class="rounded-circle">
                     <span class="d-none d-md-block dropdown-toggle ps-2">{{ auth()->user()->name }}</span>
                 </a>
                 <!-- Profile Dropdown -->
