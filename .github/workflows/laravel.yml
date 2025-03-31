@@ -41,7 +41,6 @@ jobs:
             echo ${{ secrets.DO_PASSWORD }} | sudo -S supervisorctl update
             echo ${{ secrets.DO_PASSWORD }} | sudo -S supervisorctl restart all
 
-
       - name: Set proper permissions for storage and cache
         uses: appleboy/ssh-action@master
         with:
