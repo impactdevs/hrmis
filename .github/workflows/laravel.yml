@@ -33,6 +33,7 @@ jobs:
           key: ${{ secrets.DO_SSH_KEY }}
           script: |
             cd /var/www/hrmis.uncst.go.ug
+            npm install
             php artisan migrate --force
             php artisan optimize:clear
             php artisan optimize
