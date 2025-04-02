@@ -10,6 +10,7 @@ use App\Notifications\BirthdayReminder;
 use App\Notifications\BirthdayWish;
 use Illuminate\Console\Command;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class SendBirthdayReminders extends Command
 {
@@ -24,6 +25,8 @@ class SendBirthdayReminders extends Command
 
     public function handle()
     {
+        Log::info('Birthday reminder command started.');
+
         // Get today's month and day
         $todayMonthDay = Carbon::today()->format('m-d');
         // Get tomorrow's month and day for HR reminder
@@ -83,5 +86,7 @@ class SendBirthdayReminders extends Command
         }
 
         $this->info('Birthday reminders sent successfully!');
+        Log::info('Birthday reminders sent successfully!');
+
     }
 }
