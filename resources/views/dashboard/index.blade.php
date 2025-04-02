@@ -85,7 +85,7 @@
                                 <div class="toast-body">
                                     @foreach ($todayBirthdays as $todayBirthday)
                                         <p>{{ $todayBirthday->first_name }} {{ $todayBirthday->last_name }}
-                                            - {{ $todayBirthday->department->department_name }}</p>
+                                            - {{ optional($todayBirthday->department)->department_name }}</p>
                                     @endforeach
                                 </div>
                             </div>
