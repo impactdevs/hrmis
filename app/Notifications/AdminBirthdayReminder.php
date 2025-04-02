@@ -10,7 +10,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Messages\DatabaseMessage;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 
-class BirthdayReminder extends Notification implements ShouldQueue
+class AdminBirthdayReminder extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -47,9 +47,9 @@ class BirthdayReminder extends Notification implements ShouldQueue
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->subject("Birthday Reminder, {$this->employee->first_name}!")
-                    ->line("Today is the birthday of {$this->employee->first_name} {$this->employee->last_name}. Please wish them!")
-                    ->line("UNCST MANAGEMENT")
+                    ->subject("Birthday Reminder[COMING UP TOMMORROW], {$this->employee->first_name}!")
+                    ->line("Tomorrow will be the birthday({$this->employee->date_of_birth}) of {$this->employee->first_name} {$this->employee->last_name}. Please wish them!")
+                    ->action('View Profile', url("/employees/{$this->employee->employee_id}"))
                     ->line('Thank you for using our application!');
     }
 
