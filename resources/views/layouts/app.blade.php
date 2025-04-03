@@ -34,6 +34,11 @@
     <!-- DataTables CSS -->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-table@1.23.2/dist/bootstrap-table.min.css">
+    <script>
+        window.Laravel = {
+            user: @json(auth()->user() ? ['isAdminOrSecretary' => auth()->user()->isAdminOrSecretary()] : null)
+        };
+    </script>
     <!-- Custom styles for this template -->
     @vite(['resources/css/app.css', 'resources/css/fullcalendarcss.css', 'resources/js/app.js', 'resources/js/custom-js.js'])
 </head>

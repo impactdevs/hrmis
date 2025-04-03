@@ -4,3 +4,5 @@ import "./bootstrap";
 // import "toastify-js/src/toastify.css"
 
 // window.Toastify = Toastify;
+
+window.isAdminOrSecretary = window.Laravel?.user?.isAdminOrSecretary ?? false;

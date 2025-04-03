@@ -27,72 +27,6 @@
 
                             </div>
                         </div><!-- End Employees Card -->
-                        @if (count($todayBirthdays))
-                        @php
-                            $authUserBirthday = $todayBirthdays->firstWhere('employee_id', auth()->user()->employee->employee_id);
-                            $sharedBirthdays = $todayBirthdays->where('employee_id', '!=', auth()->user()->employee->employee_id);
-                        @endphp
-                    
-                        @if ($authUserBirthday)
-                            <!-- Toast for the authenticated user's birthday -->
-                            <div class="toast-container position-fixed bottom-0 start-50 translate-middle-x p-3 text-bg-success"
-                                role="alert" aria-live="assertive" aria-atomic="true">
-                                <div class="toast-header">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                        fill="currentColor" class="bi bi-cake2" viewBox="0 0 16 16">
-                                        <path d="..." />
-                                    </svg>
-                                    <strong class="me-auto">Happy Birthday, {{ auth()->user()->employee->first_name }}! 🎉</strong>
-                                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                                </div>
-                                <div class="toast-body">
-                                    Wishing you a fantastic day filled with joy and success! 🎂🎈
-                                </div>
-                            </div>
-                    
-                            @if ($sharedBirthdays->count())
-                                <!-- Toast for others sharing the birthday -->
-                                <div class="toast-container position-fixed bottom-0 end-0 translate-middle-x p-3 text-bg-info"
-                                    role="alert" aria-live="assertive" aria-atomic="true">
-                                    <div class="toast-header">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                            fill="currentColor" class="bi bi-cake2" viewBox="0 0 16 16">
-                                            <path d="..." />
-                                        </svg>
-                                        <strong class="me-auto">Others Sharing Your Birthday 🎂</strong>
-                                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                                    </div>
-                                    <div class="toast-body">
-                                        @foreach ($sharedBirthdays as $sharedBirthday)
-                                            <p>{{ $sharedBirthday->first_name }} {{ $sharedBirthday->last_name }}
-                                                - {{ $sharedBirthday->department->department_name }}</p>
-                                        @endforeach
-                                    </div>
-                                </div>
-                            @endif
-                        @else
-                            <!-- General Toast for birthdays -->
-                            <div class="toast-container position-fixed bottom-0 start-50 translate-middle-x p-3 text-bg-primary"
-                                role="alert" aria-live="assertive" aria-atomic="true">
-                                <div class="toast-header">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                        fill="currentColor" class="bi bi-cake2" viewBox="0 0 16 16">
-                                        <path d="..." />
-                                    </svg>
-                                    <strong class="me-auto">Today's Birthdays</strong>
-                                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                                </div>
-                                <div class="toast-body">
-                                    @foreach ($todayBirthdays as $todayBirthday)
-                                        <p>{{ $todayBirthday->first_name }} {{ $todayBirthday->last_name }}
-                                            - {{ optional($todayBirthday->department)->department_name }}</p>
-                                    @endforeach
-                                </div>
-                            </div>
-                        @endif
-                    @endif
-                    
-
                         <!-- Attendees Card -->
                         <div class="col-xxl-3 col-md-6">
                             <div class="card info-card revenue-card">
@@ -525,20 +459,25 @@
                             </div><!-- End Revenue Card -->
                         @endif
 
+                        <!-- Allocated Leave -->
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body pb-0">
+                                    <h5 class="card-title">Allocated Leave Analysis <span>| This Month</span></h5>
+
+                                    <div id="budgetChart" style="min-height: 400px;" class="echart"></div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Allocated Leave -->
+
+
                     </div>
                 </div>
 
                 <!-- Right side columns -->
                 <div class="col-lg-4">
-                    <!-- Budget Report -->
-                    <div class="card">
-                        <div class="card-body pb-0">
-                            <h5 class="card-title">Allocated Leave Analysis <span>| This Month</span></h5>
-
-                            <div id="budgetChart" style="min-height: 400px;" class="echart"></div>
-
-                        </div>
-                    </div><!-- End Budget Report -->
                     <!-- Events -->
                     <div class="card">
                         <div class="card-body pb-0">
@@ -602,6 +541,75 @@
 
             </div>
         @endif
+        
+        @if (count($todayBirthdays))
+            @php
+                $authUserBirthday = $todayBirthdays->firstWhere('employee_id', auth()->user()->employee->employee_id);
+                $sharedBirthdays = $todayBirthdays->where('employee_id', '!=', auth()->user()->employee->employee_id);
+            @endphp
+
+            @if ($authUserBirthday)
+                <!-- Toast for the authenticated user's birthday -->
+                <div class="toast-container position-fixed bottom-0 start-50 translate-middle-x p-3 text-bg-success"
+                    role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-header">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-cake2" viewBox="0 0 16 16">
+                            <path d="..." />
+                        </svg>
+                        <strong class="me-auto">Happy Birthday,
+                            {{ auth()->user()->employee->first_name }}! 🎉</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body">
+                        Wishing you a fantastic day filled with joy and success! 🎂🎈
+                    </div>
+                </div>
+
+                @if ($sharedBirthdays->count())
+                    <!-- Toast for others sharing the birthday -->
+                    <div class="toast-container position-fixed bottom-0 end-0 translate-middle-x p-3 text-bg-info"
+                        role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="toast-header">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                fill="currentColor" class="bi bi-cake2" viewBox="0 0 16 16">
+                                <path d="..." />
+                            </svg>
+                            <strong class="me-auto">Others Sharing Your Birthday 🎂</strong>
+                            <button type="button" class="btn-close" data-bs-dismiss="toast"
+                                aria-label="Close"></button>
+                        </div>
+                        <div class="toast-body">
+                            @foreach ($sharedBirthdays as $sharedBirthday)
+                                <p>{{ $sharedBirthday->first_name }} {{ $sharedBirthday->last_name }}
+                                    - {{ $sharedBirthday->department->department_name }}</p>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+            @else
+                <!-- General Toast for birthdays -->
+                <div class="toast-container position-fixed bottom-0 start-50 translate-middle-x p-3 text-bg-primary"
+                    role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-header">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-cake2" viewBox="0 0 16 16">
+                            <path d="..." />
+                        </svg>
+                        <strong class="me-auto">Today's Birthdays</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body">
+                        @foreach ($todayBirthdays as $todayBirthday)
+                            <p>{{ $todayBirthday->first_name }} {{ $todayBirthday->last_name }}
+                                - {{ optional($todayBirthday->department)->department_name }}</p>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+        @endif
     </section>
 
     @push('scripts')
@@ -612,10 +620,7 @@
                 var leaveTypes = {!! $leaveTypesJson !!}; // Leave type names
                 var allocatedDays = {!! $chartDataJson !!}; // Allocated leave days
                 var employeeData = {!! $chartEmployeeDataJson !!};
-
-                console.log(employeeData)
-
-                console.log(leaveTypes, allocatedDays)
+                console.log(window.isAdminOrSecretary);
 
                 var budgetChart = echarts.init(document.querySelector("#budgetChart"));
                 budgetChart.setOption({
@@ -638,74 +643,80 @@
                     }]
                 });
 
-                echarts.init(document.querySelector("#trafficChart")).setOption({
-                    tooltip: {
-                        trigger: 'item'
-                    },
-                    // legend: {
-                    //     top: '5%',
-                    //     left: 'center'
-                    // },
-                    series: [{
-                        name: 'Employees by Department',
-                        type: 'pie',
-                        radius: ['40%', '70%'],
-                        avoidLabelOverlap: false,
-                        label: {
-                            show: false,
+                if (window.isAdminOrSecretary) {
+
+                    echarts.init(document.querySelector("#trafficChart")).setOption({
+                        tooltip: {
+                            trigger: 'item'
                         },
-                        data: employeeData
-                    }]
-                });
-                //attendance analysis
-                new ApexCharts(document.querySelector("#reportsChart"), {
-                    series: [{
-                        name: 'Today',
-                        data: @json($todayCounts),
-                    }, {
-                        name: 'Yesterday',
-                        data: @json($yesterdayCounts),
-                    }, {
-                        name: 'Late Arrivals',
-                        data: @json($lateCounts),
-                    }],
-                    chart: {
-                        height: 350,
-                        type: 'area',
-                        toolbar: {
-                            show: false
+                        // legend: {
+                        //     top: '5%',
+                        //     left: 'center'
+                        // },
+                        series: [{
+                            name: 'Employees by Department',
+                            type: 'pie',
+                            radius: ['40%', '70%'],
+                            avoidLabelOverlap: false,
+                            label: {
+                                show: false,
+                            },
+                            data: employeeData
+                        }]
+                    });
+                }
+                if (window.isAdminOrSecretary) {
+
+                    //attendance analysis
+                    new ApexCharts(document.querySelector("#reportsChart"), {
+                        series: [{
+                            name: 'Today',
+                            data: @json($todayCounts),
+                        }, {
+                            name: 'Yesterday',
+                            data: @json($yesterdayCounts),
+                        }, {
+                            name: 'Late Arrivals',
+                            data: @json($lateCounts),
+                        }],
+                        chart: {
+                            height: 350,
+                            type: 'area',
+                            toolbar: {
+                                show: false
+                            },
                         },
-                    },
-                    markers: {
-                        size: 4
-                    },
-                    colors: ['#4154f1', '#ff771d', '#ffbc00'], // Different colors for each series
-                    fill: {
-                        type: "gradient",
-                        gradient: {
-                            shadeIntensity: 1,
-                            opacityFrom: 0.3,
-                            opacityTo: 0.4,
-                            stops: [0, 90, 100]
+                        markers: {
+                            size: 4
+                        },
+                        colors: ['#4154f1', '#ff771d', '#ffbc00'], // Different colors for each series
+                        fill: {
+                            type: "gradient",
+                            gradient: {
+                                shadeIntensity: 1,
+                                opacityFrom: 0.3,
+                                opacityTo: 0.4,
+                                stops: [0, 90, 100]
+                            }
+                        },
+                        dataLabels: {
+                            enabled: false
+                        },
+                        stroke: {
+                            curve: 'smooth',
+                            width: 2
+                        },
+                        xaxis: {
+                            type: 'datetime',
+                            categories: @json($hours),
+                        },
+                        tooltip: {
+                            x: {
+                                format: 'dd/MM/yy HH:mm'
+                            },
                         }
-                    },
-                    dataLabels: {
-                        enabled: false
-                    },
-                    stroke: {
-                        curve: 'smooth',
-                        width: 2
-                    },
-                    xaxis: {
-                        type: 'datetime',
-                        categories: @json($hours),
-                    },
-                    tooltip: {
-                        x: {
-                            format: 'dd/MM/yy HH:mm'
-                        },
-                    }
-                }).render();
+                    }).render();
+                }
 
             });
             //real notifications

@@ -97,11 +97,11 @@
                                     <i class="bi bi-eye"></i>Tabular View</a>
                             </div>
                         @else
-                        <div class="d-flex align-items-center mb-1 ms-2">
-                            {{-- Tabular view --}}
-                            <p id="exceededDays" class="text-danger fw-bold"> </p>
+                            <div class="d-flex align-items-center mb-1 ms-2">
+                                {{-- Tabular view --}}
+                                <p id="exceededDays" class="text-danger fw-bold"> </p>
 
-                        </div>
+                            </div>
                         @endif
                     </div>
                 </div>

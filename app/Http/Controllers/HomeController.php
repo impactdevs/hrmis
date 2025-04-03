@@ -8,6 +8,7 @@ use App\Models\Attendance;
 use App\Models\Employee;
 use App\Models\Leave;
 use App\Models\LeaveType;
+use App\Models\Scopes\EmployeeScope;
 use App\Models\Training;
 use Carbon\Carbon;
 use App\Models\Event;
@@ -36,6 +37,8 @@ class HomeController extends Controller
 
         //ongoing appraisals
         $ongoingAppraisals = Appraisal::where('employee_id', optional(auth()->user()->employee)->employee_id)->count();
+        $isAdmin = auth()->user()->isAdminOrSecretary();
+
 
         //events and trainings
         $events = Event::where(function ($query) use ($today, $tomorrow) {
@@ -222,13 +225,13 @@ class HomeController extends Controller
         }
 
         //birthdays
-        $todayBirthdays = Employee::whereMonth('date_of_birth', Carbon::today()->month)
+        $todayBirthdays = Employee::withoutGlobalScope(EmployeeScope::class)->whereMonth('date_of_birth', Carbon::today()->month)
         ->whereDay('date_of_birth', Carbon::today()->day)
         ->get();
 
 
 
 
-        return view('dashboard.index', compact('number_of_employees', 'attendances', 'available_leave', 'hours', 'todayCounts', 'yesterdayCounts', 'lateCounts', 'chartDataJson', 'leaveTypesJson', 'chartEmployeeDataJson', 'events', 'trainings', 'entries', 'appraisals', 'leaveApprovalData', 'daysUntilExpiry', 'totalLeaves', 'totalDays', 'todayBirthdays'));
+        return view('dashboard.index', compact('number_of_employees', 'attendances', 'available_leave', 'hours', 'todayCounts', 'yesterdayCounts', 'lateCounts', 'chartDataJson', 'leaveTypesJson', 'chartEmployeeDataJson', 'events', 'trainings', 'entries', 'appraisals', 'leaveApprovalData', 'daysUntilExpiry', 'totalLeaves', 'totalDays', 'todayBirthdays', 'isAdmin'));
     }
 }

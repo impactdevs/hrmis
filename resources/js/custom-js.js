@@ -351,6 +351,7 @@ $(document).ready(function () {
   /**
    * Autoresize echart charts
    */
+  if (window.isAdminOrSecretary) {
   const mainContainer = select("#main");
   if (mainContainer) {
     setTimeout(() => {
@@ -361,4 +362,5 @@ $(document).ready(function () {
       }).observe(mainContainer);
     }, 200);
   }
+}
 });

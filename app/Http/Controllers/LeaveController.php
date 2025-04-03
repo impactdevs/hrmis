@@ -107,13 +107,12 @@ class LeaveController extends Controller
             //HEAD OF DEPARTMENT
             $user = auth()->user();
             $headOfDepartment = $user->employee->department->department_head;
-            $hod = User::where('id', $headOfDepartment)->first();
-
-            //add hod to users array
-            $users->push($hod);
-            $users->push($doneBy);
+            $hod = User::where('id', $headOfDepartment)->first();           
+             // Send notifications to those users
+            Notification::send($doneBy, new LeaveApplied($leaveCreated, 1));
             // Send notifications to those users
-            Notification::send($users, new LeaveApplied($leaveCreated));
+            Notification::send($users, new LeaveApplied($leaveCreated, 3));
+            Notification::send($hod, new LeaveApplied($leaveCreated, 2));
         }
 
         return redirect()->route('leaves.index')->with('success', 'Leave submitted successfully.');
