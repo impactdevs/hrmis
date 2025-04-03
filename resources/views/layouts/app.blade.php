@@ -78,6 +78,7 @@
     <!-- Add this right after jQuery -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.pjax/2.0.1/jquery.pjax.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.23.2/dist/extensions/export/bootstrap-table-export.min.js">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     </script>
     <!-- Vendor JS Files -->
 
@@ -122,6 +123,18 @@
     <script>
         $(document).ready(function() {
             let userId = {{ auth()->user()->id }};
+
+            // Select the active nav link (if any)
+            var activeLink = document.querySelector('.nav-link.bg-secondary');
+
+            if (activeLink) {
+                // Use Bootstrap's scroll behavior with a small JavaScript fix
+                activeLink.scrollIntoView({
+                    behavior: 'smooth', // Smooth scrolling
+                    block: 'center' // Align the active link at the center of the sidebar
+                });
+            }
+
 
             // Listen for notifications
             Echo.private('App.Models.User.' + userId)

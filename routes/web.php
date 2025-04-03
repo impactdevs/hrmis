@@ -5,6 +5,7 @@ use App\Http\Controllers\AppraisalController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\CompanyJobController;
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\Form\EntryController;
@@ -129,6 +130,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/notifications/count', [NotificationController::class, 'getUnreadCount'])->name('notifications.count');
 
     Route::get('/get-count', [NotificationController::class, 'getCount']);
+
+    Route::get('/uncst-matrix', [DocumentController::class, 'uncst_matrix'])->name('uncst-matrix');
 });
 
 Route::get('/import', [EmployeeController::class, 'import_employees']);

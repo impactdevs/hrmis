@@ -58,15 +58,7 @@
             </li> --}}
 
             {{-- <li class="nav-item">
-                <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('trainings.index') ||
-                        request()->routeIs('trainings.show') ||
-                        request()->routeIs('trainings.edit') ||
-                        request()->routeIs('trainings.create') ||
-                        request()->routeIs('out-of-station-trainings.index') ||
-                        request()->routeIs('out-of-station-trainings.create') ||
-                        request()->routeIs('out-of-station-trainings.edit') ||
-                        request()->routeIs('out-of-station-trainings.show') ||
-                        request()->routeIs('apply')) bg-secondary @endif"
+                <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('trainings.index') || request()->routeIs('trainings.show') || request()->routeIs('trainings.edit') || request()->routeIs('trainings.create') || request()->routeIs('out-of-station-trainings.index') || request()->routeIs('out-of-station-trainings.create') || request()->routeIs('out-of-station-trainings.edit') || request()->routeIs('out-of-station-trainings.show') || request()->routeIs('apply')) bg-secondary @endif"
                     href="{{ route('trainings.index') }}">
                     <i class="bi bi-eyedropper"></i>
                     Trainings/Travels
@@ -103,10 +95,7 @@
 
 
                 {{-- <li class="nav-item">
-                    <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('recruitments.index') ||
-                            request()->routeIs('recruitments.show') ||
-                            request()->routeIs('recruitments.edit') ||
-                            request()->routeIs('recruitments.create')) bg-secondary @endif"
+                    <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('recruitments.index') || request()->routeIs('recruitments.show') || request()->routeIs('recruitments.edit') || request()->routeIs('recruitments.create')) bg-secondary @endif"
                         href="{{ route('recruitments.index') }}">
                         <i class="bi bi-bank2"></i>
                         Staff Recruitment
@@ -145,5 +134,23 @@
                 @endforeach
             </ul>
         @endif
+
+        <h6
+            class="text-uppercase px-3 text-body-secondary text-light d-flex justify-content-between align-items-center my-3">
+            <span class="text-light">DOCUMENTATION</span>
+            <i class="bi bi-gear text-light"></i>
+        </h6>
+
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link text-white d-flex align-items-center gap-2 fs-6 fw-bold @if (request()->routeIs('uncst-matrix')) bg-secondary @endif"
+                    href="{{ route('uncst-matrix') }}">
+                    <i class="bi bi-book"></i>
+                    USER REQUIREMENTS MATRIX
+                </a>
+            </li>
+        </ul>
+
+        </h6>
     </div>
 </div>
