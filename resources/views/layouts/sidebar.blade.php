@@ -5,6 +5,11 @@
             class="object-fit-contain border rounded img-fluid" style="max-width: 100%; height: auto;">
     </div>
     <div class="d-md-flex flex-column p-0 pt-lg-3">
+        <h6
+            class="text-uppercase px-3 text-body-secondary text-light d-flex justify-content-between align-items-center my-3">
+            <span class="text-light">GENERAL</span>
+            <i class="bi bi-bar-chart text-light"></i>
+        </h6>
         <ul class="nav flex-column">
             <li class="nav-item">
                 <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('dashboard')) bg-secondary @endif"
@@ -138,15 +143,22 @@
         <h6
             class="text-uppercase px-3 text-body-secondary text-light d-flex justify-content-between align-items-center my-3">
             <span class="text-light">DOCUMENTATION</span>
-            <i class="bi bi-gear text-light"></i>
+            <i class="bi bi-gear bi-book"></i>
         </h6>
 
         <ul class="nav flex-column">
             <li class="nav-item">
+                <a class="nav-link text-white d-flex align-items-center gap-2 fs-6 fw-bold @if (request()->routeIs('docs')) bg-secondary @endif"
+                    href="/docs">
+                    <i class="bi bi-book"></i>
+                    User Manual
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link text-white d-flex align-items-center gap-2 fs-6 fw-bold @if (request()->routeIs('uncst-matrix')) bg-secondary @endif"
                     href="{{ route('uncst-matrix') }}">
                     <i class="bi bi-book"></i>
-                    USER REQUIREMENTS MATRIX
+                    Requirements Matrix
                 </a>
             </li>
         </ul>

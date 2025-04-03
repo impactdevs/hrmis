@@ -1,4 +1,15 @@
 <?php return array (
+  'binarytorch/larecipe' => 
+  array (
+    'aliases' => 
+    array (
+      'LaRecipe' => 'BinaryTorch\\LaRecipe\\LaRecipe',
+    ),
+    'providers' => 
+    array (
+      0 => 'BinaryTorch\\LaRecipe\\LaRecipeServiceProvider',
+    ),
+  ),
   'hotwired-laravel/turbo-laravel' => 
   array (
     'providers' => 
