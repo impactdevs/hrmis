@@ -229,9 +229,6 @@ class HomeController extends Controller
         ->whereDay('date_of_birth', Carbon::today()->day)
         ->get();
 
-
-
-
         return view('dashboard.index', compact('number_of_employees', 'attendances', 'available_leave', 'hours', 'todayCounts', 'yesterdayCounts', 'lateCounts', 'chartDataJson', 'leaveTypesJson', 'chartEmployeeDataJson', 'events', 'trainings', 'entries', 'appraisals', 'leaveApprovalData', 'daysUntilExpiry', 'totalLeaves', 'totalDays', 'todayBirthdays', 'isAdmin'));
     }
 }
