@@ -3,8 +3,5 @@
     - [Authentication](/{{route}}/{{version}}/authentication)
     - [System Configurations](/{{route}}/{{version}}/setting)
     - [Employee Management](/{{route}}/{{version}}/employee)
-    - [Expense Management](/{{route}}/{{version}}/expense)
-    - [Payroll Management](/{{route}}/{{version}}/payroll)
     - [Leave Roster Scheduling](/{{route}}/{{version}}/leave-roster)
     - [Leave Management](/{{route}}/{{version}}/leave)
-    - [Pricing](/{{route}}/{{version}}/pricing)
