@@ -25,7 +25,7 @@ The following are the different roles that UNCST HRMIS has been built with:
 
 ---
 
-To login to the system, [UNCST HRMIS](https://UNCST HRMIS.impact-outsourcing.com/login) comes with default HR credentials on the login page. Just tap the login button and you will have access to the software.
+To login to the system, [UNCST HRMIS](http://hrm.uncst.go.ug//login) comes with default HR credentials on the login page. Just tap the login button and you will have access to the software.
 
 ---
 
