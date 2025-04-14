@@ -3,7 +3,7 @@ name: DEPLOYMENT OF QUOTIENT HRMSTO DIGITAL OCEAN
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   deploy:
