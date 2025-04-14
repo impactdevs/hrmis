@@ -36,7 +36,8 @@ use App\Mail\Transport\InfobipTransport;class AppServiceProvider extends Service
             return new InfobipTransport(
                 $config['base_url'],
                 $config['api_key'],
-                $config['email_from']
+                $config['email_from'],
+                $config['name'],
             );
         });
     }

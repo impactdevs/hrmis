@@ -15,11 +15,14 @@ class InfobipTransport extends AbstractTransport
     protected $apiKey;
     protected $emailFrom;
 
-    public function __construct(string $baseUrl, string $apiKey, string $emailFrom)
+    protected $nameFrom;
+
+    public function __construct(string $baseUrl, string $apiKey, string $emailFrom, string $nameFrom)
     {
         $this->baseUrl = $baseUrl;
         $this->apiKey = $apiKey;
         $this->emailFrom = $emailFrom;
+        $this->nameFrom = $nameFrom;
 
         parent::__construct();
     }
@@ -31,6 +34,7 @@ class InfobipTransport extends AbstractTransport
     
         $multipart = [
             ['name' => 'from', 'contents' => $this->emailFrom],
+            ['name' => 'name', 'contents' => $this->nameFrom],
             ['name' => 'to', 'contents' => implode(',', array_map(fn($a) => $a->getAddress(), $email->getTo()))],
             ['name' => 'subject', 'contents' => $email->getSubject()],
         ];

@@ -22,6 +22,7 @@ return [
         'base_url' => env('INFOBIP_BASE_URL'),
         'api_key' => env('INFOBIP_API_KEY'),
         'email_from' => env('INFOBIP_EMAIL_FROM'),
+        'name' => env('INFOBIP_NAME_FROM')
     ],
 
     'ses' => [
