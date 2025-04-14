@@ -33,8 +33,7 @@ class InfobipTransport extends AbstractTransport
         $email = MessageConverter::toEmail($message->getOriginalMessage());
     
         $multipart = [
-            ['name' => 'from', 'contents' => $this->emailFrom],
-            ['name' => 'name', 'contents' => $this->nameFrom],
+            ['name' => 'from', 'contents' => $this->nameFrom.''.$this->emailFrom],
             ['name' => 'to', 'contents' => implode(',', array_map(fn($a) => $a->getAddress(), $email->getTo()))],
             ['name' => 'subject', 'contents' => $email->getSubject()],
         ];
