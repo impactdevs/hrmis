@@ -1,9 +1,10 @@
-name: DEPLOYMENT OF UNCST HRMS TO PRODUCTION
+name: DEPLOYMENT OF QUOTIENT HRMSTO DIGITAL OCEAN
 
 on:
   push:
     branches:
-      - main
+      - master
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -23,7 +24,7 @@ jobs:
           username: ${{ secrets.DO_USERNAME }}
           key: ${{ secrets.DO_SSH_KEY }}
           source: "."
-          target: "/var/www/hrmis.uncst.go.ug"
+          target: "/var/www/uncst.impact-outsourcing.com"
 
       - name: Run migrations, optimize, and restart Supervisor
         uses: appleboy/ssh-action@master
@@ -32,15 +33,15 @@ jobs:
           username: ${{ secrets.DO_USERNAME }}
           key: ${{ secrets.DO_SSH_KEY }}
           script: |
-            cd /var/www/hrmis.uncst.go.ug
-            npm run build
+            cd /var/www/uncst.impact-outsourcing.com
             php artisan migrate --force
             php artisan optimize:clear
             php artisan optimize
             php artisan storage:link
-            echo ${{ secrets.DO_PASSWORD }} | sudo -S supervisorctl reread
-            echo ${{ secrets.DO_PASSWORD }} | sudo -S supervisorctl update
-            echo ${{ secrets.DO_PASSWORD }} | sudo -S supervisorctl restart all
+            sudo supervisorctl reread
+            sudo supervisorctl update
+            sudo supervisorctl restart all
+            php artisan sitemap:generate
 
       - name: Set proper permissions for storage and cache
         uses: appleboy/ssh-action@master
@@ -49,11 +50,9 @@ jobs:
           username: ${{ secrets.DO_USERNAME }}
           key: ${{ secrets.DO_SSH_KEY }}
           script: |
-            chgrp -R ${{ secrets.DO_USERNAME }}:www-data /var/www/hrmis.uncst.go.ug/storage /var/www/hrmis.uncst.go.ug/bootstrap/cache
-            chmod -R ug+rwx /var/www/hrmis.uncst.go.ug/storage /var/www/hrmis.uncst.go.ug/bootstrap/cache
+            sudo chgrp -R www-data /var/www/uncst.impact-outsourcing.com/storage /var/www/uncst.impact-outsourcing.com/bootstrap/cache
+            sudo chmod -R ug+rwx /var/www/uncst.impact-outsourcing.com/storage /var/www/uncst.impact-outsourcing.com/bootstrap/cache
             # set right permissions for images directory in public, make sure its readable and writable
-            chown -R ${{ secrets.DO_USERNAME }}:www-data /var/www/hrmis.uncst.go.ug/public
-            chmod -R ug+rwx /var/www/hrmis.uncst.go.ug/public
 
       - name: Set proper permissions for images directory
         uses: appleboy/ssh-action@master
@@ -62,5 +61,5 @@ jobs:
           username: ${{ secrets.DO_USERNAME }}
           key: ${{ secrets.DO_SSH_KEY }}
           script: |
-            chgrp -R ${{ secrets.DO_USERNAME }}:www-data /var/www/hrmis.uncst.go.ug/public
-            chmod -R ug+rwx /var/www/hrmis.uncst.go.ug/public
+            sudo chgrp -R www-data /var/www/uncst.impact-outsourcing.com/public
+            sudo chmod -R ug+rwx /var/www/uncst.impact-outsourcing.com/public
