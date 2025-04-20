@@ -88,7 +88,7 @@
                         <th scope="col" data-field="date_of_entry">Date of Entry</th>
                         <th scope="col" data-field="contract_expiry">Contract Expiry</th>
                         <th class="col" data-field="retirement_years">Retirement Yrs</th>
-                        <th scope="col" data-field="actions">Actions</th>
+                        <th scope="col" data-field="actions" data-force-hide="true">Actions</th>
                     </tr>
                 </thead>
                 <tbody>

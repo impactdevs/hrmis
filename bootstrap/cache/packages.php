@@ -12,14 +12,14 @@
   ),
   'hotwired-laravel/turbo-laravel' => 
   array (
-    'providers' => 
-    array (
-      0 => '\\HotwiredLaravel\\TurboLaravel\\TurboServiceProvider',
-    ),
     'aliases' => 
     array (
       'Turbo' => '\\HotwiredLaravel\\TurboLaravel\\Facades\\Turbo',
       'TurboStream' => '\\HotwiredLaravel\\TurboLaravel\\Facades\\TurboStream',
+    ),
+    'providers' => 
+    array (
+      0 => '\\HotwiredLaravel\\TurboLaravel\\TurboServiceProvider',
     ),
   ),
   'kreait/laravel-firebase' => 

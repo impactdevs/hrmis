@@ -597,12 +597,7 @@
                     window.location.href = "/apply-for-leave/" + currentEvent.id;
                 });
 
-                //addLeaveRoster
-                $('#addLeaveRoster').click(function() {
-                    // show applyModal
-                    $('#applyModal').modal('show');
 
-                });
 
                 $('#applyButton').click(function() {
                     //do date validation #

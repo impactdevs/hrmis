@@ -18,15 +18,20 @@ class LeaveRosterController extends Controller
      */
     public function index()
     {
-        $user_id = auth()->user()->id;
-        $leaveTypes = LeaveType::pluck('leave_type_name', 'leave_type_id')->toArray();
-        $existingValuesArray = [];
-        $users = User::pluck('name', 'id')->toArray();
+        if (!auth()->user()->hasRole('HR')) {
+            $user_id = auth()->user()->id;
+            $leaveTypes = LeaveType::pluck('leave_type_name', 'leave_type_id')->toArray();
+            $existingValuesArray = [];
+            $users = User::pluck('name', 'id')->toArray();
 
-        //departments
-        $departments = Department::pluck('department_name', 'department_id')->toArray();
+            //departments
+            $departments = Department::pluck('department_name', 'department_id')->toArray();
 
-        return view('leave-roster.index', compact('leaveTypes', 'user_id', 'existingValuesArray', 'users', 'departments'));
+            return view('leave-roster.index', compact('leaveTypes', 'user_id', 'existingValuesArray', 'users', 'departments'));
+        } else {
+            $users = User::all();
+            return view('leave-roster.tabular', compact('users'));
+        }
     }
 
     public function getLeaveRoster(Request $request)
@@ -94,9 +99,16 @@ class LeaveRosterController extends Controller
             'start_date' => 'required|date|before:end_date',
             'end_date' => 'required|date',
             'leave_title' => 'required|string',
+            'user_id'=> 'nullable|exists:users,id'
         ]);
 
-        $employee_id = auth()->user()->employee->employee_id;
+        if (!auth()->user()->hasRole('HR')) {
+            $user = auth()->user();
+        } else {
+            $user = User::find($request->user_id);
+        }
+
+        $employee_id = $user->employee->employee_id;
         $leaveRosterAdded = LeaveRoster::create([
             'employee_id' => $employee_id,
             'start_date' => $request->input('start_date'),
@@ -107,8 +119,8 @@ class LeaveRosterController extends Controller
         $leaveRosterAdded->load('employee');
 
         if ($leaveRosterAdded) {
-            $entitledDays = auth()->user()->employee->entitled_leave_days ?? 0;
-            $scheduledDays = auth()->user()->employee->overallRosterDays();
+            $entitledDays = $user->employee->entitled_leave_days ?? 0;
+            $scheduledDays = $user->employee->overallRosterDays();
             RosterUpdate::dispatch($employee_id, $entitledDays, $scheduledDays);
             return response()->json(['success' => true, 'message' => 'Leave Roster added successfully', 'data' => $leaveRosterAdded]);
         }
