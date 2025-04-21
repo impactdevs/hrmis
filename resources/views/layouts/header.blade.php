@@ -126,8 +126,13 @@
 
             <li class="nav-item dropdown pe-3">
                 <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-                    <img src="/assets/img/profile.jpg" alt="Profile" class="rounded-circle">
-                    <span class="d-none d-md-block dropdown-toggle ps-2">{{ auth()->user()->name }}</span>
+                    @if (auth()->user()->employee->passport_photo)
+                        <img src="{{ asset('storage/' . auth()->user()->employee->passport_photo) }}" alt="Passport Photo"
+                            class="img-fluid rounded-circle" width="70%">
+                        <span class="d-none d-md-block dropdown-toggle ps-2">{{ auth()->user()->name }}</span>
+                    @else
+                        <img src="/assets/img/profile.jpg" alt="Profile" class="rounded-circle">
+                    @endif
                 </a>
                 <!-- Profile Dropdown -->
                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">

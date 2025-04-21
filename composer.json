@@ -6,6 +6,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "barryvdh/laravel-dompdf": "^3.1",
         "binarytorch/larecipe": "^2.8",
         "hotwired-laravel/turbo-laravel": "2.0.0",
         "laravel-notification-channels/fcm": "^4.3",

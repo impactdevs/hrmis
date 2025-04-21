@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Log;
+use Barryvdh\DomPDF\Facade\Pdf;
+
 class EmployeeController extends Controller
 {
     /**
@@ -129,7 +131,6 @@ class EmployeeController extends Controller
 
                         // Update the proof value to the path
                         $validatedData['qualifications_details'][$key]['proof'] = $filePath;
-
                     }
                 }
             }
@@ -145,7 +146,6 @@ class EmployeeController extends Controller
 
                         // Update the proof value to the path
                         $validatedData['contract_documents'][$key]['proof'] = $filePath;
-
                     }
                 }
             }
@@ -294,7 +294,6 @@ class EmployeeController extends Controller
             // Redirect back with an error message
             return redirect()->back()->with('error', 'Problem Updating the Employee');
         }
-
     }
 
     // In EmployeeController.php
@@ -372,7 +371,16 @@ class EmployeeController extends Controller
             } catch (Exception $e) {
                 return response()->json(['error' => 'Failed to process CSV. Please ensure the file format is correct.', 'exception' => $e->getMessage()], 400);
             }
-
         }
+    }
+
+    public function generatePDF(Employee $employee)
+    {
+        $data = ['employee' => $employee];
+        $pdf = PDF::loadView('employees.pdf', $data);
+        return $pdf->stream('employee-profile.pdf');
+
+        // Alternatively to force download:
+        // return $pdf->download('employee-profile.pdf');
     }
 }

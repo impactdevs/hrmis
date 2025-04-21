@@ -9,7 +9,12 @@
                             retire)</span>
                     </h2>
                 </div>
-                <div class="text-center">
+                <div class="d-flex align-items-center gap-">
+                    <!-- Add PDF Button Here -->
+                    <a href="{{ route('employees.generate-pdf', $employee->employee_id) }}" target="_blank"
+                        class="btn btn-danger btn-sm" title="Generate PDF">
+                        <i class="fas fa-file-pdf"></i> Export PDF
+                    </a>
                     @if ($employee->passport_photo)
                         <img src="{{ asset('storage/' . $employee->passport_photo) }}" alt="Passport Photo"
                             class="img-fluid rounded-circle" width="100">
@@ -130,36 +135,36 @@
                 <!-- Qualifications Section -->
                 <section class="mb-4 border border-1 border-secondary p-3 rounded">
                     <h5 class="mt-4 mb-3 text-dark">Qualifications</h5>
-                    @if(!is_null($employee->qualifications_details))
-                    @foreach ($employee->qualifications_details as $item)
-                        @if (isset($item['proof']))
-                            <div class="row mb-3">
-                                <div class="col-md-4"><strong>Qualification:</strong></div>
-                                <div class="col-md-8">
-                                    <div>{{ $item['title'] }}</div>
-                                    @php
-                                        $qualificationFilePath = asset('storage/' . $item['proof']);
-                                        $qualificationFileExtension = pathinfo($item['proof'], PATHINFO_EXTENSION);
-                                    @endphp
-                                    @if (in_array($qualificationFileExtension, ['jpg', 'jpeg', 'png', 'gif']))
-                                        <!-- Display Image for Qualification -->
-                                        <img src="{{ $qualificationFilePath }}" alt="Qualification Proof"
-                                            class="img-fluid rounded mt-2" style="max-width: 120px;">
-                                    @elseif ($qualificationFileExtension === 'pdf')
-                                        <!-- Display PDF Link for Qualification -->
-                                        <a href="{{ $qualificationFilePath }}" target="_blank"
-                                            class="d-flex align-items-center text-decoration-none">
-                                            <img src="{{ asset('assets/img/pdf-icon.png') }}" alt="PDF icon"
-                                                class="pdf-icon me-2" width="24">
-                                            <span class="text-dark">View Qualification Proof</span>
-                                        </a>
-                                    @else
-                                        <p class="text-muted">Unsupported qualification file type.</p>
-                                    @endif
+                    @if (!is_null($employee->qualifications_details))
+                        @foreach ($employee->qualifications_details as $item)
+                            @if (isset($item['proof']))
+                                <div class="row mb-3">
+                                    <div class="col-md-4"><strong>Qualification:</strong></div>
+                                    <div class="col-md-8">
+                                        <div>{{ $item['title'] }}</div>
+                                        @php
+                                            $qualificationFilePath = asset('storage/' . $item['proof']);
+                                            $qualificationFileExtension = pathinfo($item['proof'], PATHINFO_EXTENSION);
+                                        @endphp
+                                        @if (in_array($qualificationFileExtension, ['jpg', 'jpeg', 'png', 'gif']))
+                                            <!-- Display Image for Qualification -->
+                                            <img src="{{ $qualificationFilePath }}" alt="Qualification Proof"
+                                                class="img-fluid rounded mt-2" style="max-width: 120px;">
+                                        @elseif ($qualificationFileExtension === 'pdf')
+                                            <!-- Display PDF Link for Qualification -->
+                                            <a href="{{ $qualificationFilePath }}" target="_blank"
+                                                class="d-flex align-items-center text-decoration-none">
+                                                <img src="{{ asset('assets/img/pdf-icon.png') }}" alt="PDF icon"
+                                                    class="pdf-icon me-2" width="24">
+                                                <span class="text-dark">View Qualification Proof</span>
+                                            </a>
+                                        @else
+                                            <p class="text-muted">Unsupported qualification file type.</p>
+                                        @endif
+                                    </div>
                                 </div>
-                            </div>
-                        @endif
-                    @endforeach
+                            @endif
+                        @endforeach
                     @else
                         <p>No qualifications</p>
                     @endif

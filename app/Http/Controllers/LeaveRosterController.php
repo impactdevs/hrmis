@@ -7,6 +7,7 @@ use App\Models\Department;
 use App\Models\Employee;
 use App\Models\LeaveRoster;
 use App\Models\LeaveType;
+use App\Models\PublicHoliday;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -23,11 +24,12 @@ class LeaveRosterController extends Controller
             $leaveTypes = LeaveType::pluck('leave_type_name', 'leave_type_id')->toArray();
             $existingValuesArray = [];
             $users = User::pluck('name', 'id')->toArray();
+            $public_holidays = PublicHoliday::pluck('holiday_date')->toArray();
 
             //departments
             $departments = Department::pluck('department_name', 'department_id')->toArray();
 
-            return view('leave-roster.index', compact('leaveTypes', 'user_id', 'existingValuesArray', 'users', 'departments'));
+            return view('leave-roster.index', compact('leaveTypes', 'user_id', 'existingValuesArray', 'users', 'departments', 'public_holidays'));
         } else {
             $users = User::all();
             return view('leave-roster.tabular', compact('users'));

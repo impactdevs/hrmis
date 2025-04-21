@@ -231,6 +231,9 @@
                 var balanceToSchedule = totalLeaveDaysEntitled - totalLeaveDaysScheduled;
                 var percentageUsed = Math.min((totalLeaveDaysScheduled / totalLeaveDaysEntitled) * 100, 100);
                 var canSelect = balanceToSchedule > 0;
+                var public_holidays = @json($public_holidays);
+                console.log(public_holidays);
+
                 // Update the progress bar
                 $('#leaveProgressBar').css('width', percentageUsed + '%')
                     .attr('aria-valuenow', percentageUsed)
@@ -238,15 +241,14 @@
                 // Update label with the number of scheduled days
                 $('#scheduledDaysText').text(totalLeaveDaysScheduled + ' days scheduled');
                 // if canSelect is false, show the exceeded days
-                if (!canSelect) {
+                if (totalLeaveDaysEntitled>totalLeaveDaysScheduled) {
                     $('#exceededDays').text('Annual leave days exceeded');
                 }
 
                 Echo.private(`roster.${employeeId}`)
                     .listen('RosterUpdate', (e) => {
-                        var totalLeaveDaysEntitled = e.total_leave_days_entitled;
-                        var totalLeaveDaysScheduled = e.total_leave_days_scheduled;
-                        var balanceToSchedule = Number(totalLeaveDaysEntitled) - Number(totalLeaveDaysScheduled);
+                        totalLeaveDaysScheduled = e.total_leave_days_scheduled;
+                        balanceToSchedule = Number(totalLeaveDaysEntitled) - Number(totalLeaveDaysScheduled);
 
                         // Calculate the percentage of leave days scheduled
                         var percentageUsed = Math.min((totalLeaveDaysScheduled / totalLeaveDaysEntitled) * 100,
@@ -261,7 +263,7 @@
                         canSelect = balanceToSchedule > 0;
 
                         //if canSelect is false, show the exceeded days
-                        if (!canSelect) {
+                        if (totalLeaveDaysEntitled>totalLeaveDaysScheduled) {
                             $('#exceededDays').text('Annual Leave Days Exceeded');
                         }
 
@@ -270,6 +272,40 @@
                             .attr('aria-valuenow', percentageUsed)
                             .text(Math.round(percentageUsed) + '%');
                     });
+
+                //calculate scheduled Leave days before saving a schedule to make sure the user does not exceed the entitled leave days
+                function calculateScheduledLeaveDays(start_date, end_date, publicHolidays = [],
+                    totalLeaveDaysScheduled = 0) {
+                    const startDate = new Date(start_date);
+                    const endDate = new Date(end_date);
+                    console.log(startDate, endDate);
+                    let numberOfDaysBeingAdded = 0;
+                    console.log(totalLeaveDaysEntitled)
+
+                    for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+                        const dayOfWeek = d.getDay(); // 0 = Sunday, 6 = Saturday
+                        const formattedDate = d.toISOString().split('T')[0]; // 'YYYY-MM-DD'
+
+                        const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+                        const isPublicHoliday = publicHolidays.includes(formattedDate);
+
+                        if (!isWeekend && !isPublicHoliday) {
+                            numberOfDaysBeingAdded++;
+                        }
+                    }
+
+                    const willBeTotaldays = totalLeaveDaysScheduled + numberOfDaysBeingAdded;
+
+                    console.log(`Days being added: ${numberOfDaysBeingAdded}`);
+                    console.log(`Total leave days after scheduling: ${willBeTotaldays}`);
+
+                    if (willBeTotaldays > totalLeaveDaysEntitled) {
+                        return true;
+                    }
+
+                    return false;
+                }
+
 
                 var calendarEl = $('#calendar');
                 var currentEvent = null;
@@ -284,14 +320,6 @@
                     },
                     height: 'auto',
                     contentHeight: 'auto',
-                    // buttonText: {
-                    //     multiMonthYear: 'All Year',
-                    //     dayGridMonth: 'Month',
-                    //     timeGridWeek: 'Week',
-                    //     timeGridDay: 'Day',
-                    //     today: 'Today',
-                    //     listYear: listTitle
-                    // },
                     buttonText: {
                         dayGridMonth: 'Month',
                     },
@@ -472,6 +500,27 @@
                         const formattedStartDate = moment(startDate).format('YYYY-MM-DD');
                         const formattedEndDate = moment(endDate).format('YYYY-MM-DD');
 
+                        var exceededDays = calculateScheduledLeaveDays(formattedStartDate, formattedEndDate,
+                            public_holidays, totalLeaveDaysScheduled);
+                        if (exceededDays) {
+                            Toastify({
+                                text: "Exceeded the number of Days! try again",
+                                duration: 3000,
+                                destination: "",
+                                newWindow: true,
+                                close: true,
+                                gravity: "top", // `top` or `bottom`
+                                position: "right", // `left`, `center` or `right`
+                                stopOnFocus: true, // Prevents dismissing of toast on hover
+                                style: {
+                                    background: "linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(121,14,9,1) 35%, rgba(0,212,255,1) 100%);",
+                                },
+                                onClick: function() {} // Callback after click
+                            }).showToast();
+
+                            return;
+                        }
+
                         $.ajax({
                             url: "{{ route('leave-roster.store') }}",
                             method: 'POST',
@@ -604,6 +653,29 @@
                     // Prevent form submission until validation passes
                     const startDate = new Date($('#start_date').val());
                     const endDate = new Date($('#end_date').val());
+                    const formattedStartDate = moment(startDate).format('YYYY-MM-DD');
+                    const formattedEndDate = moment(endDate).format('YYYY-MM-DD');
+                    var exceededDays = calculateScheduledLeaveDays(formattedStartDate, formattedEndDate,
+                        public_holidays, totalLeaveDaysScheduled);
+                    if (exceededDays) {
+                        Toastify({
+                            text: "Exceeded the number of Days! \ntry again with less days\n check below the calendar to see your balance",
+                            duration: 3000,
+                            destination: "",
+                            newWindow: true,
+                            close: true,
+                            gravity: "top", // `top` or `bottom`
+                            position: "right", // `left`, `center` or `right`
+                            stopOnFocus: true, // Prevents dismissing of toast on hover
+                            style: {
+                                background: "linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(121,14,9,1) 35%, rgba(0,212,255,1) 100%);",
+                            },
+                            onClick: function() {} // Callback after click
+                        }).showToast();
+
+                        return;
+                    }
+
 
                     if (!startDate || !endDate) {
                         Toastify({

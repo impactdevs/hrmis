@@ -255,4 +255,5 @@ class Employee extends Model
         // Return the nested array of total leave days consumed per year and month
         return $daysConsumedPerYearMonth;
     }
+
 }

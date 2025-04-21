@@ -37,7 +37,9 @@ Route::get('/', function () {
 
 Route::get('/dashboard', [HomeController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 Route::get('/upload-employee', [UploadEmployees::class, 'process_csv_for_arrears']);
-
+Route::get('/employees/{employee}/generate-pdf', [EmployeeController::class, 'generatePDF'])
+     ->name('employees.generate-pdf');
+     
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('roles', RoleController::class);
     Route::resource('permissions', PermissionController::class);
