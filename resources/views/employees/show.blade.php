@@ -10,17 +10,21 @@
                     </h2>
                 </div>
                 <div class="d-flex align-items-center gap-">
+                    <a href="{{ route('employees.print', $employee->employee_id) }}" target="_blank" class="btn btn-primary btn-sm"
+                        onclick="window.print()">
+                        <i class="fas fa-print"></i> Print Profile
+                    </a>
                     <!-- Add PDF Button Here -->
                     <a href="{{ route('employees.generate-pdf', $employee->employee_id) }}" target="_blank"
                         class="btn btn-danger btn-sm" title="Generate PDF">
                         <i class="fas fa-file-pdf"></i> Export PDF
                     </a>
-                    @if ($employee->passport_photo)
+                    {{-- @if ($employee->passport_photo)
                         <img src="{{ asset('storage/' . $employee->passport_photo) }}" alt="Passport Photo"
                             class="img-fluid rounded-circle" width="100">
                     @else
                         <span class="text-muted">No passport photo available.</span>
-                    @endif
+                    @endif --}}
                 </div>
             </div>
             <div class="card-body">

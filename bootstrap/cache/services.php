@@ -38,9 +38,10 @@
     34 => 'Termwind\\Laravel\\TermwindServiceProvider',
     35 => 'OwenIt\\Auditing\\AuditingServiceProvider',
     36 => 'Pest\\Laravel\\PestServiceProvider',
-    37 => 'Spatie\\Permission\\PermissionServiceProvider',
-    38 => 'Spatie\\QueryBuilder\\QueryBuilderServiceProvider',
-    39 => 'App\\Providers\\AppServiceProvider',
+    37 => 'Rawilk\\Printing\\PrintingServiceProvider',
+    38 => 'Spatie\\Permission\\PermissionServiceProvider',
+    39 => 'Spatie\\QueryBuilder\\QueryBuilderServiceProvider',
+    40 => 'App\\Providers\\AppServiceProvider',
   ),
   'eager' => 
   array (
@@ -64,9 +65,10 @@
     17 => 'Termwind\\Laravel\\TermwindServiceProvider',
     18 => 'OwenIt\\Auditing\\AuditingServiceProvider',
     19 => 'Pest\\Laravel\\PestServiceProvider',
-    20 => 'Spatie\\Permission\\PermissionServiceProvider',
-    21 => 'Spatie\\QueryBuilder\\QueryBuilderServiceProvider',
-    22 => 'App\\Providers\\AppServiceProvider',
+    20 => 'Rawilk\\Printing\\PrintingServiceProvider',
+    21 => 'Spatie\\Permission\\PermissionServiceProvider',
+    22 => 'Spatie\\QueryBuilder\\QueryBuilderServiceProvider',
+    23 => 'App\\Providers\\AppServiceProvider',
   ),
   'deferred' => 
   array (

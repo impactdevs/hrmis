@@ -28,6 +28,7 @@ use App\Http\Controllers\StaffRecruitmentController;
 use App\Http\Controllers\TrainingController;
 use App\Http\Controllers\UploadEmployees;
 use App\Http\Controllers\UsersController;
+use App\Models\Employee;
 use App\Models\StaffRecruitment;
 use Illuminate\Support\Facades\Route;
 
@@ -39,7 +40,9 @@ Route::get('/dashboard', [HomeController::class, 'index'])->middleware(['auth', 
 Route::get('/upload-employee', [UploadEmployees::class, 'process_csv_for_arrears']);
 Route::get('/employees/{employee}/generate-pdf', [EmployeeController::class, 'generatePDF'])
      ->name('employees.generate-pdf');
-     
+     Route::get('/employees/{employee}/print', function (Employee $employee) {
+        return view('employees.pdf', ['employee' => $employee]);
+    })->name('employees.print');
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('roles', RoleController::class);
     Route::resource('permissions', PermissionController::class);
