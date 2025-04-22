@@ -32,8 +32,7 @@ class LeaveRosterController extends Controller
             return view('leave-roster.index', compact('leaveTypes', 'user_id', 'existingValuesArray', 'users', 'departments', 'public_holidays'));
         } else {
             $public_holidays = PublicHoliday::pluck('holiday_date')->toArray();
-            $users = User::all();
-            $users->load('employee');
+            $users = User::whereHas('employee')->with('employee')->get();
             return view('leave-roster.tabular', compact('users', 'public_holidays'));
         }
     }
