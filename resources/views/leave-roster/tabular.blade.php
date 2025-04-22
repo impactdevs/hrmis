@@ -135,41 +135,6 @@
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                         },
                         success: function(response) {
-                            console.log(response);
-
-                            // Add the event to the DataTable at the top (front)
-                            var table = $('#leavePlan').DataTable();
-
-                            // Calculate the numerical id
-                            var numericId = table.rows().count() + 1;
-
-                            var row = [
-                                numericId,
-                                response.data.employee.first_name + ' ' + response.data
-                                .employee.last_name,
-                                formatDate(response.data.start_date) + ' - ' +
-                                formatDate(response.data.end_date)
-                            ];
-
-                            // Insert the new row at the top (position 0)
-                            table.rows.add([row]).draw(
-                                false
-                            ); // `false` ensures the table isn't re-sorted after adding the row
-
-                            // Optionally, if you want to sort by numeric_id, you can add this:
-                            table.order([0, 'desc']).draw();
-                            calendar.addEvent({
-                                title: 'New Leave',
-                                start: response.data.start_date,
-                                end: response.data.end_date,
-                                backgroundColor: 'yellow',
-                                borderColor: 'orange',
-                                textColor: 'black',
-                                id: response.data.leave_roster_id,
-                                first_name: response.data.employee.first_name,
-                                last_name: response.data.employee.last_name,
-                            });
-
                             //close the modal
                             $('#applyModal').modal('hide');
 
