@@ -31,8 +31,10 @@ class LeaveRosterController extends Controller
 
             return view('leave-roster.index', compact('leaveTypes', 'user_id', 'existingValuesArray', 'users', 'departments', 'public_holidays'));
         } else {
+            $public_holidays = PublicHoliday::pluck('holiday_date')->toArray();
             $users = User::all();
-            return view('leave-roster.tabular', compact('users'));
+            $users->load('employee');
+            return view('leave-roster.tabular', compact('users', 'public_holidays'));
         }
     }
 
@@ -123,6 +125,7 @@ class LeaveRosterController extends Controller
         if ($leaveRosterAdded) {
             $entitledDays = $user->employee->entitled_leave_days ?? 0;
             $scheduledDays = $user->employee->overallRosterDays();
+            $leaveRosterAdded['scheduled_days'] = $scheduledDays;
             RosterUpdate::dispatch($employee_id, $entitledDays, $scheduledDays);
             return response()->json(['success' => true, 'message' => 'Leave Roster added successfully', 'data' => $leaveRosterAdded]);
         }

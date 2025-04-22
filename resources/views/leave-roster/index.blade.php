@@ -655,27 +655,6 @@
                     const endDate = new Date($('#end_date').val());
                     const formattedStartDate = moment(startDate).format('YYYY-MM-DD');
                     const formattedEndDate = moment(endDate).format('YYYY-MM-DD');
-                    var exceededDays = calculateScheduledLeaveDays(formattedStartDate, formattedEndDate,
-                        public_holidays, totalLeaveDaysScheduled);
-                    if (exceededDays) {
-                        Toastify({
-                            text: "Exceeded the number of Days! \ntry again with less days\n check below the calendar to see your balance",
-                            duration: 3000,
-                            destination: "",
-                            newWindow: true,
-                            close: true,
-                            gravity: "top", // `top` or `bottom`
-                            position: "right", // `left`, `center` or `right`
-                            stopOnFocus: true, // Prevents dismissing of toast on hover
-                            style: {
-                                background: "linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(121,14,9,1) 35%, rgba(0,212,255,1) 100%);",
-                            },
-                            onClick: function() {} // Callback after click
-                        }).showToast();
-
-                        return;
-                    }
-
 
                     if (!startDate || !endDate) {
                         Toastify({
@@ -712,6 +691,29 @@
                         }).showToast();
                         return; // Stop execution here
                     }
+
+
+                    var exceededDays = calculateScheduledLeaveDays(formattedStartDate, formattedEndDate,
+                        public_holidays, totalLeaveDaysScheduled);
+                    if (exceededDays) {
+                        Toastify({
+                            text: "Exceeded the number of Days! \ntry again with less days\n check below the calendar to see your balance",
+                            duration: 3000,
+                            destination: "",
+                            newWindow: true,
+                            close: true,
+                            gravity: "top", // `top` or `bottom`
+                            position: "right", // `left`, `center` or `right`
+                            stopOnFocus: true, // Prevents dismissing of toast on hover
+                            style: {
+                                background: "linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(121,14,9,1) 35%, rgba(0,212,255,1) 100%);",
+                            },
+                            onClick: function() {} // Callback after click
+                        }).showToast();
+
+                        return;
+                    }
+                    
                     // Extract form values
                     var start_date = $('#start_date').val();
                     var end_date = $('#end_date').val();

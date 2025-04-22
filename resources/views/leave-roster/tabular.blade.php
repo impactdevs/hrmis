@@ -23,7 +23,8 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="applyModalLabel">
-                        <i class="bi bi-calendar-plus"></i> Add Leave Roster
+                        <i class="bi bi-calendar-plus"></i> Add Leave Roster(<span id="display-entitled"></span> and
+                        <span id="display-scheduled"></span>)
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -46,7 +47,10 @@
                             <select class="employees form-select" name="user_id" id="user_id"
                                 data-placeholder="Choose the employee">
                                 @foreach ($users as $user)
-                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                    <option value="{{ $user->id }}"
+                                        data-entitled="{{ $user->employee->entitled_leave_days }}"
+                                        data-scheduled="{{ $user->employee->overallRosterDays() }}">{{ $user->name }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
@@ -67,18 +71,93 @@
     @push('scripts')
         <script>
             $(document).ready(function() {
+                //variables
+                var totalLeaveDaysEntitled = 0;
+                var totalLeaveDaysScheduled = 0;
+                console.log('leave days scheduled:', totalLeaveDaysScheduled);
+                var public_holidays = @json($public_holidays);
+
+
+
                 $('.employees').select2({
                     theme: "bootstrap-5",
                     dropdownParent: $("#applyModal"),
                     placeholder: $(this).data('placeholder')
                 });
 
+                // 2) when modal is shown (fires each time you open it)
+                $('#applyModal').on('shown.bs.modal', function() {
+                    // find the currently selected option
+                    const $sel = $('#user_id');
+                    const $opt = $sel.find('option:selected');
+
+                    // read the data-* attributes
+                    totalLeaveDaysEntitled = parseInt($opt.data('entitled'), 10) || 0;
+                    totalLeaveDaysScheduled = parseInt($opt.data('scheduled'), 10) || 0;
+
+                    console.log('Selected user totals → Entitled:', totalLeaveDaysEntitled,
+                        'Scheduled:', totalLeaveDaysScheduled);
+
+                    // (optional) If you have badges/spans to show these:
+                    $('#display-entitled').text("Entitled to " + totalLeaveDaysEntitled);
+                    $('#display-scheduled').text("Have Scheduled " + totalLeaveDaysScheduled);
+
+                });
+
+                $('#user_id').on('change', function() {
+                    const $opt = $(this).find('option:selected');
+                    totalLeaveDaysEntitled = parseInt($opt.data('entitled'), 10) || 0;
+                    totalLeaveDaysScheduled = parseInt($opt.data('scheduled'), 10) || 0;
+
+                    console.log('Selected user totals → Entitled:', totalLeaveDaysEntitled,
+                        'Scheduled:', totalLeaveDaysScheduled);
+
+                    // (optional) If you have badges/spans to show these:
+                    $('#display-entitled').text("Entitled to " + totalLeaveDaysEntitled);
+                    $('#display-scheduled').text("Have Scheduled " + totalLeaveDaysScheduled);
+                });
+
+
+
+                //calculate scheduled Leave days before saving a schedule to make sure the user does not exceed the entitled leave days
+                function calculateScheduledLeaveDays(start_date, end_date, publicHolidays = [],
+                    totalLeaveDaysScheduled) {
+                    const startDate = new Date(start_date);
+                    const endDate = new Date(end_date);
+                    console.log(startDate, endDate);
+                    let numberOfDaysBeingAdded = 0;
+                    console.log(totalLeaveDaysEntitled)
+
+                    for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+                        const dayOfWeek = d.getDay(); // 0 = Sunday, 6 = Saturday
+                        const formattedDate = d.toISOString().split('T')[0]; // 'YYYY-MM-DD'
+
+                        const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+                        const isPublicHoliday = publicHolidays.includes(formattedDate);
+
+                        if (!isWeekend && !isPublicHoliday) {
+                            numberOfDaysBeingAdded++;
+                        }
+                    }
+
+                    const willBeTotaldays = totalLeaveDaysScheduled + numberOfDaysBeingAdded;
+
+                    console.log(`Days being added: ${numberOfDaysBeingAdded}`);
+                    console.log(`Total leave days after scheduling: ${willBeTotaldays}`);
+
+                    if (willBeTotaldays > totalLeaveDaysEntitled) {
+                        return true;
+                    }
+
+                    return false;
+                }
+
                 $('#applyButton').click(function() {
-                    console.log('clicked')
                     //do date validation #
-                    // Prevent form submission until validation passes
                     const startDate = new Date($('#start_date').val());
                     const endDate = new Date($('#end_date').val());
+                    const formattedStartDate = moment(startDate).format('YYYY-MM-DD');
+                    const formattedEndDate = moment(endDate).format('YYYY-MM-DD');
 
                     if (!startDate || !endDate) {
                         Toastify({
@@ -115,6 +194,29 @@
                         }).showToast();
                         return; // Stop execution here
                     }
+
+                    var exceededDays = calculateScheduledLeaveDays(formattedStartDate, formattedEndDate,
+                        public_holidays, totalLeaveDaysScheduled);
+
+                    if (exceededDays) {
+                        Toastify({
+                            text: "Entitled Leave Days exceeded!!",
+                            duration: 3000,
+                            destination: "",
+                            newWindow: true,
+                            close: true,
+                            gravity: "top", // `top` or `bottom`
+                            position: "right", // `left`, `center` or `right`
+                            stopOnFocus: true, // Prevents dismissing of toast on hover
+                            style: {
+                                background: "linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(121,14,9,1) 35%, rgba(0,212,255,1) 100%);",
+                            },
+                            onClick: function() {} // Callback after click
+                        }).showToast();
+
+                        return;
+                    }
+
                     // Extract form values
                     var start_date = $('#start_date').val();
                     var end_date = $('#end_date').val();
@@ -137,6 +239,9 @@
                         success: function(response) {
                             //close the modal
                             $('#applyModal').modal('hide');
+
+                            //update Leave days entitled and what has been schedlued
+                            totalLeaveDaysScheduled = response.data.scheduled_days
 
                             Toastify({
                                 text: response.message,
