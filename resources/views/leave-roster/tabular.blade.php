@@ -85,6 +85,42 @@
                     placeholder: $(this).data('placeholder')
                 });
 
+                // Handle leave roster deletion
+                $(document).on('click', '.delete-roster', function() {
+                    const rosterId = $(this).data('roster-id');
+                    const $listItem = $(this).closest('li');
+
+                    if (confirm('Are you sure you want to delete this leave roster?')) {
+                        $.ajax({
+                            url: `/leave-roster/${rosterId}`,
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            success: function(response) {
+                                $listItem.remove();
+                                $table.bootstrapTable('refresh');
+                                Toastify({
+                                    text: response.message,
+                                    duration: 3000,
+                                    style: {
+                                        background: "green"
+                                    }
+                                }).showToast();
+                            },
+                            error: function(xhr) {
+                                Toastify({
+                                    text: xhr.responseJSON?.error || 'Delete failed',
+                                    duration: 3000,
+                                    style: {
+                                        background: "red"
+                                    }
+                                }).showToast();
+                            }
+                        });
+                    }
+                });
+
                 // 2) when modal is shown (fires each time you open it)
                 $('#applyModal').on('shown.bs.modal', function() {
                     // find the currently selected option
@@ -286,6 +322,25 @@
                     $(this).hide(); // Hide the text when editing starts
                 });
 
+                $(document).on('click', '.remove-roster', function() {
+                    var leaveRosterId = $(this).data('roster-id');
+                    var $entry = $(this).closest('.roster-entry');
+
+                    $.ajax({
+                        url: "{{ route('leave-roster.destroy', '') }}/" + leaveRosterId,
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function(response) {
+                            console.log("Roster Deleted");
+                            $entry.remove(); // remove the whole block
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error deleting event:', error);
+                        }
+                    });
+                });
 
 
                 //addLeaveRoster
@@ -411,14 +466,19 @@
                                 day: 'numeric'
                             });
                             var status = item.booking_approval_status;
-                            formattedValue +=
-                                `<li><span class="text-info">${startDate} - ${endDate}</span></li>`;
+
+                            formattedValue += `
+                <div class="roster-entry mb-2 nowrap d-flex justify-content-between flex-1">
+                    <span class="text-info">${startDate} - ${endDate}</span>
+                    <span class="remove-roster" title="Remove Roster" data-roster-id="${item.leave_roster_id}"><i class="bi bi-trash"></i></span>
+                </div>`;
                         });
                         formattedValue += '</ul>';
                         return formattedValue;
                     }
                     return '';
                 }
+
 
                 // Initialize table
                 initTable();
