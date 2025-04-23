@@ -240,8 +240,9 @@
                     .text(Math.round(percentageUsed) + '%');
                 // Update label with the number of scheduled days
                 $('#scheduledDaysText').text(totalLeaveDaysScheduled + ' days scheduled');
+                console.log(balanceToSchedule)
                 // if canSelect is false, show the exceeded days
-                if (totalLeaveDaysEntitled>totalLeaveDaysScheduled) {
+                if (balanceToSchedule<=0) {
                     $('#exceededDays').text('Annual leave days exceeded');
                 }
 
@@ -263,7 +264,7 @@
                         canSelect = balanceToSchedule > 0;
 
                         //if canSelect is false, show the exceeded days
-                        if (totalLeaveDaysEntitled>totalLeaveDaysScheduled) {
+                        if (balanceToSchedule<=0) {
                             $('#exceededDays').text('Annual Leave Days Exceeded');
                         }
 
