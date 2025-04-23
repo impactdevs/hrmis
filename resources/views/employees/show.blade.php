@@ -10,10 +10,10 @@
                     </h2>
                 </div>
                 <div class="d-flex align-items-center gap-">
-                    <a href="{{ route('employees.print', $employee->employee_id) }}" target="_blank" class="btn btn-primary btn-sm"
+                    {{-- <a href="{{ route('employees.print', $employee->employee_id) }}" target="_blank" class="btn btn-primary btn-sm"
                         onclick="window.print()">
                         <i class="fas fa-print"></i> Print Profile
-                    </a>
+                    </a> --}}
                     <!-- Add PDF Button Here -->
                     <a href="{{ route('employees.generate-pdf', $employee->employee_id) }}" target="_blank"
                         class="btn btn-danger btn-sm" title="Generate PDF">
