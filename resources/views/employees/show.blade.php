@@ -19,12 +19,12 @@
                         class="btn btn-danger btn-sm" title="Generate PDF">
                         <i class="fas fa-file-pdf"></i> Export PDF
                     </a>
-                    {{-- @if ($employee->passport_photo)
+                    @if ($employee->passport_photo)
                         <img src="{{ asset('storage/' . $employee->passport_photo) }}" alt="Passport Photo"
                             class="img-fluid rounded-circle" width="100">
                     @else
                         <span class="text-muted">No passport photo available.</span>
-                    @endif --}}
+                    @endif
                 </div>
             </div>
             <div class="card-body">
