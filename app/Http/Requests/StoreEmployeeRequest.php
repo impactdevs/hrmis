@@ -18,7 +18,9 @@ class StoreEmployeeRequest extends FormRequest
         $employeeId = $this->route('employee') ? $this->route('employee')->employee_id : null;
         return [
             'first_name' => 'nullable|string|max:255',
+            'middle_name' => 'nullable|string|max:255',
             'last_name' => 'nullable|string|max:255',
+            'gender' => 'required',
             'title' => 'nullable|string|max:255',
             'staff_id' => [
                 'nullable',

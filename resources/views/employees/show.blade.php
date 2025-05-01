@@ -118,6 +118,103 @@
                 </section>
 
                 <!-- Other sections for Department, Contact Information, etc. remain the same... -->
+                <section class="mb-4 border border-1 border-secondary p-3 rounded">
+                    <div class="d-flex flex-row justify-content-between align-items-center mb-4">
+                        <h5 class="mt-4 mb-3 text-dark">Contracts Information</h5>
+                        <a href="{{ route('contract.create', ['employee_id' => $employee->employee_id]) }}" 
+                           class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus me-2"></i>Add New Contract
+                        </a>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered table-striped" 
+                               data-toggle="table"
+                               data-search="true"
+                               data-show-columns="true"
+                               data-sortable="true"
+                               data-pagination="true"
+                               data-page-size="5">
+                            <thead class="bg-primary text-white">
+                                <tr>
+                                    <th data-sortable="true" data-field="id">#</th>
+                                    <th data-sortable="true" data-field="start_date">Start Date</th>
+                                    <th data-sortable="true" data-field="end_date">End Date</th>
+                                    <th data-field="duration">Duration</th>
+                                    <th data-field="description">Description</th>
+                                    <th data-field="attachments">Attachments</th>
+                                    <th data-sortable="true" data-field="status">Status</th>
+                                    @can('can edit an employee')
+                                    <th data-field="actions">Actions</th>
+                                    @endcan
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($employee->contracts as $contract)
+                                <tr>
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td>{{ $contract->start_date->format('d M Y') }}</td>
+                                    <td>{{ $contract->end_date->format('d M Y') }}</td>
+                                    <td>{{ $contract->start_date->diffInMonths($contract->end_date) }} months</td>
+                                    <td class="text-truncate" style="max-width: 200px;" title="{{ $contract->description }}">
+                                        {{ $contract->description }}
+                                    </td>
+                                    <td>
+                                        @if($contract->contract_documents)
+                                            <div class="d-flex flex-wrap gap-2">
+                                                @foreach($contract->contract_documents as $attachment)
+                                                <a href="{{ asset('storage/'.$attachment['proof']) }}" 
+                                                   target="_blank"
+                                                   class="btn btn-sm btn-outline-secondary d-flex align-items-center">
+                                                    @if(Str::endsWith($attachment['proof'], ['.pdf']))
+                                                        <i class="fas fa-file-pdf text-danger me-2"></i>
+                                                    @else
+                                                        <i class="fas fa-file-image text-primary me-2"></i>
+                                                    @endif
+                                                    {{ Str::limit($attachment['title'], 15) }}
+                                                </a>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <span class="text-muted">No attachments</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @php
+                                            $status = $contract->end_date->isPast() ? 'Expired' : 'Active';
+                                            $badgeClass = $status === $status ? 'bg-success' : 'bg-danger';
+                                        @endphp
+                                        <span class="badge {{ $badgeClass }} ">{{ $status }}</span>
+                                    </td>
+                                    @can('can edit an employee')
+                                    <td>
+                                        <div class="d-flex gap-2">
+                                            <a href="{{ route('contract.edit', $contract->id) }}" 
+                                               class="btn btn-sm btn-outline-primary"
+                                               data-bs-toggle="tooltip" 
+                                               title="Edit Contract">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form action="{{ route('contract.destroy', $contract->id) }}" method="POST">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" 
+                                                        class="btn btn-sm btn-outline-danger"
+                                                        data-bs-toggle="tooltip"
+                                                        title="Delete Contract"
+                                                        onclick="return confirm('Are you sure?')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                    @endcan
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
 
                 <!-- Contact Information Section -->
                 <section class="mb-4 border border-1 border-secondary p-3 rounded">

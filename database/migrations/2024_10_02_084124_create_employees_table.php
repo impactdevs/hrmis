@@ -19,12 +19,10 @@ return new class extends Migration {
             $table->uuid('position_id')->nullable()->references('position_id')->on('positions');
             $table->string('nin')->nullable()->unique();
             $table->date('date_of_entry')->nullable();
-            $table->date('contract_expiry_date')->nullable();
             $table->uuid('department_id')->nullable()->references('department_id')->on('departments');
             $table->string('nssf_no')->nullable();
             $table->string('home_district')->nullable();
             $table->json('qualifications_details')->nullable();
-            $table->json('contract_documents')->nullable();
             $table->string('tin_no')->nullable();
             $table->longText('job_description')->nullable();
             $table->string('email')->unique();

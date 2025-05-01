@@ -7,14 +7,23 @@
                 placeholder="Enter Employee First Name" value="{{ old('first_name', $employee->first_name ?? '') }}" />
         </div>
         <div class="col-md-6">
+            <x-forms.input name="middle_name" label="Middle Name" type="text" id="middle_name"
+                placeholder="Enter Employee Middle Name"
+                value="{{ old('middle_name', $employee->middle_name ?? '') }}" />
+        </div>
+        <div class="col-md-6">
             <x-forms.input name="last_name" label="Last Name" type="text" id="last_name"
                 placeholder="Enter Employee Last Name" value="{{ old('last_name', $employee->last_name ?? '') }}" />
+        </div>
+        <div class="col-md-6">
+            <x-forms.radio name="gender" label="Gender" id="gender" :options="['M' => 'Male', 'F' => 'Female']" :selected="$employee->gender ?? ''" />
         </div>
     </div>
     <div class="row mb-3">
         <div class="col-md-6">
             <x-forms.input name="title" label="Title" type="text" id="title"
-                placeholder="Enter Employee Title eg. MR., DR., Prof." value="{{ old('title', $employee->title ?? '') }}" />
+                placeholder="Enter Employee Title eg. MR., DR., Prof."
+                value="{{ old('title', $employee->title ?? '') }}" />
         </div>
         <div class="col-md-6">
             <x-forms.input name="staff_id" label="Staff ID" type="text" id="staff_id"

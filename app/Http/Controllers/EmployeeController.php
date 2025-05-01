@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Log;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\Contract;
 
 class EmployeeController extends Controller
 {
@@ -190,7 +191,7 @@ class EmployeeController extends Controller
     public function show(Employee $employee)
     {
         // Eager load relationships
-        $employee->load('department', 'position'); // Add any other relationships you need
+        $employee->load('department', 'position', 'contracts'); // Add any other relationships you need
 
         return view('employees.show', compact('employee'));
     }
@@ -334,53 +335,101 @@ class EmployeeController extends Controller
         }
     }
 
-    public function import_employees()
-    {
-        //read from a csv file
-        ini_set('max_execution_time', 2000);
-        ini_set('memory_limit', '-1');
-        //get column names from the csv
-        $file = public_path('uploads/employees_created.csv');
-        $csv = array_map('str_getcsv', file($file));
-
-        //set excution time to 5 minutes
-        for ($i = 54; $i < count($csv); $i++) {
-            try {
-
-                $employee = new Employee();
-                $employee->staff_id = $csv[$i][0];
-                $employee->title = $csv[$i][1];
-                $employee->first_name = $csv[$i][2];
-                $employee->last_name = $csv[$i][3];
-                $employee->email = $csv[$i][4];
-
-                $user = DB::table('users')->where('email', $csv[$i][4])->doesntExist();
-                if ($user) {
-                    //create a user
-                    $user = new User();
-                    $user->email = $csv[$i][4];
-                    $user->name = $csv[$i][2] . ' ' . $csv[$i][3];
-                    $user->password = Hash::make($csv[$i][5]);
-                    $user->save();
-                    $user->assignRole('Staff'); // Ensure the role exists
-                }
-
-                $employee->user_id = $user->id;
-
-                $employee->save();
-            } catch (Exception $e) {
-                return response()->json(['error' => 'Failed to process CSV. Please ensure the file format is correct.', 'exception' => $e->getMessage()], 400);
-            }
-        }
-    }
-
     public function generatePDF(Employee $employee)
     {
         $data = ['employee' => $employee];
         $pdf = PDF::loadView('employees.pdf', $data);
         return $pdf->stream('employee-profile.pdf');
+    }
 
-        // Alternatively to force download:
-        // return $pdf->download('employee-profile.pdf');
+    public function create_contract($employee_id)
+    {
+        $employee = Employee::findOrFail($employee_id);
+        return view('employees.create_contract', compact('employee'));
+    }
+
+    public function store_contract(Request $request)
+    {
+        //get the data for processing
+        $requestedData = $request->all();
+
+        //check if the request contains contract_documents
+        if (filled($requestedData['contract_documents'])) {
+            foreach ($requestedData['contract_documents'] as $key => $value) {
+                // Check if a file is uploaded for this qualification
+                // Use the correct input name to check for the file
+                if ($request->hasFile("contract_documents.$key.proof")) {
+                    // Store the file and get the path
+                    $filePath = $request->file("contract_documents.$key.proof")->store('contract_documents', 'public');
+
+                    // Update the proof value to the path
+                    $requestedData['contract_documents'][$key]['proof'] = $filePath;
+                }
+            }
+        }
+
+        Contract::create($requestedData);
+
+
+        // Redirect to the employees index with a success message
+        return to_route('employees.show', ['employee' => $requestedData['employee_id']]);
+    }
+
+    public function update_contract(Request $request, Contract $contract)
+    {
+        $requestedData = $request->all();
+        // Format (qualification details documents
+        if (filled($requestedData['contract_documents'])) {
+            $qualification_details = $contract->contract_documents;
+            foreach ($requestedData['contract_documents'] as $key => $value) {
+
+                // Check if the current qualification has a proof file
+                if ($request->hasFile("contract_documents.$key.proof")) {
+                    // Store the file and get the path
+                    $filePath = $request->file("contract_documents.$key.proof")->store('contract_documents', 'public');
+
+                    // Update the proof value to the path
+                    $qualification_details[$key]['proof'] = $filePath;
+                }
+
+                //check if there is title
+                if (isset($requestedData['contract_documents'][$key]['title'])) {
+                    $qualification_details[$key]['title'] = $requestedData['contract_documents'][$key]['title'];
+                }
+
+                // Update the qualification details
+                $requestedData['contract_documents'] = $qualification_details;
+            }
+        }
+        $contract->update($requestedData);
+
+        return to_route('employees.show', ['employee' => $contract->employee_id]);
+    }
+
+    public function edit_contract(Request $request, Contract $contract)
+    {
+        $contract->load('employee');
+        return view('employees.edit_contract', compact('contract'));
+    }
+
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy_contract(Contract $contract)
+    {
+        try {
+            // Delete the employee record
+            $contract->delete();
+
+            // Redirect to the employees index with a success message
+            return to_route('employees.show', ['employee' => $contract->employee_id]);
+        } catch (Exception $exception) {
+            // Log the error for debugging
+            Log::error('Error deleting employee: ' . $exception->getMessage());
+
+            // Redirect back with an error message
+            return redirect()->back()->with('error', 'Problem Deleting the Employee');
+        }
     }
 }

@@ -60,6 +60,10 @@
                     $title = auth()->user()->isAdminOrSecretary() ? 'Employees' : 'About Me';
                 }
 
+                if (request()->routeIs('employees.create')) {
+                    $title = 'Add An Employee';
+                }
+
                 if (request()->routeIs('applications.index')) {
                     $title = 'Applications';
                 }

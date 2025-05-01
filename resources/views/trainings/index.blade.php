@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="mt-3">
         <div class="d-flex flex-row flex-1 justify-content-between">
-            <h5 class="ms-3">Trainings/Travel Management</h5>
+            <h5 class="ms-3"></h5>
 
             <div class="d-flex justify-content-between align-items-center">
                 <a href="{{ route('out-of-station-trainings.index') }}" class="btn border-t-neutral-50 btn-primary me-1">

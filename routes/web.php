@@ -39,10 +39,10 @@ Route::get('/', function () {
 Route::get('/dashboard', [HomeController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 Route::get('/upload-employee', [UploadEmployees::class, 'process_csv_for_arrears']);
 Route::get('/employees/{employee}/generate-pdf', [EmployeeController::class, 'generatePDF'])
-     ->name('employees.generate-pdf');
-     Route::get('/employees/{employee}/print', function (Employee $employee) {
-        return view('employees.pdf', ['employee' => $employee]);
-    })->name('employees.print');
+    ->name('employees.generate-pdf');
+Route::get('/employees/{employee}/print', function (Employee $employee) {
+    return view('employees.pdf', ['employee' => $employee]);
+})->name('employees.print');
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('roles', RoleController::class);
     Route::resource('permissions', PermissionController::class);
@@ -50,8 +50,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('roles/{role}/permissions/add', [RoleController::class, 'addPermissions'])->name('roles.permissions.add');
     Route::post('roles/{role}/permissions/remove', [RoleController::class, 'removePermissions'])->name('roles.permissions.remove');
 
-
     Route::resource('employees', EmployeeController::class);
+    Route::get('/contract/{employee_id}/create', [EmployeeController::class, 'create_contract'])->name('contract.create');
+    Route::get('/contract/{contract}/edit', [EmployeeController::class, 'edit_contract'])->name('contract.edit');
+    Route::put('/contract/{contract}/update', [EmployeeController::class, 'update_contract'])->name('contract.update');
+    Route::delete('/contract/{contract}/delete', [EmployeeController::class, 'destroy_contract'])->name('contract.destroy');
+
+
+    Route::post('/contract', [EmployeeController::class, 'store_contract'])->name('contract.store');
     Route::get('/leave-management/data', [LeaveController::class, 'getLeaveManagementData']);
     Route::post('update-entitled-leave-days/{id}', [EmployeeController::class, 'updateEntitledLeaveDays'])->name('update-entitled-leave-days');
     Route::resource('recruitments', StaffRecruitmentController::class);

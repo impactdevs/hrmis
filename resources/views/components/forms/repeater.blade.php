@@ -1,122 +1,262 @@
-<div id="repeater-container-{{ $name }}">
-    <h5>{{ $label }}</h5>
+<div id="repeater-container-{{ $name }}" class="repeater-container">
+    <h5 class="mb-4 text-primary font-weight-bold">{{ $label }}</h5>
 
     @php
-        // Ensure $qualifications is an array to avoid count() errors
         $qualifications = $values ?? [];
-
-        // If qualifications are empty, add a default empty qualification
         if (empty($qualifications)) {
             $qualifications[] = ['title' => '', 'proof' => ''];
         }
     @endphp
 
     @foreach ($qualifications as $index => $qualification)
-        <div class="item-group d-flex flex-column">
-            <input type="text" name="{{ $name }}[{{ $index }}][title]" placeholder="Title"
-                class="form-control mb-2"
-                value="{{ old($name . '.' . $index . '.title', $qualification['title'] ?? '') }}">
+        <div class="item-group card mb-4 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="card-title text-muted">#{{ $index + 1 }}</h6>
+                    <button type="button" class="btn btn-link text-danger remove-item">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
 
-            <label for="proof-{{ $name }}-{{ $index }}">
-                @if (!empty($qualification['proof']))
-                    @if (strpos($qualification['proof'], '.pdf') !== false)
-                        <div class="pdf-preview mt-3" id="current-proof-{{ $name }}-{{ $index }}">
-                            <img src="{{ asset('assets/img/pdf-icon.png') }}" alt="PDF icon" class="pdf-icon">
-                            <span class="pdf-filename">{{ basename($qualification['proof']) }}</span>
+                <input type="text" name="{{ $name }}[{{ $index }}][title]" placeholder="Enter title"
+                    class="form-control mb-3"
+                    value="{{ old($name . '.' . $index . '.title', $qualification['title'] ?? '') }}">
+
+                <div class="file-upload-wrapper">
+                    <div class="drop-zone" data-target="proof-{{ $name }}-{{ $index }}"
+                        ondragover="event.preventDefault()"
+                        ondrop="handleDrop(event, 'proof-{{ $name }}-{{ $index }}')"
+                        ondragenter="this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')">
+                        <div class="preview-content">
+                            @if (!empty($qualification['proof']))
+                                @if (strpos($qualification['proof'], '.pdf') !== false)
+                                    <div class="pdf-preview">
+                                        <i class="fas fa-file-pdf fa-3x text-danger"></i>
+                                        <span class="d-block text-muted small mt-2">
+                                            {{ basename($qualification['proof']) }}
+                                        </span>
+                                    </div>
+                                @else
+                                    <img src="{{ asset('storage/' . $qualification['proof']) }}" alt="Current document"
+                                        class="img-thumbnail">
+                                @endif
+                            @else
+                                <i class="fas fa-cloud-upload-alt fa-3x text-primary"></i>
+                                <div class="mt-2">Drag & drop or click to upload</div>
+                                <div class="text-muted small">Supports: PDF, JPG, PNG, GIF</div>
+                            @endif
                         </div>
-                    @else
-                        <img src="{{ asset('storage/' . $qualification['proof']) }}" alt="current image"
-                            class="img-fluid mt-3" id="current-proof-{{ $name }}-{{ $index }}">
-                    @endif
-                @else
-                    <img src="{{ asset('assets/img/upload.png') }}" alt="upload placeholder" height="70px"
-                        width="70px" class="img-fluid upload-icon mt-3"
-                        id="current-proof-{{ $name }}-{{ $index }}">
-                @endif
-            </label>
+                    </div>
 
-            <input type="file" name="{{ $name }}[{{ $index }}][proof]"
-                id="proof-{{ $name }}-{{ $index }}" class="form-control-file d-none"
-                accept=".pdf,.jpg,.jpeg,.png,.gif">
+                    <input type="file" name="{{ $name }}[{{ $index }}][proof]"
+                        id="proof-{{ $name }}-{{ $index }}" class="d-none"
+                        accept=".pdf,.jpg,.jpeg,.png,.gif">
 
-
-            <button type="button" class="btn btn-danger btn-sm remove-item mt-2 w-75">Remove</button>
-            <span>You can upload a pdf, jpg, jpeg, png, or gif file</span>
+                    <div class="file-error text-danger small mt-2"></div>
+                </div>
+            </div>
         </div>
     @endforeach
 </div>
-<button type="button" id="add-item" class="btn btn-secondary">Add {{ $label }}</button>
+
+<button type="button" id="add-item-{{ $name }}" class="btn btn-primary mt-3">
+    <i class="fas fa-plus-circle mr-2"></i>Add {{ $label }}
+</button>
+
+
+
 
 @push('scripts')
+    <style>
+        .repeater-container {
+            border-radius: 8px;
+            padding: 1.5rem;
+            background: #f8f9fa;
+        }
+
+        .item-group {
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .item-group:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .drop-zone {
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .drop-zone:hover {
+            border-color: #007bff;
+            background-color: rgba(0, 123, 255, 0.05);
+        }
+
+        .drop-zone.dragover {
+            border-color: #28a745;
+            background-color: rgba(40, 167, 69, 0.1);
+        }
+
+        .preview-content img {
+            max-width: 200px;
+            max-height: 150px;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+
+        .pdf-preview {
+            line-height: 1;
+            text-align: center;
+        }
+
+        .remove-item {
+            transition: all 0.3s ease;
+            padding: 4px 8px;
+        }
+
+        .file-upload-wrapper {
+            position: relative;
+        }
+
+        .file-error {
+            height: 20px;
+            font-size: 0.85rem;
+        }
+    </style>
     <script>
-        $(document).ready(function() {
-            //convert $name to a js variable
-            var name = "{{ $name }}";
-            let itemIndex = {{ count($qualifications) }}; // Start from the next index
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('repeater-container-{{ $name }}');
+            const addButton = document.getElementById('add-item-{{ $name }}');
+            let itemIndex = {{ count($qualifications) }};
 
-            // Function to create a new item group
-            function createNewItemGroup(index) {
-                return `
-                <div class="item-group">
-                    <input type="text" name="{{ $name }}[${index}][title]" placeholder="Title" class="form-control mb-2">
-                    <label for="proof-{{ $name }}-${index}">
-                        <img src="{{ asset('assets/img/upload.png') }}" alt="upload placeholder" height="70px" width="70px" class="img-fluid upload-icon mt-3" id="current-proof-{{ $name }}-${index}">
-                    </label>
-                    <input type="file" name="{{ $name }}[${index}][proof]" id="proof-{{ $name }}-${index}" class="form-control-file d-none">
-                    <button type="button" class="btn btn-danger remove-item mt-2">Remove</button>
-                </div>
-            `;
-            }
-
-            // Function to handle file input changes
-            function handleFileChange(input) {
-                const id = input.attr('id');
-                const file = input[0].files[0];
-
-                if (file) {
-                    const reader = new FileReader();
-
-                    reader.onload = function(e) {
-                        console.log('id', id)
-                        const index = id.split('-')[2]; // Extract the index from the ID
-                        if (file.type.includes('image')) {
-                            $(`#current-proof-${name}-${index}`).attr('src', e.target
-                                .result); // Update image preview
-
-                            console.log('path', `#current-proof-${name}-${index}`)
-                        } else if (file.type === 'application/pdf') {
-                            // Replace the image with a PDF icon and filename
-                            $(`#current-proof-{{ $name }}-${index}`).replaceWith(`
-                            <div class="pdf-preview mt-3" id="current-proof-{{ $name }}-${index}">
-                                <label for="proof-${index}">
-                                    <img src="{{ asset('assets/img/pdf-icon.png') }}" alt="PDF icon" class="pdf-icon">
-                                    <span class="pdf-filename">${file.name}</span>
-                                </label>
-                            </div>
-                        `);
-                        }
-                    };
-
-                    reader.readAsDataURL(file);
-                }
-            }
-
-            // Remove item group on button click
-            $(`#repeater-container-${name}`).on('click', '.remove-item', function() {
-                $(this).closest('.item-group').remove();
-            });
-
-            // Add new item group on button click
-            $('#add-item').on('click', function() {
-                const newItemGroup = createNewItemGroup(itemIndex);
-                $(`#repeater-container-${name}`).append(newItemGroup);
+            // Add new item
+            addButton.addEventListener('click', function() {
+                const newItem = createItemGroup(itemIndex);
+                container.insertAdjacentHTML('beforeend', newItem);
                 itemIndex++;
             });
 
-            // Delegate the change event to the container, handling future inputs usi
-            $(`#repeater-container-${name}`).on('change', 'input[type="file"]', function() {
-                handleFileChange($(this));
+            document.addEventListener('click', function(e) {
+                const zone = e.target.closest('.drop-zone');
+                if (!zone) return;
+
+                // figure out which input to open
+                const inputId = zone.getAttribute('data-target');
+                const input = document.getElementById(inputId);
+                if (input) input.click();
+            });
+
+
+            // Remove item
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.remove-item')) {
+                    const itemGroup = e.target.closest('.item-group');
+                    if (itemGroup) {
+                        itemGroup.style.opacity = '0';
+                        itemGroup.style.transform = 'translateX(-100px)';
+                        setTimeout(() => itemGroup.remove(), 300);
+                    }
+                }
+            });
+
+            // File input handler
+            document.addEventListener('change', function(e) {
+                if (e.target.matches('input[type="file"]')) {
+                    handleFileSelect(e.target);
+                }
             });
         });
+
+        function handleDrop(e, targetId) {
+            e.preventDefault();
+            const input = document.getElementById(targetId);
+            input.files = e.dataTransfer.files;
+            handleFileSelect(input);
+            e.currentTarget.classList.remove('dragover');
+        }
+
+        function handleFileSelect(input) {
+            const file = input.files[0];
+            const wrapper = input.closest('.file-upload-wrapper');
+            const preview = wrapper.querySelector('.preview-content');
+            const errorDiv = wrapper.querySelector('.file-error');
+
+            if (!file) return;
+
+            // Validate file type
+            const validTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/gif'];
+            if (!validTypes.includes(file.type)) {
+                errorDiv.textContent = 'Invalid file type. Please upload a PDF, JPG, PNG, or GIF.';
+                input.value = '';
+                return;
+            }
+            errorDiv.textContent = '';
+
+            // Show preview
+            if (file.type === 'application/pdf') {
+                preview.innerHTML = `
+                <div class="pdf-preview">
+                    <i class="fas fa-file-pdf fa-3x text-danger"></i>
+                    <div class="mt-2">${file.name}</div>
+                </div>
+            `;
+            } else {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.innerHTML = `<img src="${e.target.result}" class="img-thumbnail">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function createItemGroup(index) {
+            return `
+        <div class="item-group card mb-4 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="card-title text-muted">#${index + 1}</h6>
+                    <button type="button" class="btn btn-link text-danger remove-item">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+
+                <input type="text" 
+                       name="{{ $name }}[${index}][title]" 
+                       placeholder="Enter title" 
+                       class="form-control mb-3">
+
+                <div class="file-upload-wrapper">
+                    <div class="drop-zone" 
+                         data-target="proof-{{ $name }}-${index}"
+                         ondragover="event.preventDefault()"
+                         ondrop="handleDrop(event, 'proof-{{ $name }}-${index}')"
+                         ondragenter="this.classList.add('dragover')"
+                         ondragleave="this.classList.remove('dragover')">
+                        <div class="preview-content">
+                            <i class="fas fa-cloud-upload-alt fa-3x text-primary"></i>
+                            <div class="mt-2">Drag & drop or click to upload</div>
+                            <div class="text-muted small">Supports: PDF, JPG, PNG, GIF</div>
+                        </div>
+                    </div>
+                    <input type="file" 
+                           name="{{ $name }}[${index}][proof]" 
+                           id="proof-{{ $name }}-${index}" 
+                           class="d-none"
+                           accept=".pdf,.jpg,.jpeg,.png,.gif">
+                    <div class="file-error text-danger small mt-2"></div>
+                </div>
+            </div>
+        </div>`;
+        }
     </script>
 @endpush

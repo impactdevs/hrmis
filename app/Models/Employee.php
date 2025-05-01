@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
-
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[ScopedBy([EmployeeScope::class])]
 class Employee extends Model
@@ -33,6 +33,8 @@ class Employee extends Model
         'employee_id',
         'first_name',
         'last_name',
+        'gender',
+        'middle_name',
         'title',
         'staff_id',
         'position_id',
@@ -254,6 +256,11 @@ class Employee extends Model
 
         // Return the nested array of total leave days consumed per year and month
         return $daysConsumedPerYearMonth;
+    }
+
+    public function contracts()
+    {
+        return $this->hasMany(Contract::class, 'employee_id', 'employee_id');
     }
 
 }

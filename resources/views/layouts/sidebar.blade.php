@@ -46,37 +46,44 @@
                 </li>
             @endif
 
-            {{-- <li class="nav-item">
+            <li class="nav-item">
                 <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('appraisals.index')) bg-secondary @endif"
                     href="{{ route('appraisals.index') }}">
                     <i class="bi bi-arrow-bar-up"></i>
                     {{ auth()->user()->isAdminOrSecretary() ? 'Appraisals' : 'My Appraisals' }}
                 </a>
-            </li> --}}
+            </li>
 
-            {{-- <li class="nav-item">
+            <li class="nav-item">
                 <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('attendances.index')) bg-secondary @endif"
                     href="{{ route('attendances.index') }}">
                     <i class="bi bi-check2-all"></i>
-                    {{ auth()->user()->isAdminOrSecretary() ? 'Attendances' : 'My Attendance History' }}
-                </a>
-            </li> --}}
+                    {{ auth()->user()->isAdminOrSecretary() ? 'Attendances' : 'My Attendance History' }} </a>
+            </li>
 
-            {{-- <li class="nav-item">
-                <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('trainings.index') || request()->routeIs('trainings.show') || request()->routeIs('trainings.edit') || request()->routeIs('trainings.create') || request()->routeIs('out-of-station-trainings.index') || request()->routeIs('out-of-station-trainings.create') || request()->routeIs('out-of-station-trainings.edit') || request()->routeIs('out-of-station-trainings.show') || request()->routeIs('apply')) bg-secondary @endif"
+            <li class="nav-item">
+                <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('trainings.index') ||
+                        request()->routeIs('trainings.show') ||
+                        request()->routeIs('trainings.edit') ||
+                        request()->routeIs('trainings.create') ||
+                        request()->routeIs('out-of-station-trainings.index') ||
+                        request()->routeIs('out-of-station-trainings.create') ||
+                        request()->routeIs('out-of-station-trainings.edit') ||
+                        request()->routeIs('out-of-station-trainings.show') ||
+                        request()->routeIs('apply')) bg-secondary @endif"
                     href="{{ route('trainings.index') }}">
                     <i class="bi bi-eyedropper"></i>
                     Trainings/Travels
                 </a>
-            </li> --}}
+            </li>
 
-            {{-- <li class="nav-item">
+            <li class="nav-item">
                 <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('events.index') || request()->routeIs('events.show')) bg-secondary @endif"
                     href="{{ route('events.index') }}">
                     <i class="bi bi-calendar-check"></i>
                     Events
                 </a>
-            </li> --}}
+            </li>
 
 
             <li class="nav-item">
@@ -90,22 +97,25 @@
                 </a>
             </li>
             @if (auth()->user()->isAdminOrSecretary())
-                {{-- <li class="nav-item">
+                <li class="nav-item">
                     <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('applications.index')) bg-secondary @endif"
                         href="{{ route('applications.index') }}">
                         <i class="bi bi-activity"></i>
                         Applications
                     </a>
-                </li> --}}
+                </li>
 
 
-                {{-- <li class="nav-item">
-                    <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('recruitments.index') || request()->routeIs('recruitments.show') || request()->routeIs('recruitments.edit') || request()->routeIs('recruitments.create')) bg-secondary @endif"
+                <li class="nav-item">
+                    <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('recruitments.index') ||
+                            request()->routeIs('recruitments.show') ||
+                            request()->routeIs('recruitments.edit') ||
+                            request()->routeIs('recruitments.create')) bg-secondary @endif"
                         href="{{ route('recruitments.index') }}">
                         <i class="bi bi-bank2"></i>
                         Staff Recruitment
                     </a>
-                </li> --}}
+                </li>
             @endif
         </ul>
         @if (auth()->user()->hasRole('HR'))

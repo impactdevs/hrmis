@@ -80,11 +80,19 @@
                 <thead>
                     <tr>
                         <th scope="col" data-field="id">#</th>
+                        <th scope="col" data-field="title">Title</th>
                         <th scope="col" data-field="first_name">First Name</th>
+                        <th scope="col" data-field="middle_name">Middle Name</th>
                         <th scope="col" data-field="last_name">Last Name</th>
+                        <th scope="col" data-field="gender">Gender</th>
+                        <th scope="col" data-field="age">Age</th>
+                        <th scope="col" data-field="tin">TIN</th>
+                        <th scope="col" data-field="nssf">NSSF</th>
+                        <th scope="col" data-field="home_district">Home District</th>
                         <th scope="col" data-field="position">Position</th>
                         <th scope="col" data-field="department">Department</th>
                         <th scope="col" data-field="phone_number">Phone Number</th>
+                        <th scope="col" data-field="email">Email</th>
                         <th scope="col" data-field="date_of_entry">Date of Entry</th>
                         <th scope="col" data-field="contract_expiry">Contract Expiry</th>
                         <th class="col" data-field="retirement_years">Retirement Yrs</th>
@@ -97,14 +105,22 @@
                             <th scope="row">
                                 <a href="{{ route('employees.show', $employee->employee_id) }}"
                                     class="btn {{ $employee->contract_expiry_date && $employee->contract_expiry_date->isPast() ? 'btn-outline-danger' : 'btn-outline-primary' }}">
-                                    {{ $employee->staff_id??'STAFF0000' }}
+                                    {{ $employee->staff_id ?? 'STAFF0000' }}
                                 </a>
                             </th>
+                            <td>{{ $employee->title }}</td>
                             <td>{{ $employee->first_name }}</td>
+                            <td>{{ $employee->middle_name }}</td>
                             <td>{{ $employee->last_name }}</td>
+                            <td>{{ $employee->gender }}</td>
+                            <td>{{ $employee->date_of_birth ? $employee->date_of_birth->age : '' }}</td>
+                            <td>{{ $employee->tin }}</td>
+                            <td>{{ $employee->nssf }}</td>
+                            <td>{{ $employee->home_district }}</td>
                             <td>{{ optional($employee->position)->position_name ?? 'N/A' }}</td>
                             <td>{{ optional($employee->department)->department_name }}</td>
                             <td>{{ $employee->phone_number }}</td>
+                            <td>{{ $employee->email }}</td>
                             <td>{{ $employee->date_of_entry ? $employee->date_of_entry->format('Y-m-d') : 'N/A' }}</td>
                             <td>{{ $employee->contract_expiry_date ? $employee->contract_expiry_date->format('Y-m-d') : 'N/A' }}
                             </td>
@@ -177,9 +193,16 @@
                     });
                 });
 
-                $table.bootstrapTable('hideColumn', 'contract_expiry')
-                $table.bootstrapTable('hideColumn', 'position')
-                $table.bootstrapTable('hideColumn', 'phone_number')
+                $table.bootstrapTable('hideColumn', 'contract_expiry');
+                $table.bootstrapTable('hideColumn', 'position');
+                $table.bootstrapTable('hideColumn', 'phone_number');
+                $table.bootstrapTable('hideColumn', 'nssf');
+                $table.bootstrapTable('hideColumn', 'tin');
+                $table.bootstrapTable('hideColumn', 'title');
+                $table.bootstrapTable('hideColumn', 'home_district');
+                $table.bootstrapTable('hideColumn', 'gender');
+                $table.bootstrapTable('hideColumn', 'email');
+
             });
         </script>
     @endpush
