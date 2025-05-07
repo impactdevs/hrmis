@@ -13,7 +13,7 @@ class Contract extends Model
 
     // Specify the type of the primary key
     protected $keyType = 'string';
-    protected $fillable = ["start_date", "end_date", "employee_id", "contract_documents", 'description'];
+    protected $fillable = ["start_date", "end_date", "employee_id", "contract_documents", 'description', 'supervisor'];
 
     protected $casts = [
         'contract_documents' => 'array',
@@ -30,7 +30,13 @@ class Contract extends Model
         });
     }
 
-    public function employee(){
+    public function employee()
+    {
         return $this->belongsTo(Employee::class, 'employee_id', 'employee_id');
+    }
+
+    public function supervisor_details()
+    {
+        return $this->belongsTo(Employee::class, 'supervisor', 'employee_id');
     }
 }

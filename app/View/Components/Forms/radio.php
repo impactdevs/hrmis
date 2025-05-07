@@ -15,7 +15,8 @@ class radio extends Component
         public string $name,
         public string $label,
         public string $id,
-        public array $options
+        public array $options,
+        public string $selected = 'none'
     )
     {
         //

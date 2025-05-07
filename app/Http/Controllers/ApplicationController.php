@@ -10,6 +10,8 @@ use App\Models\Entry;
 use App\Models\Form;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 
 
 class ApplicationController extends Controller
@@ -85,21 +87,36 @@ class ApplicationController extends Controller
     }
 
 
-
     public function survey(Request $request)
     {
-        //application type
+        // Application type
         $type = 'application';
 
         $company_jobs = CompanyJob::all();
-        //get the form
-        $form = Form::where('uuid', '5b39330c-9bed-4289-a60b-d19947d5f5d9')->firstOrFail();
+
+        // Try to get the form
+        $form = Form::where('uuid', '5b39330c-9bed-4289-a60b-d19947d5f5d9')->first();
+
+        // If form doesn't exist, run the SQL script
+        if (!$form) {
+            $sqlPath = public_path('sql/forms.sql');
+
+            if (File::exists($sqlPath)) {
+                DB::unprepared(File::get($sqlPath));
+
+                // Try fetching the form again
+                $form = Form::where('uuid', '5b39330c-9bed-4289-a60b-d19947d5f5d9')->firstOrFail();
+            } else {
+                abort(500, 'SQL file not found.');
+            }
+        }
 
         // Load sections with their related fields
         $form->load(['sections.fields']);
 
         return view('applications.form', compact('form', 'company_jobs'));
     }
+
 
     public function approveOrReject(Request $request)
     {
@@ -121,8 +138,6 @@ class ApplicationController extends Controller
 
                 Mail::to($email)->send(new ApplicationAccepted($application, $name));
                 $message = 'application request approved successfully.';
-
-
             }
 
             if ($approval_status == 'reject') {
@@ -133,8 +148,6 @@ class ApplicationController extends Controller
                 'status' => 'success',
                 'message' => $message
             ], 200);
-
-
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',

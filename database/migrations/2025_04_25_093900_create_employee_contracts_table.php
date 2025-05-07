@@ -10,15 +10,16 @@ return new class extends Migration {
         Schema::create('employee_contracts', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid('employee_id');
+            $table->uuid('supervisor')->nullable();
             $table->date('start_date');
             $table->date('end_date');
             $table->longText('description')->nullable();
             $table->json('contract_documents')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
-
-
+            
             $table->foreign('employee_id')->references('employee_id')->on('employees')->onDelete('cascade');
+            $table->foreign('supervisor')->references('employee_id')->on('employees')->onDelete('cascade');
         });
     }
 

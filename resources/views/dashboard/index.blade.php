@@ -1,6 +1,6 @@
 <x-app-layout>
     <section class="section dashboard m-2">
-        @if (auth()->user()->isAdminOrSecretary())
+        @if (auth()->user()->isAdminOrSecretary)
             <div class="row">
 
                 <!-- Left side columns -->
@@ -146,7 +146,7 @@
 
                                 </div>
 
-                            </div> 
+                            </div>
                         </div> --}}
 
                         <!-- Ongoing Appraisals -->
@@ -541,7 +541,7 @@
 
             </div>
         @endif
-        
+
         @if (count($todayBirthdays))
             @php
                 $authUserBirthday = $todayBirthdays->firstWhere('employee_id', auth()->user()->employee->employee_id);

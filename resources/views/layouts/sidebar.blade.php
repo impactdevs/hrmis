@@ -23,7 +23,7 @@
                 <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('leave-roster.index') || request()->routeIs('leave-roster-tabular.index')) bg-secondary @endif"
                     href="{{ route('leave-roster.index') }}">
                     <i class="bi bi-calendar-plus"></i>
-                    {{ auth()->user()->isAdminOrSecretary() ? 'Leave Roster' : 'My Leave Schedule' }}
+                    {{ auth()->user()->isAdminOrSecretary ? 'Leave Roster' : 'My Leave Schedule' }}
                 </a>
             </li>
 
@@ -31,12 +31,12 @@
                 <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('leaves.index')) bg-secondary @endif"
                     href="{{ route('leaves.index') }}">
                     <i class="bi bi-bus-front"></i>
-                    {{ auth()->user()->isAdminOrSecretary() ? 'Staff Leave Requests' : 'Apply For Leave' }}
+                    {{ auth()->user()->isAdminOrSecretary ? 'Staff Leave Requests' : 'Apply For Leave' }}
                 </a>
             </li>
 
 
-            @if (auth()->user()->isAdminOrSecretary())
+            @if (auth()->user()->isAdminOrSecretary)
                 <li class="nav-item">
                     <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('leave-management')) bg-secondary @endif"
                         href="{{ route('leave-management') }}">
@@ -50,7 +50,7 @@
                 <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('appraisals.index')) bg-secondary @endif"
                     href="{{ route('appraisals.index') }}">
                     <i class="bi bi-arrow-bar-up"></i>
-                    {{ auth()->user()->isAdminOrSecretary() ? 'Appraisals' : 'My Appraisals' }}
+                    {{ auth()->user()->isAdminOrSecretary ? 'Appraisals' : 'My Appraisals' }}
                 </a>
             </li>
 
@@ -58,7 +58,7 @@
                 <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('attendances.index')) bg-secondary @endif"
                     href="{{ route('attendances.index') }}">
                     <i class="bi bi-check2-all"></i>
-                    {{ auth()->user()->isAdminOrSecretary() ? 'Attendances' : 'My Attendance History' }} </a>
+                    {{ auth()->user()->isAdminOrSecretary ? 'Attendances' : 'My Attendance History' }} </a>
             </li>
 
             <li class="nav-item">
@@ -88,15 +88,15 @@
 
             <li class="nav-item">
                 @php
-                    $currentUrl = auth()->user()->isAdminOrSecretary() ? 'employees.index' : 'employees.show';
+                    $currentUrl = auth()->user()->isAdminOrSecretary ? 'employees.index' : 'employees.show';
                 @endphp
                 <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs($currentUrl)) bg-secondary @endif"
-                    href="{{ auth()->user()->isAdminOrSecretary() ? route('employees.index') : route('employees.show', auth()->user()->employee->employee_id) }}">
+                    href="{{ auth()->user()->isAdminOrSecretary ? route('employees.index') : route('employees.show', auth()->user()->employee->employee_id) }}">
                     <i class="bi bi-database-down"></i>
-                    {{ auth()->user()->isAdminOrSecretary() ? 'Employees' : 'About Me' }}
+                    {{ auth()->user()->isAdminOrSecretary ? 'Employees' : 'About Me' }}
                 </a>
             </li>
-            @if (auth()->user()->isAdminOrSecretary())
+            @if (auth()->user()->isAdminOrSecretary)
                 <li class="nav-item">
                     <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('applications.index')) bg-secondary @endif"
                         href="{{ route('applications.index') }}">

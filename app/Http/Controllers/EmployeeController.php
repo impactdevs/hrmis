@@ -345,7 +345,8 @@ class EmployeeController extends Controller
     public function create_contract($employee_id)
     {
         $employee = Employee::findOrFail($employee_id);
-        return view('employees.create_contract', compact('employee'));
+        $users = User::all();
+        return view('employees.create_contract', compact('employee', 'users'));
     }
 
     public function store_contract(Request $request)
@@ -409,7 +410,8 @@ class EmployeeController extends Controller
     public function edit_contract(Request $request, Contract $contract)
     {
         $contract->load('employee');
-        return view('employees.edit_contract', compact('contract'));
+        $users = User::all();
+        return view('employees.edit_contract', compact('contract', 'users'));
     }
 
 

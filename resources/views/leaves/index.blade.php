@@ -5,7 +5,7 @@
             <div class="col-lg-8">
                 {{-- Filters --}}
                 <div class="d-flex align-items-center mb-3 justify-between">
-                    @if (auth()->user()->isAdminOrSecretary())
+                    @if (auth()->user()->isAdminOrSecretary)
                         <div class="d-flex">
                             {{-- Department Filter --}}
                             <div class="ms-3">
@@ -26,7 +26,7 @@
                         <div class="card-body">
                             <div class="d-flex align-items-center">
                                 <h5 class="card-title">
-                                    {{ auth()->user()->isAdminOrSecretary() ? 'UNCST Leave Requests' : 'My Leave Requests' }}
+                                    {{ auth()->user()->isAdminOrSecretary ? 'UNCST Leave Requests' : 'My Leave Requests' }}
                                 </h5>
                                 {{-- check if role is HR and dont show the button --}}
                                 @if (!auth()->user()->hasRole('HR'))
@@ -236,7 +236,7 @@
 
                 var calendarEl = $('#calendar');
                 var currentEvent = null;
-                var listTitle = @json(auth()->user()->isAdminOrSecretary() ? 'Leave Roster' : 'My Leaves');
+                var listTitle = @json(auth()->user()->isAdminOrSecretary ? 'Leave Roster' : 'My Leaves');
                 var calendar = new FullCalendar.Calendar(calendarEl[0], {
                     initialView: 'dayGridMonth',
                     headerToolbar: {

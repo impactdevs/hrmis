@@ -59,7 +59,6 @@ class LeaveController extends Controller
         $existingValuesArray = [];
         $users = User::pluck('name', 'id')->toArray();
         return view('leaves.create', compact('leaveTypes', 'user_id', 'existingValuesArray', 'users', 'holidays'));
-
     }
 
     /**
@@ -74,7 +73,6 @@ class LeaveController extends Controller
         $existingValuesArray = [];
         $users = User::pluck('name', 'id')->toArray();
         return view('leaves.create', compact('leaveTypes', 'user_id', 'existingValuesArray', 'users', 'leaveRoster', 'holidays'));
-
     }
 
     /**
@@ -107,8 +105,8 @@ class LeaveController extends Controller
             //HEAD OF DEPARTMENT
             $user = auth()->user();
             $headOfDepartment = $user->employee->department->department_head;
-            $hod = User::where('id', $headOfDepartment)->first();           
-             // Send notifications to those users
+            $hod = User::where('id', $headOfDepartment)->first();
+            // Send notifications to those users
             Notification::send($doneBy, new LeaveApplied($leaveCreated, 1));
             // Send notifications to those users
             Notification::send($users, new LeaveApplied($leaveCreated, 3));
@@ -277,7 +275,7 @@ class LeaveController extends Controller
     {
         $department = $request->input('department', 'all');
 
-        if (auth()->user()->isAdminOrSecretary()) {
+        if (auth()->user()->isAdminOrSecretary) {
             // Query to get the leave roster with employee and leave relationships
             $leaveRosterQuery = LeaveRoster::with(['employee', 'leave', 'leave.leaveCategory'])
                 ->whereHas('leave');
@@ -335,6 +333,4 @@ class LeaveController extends Controller
         // Return the combined leave data
         return response()->json(['success' => true, 'data' => $combinedLeaves]);
     }
-
-
 }

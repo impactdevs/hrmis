@@ -121,14 +121,16 @@
                 <section class="mb-4 border border-1 border-secondary p-3 rounded">
                     <div class="d-flex flex-row justify-content-between align-items-center mb-4">
                         <h5 class="mt-4 mb-3 text-dark">Contracts Information</h5>
-                        <a href="{{ route('contract.create', ['employee_id' => $employee->employee_id]) }}" 
+                        @if (auth()->user()->isAdminOrSecretary)
+                        <a href="{{ route('contract.create', ['employee_id' => $employee->employee_id]) }}"
                            class="btn btn-primary btn-sm">
                             <i class="fas fa-plus me-2"></i>Add New Contract
                         </a>
+                        @endif
                     </div>
-                    
+
                     <div class="table-responsive">
-                        <table class="table table-hover table-bordered table-striped" 
+                        <table class="table table-hover table-bordered table-striped"
                                data-toggle="table"
                                data-search="true"
                                data-show-columns="true"
@@ -142,6 +144,7 @@
                                     <th data-sortable="true" data-field="end_date">End Date</th>
                                     <th data-field="duration">Duration</th>
                                     <th data-field="description">Description</th>
+                                    <th data-field="supervisor">Supervisor</th>
                                     <th data-field="attachments">Attachments</th>
                                     <th data-sortable="true" data-field="status">Status</th>
                                     @can('can edit an employee')
@@ -155,15 +158,16 @@
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $contract->start_date->format('d M Y') }}</td>
                                     <td>{{ $contract->end_date->format('d M Y') }}</td>
-                                    <td>{{ $contract->start_date->diffInMonths($contract->end_date) }} months</td>
+                                    <td>{{ $contract->start_date->diffInDays($contract->end_date) }} days</td>
                                     <td class="text-truncate" style="max-width: 200px;" title="{{ $contract->description }}">
                                         {{ $contract->description }}
                                     </td>
+                                    <td>{{ $contract->supervisor_details ? $contract->supervisor_details->first_name.' '.$contract->supervisor_details->last_name:'No Supervisor Assigned' }}</td>
                                     <td>
                                         @if($contract->contract_documents)
                                             <div class="d-flex flex-wrap gap-2">
                                                 @foreach($contract->contract_documents as $attachment)
-                                                <a href="{{ asset('storage/'.$attachment['proof']) }}" 
+                                                <a href="{{ asset('storage/'.$attachment['proof']) }}"
                                                    target="_blank"
                                                    class="btn btn-sm btn-outline-secondary d-flex align-items-center">
                                                     @if(Str::endsWith($attachment['proof'], ['.pdf']))
@@ -189,16 +193,16 @@
                                     @can('can edit an employee')
                                     <td>
                                         <div class="d-flex gap-2">
-                                            <a href="{{ route('contract.edit', $contract->id) }}" 
+                                            <a href="{{ route('contract.edit', $contract->id) }}"
                                                class="btn btn-sm btn-outline-primary"
-                                               data-bs-toggle="tooltip" 
+                                               data-bs-toggle="tooltip"
                                                title="Edit Contract">
                                                 <i class="fas fa-edit"></i>
                                             </a>
                                             <form action="{{ route('contract.destroy', $contract->id) }}" method="POST">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" 
+                                                <button type="submit"
                                                         class="btn btn-sm btn-outline-danger"
                                                         data-bs-toggle="tooltip"
                                                         title="Delete Contract"

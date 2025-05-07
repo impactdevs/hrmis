@@ -113,17 +113,6 @@
       0 => 'Pest\\Laravel\\PestServiceProvider',
     ),
   ),
-  'rawilk/laravel-printing' => 
-  array (
-    'aliases' => 
-    array (
-      'Printing' => 'Rawilk\\Printing\\Facades\\Printing',
-    ),
-    'providers' => 
-    array (
-      0 => 'Rawilk\\Printing\\PrintingServiceProvider',
-    ),
-  ),
   'spatie/laravel-permission' => 
   array (
     'providers' => 

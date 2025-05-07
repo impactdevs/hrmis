@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
+use App\Scopes\EmployeeScope;
+
 
 class User extends Authenticatable
 {
@@ -49,11 +51,11 @@ class User extends Authenticatable
     //a user is related to an employee by email
     public function employee()
     {
-        return $this->hasOne(Employee::class, 'email', 'email');
+        return $this->hasOne(Employee::class, 'email', 'email')->withoutGlobalScopes();
     }
 
     //check if admin or executive sec
-    public function isAdminOrSecretary()
+    public function getisAdminOrSecretaryAttribute()
     {
         return $this->hasRole('HR') || $this->hasRole('Executive Secretary') || $this->hasRole('Assistant Executive Secretary') || $this->hasRole('Head of Division');
     }

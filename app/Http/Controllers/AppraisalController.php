@@ -12,6 +12,9 @@ use App\Notifications\AppraisalApproval;
 use Illuminate\Http\Request;
 use App\Models\Form;
 use Illuminate\Support\Facades\Notification;
+use App\Mail\Invitation;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Mail;
 
 class AppraisalController extends Controller
 {
@@ -29,38 +32,123 @@ class AppraisalController extends Controller
      */
     public function create()
     {
-        //
+        if (!auth()->user()->employee) {
+            return back()->with("success", "No Employee record found! Ask the human resource");
+        }
+        if (!auth()->user()->employee->department) {
+            return back()->with("success", "Your department does not have a department head, so we cant determine a supervisor for you!.");
+        }
+        $data =  [
+            "appraisal_start_date" => null,
+            "appraisal_end_date" => null,
+            'employee_id' => auth()->user()->employee->employee_id,
+            "appraiser_id" => User::find(auth()->user()->employee->department->department_head)->employee->employee_id,
+            "appraisal_period_accomplishment" => [
+                [
+                    "planned_activity" => null,
+                    "output_results" => null,
+                    "remarks" => null,
+                ]
+            ],
+            "if_no_job_compatibility" => null,
+            "unanticipated_constraints" => null,
+            "personal_initiatives" => null,
+            "training_support_needs" => null,
+            "appraisal_period_rate" => [
+                [
+                    "planned_activity" => null,
+                    "output_results" => null,
+                    "supervisee_score" => null,
+                    "superviser_score" => null,
+                ]
+            ],
+            "personal_attributes_assessment" => [
+                "technical_knowledge" =>  [
+                    "appraisee_score" => null,
+                    "appraiser_score" => null,
+                    "agreed_score" => null,
+                ],
+                "commitment" =>  [
+                    "appraisee_score" => null,
+                    "appraiser_score" => null,
+                    "agreed_score" => null,
+                ],
+                "team_work" =>  [
+                    "appraisee_score" => null,
+                    "appraiser_score" => null,
+                    "agreed_score" => null,
+                ],
+                "productivity" =>  [
+                    "appraisee_score" => null,
+                    "appraiser_score" => null,
+                    "agreed_score" => null,
+                ],
+                "integrity" =>  [
+                    "appraisee_score" => null,
+                    "appraiser_score" => null,
+                    "agreed_score" => null,
+                ],
+                "flexibility" =>  [
+                    "appraisee_score" => null,
+                    "appraiser_score" => null,
+                    "agreed_score" => null,
+                ],
+                "attendance" =>  [
+                    "appraisee_score" => null,
+                    "appraiser_score" => null,
+                    "agreed_score" => null,
+                ],
+                "appearance" =>  [
+                    "appraisee_score" => null,
+                    "appraiser_score" => null,
+                    "agreed_score" => null,
+                ],
+                "interpersonal" =>  [
+                    "appraisee_score" => null,
+                    "appraiser_score" => null,
+                    "agreed_score" => null,
+                ],
+                "initiative" =>  [
+                    "appraisee_score" => null,
+                    "appraiser_score" => null,
+                    "agreed_score" => null,
+                ]
+            ],
+            "performance_planning" =>  [
+                [
+                    "description" => null,
+                    "performance_target" => null,
+                    "target_date" => null,
+                ]
+            ],
+            "employee_strength" => null,
+            "employee_improvement" => null,
+            "superviser_overall_assessment" => null,
+            "recommendations" => null,
+            "panel_comment" => null,
+            "panel_recommendation" => null,
+            "overall_assessment" => null,
+            "executive_secretary_comments" => null,
+        ];
+
+        $appraisal = Appraisal::create($data);
+
+        return to_route('appraisals.edit', ['appraisal' => $appraisal->appraisal_id]);
     }
+
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        //convert the form fields to json
-        $responses = json_encode($request->except('_token', 'form_id'));
-        $form_id = $request->input('form_id');
+        $data = $request->all();
 
-        $entry = new Entry();
-        $entry->form_id = $form_id;
-        $entry->responses = $responses;
-        $entry->save();
+        $data['employee_id'] = auth()->user()->employee->employee_id;
+        Appraisal::create($data);
 
-        $appraisal = new Appraisal();
-        $appraisal->entry_id = $entry->id;
-        $appraisal->employee_id = auth()->user()->employee->employee_id;
-        $appraisal->save();
-
-        //get the head of department for the logged in user
-        $user = auth()->user();
-        $headOfDepartment = $user->employee->department->department_head;
-        $email = User::where('id', $headOfDepartment)->first();
-
-        //send an email to the head of department
-        Notification::send($email, new AppraisalApplication($appraisal, $user->employee->first_name, $user->employee->last_name));
-        return back()->with('success', 'Appraisal submitted successfully! Thank you for your response.');
+        return redirect()->back()->with('success', 'Appraisal submitted successfully!');
     }
-
     /**
      * Display the specified resource.
      */
@@ -72,25 +160,29 @@ class AppraisalController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Appraisal $appraisal)
     {
-        //
+        $users = User::all();
+        return view('appraisals.edit', compact('appraisal', 'users'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Appraisal $appraisal)
     {
-        //
+        $appraisal->update($request->all());
+
+        return redirect()->back()->with('success', 'Appraisal updated successfully.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request, Appraisal $appraisal)
     {
-        //
+        $appraisal->delete();
+        return to_route('appraisals.index');
     }
 
     public function survey(Request $request)
@@ -106,42 +198,70 @@ class AppraisalController extends Controller
         return view('appraisals.form', compact('form'));
     }
 
-    public function approveOrReject(Request $request)
+
+    public function approveOrReject(Request $request, Appraisal $appraisal)
     {
-        try {
-            $approval_status = request()->input('status');
-            $appraisal = Appraisal::find(request()->input('appraisals_id'));
-            //logeed in employee
-            $loggedInEmployee = auth()->user()->employee;
-            $employee = Employee::withoutGlobalScope(EmployeeScope::class)->where('employee_id', $appraisal->employee_id)->first();
-            $appraisal->approval_status = $approval_status;
-            $appraisal->save();
-            $employeeUser = $employee->user_id;
-            $email = User::where('id', $employeeUser)->first();
+        $request->validate([
+            'status' => 'required|string|in:approved,rejected',
+            'reason' => 'nullable|string',
+        ]);
 
-            $message = '';
+        $user = auth()->user();
 
-            if ($approval_status == 'approve') {
-                //send an email to the head of department
-                Notification::send($email, new AppraisalApproval($appraisal, $loggedInEmployee ->first_name, $loggedInEmployee ->last_name));
-                $message = 'Appraisal request approved successfully.';
+        // Retrieve current leave_request_status (it will be an array due to casting)
+        $appraisalRequestStatus = $appraisal->leave_request_status ?: []; // Default to an empty array if null
+
+        // Update leave request based on the user's role and the input status
+        if ($user->hasRole('HR')) {
+            if ($request->input('status') === 'approved') {
+                // Set HR status to approved
+                $appraisalRequestStatus['HR'] = 'approved';
+                $appraisal->rejection_reason = null; // Clear reason if approved
+            } else {
+                // Set HR status to rejected
+                $appraisalRequestStatus['HR'] = 'rejected';
+                $appraisal->rejection_reason = $request->input('reason'); // Store rejection reason
             }
-            if ($approval_status == 'reject') {
-                $appraisal->rejection_reason = request()->input('reason');
-                Notification::send($email, new AppraisalApproval($appraisal, $loggedInEmployee ->first_name, $loggedInEmployee ->last_name));
-                $message = 'Appraisal request rejected successfully.';
+        } elseif ($user->hasRole('Head of Division')) {
+            if ($request->input('status') === 'approved') {
+                // Set Head of Division status to approved
+                $appraisalRequestStatus['Head of Division'] = 'approved';
+                $appraisal->rejection_reason = null; // Clear reason if approved
+            } else {
+                // Set Head of Division status to rejected
+                $appraisalRequestStatus['Head of Division'] = 'rejected';
+                $appraisal->rejection_reason = $request->input('reason'); // Store rejection reason
             }
-            return response()->json([
-                'status' => 'success',
-                'message' => $message
-            ], 200);
+        } elseif ($user->hasRole('Executive Secretary')) {
+            if ($request->input('status') === 'approved') {
+                // Set leave status as approved for Executive Secretary
+                $appraisalRequestStatus['Executive Secretary'] = 'approved';
+                $appraisal->rejection_reason = null; // Clear reason if approved
+            } else {
+                // Set rejection status
+                $appraisalRequestStatus['Executive Secretary'] = 'rejected';
+                $appraisal->rejection_reason = $request->input('reason'); // Store rejection reason
+            }
 
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'approval failed',
-            ], 500);
+            // Send notification
+            $appraisalRequester = User::find($appraisal->employee->user_id); // Get the user who requested the leave
+            // $approver = User::where('id', auth()->user()->id)->first();
+            Notification::send($appraisalRequester->email, new AppraisalApproval($appraisal, $appraisalRequester->first_name, $appraisalRequester->last_name));
+        } else {
+            return response()->json(['error' => 'Unauthorized'], 403);
         }
+
+        // Save the updated leave_request_status
+        $appraisal->appraisal_request_status = $appraisalRequestStatus;
+        $appraisal->save();
+
+        return response()->json(['message' => 'Appraisal application approved successfully.', 'status' => $appraisal->leave_request_status]);
+    }
+
+    public function downloadPDF(Appraisal $appraisal)
+    {
+        $users = User::all();
+        $pdf = PDf::loadView('appraisals.pdf', compact('appraisal', 'users'));
+        return $pdf->download("appraisal-{$appraisal->appraisal_id}.pdf");
     }
 }

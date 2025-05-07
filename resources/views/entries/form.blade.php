@@ -3,13 +3,21 @@
          <h1>This form has no form fields</h1>
      @else
          @if (isset($company_jobs))
-             <select class="form-select" aria-label="Job" name="company_job_id">
-                 @foreach ($company_jobs as $job)
-                     <option value="{{ $job->company_job_id }}">{{ $job->job_code . '-' . $job->job_title }}
-                     </option>
-                 @endforeach
-             </select>
+         <div class="row mb-3">
+            <div class="border border-primary p-3 rounded col-12">
+                <label class="form-label">Which role are you applying for?</label>
+                <select class="form-select" aria-label="Job" name="company_job_id">
+                    @foreach ($company_jobs as $job)
+                        <option value="{{ $job->company_job_id }}">
+                            {{ $job->job_code . '-' . $job->job_title }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+         </div>
+
          @endif
+
 
          {{-- iterate through sections and create an accordion --}}
          @for ($i = 0; $i < count($form->sections); $i++)

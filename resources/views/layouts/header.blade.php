@@ -1,8 +1,8 @@
 <!-- ======= Header ======= -->
 <header id="header" class="navbar sticky-top header fixed-top d-flex align-items-center">
-    <div class="d-flex flex-grow-1 flex-row align-items-center">
+    <div class="flex-row d-flex flex-grow-1 align-items-center">
         <!-- Add this toggle button before the sidebar -->
-        <button class="navbar-toggler d-md-none position-fixed start-0 mt-2" type="button" id="sidebarToggle">
+        <button class="mt-2 navbar-toggler d-md-none position-fixed start-0 no-print" type="button" id="sidebarToggle">
             <span class="navbar-toggler-icon"></span>
         </button>
 
@@ -15,11 +15,11 @@
                 }
 
                 if (request()->routeIs('leaves.index')) {
-                    $title = auth()->user()->isAdminOrSecretary() ? 'Staff Leave Requests' : 'Apply For Leave';
+                    $title = auth()->user()->isAdminOrSecretary ? 'Staff Leave Requests' : 'Apply For Leave';
                 }
 
                 if (request()->routeIs('leave-roster.index') || request()->routeIs('leave-roster-tabular.index')) {
-                    $title = auth()->user()->isAdminOrSecretary() ? 'Leave Roster' : 'My Leave Schedule';
+                    $title = auth()->user()->isAdminOrSecretary ? 'Leave Roster' : 'My Leave Schedule';
                 }
 
                 if (request()->routeIs('leave-management')) {
@@ -27,11 +27,28 @@
                 }
 
                 if (request()->routeIs('appraisals.index')) {
-                    $title = auth()->user()->isAdminOrSecretary() ? 'Appraisals' : 'My Appraisals';
+                    $title = auth()->user()->isAdminOrSecretary ? 'Appraisals' : 'My Appraisals';
+                }
+                if (request()->routeIs('appraisals.edit')) {
+                    $appraisal = request()->route('appraisal'); // This is likely a model, not an ID
+                    $title =
+                        'Appraisal for ' . $appraisal->employee->first_name . ' ' . $appraisal->employee->last_name;
+                }
+
+                if (request()->routeIs('appraisals.create')) {
+                    $title = 'Applying for an Appraisal';
                 }
 
                 if (request()->routeIs('attendances.index')) {
-                    $title = auth()->user()->isAdminOrSecretary() ? 'Attendances' : 'My Attendance History';
+                    $title = auth()->user()->isAdminOrSecretary ? 'Attendances' : 'My Attendance History';
+                }
+
+                if (request()->routeIs('contract.create')) {
+                    $title = 'Add contract';
+                }
+
+                if (request()->routeIs('contract.edit')) {
+                    $title = 'Edit contract';
                 }
 
                 if (
@@ -53,11 +70,11 @@
                 }
 
                 if (request()->routeIs('employees.index')) {
-                    $title = auth()->user()->isAdminOrSecretary() ? 'Employees' : 'About Me';
+                    $title = auth()->user()->isAdminOrSecretary ? 'Employees' : 'About Me';
                 }
 
                 if (request()->routeIs('employees.show')) {
-                    $title = auth()->user()->isAdminOrSecretary() ? 'Employees' : 'About Me';
+                    $title = auth()->user()->isAdminOrSecretary ? 'Employees' : 'About Me';
                 }
 
                 if (request()->routeIs('employees.create')) {
@@ -111,7 +128,7 @@
     </div>
 
 
-    <nav class="header-nav ms-auto">
+    <nav class="header-nav ms-auto no-print">
         <ul class="d-flex align-items-center">
             <li class="nav-item dropdown">
                 <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
@@ -122,7 +139,7 @@
                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
                     <li class="dropdown-header">
                         You have <span id="notification-count">0</span> new notifications
-                        <a href="/notifications"><span class="badge rounded-pill bg-primary p-2 ms-2">View
+                        <a href="/notifications"><span class="p-2 badge rounded-pill bg-primary ms-2">View
                                 all</span></a>
                     </li>
                 </ul>
@@ -131,8 +148,8 @@
             <li class="nav-item dropdown pe-3">
                 <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
                     @if (auth()->user()->employee->passport_photo)
-                        <img src="{{ asset('storage/' . auth()->user()->employee->passport_photo) }}" alt="Passport Photo"
-                            class="img-fluid rounded-circle" width="70%">
+                        <img src="{{ asset('storage/' . auth()->user()->employee->passport_photo) }}"
+                            alt="Passport Photo" class="img-fluid rounded-circle" width="70%">
                         <span class="d-none d-md-block dropdown-toggle ps-2">{{ auth()->user()->name }}</span>
                     @else
                         <img src="/assets/img/profile.jpg" alt="Profile" class="rounded-circle">

@@ -37,7 +37,7 @@ class HomeController extends Controller
 
         //ongoing appraisals
         $ongoingAppraisals = Appraisal::where('employee_id', optional(auth()->user()->employee)->employee_id)->count();
-        $isAdmin = auth()->user()->isAdminOrSecretary();
+        $isAdmin = auth()->user()->isAdminOrSecretary;
 
 
         //events and trainings
@@ -158,11 +158,11 @@ class HomeController extends Controller
         $chartEmployeeDataJson = json_encode($chartEmployeeData);
 
         //applications
-        $entries = Application::with('entry', 'job')->whereDate('created_at', $today)
+        $entries = Application::with('job')->whereDate('created_at', $today)
             ->latest()
             ->get();
 
-        $appraisals = Appraisal::with('entry')->whereDate('created_at', $today)
+        $appraisals = Appraisal::whereDate('created_at', $today)
             ->latest()
             ->get();
 
@@ -226,8 +226,8 @@ class HomeController extends Controller
 
         //birthdays
         $todayBirthdays = Employee::withoutGlobalScope(EmployeeScope::class)->whereMonth('date_of_birth', Carbon::today()->month)
-        ->whereDay('date_of_birth', Carbon::today()->day)
-        ->get();
+            ->whereDay('date_of_birth', Carbon::today()->day)
+            ->get();
 
         return view('dashboard.index', compact('number_of_employees', 'attendances', 'available_leave', 'hours', 'todayCounts', 'yesterdayCounts', 'lateCounts', 'chartDataJson', 'leaveTypesJson', 'chartEmployeeDataJson', 'events', 'trainings', 'entries', 'appraisals', 'leaveApprovalData', 'daysUntilExpiry', 'totalLeaves', 'totalDays', 'todayBirthdays', 'isAdmin'));
     }

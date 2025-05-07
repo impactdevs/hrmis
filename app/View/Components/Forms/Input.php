@@ -18,6 +18,9 @@ class Input extends Component
         public string $id,
         public string $placeholder = '', // Default value provided here
         public string $value = '', // Default value provided here
+        public bool $isDisabled = false,
+        public ?int $min = null,  // Optional min
+        public ?int $max = null   // Optional max
 
     )
     {

@@ -14,10 +14,10 @@
             </form>
 
             <div>
-                <a href="{{ route('form-builder.show', '5b39330c-9bed-4289-a60b-d19947d5f5d9') }}"
+                {{-- <a href="{{ route('form-builder.show', '5b39330c-9bed-4289-a60b-d19947d5f5d9') }}"
                     class="btn border-t-neutral-50 btn-primary">
                     <i class="bi bi-database-add me-2"></i>Application Form
-                </a>
+                </a> --}}
                 <a href="{{ route('application.survey') }}" class="btn border-t-neutral-50 btn-info text-light"
                     id="copyLink">
                     <i class="bi bi-link-45deg"></i>Copy Application Link
@@ -51,20 +51,20 @@
 
                                             @if ($application->application_status == 'approve')
                                                 <span class="badge text-bg-success">
-                                                    {{ $data[93] }}
+                                                    {{ $data[93]??"None" }}
                                                 </span>
                                             @else
-                                                {{ $data[93] }}
+                                                {{ $data[93]??"None" }}
                                             @endif
                                         </td>
                                         <td>
 
                                             @if ($application->application_status == 'approve')
                                                 <span class="badge text-bg-success">
-                                                    {{ $data[94] }}
+                                                    {{ $data[94]??"None" }}
                                                 </span>
                                             @else
-                                                {{ $data[94] }}
+                                                {{ $data[94]??"None" }}
                                             @endif
                                         </td>
                                         <td>{{ $application->job->job_title }}</td>

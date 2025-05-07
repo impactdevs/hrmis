@@ -31,21 +31,21 @@ class InfobipTransport extends AbstractTransport
     {
         /** @var Email $email */
         $email = MessageConverter::toEmail($message->getOriginalMessage());
-    
+
         $multipart = [
             ['name' => 'from', 'contents' => $this->nameFrom.' <'.$this->emailFrom.'>'],
             ['name' => 'to', 'contents' => implode(',', array_map(fn($a) => $a->getAddress(), $email->getTo()))],
             ['name' => 'subject', 'contents' => $email->getSubject()],
         ];
-    
+
         if ($email->getTextBody()) {
             $multipart[] = ['name' => 'text', 'contents' => $email->getTextBody()];
         }
-    
+
         if ($email->getHtmlBody()) {
             $multipart[] = ['name' => 'html', 'contents' => $email->getHtmlBody()];
         }
-    
+
     // Handle Attachments
     foreach ($email->getAttachments() as $attachment) {
         if ($attachment->getDisposition() !== 'attachment') {
@@ -73,7 +73,7 @@ class InfobipTransport extends AbstractTransport
             ]
         ];
 
-    } 
+    }
 
         $response = Http::withHeaders([
             'Authorization' => 'App ' . $this->apiKey,
@@ -81,12 +81,12 @@ class InfobipTransport extends AbstractTransport
         ])
         ->asMultipart()
         ->post("{$this->baseUrl}/email/3/send", $multipart);
-    
+
         if ($response->failed()) {
             throw new \RuntimeException("Infobip API Error: " . $response->body());
         }
     }
-    
+
 
     private function formatAddresses(array $addresses): array
     {

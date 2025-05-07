@@ -43,6 +43,9 @@ Route::get('/employees/{employee}/generate-pdf', [EmployeeController::class, 'ge
 Route::get('/employees/{employee}/print', function (Employee $employee) {
     return view('employees.pdf', ['employee' => $employee]);
 })->name('employees.print');
+
+Route::get('/send-email', [AppraisalController::class, 'sendEmails'])
+    ->name('send-email');
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('roles', RoleController::class);
     Route::resource('permissions', PermissionController::class);
@@ -57,6 +60,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/contract/{contract}/delete', [EmployeeController::class, 'destroy_contract'])->name('contract.destroy');
 
 
+
+
     Route::post('/contract', [EmployeeController::class, 'store_contract'])->name('contract.store');
     Route::get('/leave-management/data', [LeaveController::class, 'getLeaveManagementData']);
     Route::post('update-entitled-leave-days/{id}', [EmployeeController::class, 'updateEntitledLeaveDays'])->name('update-entitled-leave-days');
@@ -66,6 +71,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('appraisals', AppraisalController::class);
     Route::post('/appraisal/appraisal-approval', [AppraisalController::class, 'approveOrReject'])
         ->name('appraisals.approveOrReject');
+    Route::post('/appraisals/{appraisal}/status', [AppraisalController::class, 'approveOrReject'])
+        ->name('appraisals.approveOrReject');
+    Route::get('/appraisals/{appraisal}/download', [AppraisalController::class, 'downloadPDF'])
+        ->name('appraisals.download');
     Route::resource('events', EventController::class);
     Route::resource('trainings', TrainingController::class);
     Route::resource('out-of-station-trainings', OutOfStationTrainingController::class);

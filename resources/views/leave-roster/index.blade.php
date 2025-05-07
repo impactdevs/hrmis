@@ -63,7 +63,7 @@
             <div class="col-lg-4">
                 {{-- Filters --}}
                 <div class="d-flex align-items-center mb-3 justify-between">
-                    @if (auth()->user()->isAdminOrSecretary())
+                    @if (auth()->user()->isAdminOrSecretary)
                         <div class="d-flex">
                             {{-- Department Filter --}}
                             <div class="ms-3">
@@ -88,7 +88,7 @@
                                 <i class="bi bi-plus-circle"></i> Add Leave Days</button>
                         </div>
 
-                        @if (auth()->user()->isAdminOrSecretary())
+                        @if (auth()->user()->isAdminOrSecretary)
                             <div class="d-flex align-items-center mb-3">
                                 {{-- Tabular view --}}
                                 <a class="btn btn-primary btn-sm mt-3 ms-1 font-weight-bold"
@@ -242,7 +242,7 @@
                 $('#scheduledDaysText').text(totalLeaveDaysScheduled + ' days scheduled');
                 console.log(balanceToSchedule)
                 // if canSelect is false, show the exceeded days
-                if (balanceToSchedule<=0) {
+                if (balanceToSchedule <= 0) {
                     $('#exceededDays').text('Annual leave days exceeded');
                 }
 
@@ -264,7 +264,7 @@
                         canSelect = balanceToSchedule > 0;
 
                         //if canSelect is false, show the exceeded days
-                        if (balanceToSchedule<=0) {
+                        if (balanceToSchedule <= 0) {
                             $('#exceededDays').text('Annual Leave Days Exceeded');
                         }
 
@@ -310,7 +310,7 @@
 
                 var calendarEl = $('#calendar');
                 var currentEvent = null;
-                var listTitle = @json(auth()->user()->isAdminOrSecretary() ? 'Leave Roster' : 'My Leaves');
+                var listTitle = @json(auth()->user()->isAdminOrSecretary ? 'Leave Roster' : 'My Leaves');
                 var calendar = new FullCalendar.Calendar(calendarEl[0], {
                     initialView: 'dayGridMonth',
                     headerToolbar: {
@@ -714,7 +714,7 @@
 
                         return;
                     }
-                    
+
                     // Extract form values
                     var start_date = $('#start_date').val();
                     var end_date = $('#end_date').val();

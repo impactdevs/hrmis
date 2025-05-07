@@ -1,7 +1,6 @@
 <x-app-layout>
     <div class="mt-3">
         <div class="d-flex flex-row flex-1 justify-content-between">
-            <h5 class="ms-3 text-primary font-weight-bold">Events Management</h5>
             @can('can add an event')
                 <div>
                     <a href="{{ route('events.create') }}" class="btn border-t-neutral-50 btn-primary">
