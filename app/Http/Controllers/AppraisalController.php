@@ -162,7 +162,8 @@ class AppraisalController extends Controller
      */
     public function edit(Appraisal $appraisal)
     {
-        $users = User::all();
+        $users = User::whereHas('employee')->get();
+
         return view('appraisals.edit', compact('appraisal', 'users'));
     }
 
