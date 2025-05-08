@@ -7,7 +7,7 @@
 
         $rejectionReason = $appraisal->rejection_reason ?? 'No reason provided.';
     @endphp
-    <div class="position-fixed top-50 end-0 translate-middle-y p-2 bg-white shadow rounded d-flex align-items-center gap-2 border border-primary no-print"
+    <div class="gap-2 p-2 bg-white border rounded shadow position-fixed top-50 end-0 translate-middle-y d-flex align-items-center border-primary no-print"
         style="z-index: 9999; cursor: pointer;" role="button" onclick="window.print();" title="Print this page">
 
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="blue" stroke-width="2"
@@ -21,7 +21,7 @@
 
     @if ($rejectedEntry)
         <!-- Toast for rejection -->
-        <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3 text-bg-danger approval"
+        <div class="top-0 p-3 toast-container position-fixed start-50 translate-middle-x text-bg-danger approval"
             role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
@@ -143,7 +143,7 @@
                                     data-placeholder="Choose the Appraiser" required>
                                     @foreach ($users as $user)
                                         <option value=""></option>
-                                        <option value="{{ $user->employee->employee_id }}"
+                                        <option value="{{ optional($user->employee)->employee_id }}"
                                             {{ $user->employee && $user->employee->employee_id == $appraisal->appraiser_id ? 'selected' : '' }}>
                                             {{ $user->name }}
                                         </option>
@@ -351,7 +351,7 @@
                                     <div class="mt-2 row g-3 repeater-rate-item">
                                         <div class="col-md-12">
                                             <x-forms.text-area
-                                                name="appraisal_period_rate[{{ $loop->index }}][planned_activity]" 
+                                                name="appraisal_period_rate[{{ $loop->index }}][planned_activity]"
                                                 id="appraisal_period_rate_planned_activity_{{ $loop->index }}"
                                                 label="Planned Activities/Tasks"
                                                 placeholder="Enter Planned Activities" :value="old(
@@ -928,7 +928,7 @@
                         </div>
                         @can('approve appraisal')
                             @if (!is_null($appraisal->employee->user_id))
-                                <div class="status m-2">
+                                <div class="m-2 status">
                                     @php $userRole = Auth::user()->roles->pluck('name')[0]; @endphp
 
                                     {{-- Current user's decision --}}
