@@ -3,18 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appraisal;
-use App\Models\Employee;
-use App\Models\Entry;
-use App\Models\Scopes\EmployeeScope;
+
 use App\Models\User;
-use App\Notifications\AppraisalApplication;
 use App\Notifications\AppraisalApproval;
 use Illuminate\Http\Request;
 use App\Models\Form;
 use Illuminate\Support\Facades\Notification;
-use App\Mail\Invitation;
+
 use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Support\Facades\Mail;
 
 class AppraisalController extends Controller
 {
