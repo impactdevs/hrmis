@@ -5,33 +5,33 @@
         </h5>
         <div class="row">
             <div class="col-md-6">
-                <div class="form-group mb-3">
+                <div class="mb-3 form-group">
                     <label for="event_name">
                         <i class="fas fa-tag"></i> Event Name
                     </label>
-                    <p class="border p-2 rounded bg-light">{{ $event->event_title }}</p>
+                    <p class="p-2 border rounded bg-light">{{ $event->event_title }}</p>
                 </div>
-                <div class="form-group mb-3">
+                <div class="mb-3 form-group">
                     <label for="event_start_date">
                         <i class="fas fa-clock"></i> Event Start Date
                     </label>
-                    <p class="border p-2 rounded bg-light">{{ $event->event_start_date->toDateString() }}</p>
+                    <p class="p-2 border rounded bg-light">{{ $event->event_start_date->toDateString() }}</p>
                 </div>
-                <div class="form-group mb-3">
+                <div class="mb-3 form-group">
                     <label for="event_end_date">
                         <i class="fas fa-clock"></i> Event End Date
                     </label>
-                    <p class="border p-2 rounded bg-light">{{ $event->event_end_date->toDateString() }}</p>
+                    <p class="p-2 border rounded bg-light">{{ $event->event_end_date->toDateString() }}</p>
                 </div>
-                <div class="form-group mb-3">
+                <div class="mb-3 form-group">
                     <label for="event_description">
                         <i class="fas fa-info-circle"></i> Event Description
                     </label>
-                    <p class="border p-2 rounded bg-light">{{ $event->event_description }}</p>
+                    <p class="p-2 border rounded bg-light">{{ $event->event_description }}</p>
                 </div>
             </div>
             <div class="col-md-6">
-                <div class="form-group mb-3">
+                <div class="mb-3 form-group">
                     <label for="category">
                         <i class="fas fa-tags"></i> Event Categories
                     </label>
@@ -55,14 +55,14 @@
 
 
                         @foreach ($departmentIds as $id)
-                            @if (isset($options['users'][$id]))
+                            @if (filled($id))
                                 <span
                                     class="badge bg-success">{{ $options['departments'][$id] == '' ? '' : $options['departments'][$id] ?? 'Unknown Department' }}</span>
                             @endif
                         @endforeach
 
                         @foreach ($positionIds as $id)
-                            @if (isset($options['users'][$id]))
+                            @if (filled($id))
                                 <span
                                     class="badge bg-info">{{ $options['positions'][$id] == '' ? '' : $options['positions'][$id] ?? 'Unknown Position' }}</span>
                             @endif

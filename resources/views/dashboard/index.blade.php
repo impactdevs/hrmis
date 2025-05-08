@@ -1,5 +1,5 @@
 <x-app-layout>
-    <section class="section dashboard m-2">
+    <section class="m-2 section dashboard">
         @if (auth()->user()->isAdminOrSecretary)
             <div class="row">
 
@@ -47,6 +47,64 @@
 
                             </div>
                         </div><!-- End Attendees Card -->
+
+                        <!-- Pending Appraisals Card -->
+                        <div class="col-xxl-4 col-md-6">
+                            <div class="card info-card customers-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Pending Appraisals</h5>
+                                    <div class="d-flex align-items-center">
+                                        <div
+                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                            <i class="bi bi-hourglass-split text-warning"></i>
+                                        </div>
+                                        <div class="ps-3">
+                                            <h6>{{ $pendingAppraisals }}</h6>
+                                            <span class="pt-2 text-muted small ps-1">Pending evaluations</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ongoing Appraisals Card -->
+                        <div class="col-xxl-4 col-md-6">
+                            <div class="card info-card customers-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Ongoing Appraisals</h5>
+                                    <div class="d-flex align-items-center">
+                                        <div
+                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                            <i class="bi bi-arrow-repeat text-primary"></i>
+                                        </div>
+                                        <div class="ps-3">
+                                            <h6>{{ $ongoingAppraisals }}</h6>
+                                            <span class="pt-2 text-muted small ps-1">Awaiting final approval</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Complete Appraisals Card -->
+                        <div class="col-xxl-4 col-md-6">
+                            <div class="card info-card customers-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Complete Appraisals</h5>
+                                    <div class="d-flex align-items-center">
+                                        <div
+                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                            <i class="bi bi-check-circle text-success"></i>
+                                        </div>
+                                        <div class="ps-3">
+                                            <h6>{{ $completeAppraisals }}</h6>
+                                            <span class="pt-2 text-muted small ps-1">Complete evaluations</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
 
                         <!-- Leaves Card -->
                         <div class="col-xxl-3 col-xl-12">
@@ -111,7 +169,7 @@
 
                         <!-- Applications -->
                         {{-- <div class="col-12">
-                            <div class="card recent-sales overflow-auto">
+                            <div class="overflow-auto card recent-sales">
                                 <div class="card-body">
                                     <h5 class="card-title">Applications <span>| Today</span></h5>
 
@@ -151,9 +209,9 @@
 
                         <!-- Ongoing Appraisals -->
                         {{-- <div class="col-12">
-                            <div class="card top-selling overflow-auto">
+                            <div class="overflow-auto card top-selling">
 
-                                <div class="card-body pb-0">
+                                <div class="pb-0 card-body">
                                     <h5 class="card-title">On Going Appraisals</h5>
 
                                     <table class="table table-borderless">
@@ -198,7 +256,7 @@
                         <!-- Allocated Leave -->
                         <div class="col-12">
                             <div class="card">
-                                <div class="card-body pb-0">
+                                <div class="pb-0 card-body">
                                     <h5 class="card-title">Allocated Leave Analysis <span>| This Month</span></h5>
 
                                     <div id="budgetChart" style="min-height: 400px;" class="echart"></div>
@@ -229,7 +287,7 @@
                             </ul>
                         </div>
 
-                        <div class="card-body pb-0">
+                        <div class="pb-0 card-body">
                             <h5 class="card-title">Employee Distribution</h5>
 
                             <div id="trafficChart" style="min-height: 400px;" class="echart"></div>
@@ -240,13 +298,13 @@
 
                     <!-- Events -->
                     <div class="card">
-                        <div class="card-body pb-0">
+                        <div class="pb-0 card-body">
                             <h5 class="card-title">Events &amp; Trainings <span>| Ongoing, Due Today & Tomorrow</span>
                             </h5>
 
                             <div class="news">
                                 @foreach ($events as $event)
-                                    <div class="post-item clearfix">
+                                    <div class="clearfix post-item">
                                         <img src="{{ 'assets/img/event.gif' }}" alt="">
                                         <h4><a
                                                 href="{{ route('events.show', $event->event_id) }}">{{ $event->event_title }}</a>
@@ -270,7 +328,7 @@
                                 @endforeach
 
                                 @foreach ($trainings as $training)
-                                    <div class="post-item clearfix">
+                                    <div class="clearfix post-item">
                                         <img src="{{ 'assets/img/training.gif' }}" alt="">
                                         <h4><a
                                                 href="{{ route('trainings.show', $training->training_id) }}">{{ $training->training_title }}</a>
@@ -360,38 +418,73 @@
                             </div>
                         </div><!-- End Revenue Card -->
 
-                        <!-- Customers Card -->
-                        {{-- <div class="col-xxl-4 col-xl-12">
-
+                        <!-- Pending Appraisals Card -->
+                        <div class="col-xxl-4 col-md-6">
                             <div class="card info-card customers-card">
-
                                 <div class="card-body">
-                                    <h5 class="card-title">Ongoing Appraisals</h5>
-
+                                    <h5 class="card-title">Pending Appraisals</h5>
                                     <div class="d-flex align-items-center">
                                         <div
                                             class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                            <i class="bi bi-people"></i>
+                                            <i class="bi bi-hourglass-split text-warning"></i>
+                                        </div>
+                                        <div class="ps-3">
+                                            <h6>{{ $pendingAppraisals }}</h6>
+                                            <span class="pt-2 text-muted small ps-1">Pending evaluations</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ongoing Appraisals Card -->
+                        <div class="col-xxl-4 col-md-6">
+                            <div class="card info-card customers-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Ongoing Appraisals</h5>
+                                    <div class="d-flex align-items-center">
+                                        <div
+                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                            <i class="bi bi-arrow-repeat text-primary"></i>
                                         </div>
                                         <div class="ps-3">
                                             <h6>{{ $ongoingAppraisals }}</h6>
+                                            <span class="pt-2 text-muted small ps-1">Awaiting final approval</span>
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
+                        </div>
 
-                        </div> --}}
+                        <!-- Complete Appraisals Card -->
+                        <div class="col-xxl-4 col-md-6">
+                            <div class="card info-card customers-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Complete Appraisals</h5>
+                                    <div class="d-flex align-items-center">
+                                        <div
+                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                            <i class="bi bi-check-circle text-success"></i>
+                                        </div>
+                                        <div class="ps-3">
+                                            <h6>{{ $completeAppraisals }}</h6>
+                                            <span class="pt-2 text-muted small ps-1">Complete evaluations</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- End Customers Card -->
                         @if (count($leaveApprovalData) > 0)
                             <!-- Leave Approval Progress -->
                             <div class="col-xxl-12 col-md-12">
-                                <div class="card info-card leave-approval-card border border-5 border-primary">
+                                <div class="border card info-card leave-approval-card border-5 border-primary">
                                     <div class="card-body">
                                         <h6 class="mb-2">Leave Requests</h6>
 
                                         @foreach ($leaveApprovalData as $leaveData)
-                                            <div class="leave-approval-item mb-3">
+                                            <div class="mb-3 leave-approval-item">
                                                 @if ($leaveData['esStatus'] === 'Approved')
                                                     <!-- Hide progress area -->
                                                     <div class="congratulations-message">
@@ -435,34 +528,63 @@
                                 </div>
                             </div><!-- End Leave Approval Progress Card -->
                         @endif
-                        @if ($daysUntilExpiry <= 90)
-                            <!-- Revenue Card -->
-                            <div class="col-xxl-12 col-md-12">
-                                @if ($daysUntilExpiry >= 0 && $daysUntilExpiry != null)
-                                    <div class="alert alert-warning mt-3">
-                                        <h5>Contract Expiry Notification</h5>
-                                        <p>Your contract is expiring in <strong>{{ $daysUntilExpiry }}
-                                                days</strong>.</p>
-                                        <div class="countdown"
-                                            data-expiry="{{ auth()->user()->employee->contract_expiry_date }}">
+                        @foreach ($contracts as $contract)
+                            @if ($contract->days_until_end >= 0 && $contract->days_until_end <= 90)
+                                <div class="col-xxl-12 col-md-12">
+                                    @php
+                                        $bgClass =
+                                            $contract->days_until_end === 0 ? 'text-bg-danger' : 'text-bg-warning';
+                                        $icon =
+                                            $contract->days_until_end === 0
+                                                ? 'bi-exclamation-triangle-fill'
+                                                : 'bi-hourglass-split';
+                                        $title =
+                                            $contract->days_until_end === 0
+                                                ? 'Contract Expiring Today!'
+                                                : 'Contract Expiry Notice';
+                                        $message =
+                                            $contract->days_until_end === 0
+                                                ? 'Your contract is expiring <strong>today</strong>. Please take immediate action!'
+                                                : "Your contract will expire in <strong>{$contract->days_until_end}</strong> days. Please plan accordingly.";
+                                    @endphp
+
+                                    <div class="bottom-0 p-3 position-fixed end-0" style="z-index: 9999;">
+                                        <div class="toast show {{ $bgClass }} border-0 shadow-lg rounded-3"
+                                            role="alert" aria-live="assertive" aria-atomic="true">
+                                            <div class="bg-transparent border-0 toast-header">
+                                                <i class="bi {{ $icon }} me-2 fs-5 text-white"></i>
+                                                <strong class="text-white me-auto">{{ $title }}</strong>
+                                                <button type="button" class="btn-close btn-close-white"
+                                                    data-bs-dismiss="toast" aria-label="Close"></button>
+                                            </div>
+                                            <div class="text-white toast-body">
+                                                <div class="mb-2">
+                                                    <strong>Description:</strong> {{ $contract->description }}
+                                                </div>
+                                                <div class="mb-2">
+                                                    <strong>Start Date:</strong>
+                                                    {{ $contract->start_date->format('d M Y') }}<br>
+                                                    <strong>End Date:</strong>
+                                                    {{ $contract->end_date->format('d M Y') }}
+                                                </div>
+                                                <div class="fw-semibold">
+                                                    {!! $message !!}
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                @endif
-                                @if ($daysUntilExpiry < 0)
-                                    <div class="alert alert-danger">
-                                        <h5>Contract Expired</h5>
-                                        <p>Your contract expired <strong>{{ abs($daysUntilExpiry ?? 0) }} days
-                                                ago</strong>.</p>
-                                    </div>
-                                @endif
+                                </div>
+                            @endif
+                        @endforeach
 
-                            </div><!-- End Revenue Card -->
-                        @endif
+
+
+
 
                         <!-- Allocated Leave -->
                         <div class="col-12">
                             <div class="card">
-                                <div class="card-body pb-0">
+                                <div class="pb-0 card-body">
                                     <h5 class="card-title">Allocated Leave Analysis <span>| This Month</span></h5>
 
                                     <div id="budgetChart" style="min-height: 400px;" class="echart"></div>
@@ -480,13 +602,13 @@
                 <div class="col-lg-4">
                     <!-- Events -->
                     <div class="card">
-                        <div class="card-body pb-0">
+                        <div class="pb-0 card-body">
                             <h5 class="card-title">Events &amp; Trainings <span>| Ongoing, Due Today & Tomorrow</span>
                             </h5>
 
                             <div class="news">
                                 @foreach ($events as $event)
-                                    <div class="post-item clearfix">
+                                    <div class="clearfix post-item">
                                         <img src="{{ 'assets/img/event.gif' }}" alt="">
                                         <h4><a
                                                 href="{{ route('events.show', $event->event_id) }}">{{ $event->event_title }}</a>
@@ -510,7 +632,7 @@
                                 @endforeach
 
                                 @foreach ($trainings as $training)
-                                    <div class="post-item clearfix">
+                                    <div class="clearfix post-item">
                                         <img src="{{ 'assets/img/training.gif' }}" alt="">
                                         <h4><a
                                                 href="{{ route('trainings.show', $training->training_id) }}">{{ $training->training_title }}</a>
@@ -550,7 +672,7 @@
 
             @if ($authUserBirthday)
                 <!-- Toast for the authenticated user's birthday -->
-                <div class="toast-container position-fixed bottom-0 start-50 translate-middle-x p-3 text-bg-success"
+                <div class="bottom-0 p-3 toast-container position-fixed start-50 translate-middle-x text-bg-success"
                     role="alert" aria-live="assertive" aria-atomic="true">
                     <div class="toast-header">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
@@ -569,7 +691,7 @@
 
                 @if ($sharedBirthdays->count())
                     <!-- Toast for others sharing the birthday -->
-                    <div class="toast-container position-fixed bottom-0 end-0 translate-middle-x p-3 text-bg-info"
+                    <div class="bottom-0 p-3 toast-container position-fixed end-0 translate-middle-x text-bg-info"
                         role="alert" aria-live="assertive" aria-atomic="true">
                         <div class="toast-header">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
@@ -590,7 +712,7 @@
                 @endif
             @else
                 <!-- General Toast for birthdays -->
-                <div class="toast-container position-fixed bottom-0 start-50 translate-middle-x p-3 text-bg-primary"
+                <div class="bottom-0 p-3 toast-container position-fixed start-50 translate-middle-x text-bg-primary"
                     role="alert" aria-live="assertive" aria-atomic="true">
                     <div class="toast-header">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"

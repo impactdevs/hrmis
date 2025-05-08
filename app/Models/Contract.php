@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
@@ -35,8 +36,9 @@ class Contract extends Model
         return $this->belongsTo(Employee::class, 'employee_id', 'employee_id');
     }
 
-    public function supervisor_details()
+    public function getDaysUntilEndAttribute()
     {
-        return $this->belongsTo(Employee::class, 'supervisor', 'employee_id');
+        return floor(Carbon::now()->diffInRealDays($this->end_date, false));
+
     }
 }

@@ -76,11 +76,6 @@ class EmployeeController extends Controller
         return view('employees.index', compact('employees', 'keyword', 'positions', 'departments', 'expiryOptions', 'employeeCount', 'appliedFiltersMessage'));
     }
 
-
-
-
-
-
     /**
      * Show the form for creating a new resource.
      */
@@ -180,10 +175,6 @@ class EmployeeController extends Controller
             return redirect()->back()->with('error', 'Problem Adding the Employee');
         }
     }
-
-
-
-
 
     /**
      * Display the specified resource.

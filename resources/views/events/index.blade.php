@@ -1,6 +1,6 @@
 <x-app-layout>
     <div class="mt-3">
-        <div class="d-flex flex-row flex-1 justify-content-between">
+        <div class="flex-row flex-1 d-flex justify-content-between">
             @can('can add an event')
                 <div>
                     <a href="{{ route('events.create') }}" class="btn border-t-neutral-50 btn-primary">
@@ -50,14 +50,14 @@
                                 @endforeach
 
                                 @foreach ($departmentIds as $id)
-                                    @if (isset($options['users'][$id]))
+                                    @if (filled($id))
                                         <span
-                                            class="badge bg-success">{{ $options['departments'][$id] == '' ? '' : $options['departments'][$id] ?? 'Unknown Department' }}</span>
+                                            class="badge bg-success">{{ $options['departments'][$id] == '' ? 'not found' : $options['departments'][$id] ?? 'Unknown Department' }}</span>
                                     @endif
                                 @endforeach
 
                                 @foreach ($positionIds as $id)
-                                    @if (isset($options['users'][$id]))
+                                    @if (filled($id))
                                         <span
                                             class="badge bg-info">{{ $options['positions'][$id] == '' ? '' : $options['positions'][$id] ?? 'Unknown Position' }}</span>
                                     @endif
@@ -102,13 +102,13 @@
                             </td>
 
                         </tr>
-                        @empty
+                    @empty
                         <tr>
                             <td colspan="8" class="text-center text-danger">
                                 No events records found for the selected date.
                             </td>
                         </tr>
-                        @endforelse
+                    @endforelse
 
                 </tbody>
             </table>

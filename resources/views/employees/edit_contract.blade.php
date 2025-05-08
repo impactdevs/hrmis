@@ -27,22 +27,6 @@
                                 :value="old('description', $contract->description ?? '')" />
                         </div>
 
-                        <div class="mb-3 col">
-                            <label for="supervisor">Employee Supervisor</label>
-                            <select class="employees form-select" name="supervisor" id="supervisor"
-                                data-placeholder="Choose the Supervisor">
-                                @foreach ($users as $user)
-                                    <option value=""></option>
-                                    <option value="{{ $user->employee->employee_id }}"
-                                        {{ $user->employee && $user->employee->employee_id == $contract->supervisor ? 'selected' : '' }}>
-                                        {{ $user->name }}
-                                    </option>
-                                                                        </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-
                         <div class="col-md-12">
                             <x-forms.repeater name="contract_documents" label="Contract Documents" :values="$contract->contract_documents ?? []" />
                         </div>
@@ -54,16 +38,4 @@
             </div>
         </form>
     </div>
-
-    @push('scripts')
-        <script>
-            $(document).ready(function() {
-
-                $('.employees').select2({
-                    theme: "bootstrap-5",
-                    placeholder: $(this).data('placeholder')
-                });
-            });
-        </script>
-    @endpush
 </x-app-layout>

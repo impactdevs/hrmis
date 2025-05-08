@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Application;
 use App\Models\Appraisal;
 use App\Models\Attendance;
+use App\Models\Contract;
 use App\Models\Employee;
 use App\Models\Leave;
 use App\Models\LeaveType;
@@ -30,13 +31,28 @@ class HomeController extends Controller
 
         $employee = auth()->user()->employee; // Assuming you have a relationship set up
 
-        // Check days until contract expiry for the logged-in employee
-        $daysUntilExpiry = optional($employee)->daysUntilContractExpiry();
+        $appraisals = Appraisal::count();
+
+        $pendingAppraisals = Appraisal::whereNull('appraisal_request_status->HR')
+            ->count();
+
+        $ongoingAppraisals = Appraisal::whereJsonContains('appraisal_request_status', ['HR' => 'approved'])
+            ->whereNull('appraisal_request_status->Executive Secretary')
+            ->count();
+
+
+        $completeAppraisals= Appraisal::whereJsonContains('appraisal_request_status', ['HR' => 'approved'])
+            ->whereJsonContains('appraisal_request_status', ['Executive Secretary' => 'approved'])
+            ->count();
+        // contracts
+        $contracts = Contract::where('employee_id', $employee->employee_id)->orWhereTodayOrAfter('end_date')->get();
 
         $leaveTypes = LeaveType::all()->keyBy('leave_type_id');
 
-        //ongoing appraisals
-        $ongoingAppraisals = Appraisal::where('employee_id', optional(auth()->user()->employee)->employee_id)->count();
+        // //ongoing appraisals
+        // $ongoingAppraisals = Appraisal::where('employee_id', optional(auth()->user()->employee)->employee_id)->count();
+
+
         $isAdmin = auth()->user()->isAdminOrSecretary;
 
 
@@ -229,6 +245,6 @@ class HomeController extends Controller
             ->whereDay('date_of_birth', Carbon::today()->day)
             ->get();
 
-        return view('dashboard.index', compact('number_of_employees', 'attendances', 'available_leave', 'hours', 'todayCounts', 'yesterdayCounts', 'lateCounts', 'chartDataJson', 'leaveTypesJson', 'chartEmployeeDataJson', 'events', 'trainings', 'entries', 'appraisals', 'leaveApprovalData', 'daysUntilExpiry', 'totalLeaves', 'totalDays', 'todayBirthdays', 'isAdmin'));
+        return view('dashboard.index', compact('number_of_employees', 'contracts', 'attendances', 'available_leave', 'hours', 'todayCounts', 'yesterdayCounts', 'lateCounts', 'chartDataJson', 'leaveTypesJson', 'chartEmployeeDataJson', 'events', 'trainings', 'entries', 'appraisals', 'leaveApprovalData', 'totalLeaves', 'totalDays', 'todayBirthdays', 'isAdmin', 'completeAppraisals', 'ongoingAppraisals', 'pendingAppraisals'));
     }
 }

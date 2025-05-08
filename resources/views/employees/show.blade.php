@@ -1,6 +1,6 @@
 <x-app-layout>
     <div class="container">
-        <div class="card mb-4 shadow-lg">
+        <div class="mb-4 shadow-lg card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <div class="flex-grow-1">
                     <h2 class="mb-0 text-dark">{{ $employee->title }} {{ $employee->first_name }}
@@ -29,50 +29,50 @@
             </div>
             <div class="card-body">
                 <!-- Basic Information Section -->
-                <section class="mb-4 border border-1 border-secondary p-3 rounded">
+                <section class="p-3 mb-4 border rounded border-1 border-secondary">
                     <h1 class="mt-4 mb-3 text-dark">Basic Information</h1>
-                    <div class="row mb-3">
+                    <div class="mb-3 row">
                         <div class="col-md-4"><strong>Staff ID:</strong></div>
                         <div class="col-md-8">{{ $employee->staff_id ?? 'No Staff ID' }}</div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="mb-3 row">
                         <div class="col-md-4"><strong>Position:</strong></div>
                         <div class="col-md-8">{{ optional($employee->position)->position_name }}</div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="mb-3 row">
                         <div class="col-md-4"><strong>NIN:</strong></div>
                         <div class="col-md-8">{{ $employee->nin ?? 'No NIN' }}</div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="mb-3 row">
                         <div class="col-md-4"><strong>National ID:</strong></div>
                         <div class="col-md-8">
                             @if ($employee->national_id_photo)
                                 <img src="{{ asset('storage/' . $employee->national_id_photo) }}"
-                                    alt="National ID Photo" class="img-fluid rounded">
+                                    alt="National ID Photo" class="rounded img-fluid">
                             @else
                                 <p class="text-muted">No national ID photo provided.</p>
                             @endif
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="mb-3 row">
                         <div class="col-md-4"><strong>Date of Entry:</strong></div>
                         <div class="col-md-8">{{ $employee->date_of_entry ?? 'No Date Specified' }}</div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="mb-3 row">
                         <div class="col-md-4"><strong>Contract Expiry Date:</strong></div>
                         <div class="col-md-8">{{ $employee->contract_expiry_date ?? 'No Date Specified' }}</div>
                     </div>
 
-                    <div class="row mb-3">
+                    <div class="mb-3 row">
                         <div class="col-md-4"><strong>Department</strong></div>
                         <div class="col-md-8">{{ $employee->department->department_name ?? 'No Department' }}</div>
                     </div>
                     {{-- job --}}
-                    <div class="row mb-3">
+                    <div class="mb-3 row">
                         <div class="col-md-4"><strong>Job Description:</strong></div>
                         <div class="col-md-8">{{ $employee->job_description ?? 'No Job Description' }}</div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="mb-3 row">
                         <div class="col-md-4"><strong>Contract Documents:</strong></div>
                         <div class="col-md-8">
                             @if (!is_null($employee->contract_documents))
@@ -88,7 +88,7 @@
                                                     <!-- Display Image -->
                                                     <div>
                                                         <img src="{{ $filePath }}" alt="{{ $item['title'] }}"
-                                                            class="img-fluid rounded mt-2" style="max-width: 120px;">
+                                                            class="mt-2 rounded img-fluid" style="max-width: 120px;">
                                                     </div>
                                                 @elseif ($fileExtension === 'pdf')
                                                     <!-- Display PDF Link -->
@@ -118,8 +118,8 @@
                 </section>
 
                 <!-- Other sections for Department, Contact Information, etc. remain the same... -->
-                <section class="mb-4 border border-1 border-secondary p-3 rounded">
-                    <div class="d-flex flex-row justify-content-between align-items-center mb-4">
+                <section class="p-3 mb-4 border rounded border-1 border-secondary">
+                    <div class="flex-row mb-4 d-flex justify-content-between align-items-center">
                         <h5 class="mt-4 mb-3 text-dark">Contracts Information</h5>
                         @if (auth()->user()->isAdminOrSecretary)
                         <a href="{{ route('contract.create', ['employee_id' => $employee->employee_id]) }}"
@@ -137,14 +137,13 @@
                                data-sortable="true"
                                data-pagination="true"
                                data-page-size="5">
-                            <thead class="bg-primary text-white">
+                            <thead class="text-white bg-primary">
                                 <tr>
                                     <th data-sortable="true" data-field="id">#</th>
                                     <th data-sortable="true" data-field="start_date">Start Date</th>
                                     <th data-sortable="true" data-field="end_date">End Date</th>
                                     <th data-field="duration">Duration</th>
                                     <th data-field="description">Description</th>
-                                    <th data-field="supervisor">Supervisor</th>
                                     <th data-field="attachments">Attachments</th>
                                     <th data-sortable="true" data-field="status">Status</th>
                                     @can('can edit an employee')
@@ -162,10 +161,9 @@
                                     <td class="text-truncate" style="max-width: 200px;" title="{{ $contract->description }}">
                                         {{ $contract->description }}
                                     </td>
-                                    <td>{{ $contract->supervisor_details ? $contract->supervisor_details->first_name.' '.$contract->supervisor_details->last_name:'No Supervisor Assigned' }}</td>
                                     <td>
                                         @if($contract->contract_documents)
-                                            <div class="d-flex flex-wrap gap-2">
+                                            <div class="flex-wrap gap-2 d-flex">
                                                 @foreach($contract->contract_documents as $attachment)
                                                 <a href="{{ asset('storage/'.$attachment['proof']) }}"
                                                    target="_blank"
@@ -192,7 +190,7 @@
                                     </td>
                                     @can('can edit an employee')
                                     <td>
-                                        <div class="d-flex gap-2">
+                                        <div class="gap-2 d-flex">
                                             <a href="{{ route('contract.edit', $contract->id) }}"
                                                class="btn btn-sm btn-outline-primary"
                                                data-bs-toggle="tooltip"
@@ -221,29 +219,29 @@
                 </section>
 
                 <!-- Contact Information Section -->
-                <section class="mb-4 border border-1 border-secondary p-3 rounded">
+                <section class="p-3 mb-4 border rounded border-1 border-secondary">
                     <h5 class="mt-4 mb-3 text-dark">Contact Information</h5>
-                    <div class="row mb-3">
+                    <div class="mb-3 row">
                         <div class="col-md-4"><strong>Mobile Number:</strong></div>
                         <div class="col-md-8">{{ $employee->phone_number ?? 'No Mobile Number' }}</div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="mb-3 row">
                         <div class="col-md-4"><strong>Email:</strong></div>
                         <div class="col-md-8">{{ $employee->email ?? 'No Email' }}</div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="mb-3 row">
                         <div class="col-md-4"><strong>Next of Kin:</strong></div>
                         <div class="col-md-8">{{ $employee->next_of_kin ?? 'No Email' }}</div>
                     </div>
                 </section>
 
                 <!-- Qualifications Section -->
-                <section class="mb-4 border border-1 border-secondary p-3 rounded">
+                <section class="p-3 mb-4 border rounded border-1 border-secondary">
                     <h5 class="mt-4 mb-3 text-dark">Qualifications</h5>
                     @if (!is_null($employee->qualifications_details))
                         @foreach ($employee->qualifications_details as $item)
                             @if (isset($item['proof']))
-                                <div class="row mb-3">
+                                <div class="mb-3 row">
                                     <div class="col-md-4"><strong>Qualification:</strong></div>
                                     <div class="col-md-8">
                                         <div>{{ $item['title'] }}</div>
@@ -254,7 +252,7 @@
                                         @if (in_array($qualificationFileExtension, ['jpg', 'jpeg', 'png', 'gif']))
                                             <!-- Display Image for Qualification -->
                                             <img src="{{ $qualificationFilePath }}" alt="Qualification Proof"
-                                                class="img-fluid rounded mt-2" style="max-width: 120px;">
+                                                class="mt-2 rounded img-fluid" style="max-width: 120px;">
                                         @elseif ($qualificationFileExtension === 'pdf')
                                             <!-- Display PDF Link for Qualification -->
                                             <a href="{{ $qualificationFilePath }}" target="_blank"
@@ -277,7 +275,7 @@
             </div>
         </div>
         @can('can delete an employee')
-            <div class="text-center mt-4">
+            <div class="mt-4 text-center">
                 <a href="{{ route('employees.index') }}" class="btn btn-primary">Back to Employee List</a>
             </div>
         @endcan

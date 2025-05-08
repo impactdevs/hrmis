@@ -1,4 +1,4 @@
-<div class="row mb-3">
+<div class="mb-3 row">
     <div class="col-md-6">
         <x-forms.input name="destination" label="Destination" type="text" id="destination"
             value="{{ old('destination', $training->destination ?? '') }}" />
@@ -10,7 +10,7 @@
     </div>
 </div>
 
-<div class="row mb-3">
+<div class="mb-3 row">
     <div class="col-md-6">
         <x-forms.input name="departure_date" label="Departure Date" type="date" id="departure_date"
             value="{{ old('departure_date', isset($training) && $training->departure_date ? $training->departure_date->toDateString() : '') }}" />
@@ -24,7 +24,7 @@
     </div>
 </div>
 
-<div class="row mb-3">
+<div class="mb-3 row">
     <div class="col-md-6">
         <x-forms.input name="sponsor" label="Sponsor(s)" type="text" id="sponsor"
             value="{{ old('sponsor', $training->sponsor ?? '') }}" />
@@ -34,11 +34,11 @@
     <div class="mb-3 col">
         <label for="usertokenfield" class="form-label">The following do my work</label>
         <input type="text" class="form-control" id="usertokenfield" />
-        <input type="hidden" name="my_work_will_be_done_by[users]" id="user_ids" />
+        <input type="hidden" name="my_work_will_be_done_by[users]" id="user_ids" value="{{ old('my_work_will_be_done_by.users', isset($training) ? (isset($training->my_work_will_be_done_by['users']) ? $training->my_work_will_be_done_by['users'] : '') : '') }}" />
     </div>
 </div>
 
-<div class="row mb-3">
+<div class="mb-3 row">
     <h5>Contact Address while out of Station:</h5>
     <div class="col-md-6">
         <x-forms.input name="hotel" label="Place of Residence" type="text" id="hotel"
@@ -83,6 +83,18 @@
                     const currentIds = $('#user_ids').val().split(',').filter(Boolean);
                     currentIds.push(userId);
                     $('#user_ids').val(currentIds.join(','));
+                }
+            });
+
+            const initialUserIds = $('#user_ids').val().split(',').filter(Boolean);
+            initialUserIds.forEach(id => {
+                if (id === 'All') {
+                    $('#usertokenfield').tokenfield('createToken', 'All Users');
+                } else {
+                    const user = userSource.find(u => u.id === id);
+                    if (user) {
+                        $('#usertokenfield').tokenfield('createToken', user.name);
+                    }
                 }
             });
         });

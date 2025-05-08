@@ -69,6 +69,16 @@
                     $title = 'Events';
                 }
 
+                if (request()->routeIs('events.create')) {
+                    $title = 'Create an Event';
+                }
+
+
+                if (request()->routeIs('events.edit')) {
+                    $title = 'Edit an Event';
+                }
+
+
                 if (request()->routeIs('employees.index')) {
                     $title = auth()->user()->isAdminOrSecretary ? 'Employees' : 'About Me';
                 }
