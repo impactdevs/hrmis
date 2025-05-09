@@ -1,15 +1,17 @@
 <x-app-layout>
     <div class="py-12">
         <!-- Page Heading -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="mb-4 d-flex justify-content-between align-items-center">
             <h3 class="mb-0">Recruitment Requests</h3>
-            <a href="{{ route('recruitments.create') }}" class="btn btn-primary">
-                <i class="bi bi-database-add"></i> Apply for Recruitment
-            </a>
+            @cannot('can approve recruitment')
+                <a href="{{ route('recruitments.create') }}" class="btn btn-primary">
+                    <i class="bi bi-database-add"></i> Apply for Recruitment
+                </a>
+            @endcannot
         </div>
 
         <!-- Recruitment Requests Table -->
-        <div class="card shadow-sm">
+        <div class="shadow-sm card">
             <div class="card-body">
                 @if ($rectrutmentRequests->isEmpty())
                     <div class="alert alert-warning" role="alert">
