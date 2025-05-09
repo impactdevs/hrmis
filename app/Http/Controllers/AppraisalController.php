@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Notifications\AppraisalApproval;
 use Illuminate\Http\Request;
 use App\Models\Form;
+use App\Models\Scopes\EmployeeScope;
 use Illuminate\Support\Facades\Notification;
 
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -205,46 +206,62 @@ class AppraisalController extends Controller
 
         $user = auth()->user();
 
-        // Get the current appraisal status array (or initialize if empty)
-        $appraisalRequestStatus = $appraisal->appraisal_request_status ?? [];
+        // Retrieve current leave_request_status (it will be an array due to casting)
+        $appraisalRequestStatus = $appraisal->appraisal_request_status ?: []; // Default to an empty array if null
 
-        // Update based on role
+        // Update leave request based on the user's role and the input status
         if ($user->hasRole('HR')) {
-            $appraisalRequestStatus['HR'] = $request->input('status');
+            if ($request->input('status') === 'approved') {
+                // Set HR status to approved
+                $appraisalRequestStatus['HR'] = 'approved';
+                $appraisal->rejection_reason = null; // Clear reason if approved
+            } else {
+                // Set HR status to rejected
+                $appraisalRequestStatus['HR'] = 'rejected';
+                $appraisal->rejection_reason = $request->input('reason'); // Store rejection reason
+            }
         } elseif ($user->hasRole('Head of Division')) {
-            $appraisalRequestStatus['Head of Division'] = $request->input('status');
+            if ($request->input('status') === 'approved') {
+                // Set Head of Division status to approved
+                $appraisalRequestStatus['Head of Division'] = 'approved';
+                $appraisal->rejection_reason = null; // Clear reason if approved
+            } else {
+                // Set Head of Division status to rejected
+                $appraisalRequestStatus['Head of Division'] = 'rejected';
+                $appraisal->rejection_reason = $request->input('reason'); // Store rejection reason
+            }
         } elseif ($user->hasRole('Executive Secretary')) {
-            $appraisalRequestStatus['Executive Secretary'] = $request->input('status');
+            if ($request->input('status') === 'approved') {
+                // Set leave status as approved for Executive Secretary
+                $appraisalRequestStatus['Executive Secretary'] = 'approved';
+                $appraisal->rejection_reason = null; // Clear reason if approved
+            } else {
+                // Set rejection status
+                $appraisalRequestStatus['Executive Secretary'] = 'rejected';
+                $appraisal->rejection_reason = $request->input('reason'); // Store rejection reason
+            }
+
+            // Get the user who requested the appraisal
+            $employee = \App\Models\Employee::withoutGlobalScope(EmployeeScope::class)
+                ->find($appraisal->employee_id)
+                ?->user_id;
+
+            $appraisalRequester = User::find($user->user_id); // Removed ->first()
+
+
+            // Send notification to the User instance
+            Notification::send($appraisalRequester, new AppraisalApproval($appraisal, auth()->user()->employee->first_name, auth()->user()->employee->last_name));
         } else {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        // Set rejection reason if status is "rejected"
-        if ($request->input('status') === 'rejected') {
-            $appraisal->rejection_reason = $request->input('reason');
-        } else {
-            $appraisal->rejection_reason = null; // Clear reason if approved
-        }
-
-        // Save the updated status array
+        // Save the updated leave_request_status
         $appraisal->appraisal_request_status = $appraisalRequestStatus;
         $appraisal->save();
 
-        // Send notification only if Executive Secretary action
-        if ($user->hasRole('Executive Secretary')) {
-            $appraisalRequester = User::find($appraisal->employee->user_id); // No ->first()
-            Notification::send($appraisalRequester, new AppraisalApproval(
-                $appraisal,
-                $appraisalRequester->employee->first_name,
-                $appraisalRequester->employee->last_name
-            ));
-        }
-
-        return response()->json([
-            'message' => 'Appraisal status updated successfully.',
-            'status' => $appraisal->appraisal_request_status
-        ]);
+        return response()->json(['message' => 'Appraisal application approved successfully.', 'status' => $appraisal->leave_request_status]);
     }
+
     public function downloadPDF(Appraisal $appraisal)
     {
         $users = User::all();
