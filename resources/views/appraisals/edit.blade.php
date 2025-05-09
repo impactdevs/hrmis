@@ -449,7 +449,7 @@
                                             max="5"></td>
                                     <td class="text-center"><input type="number"
                                             name="personal_attributes_assessment[technical_knowledge][agreed_score]"
-                                            value="{{ $appraisal->personal_attributes_assessment['technical_knowledge']['agreed_score'] }}"
+                                            value="{{ $appraisal->personal_attributes_assessment['technical_knowledge']['agreed_score']??'' }}"
                                             @if ($appraisal->is_appraisee) disabled @endif
                                             class="form-control form-control-sm score-input" min="0"
                                             max="5"></td>
