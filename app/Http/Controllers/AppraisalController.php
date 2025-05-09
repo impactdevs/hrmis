@@ -240,10 +240,11 @@ class AppraisalController extends Controller
                 $appraisal->rejection_reason = $request->input('reason'); // Store rejection reason
             }
 
-            // Send notification
-            $appraisalRequester = User::find($appraisal->employee->user_id); // Get the user who requested the leave
-            // $approver = User::where('id', auth()->user()->id)->first();
-            Notification::send($appraisalRequester->email, new AppraisalApproval($appraisal, $appraisalRequester->first_name, $appraisalRequester->last_name));
+            // Get the user who requested the appraisal
+            $appraisalRequester = User::find($appraisal->employee->user_id); // Removed ->first()
+
+            // Send notification to the User instance
+            Notification::send($appraisalRequester, new AppraisalApproval($appraisal, $appraisalRequester->employee->first_name, $appraisalRequester->employee->last_name));
         } else {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
