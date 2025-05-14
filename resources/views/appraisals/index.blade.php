@@ -79,43 +79,58 @@
                                                 </td>
                                                 <td class="px-6 py-4 whitespace-nowrap">
                                                     @php
-                                                        $approvedBy = collect($appraisal->appraisal_request_status)
-                                                            ->filter(fn($status) => $status === 'approved')
-                                                            ->keys();
-
-                                                        $rejectedBy = collect($appraisal->appraisal_request_status)
-                                                            ->filter(fn($status) => $status === 'rejected')
-                                                            ->keys();
+                                                        $statusHistory = collect($appraisal->appraisal_request_status);
+                                                        $roleIcons = [
+                                                            'approved' => [
+                                                                'icon' =>
+                                                                    '<svg class="w-4 h-4 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>',
+                                                                'textClass' => 'text-green-600 dark:text-green-400',
+                                                            ],
+                                                            'rejected' => [
+                                                                'icon' =>
+                                                                    '<svg class="w-4 h-4 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>',
+                                                                'textClass' => 'text-red-600 dark:text-red-400',
+                                                            ],
+                                                            'pending' => [
+                                                                'icon' =>
+                                                                    '<svg class="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3" /></svg>',
+                                                                'textClass' => 'text-gray-600 dark:text-gray-400',
+                                                            ],
+                                                        ];
                                                     @endphp
 
-                                                    <div class="space-y-1">
-                                                        @if ($approvedBy->isNotEmpty())
+                                                    <div class="space-y-2">
+                                                        @foreach ($statusHistory as $role => $status)
                                                             <div class="flex items-center">
-                                                                <svg class="w-4 h-4 mr-1 text-green-500" fill="none"
-                                                                    stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                                        stroke-width="2" d="M5 13l4 4L19 7" />
-                                                                </svg>
+                                                                {!! $roleIcons[$status]['icon'] ?? $roleIcons['pending']['icon'] !!}
                                                                 <span
-                                                                    class="text-sm text-green-600 dark:text-green-400">Approved
-                                                                    by {{ $approvedBy->join(', ') }}</span>
+                                                                    class="text-sm {{ $roleIcons[$status]['textClass'] ?? $roleIcons['pending']['textClass'] }}">
+                                                                    {{ ucfirst($status) }} by {{ $role }}
+                                                                </span>
                                                             </div>
-                                                        @endif
+                                                        @endforeach
 
-                                                        @if ($rejectedBy->isNotEmpty())
+                                                        @if (is_null($appraisal->current_approver))
                                                             <div class="flex items-center">
-                                                                <svg class="w-4 h-4 mr-1 text-red-500" fill="none"
-                                                                    stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                                        stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                                                </svg>
+                                                                {!! $roleIcons['pending']['icon'] !!}
                                                                 <span
-                                                                    class="text-sm text-red-600 dark:text-red-400">Rejected
-                                                                    by {{ $rejectedBy->join(', ') }}</span>
+                                                                    class="text-sm {{ $roleIcons['pending']['textClass'] }}">
+                                                                    Waiting for approval from Executive Secretary
+                                                                </span>
+                                                            </div>
+                                                        @elseif (!isset($statusHistory[$appraisal->current_approver]))
+                                                            <div class="flex items-center">
+                                                                {!! $roleIcons['pending']['icon'] !!}
+                                                                <span
+                                                                    class="text-sm {{ $roleIcons['pending']['textClass'] }}">
+                                                                    Waiting for approval from
+                                                                    {{ $appraisal->current_approver }}
+                                                                </span>
                                                             </div>
                                                         @endif
                                                     </div>
                                                 </td>
+
                                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                                     <div class="flex items-center justify-end space-x-3">
 

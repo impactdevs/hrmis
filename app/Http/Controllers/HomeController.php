@@ -47,6 +47,10 @@ class HomeController extends Controller
         // contracts
         $contracts = Contract::where('employee_id', $employee->employee_id)->orWhereTodayOrAfter('end_date')->get();
 
+        $runningContracts = Contract::where('employee_id', $employee->employee_id)->orWhereTodayOrBefore('end_date')->count();
+
+        $expiredContracts=Contract::where('employee_id', $employee->employee_id)->orWhereTodayOrAfter('end_date')->count();
+
         $leaveTypes = LeaveType::all()->keyBy('leave_type_id');
 
         // //ongoing appraisals
@@ -245,6 +249,6 @@ class HomeController extends Controller
             ->whereDay('date_of_birth', Carbon::today()->day)
             ->get();
 
-        return view('dashboard.index', compact('number_of_employees', 'contracts', 'attendances', 'available_leave', 'hours', 'todayCounts', 'yesterdayCounts', 'lateCounts', 'chartDataJson', 'leaveTypesJson', 'chartEmployeeDataJson', 'events', 'trainings', 'entries', 'appraisals', 'leaveApprovalData', 'totalLeaves', 'totalDays', 'todayBirthdays', 'isAdmin', 'completeAppraisals', 'ongoingAppraisals', 'pendingAppraisals'));
+        return view('dashboard.index', compact('number_of_employees', 'contracts', 'runningContracts','expiredContracts','attendances', 'available_leave', 'hours', 'todayCounts', 'yesterdayCounts', 'lateCounts', 'chartDataJson', 'leaveTypesJson', 'chartEmployeeDataJson', 'events', 'trainings', 'entries', 'appraisals', 'leaveApprovalData', 'totalLeaves', 'totalDays', 'todayBirthdays', 'isAdmin', 'completeAppraisals', 'ongoingAppraisals', 'pendingAppraisals'));
     }
 }

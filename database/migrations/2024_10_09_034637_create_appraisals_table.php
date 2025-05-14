@@ -30,7 +30,6 @@ return new class extends Migration {
             $table->text('unanticipated_constraints')->nullable();
             $table->text('personal_initiatives')->nullable();
             $table->text('training_support_needs')->nullable();
-            $table->json('appraisal_period_accomplishment')->nullable();
             $table->json('appraisal_period_rate')->nullable();
 
             // Section 2

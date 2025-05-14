@@ -40,13 +40,6 @@ class AppraisalController extends Controller
             "appraisal_end_date" => null,
             'employee_id' => auth()->user()->employee->employee_id,
             "appraiser_id" => User::find(auth()->user()->employee->department->department_head)->employee->employee_id,
-            "appraisal_period_accomplishment" => [
-                [
-                    "planned_activity" => null,
-                    "output_results" => null,
-                    "remarks" => null,
-                ]
-            ],
             "if_no_job_compatibility" => null,
             "unanticipated_constraints" => null,
             "personal_initiatives" => null,
@@ -129,6 +122,7 @@ class AppraisalController extends Controller
         ];
 
         $appraisal = Appraisal::create($data);
+        
 
         return to_route('appraisals.edit', ['appraisal' => $appraisal->appraisal_id]);
     }

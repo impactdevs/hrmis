@@ -105,6 +105,44 @@
                             </div>
                         </div>
 
+                        <!-- Complete Appraisals Card -->
+                        <div class="col-xxl-4 col-md-6">
+                            <div class="card info-card customers-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Running Contracts</h5>
+                                    <div class="d-flex align-items-center">
+                                        <div
+                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                            <i class="bi bi-check-circle text-success"></i>
+                                        </div>
+                                        <div class="ps-3">
+                                            <h6>{{ $runningContracts }}</h6>
+                                            <span class="pt-2 text-muted small ps-1">Running Contracts</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Complete Appraisals Card -->
+                        <div class="col-xxl-4 col-md-6">
+                            <div class="card info-card customers-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Expired Contracts</h5>
+                                    <div class="d-flex align-items-center">
+                                        <div
+                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                            <i class="bi bi-check-circle text-success"></i>
+                                        </div>
+                                        <div class="ps-3">
+                                            <h6>{{ $expiredContracts }}</h6>
+                                            <span class="pt-2 text-muted small ps-1">Expired Contracts</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
 
                         <!-- Leaves Card -->
                         <div class="col-xxl-3 col-xl-12">
@@ -469,6 +507,44 @@
                                         <div class="ps-3">
                                             <h6>{{ $completeAppraisals }}</h6>
                                             <span class="pt-2 text-muted small ps-1">Complete evaluations</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Complete Appraisals Card -->
+                        <div class="col-xxl-4 col-md-6">
+                            <div class="card info-card customers-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Running Contracts</h5>
+                                    <div class="d-flex align-items-center">
+                                        <div
+                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                            <i class="bi bi-check-circle text-success"></i>
+                                        </div>
+                                        <div class="ps-3">
+                                            <h6>{{ $runningContracts }}</h6>
+                                            <span class="pt-2 text-muted small ps-1">Running Contracts</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Complete Appraisals Card -->
+                        <div class="col-xxl-4 col-md-6">
+                            <div class="card info-card customers-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Expired Contracts</h5>
+                                    <div class="d-flex align-items-center">
+                                        <div
+                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                            <i class="bi bi-check-circle text-success"></i>
+                                        </div>
+                                        <div class="ps-3">
+                                            <h6>{{ $expiredContracts }}</h6>
+                                            <span class="pt-2 text-muted small ps-1">Expired Contracts</span>
                                         </div>
                                     </div>
                                 </div>

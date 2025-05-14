@@ -38,7 +38,6 @@ class Appraisal extends Model
         'unanticipated_constraints',
         'personal_initiatives',
         'training_support_needs',
-        'appraisal_period_accomplishment',
         'appraisal_period_rate',
         'personal_attributes_assessment',
         'performance_planning',
@@ -92,4 +91,38 @@ class Appraisal extends Model
 
         return false;
     }
+
+    public function getIsAppraisorAttribute()
+    {
+        if(auth()->user()->employee->employee_id == $this->appraiser_id){
+            return true;
+        }
+
+        return false;
+    }
+
+    /* enforce appraisal approval hierarchy
+    *Staff creates appraisal
+    *the next to approve is the supervisor(Head of Division)
+    *the next to approve is HR
+    *the next to and the last to approve is the Executive Secretary
+    */
+public function getCurrentApproverAttribute()
+{
+    // Expected approval flow in order
+    $approvalFlow = ['Head of Division', 'HR', 'Executive Secretary'];
+
+    $status = $this->appraisal_request_status ?? [];
+
+    foreach ($approvalFlow as $role) {
+        // If the role is not set or false, it's the next approver
+        if (empty($status[$role])) {
+            return $role; // Return key as the role (e.g., 'hod', 'hr', 'executive_secretary')
+        }
+    }
+
+    // All roles have approved
+    return null;
+}
+
 }

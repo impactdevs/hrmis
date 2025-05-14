@@ -66,17 +66,6 @@
             <x-forms.input name="date_of_entry" label="Date of Entry" type="date" id="date_of_entry"
                 value="{{ old('date_of_entry', isset($employee) && $employee->date_of_entry ? $employee->date_of_entry->toDateString() : '') }}" />
         </div>
-
-        <div class="col-md-6">
-            <x-forms.input name="contract_expiry_date" label="Contract Expiry Date" type="date"
-                id="contract_expiry_date"
-                value="{{ old('contract_expiry_date', isset($employee) && $employee->contract_expiry_date ? $employee->contract_expiry_date->toDateString() : '') }}" />
-        </div>
-
-        <div class="col-md-6">
-            <x-forms.repeater name="contract_documents" label="Contract Documents" :values="$employee->contract_documents ?? []" />
-        </div>
-
     </div>
     <div class="row mb-3">
         <div class="col-md-6">
