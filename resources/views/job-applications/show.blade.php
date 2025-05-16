@@ -6,9 +6,6 @@
                     <h3 class="mb-0"><i class="fas fa-file-invoice mr-2"></i>Application Details -
                         {{ $application->reference_number }}</h3>
                     <div>
-                        <a href="#" class="btn btn-light btn-sm">
-                            <i class="fas fa-edit mr-1"></i> Edit Application
-                        </a>
                     </div>
                 </div>
             </div>
