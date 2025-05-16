@@ -11,7 +11,6 @@
             </div>
 
             <div class="card-body">
-                <!-- Personal Details Section -->
                 <div class="section-card mb-4">
                     <h5 class="section-title"><i class="fas fa-user-circle mr-2"></i>Personal Details</h5>
                     <div class="row">
