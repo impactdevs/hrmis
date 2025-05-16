@@ -3,11 +3,11 @@
         <!-- Page Heading -->
         <div class="mb-4 d-flex justify-content-between align-items-center">
             <h3 class="mb-0">Recruitment Requests</h3>
-            @cannot('can approve recruitment')
+            @can('can apply recruitment')
                 <a href="{{ route('recruitments.create') }}" class="btn btn-primary">
                     <i class="bi bi-database-add"></i> Apply for Recruitment
                 </a>
-            @endcannot
+            @endcan
         </div>
 
         <!-- Recruitment Requests Table -->
