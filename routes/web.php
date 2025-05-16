@@ -110,28 +110,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
 
-    Route::resource('fields', FormFieldController::class);
-    Route::post('add-condition', [FormFieldController::class, 'addConditionalVisibilityField'])->name('fields.add-condition');
-    Route::get('/get-condition/{field_id}', [FormFieldController::class, 'getConditionalVisibilityField'])->name('fields.get-condition');
-
-
-
-    Route::resource('form-builder', FormController::class);
-    Route::resource('forms', FormController::class);
-    Route::get('/forms/{form}', [FormController::class, 'display_questionnaire'])->name('forms.show');
-
-    Route::resource('sections', SectionController::class);
-
-
-    Route::resource('entries', EntryController::class);
-    Route::get('/forms/{form}/entries', [EntryController::class, 'entries'])->name('forms.entries');
-    Route::post('entry-update/{id}', [EntryController::class, 'entry_update'])->name('entry.update-up');
-    Route::post('/save-draft', [EntryController::class, 'store'])->middleware('auth')->name('save-draft');
-    Route::get('/forms/survey/{form}/{user}', [EntryController::class, 'survey'])->name('form.survey');
-
-    Route::get('/forms/{form}/settings', [FormSettingController::class, 'index'])->name('forms.settings');
-    Route::put('/update-settings', [FormSettingController::class, 'update'])->name('form-settings.update');
-
     //appraisal
     Route::get('/employee-appraisal', [AppraisalController::class, 'survey'])->name('appraisal.survey');
     Route::post('/appraisals', [AppraisalController::class, 'store'])->name('appraisals.store');
@@ -145,12 +123,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/uncst-matrix', [DocumentController::class, 'uncst_matrix'])->name('uncst-matrix');
 
-    
+    Route::resource('applications', JobApplicationController::class)
+        ->except(['create']); // exclude create because it's public
 });
 
-Route::get('/unst-job-application', [ApplicationController::class, 'survey'])->name('application.survey');
-
-Route::resource('applications', JobApplicationController::class);
+Route::get('job-applications/create', [JobApplicationController::class, 'create'])->name('job-applications.create');
 
 
 Route::get('/import', [EmployeeController::class, 'import_employees']);
