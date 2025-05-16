@@ -635,8 +635,6 @@
                                             </div>
                                             <div class="text-white toast-body">
                                                 <div class="mb-2">
-                                                    <h1>{{ $contract->employee->first_name . ' ' . $contract->employee->first_name }}
-                                                    </h1>
                                                     <strong>Description:</strong> {{ $contract->description }}
                                                 </div>
                                                 <div class="mb-2">
