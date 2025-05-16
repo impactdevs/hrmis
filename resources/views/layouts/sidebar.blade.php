@@ -96,7 +96,7 @@
                     {{ auth()->user()->isAdminOrSecretary ? 'Employees' : 'About Me' }}
                 </a>
             </li>
-            @if (auth()->user()->isAdminOrSecretary)
+            @if (auth()->user()->hasRole('HR'))
                 <li class="nav-item">
                     <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('applications.index')) bg-secondary @endif"
                         href="{{ route('applications.index') }}">
@@ -104,8 +104,8 @@
                         Applications
                     </a>
                 </li>
-
-
+            @endif
+            @if (auth()->user()->isAdminOrSecretary)
                 <li class="nav-item">
                     <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('recruitments.index') ||
                             request()->routeIs('recruitments.show') ||
