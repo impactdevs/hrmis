@@ -148,7 +148,6 @@ class EmployeeController extends Controller
             $user = DB::table('users')->where('email', $validatedData['email'])->doesntExist();
             if ($user) {
                 $password = Str::random(10);
-                Log::info('Password generated for ' . $validatedData['email'] . ': ' . $password);
                 $user = new User();
                 $user->email = $validatedData['email'];
                 $user->name = $validatedData['first_name'] . ' ' . $validatedData['last_name'];

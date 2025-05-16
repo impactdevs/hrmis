@@ -14,6 +14,7 @@ use App\Http\Controllers\Form\FormFieldController;
 use App\Http\Controllers\Form\FormSettingController;
 use App\Http\Controllers\Form\SectionController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\JobApplicationController;
 use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\LeaveRosterController;
 use App\Http\Controllers\LeaveTypesController;
@@ -131,15 +132,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/forms/{form}/settings', [FormSettingController::class, 'index'])->name('forms.settings');
     Route::put('/update-settings', [FormSettingController::class, 'update'])->name('form-settings.update');
 
-
-    //applications
-    Route::get('/applications', [ApplicationController::class, 'index'])->name('applications.index');
-    Route::post('application/application-approval', [ApplicationController::class, 'approveOrReject'])
-        ->name('application.approveOrReject');
-    Route::get('/unst-job-application', [ApplicationController::class, 'survey'])->name('application.survey');
-    Route::post('/applications', [ApplicationController::class, 'store'])->name('applications.store');
-
-
     //appraisal
     Route::get('/employee-appraisal', [AppraisalController::class, 'survey'])->name('appraisal.survey');
     Route::post('/appraisals', [AppraisalController::class, 'store'])->name('appraisals.store');
@@ -152,7 +144,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/get-count', [NotificationController::class, 'getCount']);
 
     Route::get('/uncst-matrix', [DocumentController::class, 'uncst_matrix'])->name('uncst-matrix');
+
+    
 });
+
+Route::get('/unst-job-application', [ApplicationController::class, 'survey'])->name('application.survey');
+
+Route::resource('applications', JobApplicationController::class);
+
 
 Route::get('/import', [EmployeeController::class, 'import_employees']);
 

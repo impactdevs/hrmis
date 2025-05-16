@@ -29,21 +29,21 @@
         <label for="usertokenfield" class="form-label">Participants</label>
         <input type="text" class="form-control" id="usertokenfield" />
         <input type="hidden" name="training_category[users]" id="user_ids"
-            value="{{ old('training_category.users', isset($training) ? (isset($training->training_category['users']) ? $training->training_category['users'] : 'All') : 'All') }}" />
+            value="{{ old('training_category.users', isset($event) ? (isset($event->training_category['users']) ? $event->training_category['users'] : 'All') : 'All') }}" />
     </div>
 
     <div class="mb-3 col">
         <label for="departmenttokenfield" class="form-label">Departments</label>
         <input type="text" class="form-control" id="departmenttokenfield" />
         <input type="hidden" name="training_category[departments]" id="department_ids"
-            value="{{ old('training_category.departments', isset($training) ? (isset($training->training_category['departments']) ? $training->training_category['departments'] : '') : '') }}" />
+            value="{{ old('training_category.departments', isset($event) ? (isset($event->training_category['departments']) ? $event->training_category['departments'] : '') : '') }}" />
     </div>
 
     <div class="mb-3 col">
         <label for="positiontokenfield" class="form-label">Positions</label>
         <input type="text" class="form-control" id="positiontokenfield" />
         <input type="hidden" name="training_category[positions]" id="position_ids"
-            value="{{ old('training_category.positions', isset($training) ? (isset($training->training_category['positions']) ? $training->training_category['positions'] : '') : '') }}" />
+            value="{{ old('training_category.positions', isset($event) ? (isset($event->training_category['positions']) ? $event->training_category['positions'] : '') : '') }}" />
     </div>
 
 </div>
@@ -143,6 +143,8 @@
                         const currentIds = $('#department_ids').val().split(',').filter(Boolean);
                         currentIds.push(department.department_id);
                         $('#department_ids').val(currentIds.join(','));
+
+                        console.log('departments', currentIds)
                     }
                 })
                 .on('tokenfield:removedtoken', function(e) {

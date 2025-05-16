@@ -20,6 +20,13 @@
                                     if (isset($notification->data['event_id'])) {
                                         $url = url('events', $notification->data['event_id']);
                                     }
+
+                                    if (isset($notification->data['appraisal_id'])) {
+                                        $url = url('appraisals', $notification->data['appraisal_id']);
+                                    }
+                                    if (isset($notification->data['travel_training_id'])) {
+                                        $url = url('out-of-station-trainings', $notification->data['travel_training_id']);
+                                    }
                                 @endphp
                                 <li class="list-group-item notification-item m-2 d-flex justify-content-between"
                                     data-url="{{ $url }}" data-id="{{ $notification->id }}"

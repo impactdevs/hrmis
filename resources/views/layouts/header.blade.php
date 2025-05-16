@@ -203,7 +203,6 @@
 @push('scripts')
     <script>
         $(document).ready(function() {
-            console.log('header finished')
             // Function to fetch the unread notification count
             function fetchNotificationCount() {
                 $.ajax({

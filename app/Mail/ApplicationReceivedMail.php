@@ -3,6 +3,7 @@
 namespace App\Mail;
 
 use App\Models\Application;
+use App\Models\JobApplication;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -14,13 +15,13 @@ class ApplicationReceivedMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    public Application $application;
+    public JobApplication $application;
     public string $name;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(Application $application, string $name)
+    public function __construct(JobApplication $application, string $name)
     {
         $this->application = $application;
         $this->name = $name;
@@ -42,7 +43,7 @@ class ApplicationReceivedMail extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(
-            view: 'applications.received',
+            view: 'job-applications.email-comfirmation',
         );
     }
 

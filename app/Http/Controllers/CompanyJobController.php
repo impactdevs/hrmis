@@ -29,6 +29,10 @@ class CompanyJobController extends Controller
      */
     public function store(Request $request)
     {
+        $validated = $request->validate([
+            'job_code' => 'required',
+            'job_title' => 'required'
+        ]);
         CompanyJob::create($request->all());
 
         return redirect()->route('company-jobs.index')->with('success', 'Company Job created successfully.');

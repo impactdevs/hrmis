@@ -985,25 +985,25 @@
             <div class="mb-3 row">
                 <div class="col-md-12">
                     <x-forms.text-area name="panel_comment" label="(a)	Comments of the Panel." id="panel_comment"
-                        :value="old('panel_comment', $appraisal->panel_comment ?? '')" :isDisabled="$appraisal->is_appraisee" />
+                        :value="old('panel_comment', $appraisal->panel_comment ?? '')" :isDisabled="!$appraisal->is_es" />
                 </div>
 
                 <div class="col-md-12">
                     <x-forms.text-area name="panel_recommendation" label="(b)	Recommendation of the Panel"
-                        id="panel_recommendation" :value="old('panel_recommendation', $appraisal->panel_recommendation ?? '')" :isDisabled="$appraisal->is_appraisee" />
+                        id="panel_recommendation" :value="old('panel_recommendation', $appraisal->panel_recommendation ?? '')" :isDisabled="!$appraisal->is_es" />
                 </div>
 
 
                 <div class="col-md-12">
                     <x-forms.text-area name="overall_assessment"
                         label="iii.	Supervisor’s overall assessment - Describe overall performance in accomplishing goals, fulfilling other results and responsibilities; eg Excellent, Very good, Satisfactory, Average, Unsatisfactory. "
-                        id="overall_assessment" :value="old('overall_assessment', $appraisal->overall_assessment ?? '')" :isDisabled="$appraisal->is_appraisee" />
+                        id="overall_assessment" :value="old('overall_assessment', $appraisal->overall_assessment ?? '')" :isDisabled="!$appraisal->is_es" />
                 </div>
 
                 <div class="col-md-12">
                     <x-forms.text-area name="recommendations"
                         label="iv. Recommendations: Recommendations with reasons on whether the employee under review should be promoted, confirmed, remain on probation, redeployed, terminated from Council Service, contract renewed, go for further training, needs counseling, status quo should be maintained, etc.)."
-                        id="recommendations" :value="old('recommendations', $appraisal->recommendations ?? '')" :isDisabled="$appraisal->is_appraisee" />
+                        id="recommendations" :value="old('recommendations', $appraisal->recommendations ?? '')" :isDisabled="!$appraisal->is_es" />
                 </div>
             </div>
         </fieldset>
@@ -1018,7 +1018,7 @@
                         id="overall_assessment_and_comments" :value="old(
                             'overall_assessment_and_comments',
                             $appraisal->overall_assessment_and_comments ?? '',
-                        )" :isDisabled="$appraisal->is_appraisee" />
+                        )" :isDisabled="!$appraisal->is_es" />
                 </div>
             </div>
         </fieldset>
@@ -1044,10 +1044,39 @@
                     @endif
                     @can('approve appraisal')
                         @if (!is_null($appraisal->employee->user_id))
-                            <div class="m-2 status">
-                                @php $userRole = Auth::user()->roles->pluck('name')[0]; @endphp
+                            @php
+                                $userRole = Auth::user()->roles->pluck('name')[0];
+                                $roleNames = [
+                                    'Head of Division' => 'Head of Division',
+                                    'HR' => 'HR',
+                                    'Executive Secretary' => 'Executive Secretary',
+                                ];
+                                $currentApprover = $appraisal->current_approver ?? 'Executive Secretary';
+                                $previousApprover = 'None';
+                                $isHR = $appraisal->appraiser_id == auth()->user()->employee->employee_id;
 
-                                {{-- Current user's decision --}}
+                                if ($userRole == 'HR' && !$isHR) {
+                                    $previousApprover = 'Head of Division';
+                                }
+
+                                if ($userRole == 'Executive Secretary') {
+                                    $previousApprover = 'HR';
+                                }
+                                $hasBeenRejected = collect($appraisal->appraisal_request_status)->contains(
+                                    fn($status) => $status === 'rejected',
+                                );
+
+                                $approvedBy = collect($appraisal->appraisal_request_status)
+                                    ->filter(fn($status) => $status === 'approved')
+                                    ->keys();
+                                $rejectedBy = collect($appraisal->appraisal_request_status)
+                                    ->filter(fn($status) => $status === 'rejected')
+                                    ->keys();
+                            @endphp
+
+                            <div class="m-2 status">
+
+                                {{-- Current User's Decision --}}
                                 @if (isset($appraisal->appraisal_request_status[$userRole]) &&
                                         $appraisal->appraisal_request_status[$userRole] === 'approved')
                                     <span class="badge bg-success">You Approved this Leave Request.</span>
@@ -1062,60 +1091,43 @@
                                     <span class="badge bg-warning">Pending</span>
                                 @endif
 
-                                {{-- Show all who approved --}}
-                                @php
-                                    $approvedBy = collect($appraisal->appraisal_request_status)
-                                        ->filter(fn($status) => $status === 'approved')
-                                        ->keys();
-
-                                    $rejectedBy = collect($appraisal->appraisal_request_status)
-                                        ->filter(fn($status) => $status === 'rejected')
-                                        ->keys();
-                                @endphp
-
+                                {{-- Approved By List --}}
                                 @if ($approvedBy->isNotEmpty())
                                     <p class="mt-2"><strong>Approved by:</strong> {{ $approvedBy->join(', ') }}</p>
                                 @endif
 
+                                {{-- Rejected By List --}}
                                 @if ($rejectedBy->isNotEmpty())
                                     <p class="mt-2"><strong>Rejected by:</strong> {{ $rejectedBy->join(', ') }}</p>
                                 @endif
                             </div>
-                            @php
-                                $roleNames = [
-                                    'Head of Division' => 'Head of Division',
-                                    'HR' => 'HR',
-                                    'Executive Secretary' => 'Executive Secretary',
-                                ];
 
-                                // Default to 'Executive Secretary' if current_approver is null
-                                $currentApprover = $appraisal->current_approver ?? 'Executive Secretary';
-                                $userRole = Auth::user()->roles->pluck('name')[0];
-
-                                //here the check should be if the appraisor is the HR, then handle the scenario
-                                $isHR = Auth::user()->roles->pluck('name')[0]=="HR"?true:false;
-
-                                // Determine if the request has been rejected by someone
-                                $hasBeenRejected = collect($appraisal->appraisal_request_status)->contains(
-                                    fn($status) => $status === 'rejected',
-                                );
-                            @endphp
-
-                            @if (($userRole == $currentApprover || $isHR) && !$hasBeenRejected)
-                                <div class="form-group no-print">
-                                    <input class="btn btn-outline-primary btn-large approve-btn" value="Approve"
-                                        type="button" data-appraisal-id="{{ $appraisal->appraisal_id }}">
-                                    <input class="btn btn-outline-danger btn-large reject-btn" value="Reject"
-                                        type="button" data-appraisal-id="{{ $appraisal->appraisal_id }}"
-                                        data-bs-toggle="modal" data-bs-target="#rejectModal">
-                                </div>
-                            @elseif ($hasBeenRejected)
-                                <div class="alert alert-danger mt-2">
-                                    <p>This request has been <strong>rejected</strong> by a previous approver.</p>
-                                    <p><strong>Reason:</strong> {{ $appraisal->rejection_reason }}</p>
-                                </div>
+                            {{-- Approval / Rejection Controls --}}
+                            @if ($userRole == $currentApprover || $isHR)
+                                @if ($previousApprover != 'None' && $appraisal->appraisal_request_status[$previousApprover] == 'approved')
+                                    <div class="form-group no-print mt-3 d-flex gap-2">
+                                        <input class="btn btn-outline-primary btn-large approve-btn" type="button"
+                                            value="Approve" data-appraisal-id="{{ $appraisal->appraisal_id }}">
+                                        <input class="btn btn-outline-danger btn-large reject-btn" type="button"
+                                            value="Reject" data-appraisal-id="{{ $appraisal->appraisal_id }}"
+                                            data-bs-toggle="modal" data-bs-target="#rejectModal">
+                                    </div>
+                                @elseif ($previousApprover != 'None' && $appraisal->appraisal_request_status[$previousApprover] == 'rejected')
+                                    <p>Rejected by the {{ $previousApprover }}</p>
+                                @else
+                                    <div class="form-group no-print mt-3 d-flex gap-2">
+                                        <input class="btn btn-outline-primary btn-large approve-btn" type="button"
+                                            value="Approve" data-appraisal-id="{{ $appraisal->appraisal_id }}">
+                                        <input class="btn btn-outline-danger btn-large reject-btn" type="button"
+                                            value="Reject" data-appraisal-id="{{ $appraisal->appraisal_id }}"
+                                            data-bs-toggle="modal" data-bs-target="#rejectModal">
+                                    </div>
+                                @endif
                             @else
-                                <p>Waiting for approval from: <strong>{{ $roleNames[$currentApprover] }}</strong></p>
+                                <p class="mt-3">
+                                    Waiting for approval from:
+                                    <strong>{{ $roleNames[$currentApprover] ?? $currentApprover }}</strong>
+                                </p>
                             @endif
                         @endif
                     @endcan

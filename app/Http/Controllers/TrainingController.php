@@ -64,6 +64,8 @@ class TrainingController extends Controller
             // Initialize an array to hold the validated data
             $validatedData = $request->validated();
 
+           
+
             // Create the training
             $trainingCreated = Training::create($validatedData);
 
@@ -71,7 +73,7 @@ class TrainingController extends Controller
             $users = array_map('trim', explode(',', $trainingCreated->training_category['users'] ?? ''));
 
             // If $users has '0' then send notification to all users
-            if (in_array('0', $users)) {
+            if (in_array('All', $users)) {
                 $users = User::all(); // Get all User instances
             } else {
                 // Departments

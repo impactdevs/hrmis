@@ -6,6 +6,7 @@ use App\Models\Appraisal;
 
 use App\Models\User;
 use App\Notifications\AppraisalApproval;
+use App\Notifications\AppraisalApplication;
 use Illuminate\Http\Request;
 use App\Models\Form;
 use App\Models\Scopes\EmployeeScope;
@@ -122,7 +123,28 @@ class AppraisalController extends Controller
         ];
 
         $appraisal = Appraisal::create($data);
+
+        $employeeAppraisor = \App\Models\Employee::withoutGlobalScope(EmployeeScope::class)
+                ->find($appraisal->appraiser_id);
+
+        $employeeAppraisee = \App\Models\Employee::withoutGlobalScope(EmployeeScope::class)
+                ->where('email', auth()->user()->email)->first();
+
+        $appraisorUser = User::find($employeeAppraisor->user_id); // Removed ->first()
+
+        Notification::send($appraisorUser , new AppraisalApplication($appraisal, $employeeAppraisee->first_name, $employeeAppraisee->last_name));
         
+        $hrUser = User::role('HR')->first();
+        $hrEmployee = \App\Models\Employee::withoutGlobalScope(EmployeeScope::class)
+                ->where('email', $hrUser->email)->first();
+
+        Notification::send($hrUser , new AppraisalApplication($appraisal, $employeeAppraisee->first_name, $employeeAppraisee->last_name));
+
+        $esUser = User::role('Executive Secretary')->first();
+        $esEmployee = \App\Models\Employee::withoutGlobalScope(EmployeeScope::class)
+                ->where('email', $esUser->email)->first();
+
+        Notification::send($esUser, new AppraisalApplication($appraisal, $employeeAppraisee->first_name, $employeeAppraisee->last_name));
 
         return to_route('appraisals.edit', ['appraisal' => $appraisal->appraisal_id]);
     }
@@ -143,9 +165,9 @@ class AppraisalController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Appraisal $appraisal)
     {
-        //
+        return to_route('appraisals.edit', ['appraisal' => $appraisal->appraisal_id]);
     }
 
     /**
@@ -200,6 +222,8 @@ class AppraisalController extends Controller
 
         $user = auth()->user();
 
+        $isHR = $appraisal->appraiser_id == auth()->user()->employee->employee_id;
+
         // Retrieve current leave_request_status (it will be an array due to casting)
         $appraisalRequestStatus = $appraisal->appraisal_request_status ?: []; // Default to an empty array if null
 
@@ -208,11 +232,18 @@ class AppraisalController extends Controller
             if ($request->input('status') === 'approved') {
                 // Set HR status to approved
                 $appraisalRequestStatus['HR'] = 'approved';
-                $appraisal->rejection_reason = null; // Clear reason if approved
+                if ($isHR) {
+                   // Approve for Head of Division too if HR is also the appraiser
+                   $appraisalRequestStatus['Head of Division'] = 'approved';
+                 }
+                   $appraisal->rejection_reason = null;
             } else {
-                // Set HR status to rejected
-                $appraisalRequestStatus['HR'] = 'rejected';
-                $appraisal->rejection_reason = $request->input('reason'); // Store rejection reason
+            $appraisalRequestStatus['HR'] = 'rejected';
+            if ($isHR) {
+                // Reject for Head of Division too if HR is also the appraiser
+                $appraisalRequestStatus['Head of Division'] = 'rejected';
+            }
+            $appraisal->rejection_reason = $request->input('reason');
             }
         } elseif ($user->hasRole('Head of Division')) {
             if ($request->input('status') === 'approved') {
@@ -237,14 +268,12 @@ class AppraisalController extends Controller
 
             // Get the user who requested the appraisal
             $employee = \App\Models\Employee::withoutGlobalScope(EmployeeScope::class)
-                ->find($appraisal->employee_id)
-                ?->user_id;
+                ->find($appraisal->employee_id);
 
-            $appraisalRequester = User::find($user->user_id); // Removed ->first()
-
+            $appraisalRequester = User::find($employee->user_id); // Removed ->first()
 
             // Send notification to the User instance
-            Notification::send($appraisalRequester, new AppraisalApproval($appraisal, auth()->user()->employee->first_name, auth()->user()->employee->last_name));
+            Notification::send($appraisalRequester, new AppraisalApproval($appraisal, $employee->first_name, $employee->last_name));
         } else {
             return response()->json(['error' => 'Unauthorized'], 403);
         }

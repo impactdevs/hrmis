@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\OutStationTrainingRequest;
-use App\Models\Department;
 use App\Models\OutOfStationTraining;
-use App\Models\Position;
+
 use App\Models\User;
 use App\Notifications\OutOfStationApproval;
+use App\Notifications\OutOfStationAttachment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
 
@@ -46,6 +46,7 @@ class OutOfStationTrainingController extends Controller
     {
         // Get the request data as an array
         $data = $request->all();
+        $substitute = User::find((int)$data['my_work_will_be_done_by']['users']);
         // Format (qualification details documents
         if (filled($data['relevant_documents'])) {
             foreach ($data['relevant_documents'] as $key => $value) {
@@ -64,7 +65,7 @@ class OutOfStationTrainingController extends Controller
 
         $data['user_id'] = auth()->user()->id;
         $training = OutOfStationTraining::create($data);
-
+        Notification::send($substitute , new OutOfStationAttachment($training));
         return redirect()->route('out-of-station-trainings.index')->with('success', 'Travel Clearance created successfully.');
     }
 

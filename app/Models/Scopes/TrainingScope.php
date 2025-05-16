@@ -107,43 +107,54 @@ class TrainingScope implements Scope
      */
     private function applyStaffScope(Builder $builder, $user): void
     {
-        // Get the employee details
         $employee = Employee::where('user_id', $user->id)->first();
 
         if (!$employee) {
-            return; // If no employee data found, skip the query
+            return;
         }
 
-        // Get all training categories
         $training_categories = DB::table('trainings')
             ->whereNotNull('training_category')
             ->pluck('training_category', 'training_id');
 
-        // Prepare the list of allowed trainings
         $users_trainings = [];
 
         foreach ($training_categories as $training_id => $training_category_json) {
             $training_category = json_decode($training_category_json);
-            $users = explode(',', $training_category->users);
-            $departments = explode(',', $training_category->departments);
-            $positions = explode(',', $training_category->positions);
 
-            // Check if the user is directly included in the users list
-            if (in_array($user->id, $users)) {
-                $users_trainings[] = $training_id;
+            // If decoding fails, skip this record
+            if (!$training_category) {
+                continue;
             }
 
-            // Check if the user's department or position matches
-            if (in_array($employee->department_id, $departments)) {
+            $users = $training_category->users ?? '';
+            $departments = $training_category->departments ?? '';
+            $positions = $training_category->positions ?? '';
+
+            // Show to all users if "All"
+            if ($users === 'All') {
                 $users_trainings[] = $training_id;
+                continue;
             }
 
-            if (in_array($employee->position_id, $positions)) {
+            $user_ids = array_filter(explode(',', $users));
+            $department_ids = array_filter(explode(',', $departments));
+            $position_ids = array_filter(explode(',', $positions));
+
+            // Check if user ID, department, or position matches
+            if (
+                in_array((string)$user->id, $user_ids) ||
+                in_array((string)$employee->department_id, $department_ids) ||
+                in_array((string)$employee->position_id, $position_ids)
+            ) {
                 $users_trainings[] = $training_id;
             }
         }
 
-        // Filter the builder by the relevant trainings
-        $builder->whereIn('trainings.training_id', $users_trainings)->orWhere('trainings.user_id', $user->id);
+        // Apply scope
+        $builder->where(function ($query) use ($users_trainings, $user) {
+            $query->whereIn('trainings.training_id', $users_trainings)
+                ->orWhere('trainings.user_id', $user->id);
+        });
     }
 }

@@ -101,6 +101,15 @@ class Appraisal extends Model
         return false;
     }
 
+        public function getIsEsAttribute()
+    {
+        if(auth()->user()->hasRole('Executive Secretary')){
+            return true;
+        }
+
+        return false;
+    }
+
     /* enforce appraisal approval hierarchy
     *Staff creates appraisal
     *the next to approve is the supervisor(Head of Division)
@@ -124,5 +133,26 @@ public function getCurrentApproverAttribute()
     // All roles have approved
     return null;
 }
+
+public function getPreviousApproverAttribute()
+{
+    $approvalFlow = ['Head of Division', 'HR', 'Executive Secretary'];
+
+    $status = $this->appraisal_request_status ?? [];
+
+    $previousApprover = null;
+
+    foreach ($approvalFlow as $role) {
+        if (!array_key_exists($role, $status)) {
+            break;
+        }
+        $previousApprover = $role;
+    }
+
+    return $previousApprover; // null if no previous approver exists
+}
+
+
+
 
 }

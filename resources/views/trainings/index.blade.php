@@ -40,41 +40,35 @@
                             <td>{{ $training->training_start_date->format('d/m/Y') }}</td>
                             <td>{{ $training->training_end_date->format('d/m/Y') }}</td>
                             <td>
-                                @if (!is_null($training->training_category))
-                                    @php
-                                        // Assume training_category contains comma-separated IDs for each category
-                                        $userIds = explode(',', $training->training_category['users'] ?? '');
-                                        $departmentIds = explode(
-                                            ',',
-                                            $training->training_category['departments'] ?? '',
-                                        );
-                                        $positionIds = explode(',', $training->training_category['positions'] ?? '');
-                                    @endphp
-                                    @foreach ($userIds as $id)
-                                        @if ($id == '')
-                                            <span class="badge bg-primary">All Users</span>
-                                        @else
-                                            <span
-                                                class="badge bg-primary">{{ $options['users'][$id] ?? 'Unknown User' }}</span>
-                                        @endif
-                                    @endforeach
+                                @php
+                                    // Assume training_category contains comma-separated IDs for each category
+                                    $userIds = explode(',', $training->training_category['users'] ?? '');
+                                    $departmentIds = explode(',', $training->training_category['departments'] ?? '');
+                                    $positionIds = explode(',', $training->training_category['positions'] ?? '');
 
-                                    @foreach ($departmentIds as $id)
-                                        @if (!($id == ''))
-                                            <span
-                                                class="badge bg-success">{{ $options['departments'][$id] ?? 'Unknown Department' }}</span>
-                                        @endif
-                                    @endforeach
+                                @endphp
+                                @foreach ($userIds as $id)
+                                    @if ($id === 'All')
+                                        <span class="badge bg-primary">All Users</span>
+                                    @elseif (!empty($id) && isset($options['users'][$id]))
+                                        <span
+                                            class="badge bg-primary">{{ $options['users'][$id] ?? 'Unknown User' }}</span>
+                                    @endif
+                                @endforeach
 
-                                    @foreach ($positionIds as $id)
-                                        @if (!($id == ''))
-                                            <span
-                                                class="badge bg-info">{{ $options['positions'][$id] ?? 'Unknown Position' }}</span>
-                                        @endif
-                                    @endforeach
-                                @else
-                                    <span class="badge bg-secondary">{{ $options['users'][$training->user_id] }}
-                                @endif
+                                @foreach ($departmentIds as $id)
+                                    @if (filled($id))
+                                        <span
+                                            class="badge bg-success">{{ $options['departments'][$id] == '' ? 'not found' : $options['departments'][$id] ?? 'Unknown Department' }}</span>
+                                    @endif
+                                @endforeach
+
+                                @foreach ($positionIds as $id)
+                                    @if (filled($id))
+                                        <span
+                                            class="badge bg-info">{{ $options['positions'][$id] == '' ? '' : $options['positions'][$id] ?? 'Unknown Position' }}</span>
+                                    @endif
+                                @endforeach
                             </td>
                             <td>
                                 <div class="dropdown">

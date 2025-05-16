@@ -34,7 +34,8 @@
     <div class="mb-3 col">
         <label for="usertokenfield" class="form-label">The following do my work</label>
         <input type="text" class="form-control" id="usertokenfield" />
-        <input type="hidden" name="my_work_will_be_done_by[users]" id="user_ids" value="{{ old('my_work_will_be_done_by.users', isset($training) ? (isset($training->my_work_will_be_done_by['users']) ? $training->my_work_will_be_done_by['users'] : '') : '') }}" />
+        <input type="hidden" name="my_work_will_be_done_by[users]" id="user_ids"
+            value="{{ old('my_work_will_be_done_by.users', isset($training) ? (isset($training->my_work_will_be_done_by['users']) ? $training->my_work_will_be_done_by['users'] : '') : '') }}" />
     </div>
 </div>
 
@@ -69,23 +70,61 @@
                 id,
                 name
             }));
-            // Users Tokenfield
+            // Initialize User Tokenfield
             $('#usertokenfield').tokenfield({
-                autocomplete: {
-                    source: userSource.map(user => user.name),
-                    delay: 100
-                },
-                showAutocompleteOnFocus: true
-            }).on('tokenfield:createtoken', function(event) {
-                const token = event.attrs;
-                const userId = userSource.find(user => user.name === token.value)?.id;
-                if (userId) {
-                    const currentIds = $('#user_ids').val().split(',').filter(Boolean);
-                    currentIds.push(userId);
-                    $('#user_ids').val(currentIds.join(','));
-                }
-            });
+                    autocomplete: {
+                        source: userSource.map(user => user.name),
+                        delay: 100
+                    },
+                    showAutocompleteOnFocus: true
+                })
+                .on('tokenfield:createtoken', function(event) {
+                    const tokenValue = event.attrs.value;
+                    let userId;
 
+                    if (tokenValue === 'All Users') {
+                        userId = 'All';
+                    } else {
+                        const user = userSource.find(u => u.name === tokenValue);
+                        userId = user ? user.id : null;
+                    }
+
+                    if (userId) {
+                        let currentIds = $('#user_ids').val().split(',').filter(Boolean);
+
+                        if (userId === 'All') {
+                            currentIds = ['All'];
+                        } else {
+                            currentIds = currentIds.filter(id => id !== 'All');
+                            if (!currentIds.includes(userId)) {
+                                currentIds.push(userId);
+                            }
+                        }
+
+                        $('#user_ids').val(currentIds.join(','));
+                    } else {
+                        event.preventDefault();
+                    }
+                })
+                .on('tokenfield:removedtoken', function(e) {
+                    const tokenValue = e.attrs.value;
+                    let userId;
+
+                    if (tokenValue === 'All Users') {
+                        userId = 'All';
+                    } else {
+                        const user = userSource.find(u => u.name === tokenValue);
+                        userId = user ? user.id : null;
+                    }
+
+                    if (userId) {
+                        let currentIds = $('#user_ids').val().split(',').filter(Boolean);
+                        currentIds = currentIds.filter(id => id !== userId);
+                        $('#user_ids').val(currentIds.join(','));
+                    }
+                });
+
+            // Populate initial tokens for Users
             const initialUserIds = $('#user_ids').val().split(',').filter(Boolean);
             initialUserIds.forEach(id => {
                 if (id === 'All') {

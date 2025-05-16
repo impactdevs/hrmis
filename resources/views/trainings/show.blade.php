@@ -35,32 +35,34 @@
                         <i class="fas fa-info-circle"></i> Training Categories
                     </label>
                     <p>
-                        @if (!is_null($training->training_category))
-                            @php
-                                // Assume training_category contains comma-separated IDs for each category
-                                $userIds = explode(',', $training->training_category['users'] ?? '');
-                                $departmentIds = explode(',', $training->training_category['departments'] ?? '');
-                                $positionIds = explode(',', $training->training_category['positions'] ?? '');
-                            @endphp
+                        @php
+                            // Assume training_category contains comma-separated IDs for each category
+                            $userIds = explode(',', $training->training_category['users'] ?? '');
+                            $departmentIds = explode(',', $training->training_category['departments'] ?? '');
+                            $positionIds = explode(',', $training->training_category['positions'] ?? '');
 
-                            @foreach ($userIds as $id)
-                                @if ($id == 0)
-                                    <span class="">All Users,</span>
-                                @else
-                                    <span class="">{{ $options['users'][$id] ?? 'Unknown User' }},</span>
-                                @endif
-                            @endforeach
+                        @endphp
+                        @foreach ($userIds as $id)
+                            @if ($id === 'All')
+                                <span class="badge bg-primary">All Users</span>
+                            @elseif (!empty($id) && isset($options['users'][$id]))
+                                <span class="badge bg-primary">{{ $options['users'][$id] ?? 'Unknown User' }}</span>
+                            @endif
+                        @endforeach
 
-                            @foreach ($departmentIds as $id)
-                                <span class="">{{ $options['departments'][$id] ?? 'Unknown Department' }},</span>
-                            @endforeach
+                        @foreach ($departmentIds as $id)
+                            @if (filled($id))
+                                <span
+                                    class="badge bg-success">{{ $options['departments'][$id] == '' ? 'not found' : $options['departments'][$id] ?? 'Unknown Department' }}</span>
+                            @endif
+                        @endforeach
 
-                            @foreach ($positionIds as $id)
-                                <span class="">{{ $options['positions'][$id] ?? 'Unknown Position' }},</span>
-                            @endforeach
-                        @else
-                            <span class="">{{ $options['users'][$training->user_id] }},
-                        @endif
+                        @foreach ($positionIds as $id)
+                            @if (filled($id))
+                                <span
+                                    class="badge bg-info">{{ $options['positions'][$id] == '' ? '' : $options['positions'][$id] ?? 'Unknown Position' }}</span>
+                            @endif
+                        @endforeach
                     </p>
 
                 </div>
