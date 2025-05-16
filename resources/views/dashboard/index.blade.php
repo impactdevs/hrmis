@@ -150,7 +150,7 @@
                             <div class="card info-card customers-card">
 
                                 <div class="card-body">
-                                    <h5 class="card-title">Leave <span>| Currently</span></h5>
+                                    <h5 class="card-title">Number of Employees on Leave <span>| Currently</span></h5>
 
                                     <div class="d-flex align-items-center">
                                         <div
