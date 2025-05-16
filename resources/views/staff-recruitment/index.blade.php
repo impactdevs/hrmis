@@ -10,7 +10,6 @@
             @endcan
         </div>
 
-        <!-- Recruitment Requests Table -->
         <div class="shadow-sm card">
             <div class="card-body">
                 @if ($rectrutmentRequests->isEmpty())
