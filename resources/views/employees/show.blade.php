@@ -58,10 +58,6 @@
                         <div class="col-md-4"><strong>Date of Entry:</strong></div>
                         <div class="col-md-8">{{ $employee->date_of_entry ?? 'No Date Specified' }}</div>
                     </div>
-                    <div class="mb-3 row">
-                        <div class="col-md-4"><strong>Contract Expiry Date:</strong></div>
-                        <div class="col-md-8">{{ $employee->contract_expiry_date ?? 'No Date Specified' }}</div>
-                    </div>
 
                     <div class="mb-3 row">
                         <div class="col-md-4"><strong>Department</strong></div>
@@ -72,7 +68,7 @@
                         <div class="col-md-4"><strong>Job Description:</strong></div>
                         <div class="col-md-8">{{ $employee->job_description ?? 'No Job Description' }}</div>
                     </div>
-                    <div class="mb-3 row">
+                    {{-- <div class="mb-3 row">
                         <div class="col-md-4"><strong>Contract Documents:</strong></div>
                         <div class="col-md-8">
                             @if (!is_null($employee->contract_documents))
@@ -114,7 +110,7 @@
                                 <p>No contract documents</p>
                             @endif
                         </div>
-                    </div>
+                    </div> --}}
                 </section>
 
                 <!-- Other sections for Department, Contact Information, etc. remain the same... -->

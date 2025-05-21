@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\Summit;
 use App\Models\Appraisal;
 
 use App\Models\User;
@@ -13,6 +14,9 @@ use App\Models\Scopes\EmployeeScope;
 use Illuminate\Support\Facades\Notification;
 
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
+
 
 class AppraisalController extends Controller
 {
@@ -125,24 +129,24 @@ class AppraisalController extends Controller
         $appraisal = Appraisal::create($data);
 
         $employeeAppraisor = \App\Models\Employee::withoutGlobalScope(EmployeeScope::class)
-                ->find($appraisal->appraiser_id);
+            ->find($appraisal->appraiser_id);
 
         $employeeAppraisee = \App\Models\Employee::withoutGlobalScope(EmployeeScope::class)
-                ->where('email', auth()->user()->email)->first();
+            ->where('email', auth()->user()->email)->first();
 
         $appraisorUser = User::find($employeeAppraisor->user_id); // Removed ->first()
 
-        Notification::send($appraisorUser , new AppraisalApplication($appraisal, $employeeAppraisee->first_name, $employeeAppraisee->last_name));
-        
+        Notification::send($appraisorUser, new AppraisalApplication($appraisal, $employeeAppraisee->first_name, $employeeAppraisee->last_name));
+
         $hrUser = User::role('HR')->first();
         $hrEmployee = \App\Models\Employee::withoutGlobalScope(EmployeeScope::class)
-                ->where('email', $hrUser->email)->first();
+            ->where('email', $hrUser->email)->first();
 
-        Notification::send($hrUser , new AppraisalApplication($appraisal, $employeeAppraisee->first_name, $employeeAppraisee->last_name));
+        Notification::send($hrUser, new AppraisalApplication($appraisal, $employeeAppraisee->first_name, $employeeAppraisee->last_name));
 
         $esUser = User::role('Executive Secretary')->first();
         $esEmployee = \App\Models\Employee::withoutGlobalScope(EmployeeScope::class)
-                ->where('email', $esUser->email)->first();
+            ->where('email', $esUser->email)->first();
 
         Notification::send($esUser, new AppraisalApplication($appraisal, $employeeAppraisee->first_name, $employeeAppraisee->last_name));
 
@@ -233,17 +237,17 @@ class AppraisalController extends Controller
                 // Set HR status to approved
                 $appraisalRequestStatus['HR'] = 'approved';
                 if ($isHR) {
-                   // Approve for Head of Division too if HR is also the appraiser
-                   $appraisalRequestStatus['Head of Division'] = 'approved';
-                 }
-                   $appraisal->rejection_reason = null;
+                    // Approve for Head of Division too if HR is also the appraiser
+                    $appraisalRequestStatus['Head of Division'] = 'approved';
+                }
+                $appraisal->rejection_reason = null;
             } else {
-            $appraisalRequestStatus['HR'] = 'rejected';
-            if ($isHR) {
-                // Reject for Head of Division too if HR is also the appraiser
-                $appraisalRequestStatus['Head of Division'] = 'rejected';
-            }
-            $appraisal->rejection_reason = $request->input('reason');
+                $appraisalRequestStatus['HR'] = 'rejected';
+                if ($isHR) {
+                    // Reject for Head of Division too if HR is also the appraiser
+                    $appraisalRequestStatus['Head of Division'] = 'rejected';
+                }
+                $appraisal->rejection_reason = $request->input('reason');
             }
         } elseif ($user->hasRole('Head of Division')) {
             if ($request->input('status') === 'approved') {
@@ -291,4 +295,5 @@ class AppraisalController extends Controller
         $pdf = PDf::loadView('appraisals.pdf', compact('appraisal', 'users'));
         return $pdf->download("appraisal-{$appraisal->appraisal_id}.pdf");
     }
+
 }

@@ -131,20 +131,6 @@ class EmployeeController extends Controller
                 }
             }
 
-            // Format (qualification details documents
-            if (filled($validatedData['contract_documents'])) {
-                foreach ($validatedData['contract_documents'] as $key => $value) {
-                    // Check if a file is uploaded for this qualification
-                    // Use the correct input name to check for the file
-                    if ($request->hasFile("contract_documents.$key.proof")) {
-                        // Store the file and get the path
-                        $filePath = $request->file("contract_documents.$key.proof")->store('contract_documents', 'public');
-
-                        // Update the proof value to the path
-                        $validatedData['contract_documents'][$key]['proof'] = $filePath;
-                    }
-                }
-            }
             $user = DB::table('users')->where('email', $validatedData['email'])->doesntExist();
             if ($user) {
                 $password = Str::random(10);
@@ -247,29 +233,6 @@ class EmployeeController extends Controller
 
                     // Update the qualification details
                     $validatedData['qualifications_details'] = $qualification_details;
-                }
-            }
-
-
-            // Format (qualification details documents
-            if (filled($validatedData['contract_documents'])) {
-                foreach ($validatedData['contract_documents'] as $key => $value) {
-                    // Check if the current qualification has a proof file
-                    if ($request->hasFile("contract_documents.$key.proof")) {
-                        // Store the file and get the path
-                        $filePath = $request->file("contract_documents.$key.proof")->store('contract_documents', 'public');
-
-                        // Update the proof value to the path
-                        $qualification_details[$key]['proof'] = $filePath;
-                    }
-
-                    //check if there is title
-                    if (isset($validatedData['contract_documents'][$key]['title'])) {
-                        $qualification_details[$key]['title'] = $validatedData['contract_documents'][$key]['title'];
-                    }
-
-                    // Update the qualification details
-                    $validatedData['contract_documents'] = $qualification_details;
                 }
             }
 

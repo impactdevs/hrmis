@@ -39,6 +39,7 @@
                 value="{{ old('national_id_photo', $employee->national_id_photo ?? '') }}" />
             <div id="national-id-photo-preview" class="mt-3"></div> <!-- Preview container -->
         </div>
+
         <div class="row mb-3">
             <div class="col-md-6">
                 <x-forms.input name="date_of_birth" label="Date of Birth" type="date" id="date_of_birth"
