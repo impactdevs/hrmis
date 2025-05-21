@@ -12,73 +12,6 @@
     @push('scripts')
         <script>
             $(document).ready(function() {
-                // // Make the "Entitled Days" cell editable on click
-                // $(document).on('click', '.entitled-days-text', function() {
-                //     var $inputField = $(this).next('.entitled-days-input');
-
-                //     $inputField.show().focus(); // Show the input field and focus on it
-                //     console.log($inputField)
-                //     $(this).hide(); // Hide the text when editing starts
-                // });
-
-                // Handle "Entitled Days" updates on blur
-                // $(document).on('blur', '.entitled-days-input', function() {
-                //     var $inputField = $(this);
-                //     var newValue = $inputField.val();
-                //     var $row = $inputField.closest('tr');
-                //     var employeeId = $row.data('employee-id');
-
-                //     //check if the value did not change and is empty
-                //     if (newValue === $row.find('.entitled-days-text').text()) {
-                //         //just keep the value
-                //         $row.find('.entitled-days-text').show();
-                //         $inputField.hide();
-                //         return;
-                //     }
-
-                //     //if the value is empty toastify that its empty and return
-                //     if (newValue === '') {
-                //         Toastify({
-                //             text: 'Please enter a value',
-                //             duration: 3000,
-                //             gravity: "top",
-                //             position: "right",
-                //             backgroundColor: "linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(121,14,9,1) 35%, rgba(0,212,255,1) 100%)",
-                //         }).showToast();
-                //         $row.find('.entitled-days-text').show();
-                //         //hide
-                //         $inputField.hide();
-                //         return;
-                //     }
-
-                //     // AJAX request to update data
-                //     $.ajax({
-                //         url: '/update-entitled-leave-days/' + employeeId,
-                //         method: 'POST',
-                //         headers: {
-                //             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                //         },
-                //         data: {
-                //             entitled_leave_days: newValue
-                //         },
-                //         success: function(response) {
-                //             $row.find('.entitled-days-text').text(newValue).show();
-                //             $inputField.hide();
-                //         },
-                //         error: function() {
-
-                //             Toastify({
-                //                 text: 'Failed to update',
-                //                 duration: 3000,
-                //                 gravity: "top",
-                //                 position: "right",
-                //                 backgroundColor: "linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(121,14,9,1) 35%, rgba(0,212,255,1) 100%)",
-                //             }).showToast();
-
-                //         }
-                //     });
-                // });
-
                 var $table = $('#leave-management-table');
 
                 // Initialize the table with Bootstrap Table options
@@ -96,16 +29,18 @@
                             sortable: true,
                             class: 'text-primary',
                             formatter: function(value) {
-                                return value.toUpperCase(); // Make names uppercase
+                                return value ? value.toUpperCase() : "None";
                             }
+
                         }, {
                             field: 'last_name',
                             title: 'LAST NAME',
                             sortable: true,
                             class: 'text-primary',
                             formatter: function(value) {
-                                return value.toUpperCase(); // Make names uppercase
+                                return value ? value.toUpperCase() : "None";
                             }
+
                         }, {
                             field: 'entitled_leave_days',
                             title: 'ENTITLED LEAVE DAYS',
