@@ -10,8 +10,8 @@ class UsersController extends Controller
 {
     public function index()
     {
-        $users = User::all();
-        return view('users.index', compact('users'));
+        $roles = Role::with('users')->get();
+        return view('users.index', compact('roles'));
     }
 
     public function edit(User $user)
@@ -30,4 +30,3 @@ class UsersController extends Controller
         return redirect()->route('users.index')->with('success', 'Roles updated successfully.');
     }
 }
-
