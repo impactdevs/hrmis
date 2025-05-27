@@ -18,7 +18,6 @@ class JobApplication extends Model
         'uace_details' => 'array',
         'employment_record' => 'array',
         'references' => 'array',
-        'present_salary' => 'decimal:2',
         'salary_expectation' => 'decimal:2',
         'academic_documents' => 'array',
         'other_documents' => 'array',
@@ -44,13 +43,10 @@ class JobApplication extends Model
         'present_department',
         'present_post',
         'date_of_appointment_present_post',
-        'present_salary',
         'terms_of_employment',
 
         // Section 4
         'marital_status',
-        'number_of_children',
-        'children_ages',
 
         // Section 5-7
         'education_history',

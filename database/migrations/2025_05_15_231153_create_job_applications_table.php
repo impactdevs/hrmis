@@ -30,13 +30,11 @@ return new class extends Migration
             $table->string('present_department')->nullable();
             $table->string('present_post')->nullable();
             $table->date('date_of_appointment_present_post')->nullable();
-            $table->decimal('present_salary', 10, 2)->nullable();
             $table->string('terms_of_employment')->nullable();
 
             // Section 4: Family Background
             $table->string('marital_status')->nullable();
-            $table->integer('number_of_children')->nullable();
-            $table->string('children_ages')->nullable();
+
 
             // Section 5: Education History
             $table->json('education_history')->nullable();

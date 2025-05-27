@@ -948,14 +948,14 @@
                 <div class="col-md-12">
                     <x-forms.text-area name="employee_strength"
                         label="i. Strengths - Summarize employee's strengths..." id="employee_strength"
-                        :value="old('employee_strength', $appraisal->employee_strength ?? '')" :isDisabled="$appraisal->is_appraisee" />
+                        :value="old('employee_strength', $appraisal->employee_strength ?? '')" :isDisabled="$appraisal->is_appraisor" />
 
                 </div>
 
                 <div class="col-md-12">
                     <x-forms.text-area name="employee_improvement"
                         label="ii.	Areas for Improvement - Summarize employee’s areas for improvement"
-                        id="employee_improvement" :value="old('employee_improvement', $appraisal->employee_improvement ?? '')" :isDisabled="$appraisal->is_appraisee" />
+                        id="employee_improvement" :value="old('employee_improvement', $appraisal->employee_improvement ?? '')" :isDisabled="$appraisal->is_appraisor" />
                 </div>
 
 
@@ -965,13 +965,13 @@
                         id="superviser_overall_assessment" :value="old(
                             'superviser_overall_assessment',
                             $appraisal->superviser_overall_assessment ?? '',
-                        )" :isDisabled="$appraisal->is_appraisee" />
+                        )" :isDisabled="$appraisal->is_appraisor" />
                 </div>
 
                 <div class="col-md-12">
                     <x-forms.text-area name="recommendations"
                         label="iv. Recommendations: Recommendations with reasons on whether the employee under review should be promoted, confirmed, remain on probation, redeployed, terminated from Council Service, contract renewed, go for further training, needs counseling, status quo should be maintained, etc.)."
-                        id="recommendations" :value="old('recommendations', $appraisal->recommendations ?? '')" :isDisabled="$appraisal->is_appraisee" />
+                        id="recommendations" :value="old('recommendations', $appraisal->recommendations ?? '')" :isDisabled="$appraisal->is_appraisor" />
                 </div>
             </div>
         </fieldset>
@@ -1563,27 +1563,30 @@
                         return validScores.length > 0 ? (sum / (validScores.length * 6)) * 100 : 0;
                     }
 
+                    // Update the updateOverallAverage function in the initActivityRatingTable
                     function updateOverallAverage() {
-                        const rowAverages = Array.from(rows).map(row => {
-                            const val = parseFloat(row.querySelector('.percentage-display')?.textContent);
-                            return isNaN(val) ? 0 : val;
+                        let totalScores = 0;
+                        rows.forEach(row => {
+                            const scores = Array.from(row.querySelectorAll('.score-cell')).map(cell => {
+                                const val = parseInt(cell.textContent);
+                                return isNaN(val) ? 0 : val;
+                            });
+                            totalScores += scores.reduce((a, b) => a + b, 0);
                         });
 
-                        const overallAvg = rowAverages.length > 0 ?
-                            rowAverages.reduce((a, b) => a + b, 0) / rowAverages.length : 0;
+                        const keyDutiesContribution = (totalScores / 24) * 60;
+                        overallAverageElement.textContent = keyDutiesContribution.toFixed(1);
+                        averageProgress.style.width = `${Math.min(keyDutiesContribution, 60)}%`;
 
-                        overallAverageElement.textContent = overallAvg.toFixed(1);
-                        averageProgress.style.width = `${Math.min(overallAvg, 100)}%`;
-
-                        const status = statusMessages.find(s => overallAvg >= s.threshold);
+                        const totalScore = keyDutiesContribution + (window.personalAttributesContribution || 0);
+                        const status = statusMessages.find(s => totalScore >= s.threshold);
                         performanceStatus.textContent = status.message;
                         averageProgress.className =
                             `absolute left-0 top-0 h-full bg-gradient-to-r ${status.color} transition-all duration-500`;
 
-                        window.keyDutiesContribution = overallAvg * 0.6;
+                        window.keyDutiesContribution = keyDutiesContribution;
                         updateTotalScore();
                     }
-
                     // Initial calculations
                     rows.forEach(updateRowPercentage);
                     updateOverallAverage();

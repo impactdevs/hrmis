@@ -99,12 +99,8 @@ public function index(Request $request)
             'work_background.present_department' => 'nullable|string|max:255',
             'work_background.present_post' => 'nullable|string|max:255',
             'work_background.date_of_appointment_to_present_post' => 'nullable|date',
-            'work_background.present_salary' => 'nullable|numeric',
             'work_background.terms_of_employment' => 'nullable|string|max:255',
 
-            // Section 4: Family Background
-            'family_background.number_of_children' => 'nullable|integer|min:0',
-            'family_background.ages' => 'nullable|string|max:255',
             'family_background.marital_status' => 'nullable|string|max:255',
 
             // Section 5: Education History
@@ -199,13 +195,11 @@ public function index(Request $request)
             'present_department' => $validated['work_background']['present_department'],
             'present_post' => $validated['work_background']['present_post'],
             'date_of_appointment_present_post' => $validated['work_background']['date_of_appointment_to_present_post'],
-            'present_salary' => $validated['work_background']['present_salary'],
             'terms_of_employment' => $validated['work_background']['terms_of_employment'] ?? null,
 
             // Section 4
             'marital_status' => $validated['family_background']['marital_status'] ?? null,
-            'number_of_children' => $validated['family_background']['number_of_children'] ?? null,
-            'children_ages' => $validated['family_background']['ages'] ?? null,
+         
 
             // Education
             'education_history' => $validated['education_history'],
@@ -284,13 +278,10 @@ public function index(Request $request)
             'work_background.present_department' => 'required|string|max:255',
             'work_background.present_post' => 'required|string|max:255',
             'work_background.date_of_appointment_to_present_post' => 'required|date',
-            'work_background.present_salary' => 'required|numeric',
             'work_background.terms_of_employment' => 'required|in:temp,contract,probation,perm',
 
             // Section 4: Family Background
             'family_background.marital_status' => 'required|in:married,single,widowed,divorced,separated',
-            'family_background.number_of_children' => 'nullable|integer|min:0',
-            'family_background.ages' => 'nullable|string|max:255',
 
             // Section 5: Education History
             'education_history' => 'required|array',

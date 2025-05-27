@@ -1,10 +1,5 @@
 <x-app-layout>
     <div class="container py-5 card ">
-        <!-- Title Section -->
-        <div class="text-center mb-5 card-title">
-            <h1 class="text-primary font-weight-bold">Staff Recruitment Request Form</h1>
-            <h3 class="text-muted">Recruitment Details</h3>
-        </div>
         <!-- Form Details Section -->
         <div class="row card-body">
             <div class="col-md-6">
@@ -64,17 +59,23 @@
         </div>
 
         <div class="status m-2">
-            @if (isset($recruitment->approval_status[Auth::user()->roles->pluck('name')[0]]) && ($recruitment->approval_status[Auth::user()->roles->pluck('name')[0]] === 'rejected'))
+            @if (isset($recruitment->approval_status[Auth::user()->roles->pluck('name')[0]]) &&
+                    $recruitment->approval_status[Auth::user()->roles->pluck('name')[0]] === 'rejected')
                 <span class="badge bg-danger">You rejected this Request</span>
                 <p class="mt-1"><strong>Rejection Reason:</strong>
                     {{ $recruitment->rejection_reason }}</p>
-            @elseif (isset($recruitment->approval_status[Auth::user()->roles->pluck('name')[0]]) && ($recruitment->approval_status[Auth::user()->roles->pluck('name')[0]] === 'approved'))
+            @elseif (isset($recruitment->approval_status[Auth::user()->roles->pluck('name')[0]]) &&
+                    $recruitment->approval_status[Auth::user()->roles->pluck('name')[0]] === 'approved')
                 <span class="badge bg-danger">Approved</span>
             @else
                 <span class="badge bg-warning">Pending</span>
             @endif
         </div>
         @can('can approve recruitment')
+            {{-- list the approval order --}}
+            @php
+                $approvalFlow = ['HR', 'Head of Finance', 'Executive Secretary'];
+            @endphp
             <div class="form-group">
                 <input class="btn btn-outline-primary btn-large approve-btn" value="Approve" type="button"
                     data-recruitment-id="{{ $recruitment->staff_recruitment_id }}">

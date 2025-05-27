@@ -126,12 +126,6 @@
                 </div>
 
                 <div class="col-md-6">
-                    <label class="form-label">Present Salary and Scale (if applicable)</label>
-                    <input type="text" class="form-control" placeholder="UGX"
-                        name="work_background[present_salary]">
-                </div>
-
-                <div class="col-md-6">
                     <label class="form-label">Terms of Employment</label>
                     <div class="d-flex gap-4 flex-wrap">
                         <div class="form-check">
@@ -176,38 +170,10 @@
                                 id="single">
                             <label class="form-check-label" for="single">Single</label>
                         </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="family_background[marital_status]"
-                                id="widowed">
-                            <label class="form-check-label" for="widowed">Widowed</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="family_background[marital_status]"
-                                id="divorced">
-                            <label class="form-check-label" for="divorced">Divorced</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="family_background[marital_status]"
-                                id="separated">
-                            <label class="form-check-label" for="separated">Separated</label>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-md-6">
-                    <label class="form-label">Number and age of Children</label>
-                    <div class="children-fields">
-                        <div class="input-group mb-2">
-                            <input type="number" class="form-control" name="family_background[number_of_children]"
-                                placeholder="Number of children">
-                        </div>
-                        <div class="input-group mb-2">
-                            <input type="text" class="form-control" name="family_background[ages]"
-                                placeholder="Ages (e.g., 5, 8, 12)">
-                        </div>
-                    </div>
-                    <div class="form-text">Example: 3 children aged 5, 8, and 12 years</div>
-                </div>
             </div>
         </div>
 
