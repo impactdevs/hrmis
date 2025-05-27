@@ -164,10 +164,12 @@ class JobApplicationController extends Controller
 
         // Handle Academic Documents
         $academicDocumentsPaths = [];
+        if ($request->hasFile('academic_documents')){
         foreach ($request->file('academic_documents') as $file) {
             $path = $file->store('academic_docs', 'public');
             $academicDocumentsPaths[] = $path;
         }
+    }
 
         // Handle CV
         $cvPath = $request->file('cv')->store('cvs', 'public');
@@ -191,12 +193,6 @@ class JobApplicationController extends Controller
             'email' => $validated['personal_details']['email'],
             'telephone' => $validated['personal_details']['telephone_number'],
 
-            'university_name' => $validated['university']['name'],
-            'university_course' => $validated['university']['course'],
-            'university_start_date' => $validated['university']['start_date'],
-            'university_end_date' => $validated['university']['end_date'],
-            'university_cgpa' => $validated['university']['cgpa'],
-
             // Section 2
             'nationality' => $validated['nationality_and_residence']['nationality'],
             'home_district' => $validated['nationality_and_residence']['home_district'],
@@ -219,6 +215,13 @@ class JobApplicationController extends Controller
             'education_history' => $validated['education_history'],
             'uce_details' => $validated['uce'],
             'uace_details' => $validated['uace'],
+            'university_details' => [
+                'name' => $validated['university']['name'] ?? null,
+                'course' => $validated['university']['course'] ?? null,
+                'start_date' => $validated['university']['start_date'] ?? null,
+                'end_date' => $validated['university']['end_date'] ?? null,
+                'cgpa' => $validated['university']['cgpa'] ?? null,
+            ],
 
             // Employment
             'employment_record' => $validated['employment_record'],

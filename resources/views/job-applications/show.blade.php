@@ -67,6 +67,15 @@
                                 <dd>{{ $application->residency_type ?? '-' }}</dd>
                             </dl>
                         </div>
+
+                        <div class="col-md-4">
+                            <dl>
+                                <dt>NIN</dt>
+                                <dd>{{ $application->nin ?? '-' }}</dd>
+
+                            
+                            </dl>
+                        </div>
                     </div>
                 </div>
 
@@ -87,10 +96,6 @@
                             <dl>
                                 <dt>Appointment Date</dt>
                                 <dd>{{ $application->date_of_appointment_present_post ? $application->date_of_appointment_present_post->format('d/m/Y') : '-' }}
-                                </dd>
-
-                                <dt>Current Salary</dt>
-                                <dd>{{ $application->present_salary ? number_format($application->present_salary) : '-' }}
                                 </dd>
                             </dl>
                         </div>
@@ -113,18 +118,8 @@
                                 <dd>{{ $application->marital_status ?? '-' }}</dd>
                             </dl>
                         </div>
-                        <div class="col-md-4">
-                            <dl>
-                                <dt>Number of Children</dt>
-                                <dd>{{ $application->number_of_children ?? '-' }}</dd>
-                            </dl>
-                        </div>
-                        <div class="col-md-4">
-                            <dl>
-                                <dt>Children Ages</dt>
-                                <dd>{{ $application->children_ages ?? '-' }}</dd>
-                            </dl>
-                        </div>
+                  
+           
                     </div>
                 </div>
 
@@ -163,7 +158,7 @@
                 <!-- Examination Results -->
                 <div class="row mb-4">
                     <!-- UCE Section -->
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="section-card h-100">
                             <h5 class="section-title"><i class="fas fa-file-alt mr-2"></i>UCE Details</h5>
                             @if (!empty($application->uce_details))
@@ -205,7 +200,7 @@
                     </div>
 
                     <!-- UACE Section -->
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="section-card h-100">
                             <h5 class="section-title"><i class="fas fa-file-certificate mr-2"></i>UACE Details</h5>
                             @if (!empty($application->uace_details))
@@ -245,7 +240,31 @@
                             @endif
                         </div>
                     </div>
+
+                    <!-- University Section -->
+                    <div class="col-md-4">
+                        <div class="section-card h-100">
+                            <h5 class="section-title"><i class="fas fa-university mr-2"></i>University Education</h5>
+                            @if (!empty($application->university_details))
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item"><strong>University:</strong>
+                                        {{ $application->university_details['name'] ?? '-' }}</li>
+                                    <li class="list-group-item"><strong>Course:</strong>
+                                        {{ $application->university_details['course'] ?? '-' }}</li>
+                                    <li class="list-group-item"><strong>Start Date:</strong>
+                                        {{ $application->university_details['start_date'] ?? '-' }}</li>
+                                    <li class="list-group-item"><strong>End Date:</strong>
+                                        {{ $application->university_details['end_date'] ?? '-' }}</li>
+                                    <li class="list-group-item"><strong>CGPA:</strong>
+                                        {{ $application->university_details['cgpa'] ?? '-' }}</li>
+                                </ul>
+                            @else
+                                <div class="alert alert-info py-2 mb-0">No university education details provided</div>
+                            @endif
+                        </div>
+                    </div>
                 </div>
+
 
                 <!-- Employment Record -->
                 <div class="section-card mb-4">

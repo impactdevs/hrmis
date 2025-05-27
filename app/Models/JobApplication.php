@@ -33,11 +33,6 @@ class JobApplication extends Model
         'email',
         'telephone',
 
-        'university_name',
-        'university_course',
-        'university_start_date',
-        'university_end_date',
-        'university_cgpa',
 
         // Section 2
         'nationality',
@@ -60,6 +55,7 @@ class JobApplication extends Model
         'education_history',
         'uce_details',
         'uace_details',
+        'university_details',
         'employment_record',
 
         // Section 8-9

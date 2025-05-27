@@ -4,7 +4,7 @@
     <textarea name="{{ $name }}" rows="6" id="{{ $id }}"
         class="form-control @error($name) is-invalid @enderror"
         style="font-family: 'Courier New', Courier, monospace; font-size: 16px; color: #333;"
-        @if ($isDisabled) disabled @endif>
+        @if ($isDisabled) readonly @endif>
         {{ old($name, $value) }}
     </textarea>
 

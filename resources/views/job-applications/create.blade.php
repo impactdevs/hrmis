@@ -270,15 +270,7 @@
                     </div>
 
                     <div class="col-md-6">
-                        <label class="form-label">Present Salary and Scale (if applicable)</label>
-                        <input type="text"
-                            class="form-control @error('work_background.present_salary') is-invalid @enderror"
-                            placeholder="UGX" name="work_background[present_salary]"
-                            value="{{ old('work_background.present_salary') }}">
-                        @error('work_background.present_salary')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
+                 
 
                     <div class="col-md-6">
                         <label class="form-label">Terms of Employment</label>

@@ -524,20 +524,20 @@
                                 <td class="text-center">4</td>
                                 <td class="text-center"><input type="number"
                                         name="personal_attributes_assessment[technical_knowledge][appraisee_score]"
-                                        @if (!$appraisal->is_appraisee) disabled @endif
+                                        @if (!$appraisal->is_appraisee) readonly @endif
                                         class="form-control form-control-sm score-input" min="0"
                                         value="{{ $appraisal->personal_attributes_assessment['technical_knowledge']['appraisee_score'] ?? '' }}"
                                         max="4"></td>
                                 <td class="text-center"><input type="number"
                                         name="personal_attributes_assessment[technical_knowledge][appraiser_score]"
-                                        @if ($appraisal->is_appraisee) disabled @endif
+                                        @if ($appraisal->is_appraisee) readonly @endif
                                         class="form-control form-control-sm score-input" min="0"
                                         value="{{ $appraisal->personal_attributes_assessment['technical_knowledge']['appraiser_score'] ?? '' }}"
                                         max="4"></td>
                                 <td class="text-center"><input type="number"
                                         name="personal_attributes_assessment[technical_knowledge][agreed_score]"
                                         value="{{ $appraisal->personal_attributes_assessment['technical_knowledge']['agreed_score'] ?? '' }}"
-                                        @if ($appraisal->is_appraisee) disabled @endif
+                                        @if ($appraisal->is_appraisee) readonly @endif
                                         class="form-control form-control-sm score-input" min="0"
                                         max="4"></td>
                             </tr>
@@ -552,15 +552,15 @@
                                 <td class="text-center">
                                     <input type="number"
                                         name="personal_attributes_assessment[commitment][appraisee_score]"
-                                        @if (!$appraisal->is_appraisee) disabled @endif
+                                        @if (!$appraisal->is_appraisee) readonly @endif
                                         value="{{ $appraisal->personal_attributes_assessment['commitment']['appraisee_score'] ?? '' }}"
                                         class="form-control form-control-sm score-input" min="0"
-                                        max="4" @if (!$appraisal->is_appraisee) disabled @endif>
+                                        max="4" @if (!$appraisal->is_appraisee) readonly @endif>
                                 </td>
                                 <td class="text-center">
                                     <input type="number"
                                         name="personal_attributes_assessment[commitment][appraiser_score]"
-                                        @if ($appraisal->is_appraisee) disabled @endif
+                                        @if ($appraisal->is_appraisee) readonly @endif
                                         value="{{ $appraisal->personal_attributes_assessment['commitment']['appraiser_score'] ?? '' }}"
                                         class="form-control form-control-sm score-input" min="0"
                                         max="4">
@@ -569,7 +569,7 @@
                                     <input type="number"
                                         name="personal_attributes_assessment[commitment][agreed_score]"
                                         value="{{ $appraisal->personal_attributes_assessment['commitment']['agreed_score'] ?? '' }}"
-                                        @if ($appraisal->is_appraisee) disabled @endif
+                                        @if ($appraisal->is_appraisee) readonly @endif
                                         class="form-control form-control-sm score-input" min="0"
                                         max="4">
                                 </td>
@@ -587,7 +587,7 @@
                                 <td class="text-center">
                                     <input type="number"
                                         name="personal_attributes_assessment[team_work][appraisee_score]"
-                                        @if (!$appraisal->is_appraisee) disabled @endif
+                                        @if (!$appraisal->is_appraisee) readonly @endif
                                         value="{{ $appraisal->personal_attributes_assessment['team_work']['appraisee_score'] ?? '' }}"
                                         class="form-control form-control-sm score-input" min="0"
                                         max="4">
@@ -595,7 +595,7 @@
                                 <td class="text-center">
                                     <input type="number"
                                         name="personal_attributes_assessment[team_work][appraiser_score]"
-                                        @if ($appraisal->is_appraisee) disabled @endif
+                                        @if ($appraisal->is_appraisee) readonly @endif
                                         value="{{ $appraisal->personal_attributes_assessment['team_work']['appraiser_score'] ?? '' }}"
                                         class="form-control form-control-sm score-input" min="0"
                                         max="4">
@@ -604,7 +604,7 @@
                                     <input type="number"
                                         name="personal_attributes_assessment[team_work][agreed_score]"
                                         value="{{ $appraisal->personal_attributes_assessment['team_work']['agreed_score'] ?? '' }}"
-                                        @if ($appraisal->is_appraisee) disabled @endif
+                                        @if ($appraisal->is_appraisee) readonly @endif
                                         class="form-control form-control-sm score-input" min="0"
                                         max="4">
                                 </td>
@@ -621,7 +621,7 @@
                                 <td class="text-center">
                                     <input type="number"
                                         name="personal_attributes_assessment[productivity][appraisee_score]"
-                                        @if (!$appraisal->is_appraisee) disabled @endif
+                                        @if (!$appraisal->is_appraisee) readonly @endif
                                         value="{{ $appraisal->personal_attributes_assessment['productivity']['appraisee_score'] ?? '' }}"
                                         class="form-control form-control-sm score-input" min="0"
                                         max="4">
@@ -629,7 +629,7 @@
                                 <td class="text-center">
                                     <input type="number"
                                         name="personal_attributes_assessment[productivity][appraiser_score]"
-                                        @if ($appraisal->is_appraisee) disabled @endif
+                                        @if ($appraisal->is_appraisee) readonly @endif
                                         value="{{ $appraisal->personal_attributes_assessment['productivity']['appraiser_score'] ?? '' }}"
                                         class="form-control form-control-sm score-input" min="0"
                                         max="4">
@@ -638,7 +638,7 @@
                                     <input type="number"
                                         name="personal_attributes_assessment[productivity][agreed_score]"
                                         value="{{ $appraisal->personal_attributes_assessment['productivity']['agreed_score'] ?? '' }}"
-                                        @if ($appraisal->is_appraisee) disabled @endif
+                                        @if ($appraisal->is_appraisee) readonly @endif
                                         class="form-control form-control-sm score-input" min="0"
                                         max="4">
                                 </td>
@@ -655,7 +655,7 @@
                                 <td class="text-center">
                                     <input type="number"
                                         name="personal_attributes_assessment[integrity][appraisee_score]"
-                                        @if (!$appraisal->is_appraisee) disabled @endif
+                                        @if (!$appraisal->is_appraisee) readonly @endif
                                         value="{{ $appraisal->personal_attributes_assessment['integrity']['appraisee_score'] ?? '' }}"
                                         class="form-control form-control-sm score-input" min="0"
                                         max="4">
@@ -663,7 +663,7 @@
                                 <td class="text-center">
                                     <input type="number"
                                         name="personal_attributes_assessment[integrity][appraiser_score]"
-                                        @if ($appraisal->is_appraisee) disabled @endif
+                                        @if ($appraisal->is_appraisee) readonly @endif
                                         value="{{ $appraisal->personal_attributes_assessment['integrity']['appraiser_score'] ?? '' }}"
                                         class="form-control form-control-sm score-input" min="0"
                                         max="4">
@@ -672,7 +672,7 @@
                                     <input type="number"
                                         name="personal_attributes_assessment[integrity][agreed_score]"
                                         value="{{ $appraisal->personal_attributes_assessment['integrity']['agreed_score'] ?? '' }}"
-                                        @if ($appraisal->is_appraisee) disabled @endif
+                                        @if ($appraisal->is_appraisee) readonly @endif
                                         class="form-control form-control-sm score-input" min="0"
                                         max="4">
                                 </td>
@@ -689,7 +689,7 @@
                                 <td class="text-center">
                                     <input type="number"
                                         name="personal_attributes_assessment[flexibility][appraisee_score]"
-                                        @if (!$appraisal->is_appraisee) disabled @endif
+                                        @if (!$appraisal->is_appraisee) readonly @endif
                                         value="{{ $appraisal->personal_attributes_assessment['flexibility']['appraisee_score'] ?? '' }}"
                                         class="form-control form-control-sm score-input" min="0"
                                         max="4">
@@ -697,7 +697,7 @@
                                 <td class="text-center">
                                     <input type="number"
                                         name="personal_attributes_assessment[flexibility][appraiser_score]"
-                                        @if ($appraisal->is_appraisee) disabled @endif
+                                        @if ($appraisal->is_appraisee) readonly @endif
                                         value="{{ $appraisal->personal_attributes_assessment['flexibility']['appraiser_score'] ?? '' }}"
                                         class="form-control form-control-sm score-input" min="0"
                                         max="4">
@@ -706,7 +706,7 @@
                                     <input type="number"
                                         name="personal_attributes_assessment[flexibility][agreed_score]"
                                         value="{{ $appraisal->personal_attributes_assessment['flexibility']['agreed_score'] ?? '' }}"
-                                        @if ($appraisal->is_appraisee) disabled @endif
+                                        @if ($appraisal->is_appraisee) readonly @endif
                                         class="form-control form-control-sm score-input" min="0"
                                         max="4">
                                 </td>
@@ -725,7 +725,7 @@
                                 <td class="text-center">
                                     <input type="number"
                                         name="personal_attributes_assessment[attendance][appraisee_score]"
-                                        @if (!$appraisal->is_appraisee) disabled @endif
+                                        @if (!$appraisal->is_appraisee) readonly @endif
                                         value="{{ $appraisal->personal_attributes_assessment['attendance']['appraisee_score'] ?? '' }}"
                                         class="form-control form-control-sm score-input" min="0"
                                         max="4">
@@ -733,7 +733,7 @@
                                 <td class="text-center">
                                     <input type="number"
                                         name="personal_attributes_assessment[attendance][appraiser_score]"
-                                        @if ($appraisal->is_appraisee) disabled @endif
+                                        @if ($appraisal->is_appraisee) readonly @endif
                                         value="{{ $appraisal->personal_attributes_assessment['attendance']['appraiser_score'] ?? '' }}"
                                         class="form-control form-control-sm score-input" min="0"
                                         max="4">
@@ -742,7 +742,7 @@
                                     <input type="number"
                                         name="personal_attributes_assessment[attendance][agreed_score]"
                                         value="{{ $appraisal->personal_attributes_assessment['attendance']['agreed_score'] ?? '' }}"
-                                        @if ($appraisal->is_appraisee) disabled @endif
+                                        @if ($appraisal->is_appraisee) readonly @endif
                                         class="form-control form-control-sm score-input" min="0"
                                         max="4">
                                 </td>
@@ -759,7 +759,7 @@
                                 <td class="text-center">
                                     <input type="number"
                                         name="personal_attributes_assessment[appearance][appraisee_score]"
-                                        @if (!$appraisal->is_appraisee) disabled @endif
+                                        @if (!$appraisal->is_appraisee) readonly @endif
                                         value="{{ $appraisal->personal_attributes_assessment['appearance']['appraisee_score'] ?? '' }}"
                                         class="form-control form-control-sm score-input" min="0"
                                         max="4">
@@ -767,7 +767,7 @@
                                 <td class="text-center">
                                     <input type="number"
                                         name="personal_attributes_assessment[appearance][appraiser_score]"
-                                        @if ($appraisal->is_appraisee) disabled @endif
+                                        @if ($appraisal->is_appraisee) readonly @endif
                                         value="{{ $appraisal->personal_attributes_assessment['appearance']['appraiser_score'] ?? '' }}"
                                         class="form-control form-control-sm score-input" min="0"
                                         max="4">
@@ -776,7 +776,7 @@
                                     <input type="number"
                                         name="personal_attributes_assessment[appearance][agreed_score]"
                                         value="{{ $appraisal->personal_attributes_assessment['appearance']['agreed_score'] ?? '' }}"
-                                        @if ($appraisal->is_appraisee) disabled @endif
+                                        @if ($appraisal->is_appraisee) readonly @endif
                                         class="form-control form-control-sm score-input" min="0"
                                         max="4">
                                 </td>
@@ -795,7 +795,7 @@
                                 <td class="text-center">
                                     <input type="number"
                                         name="personal_attributes_assessment[interpersonal][appraisee_score]"
-                                        @if (!$appraisal->is_appraisee) disabled @endif
+                                        @if (!$appraisal->is_appraisee) readonly @endif
                                         value="{{ $appraisal->personal_attributes_assessment['interpersonal']['appraisee_score'] ?? '' }}"
                                         class="form-control form-control-sm score-input" min="0"
                                         max="4">
@@ -803,7 +803,7 @@
                                 <td class="text-center">
                                     <input type="number"
                                         name="personal_attributes_assessment[interpersonal][appraiser_score]"
-                                        @if ($appraisal->is_appraisee) disabled @endif
+                                        @if ($appraisal->is_appraisee) readonly @endif
                                         value="{{ $appraisal->personal_attributes_assessment['interpersonal']['appraiser_score'] ?? '' }}"
                                         class="form-control form-control-sm score-input" min="0"
                                         max="4">
@@ -812,7 +812,7 @@
                                     <input type="number"
                                         name="personal_attributes_assessment[interpersonal][agreed_score]"
                                         value="{{ $appraisal->personal_attributes_assessment['interpersonal']['agreed_score'] ?? '' }}"
-                                        @if ($appraisal->is_appraisee) disabled @endif
+                                        @if ($appraisal->is_appraisee) readonly @endif
                                         class="form-control form-control-sm score-input" min="0"
                                         max="4">
                                 </td>
@@ -832,7 +832,7 @@
                                 <td class="text-center">
                                     <input type="number"
                                         name="personal_attributes_assessment[initiative][appraisee_score]"
-                                        @if (!$appraisal->is_appraisee) disabled @endif
+                                        @if (!$appraisal->is_appraisee) readonly @endif
                                         value="{{ $appraisal->personal_attributes_assessment['initiative']['appraisee_score'] ?? '' }}"
                                         class="form-control form-control-sm score-input" min="0"
                                         max="4">
@@ -840,7 +840,7 @@
                                 <td class="text-center">
                                     <input type="number"
                                         name="personal_attributes_assessment[initiative][appraiser_score]"
-                                        @if ($appraisal->is_appraisee) disabled @endif
+                                        @if ($appraisal->is_appraisee) readonly @endif
                                         value="{{ $appraisal->personal_attributes_assessment['initiative']['appraiser_score'] ?? '' }}"
                                         class="form-control form-control-sm score-input" min="0"
                                         max="4">
@@ -849,7 +849,7 @@
                                     <input type="number"
                                         name="personal_attributes_assessment[initiative][agreed_score]"
                                         value="{{ $appraisal->personal_attributes_assessment['initiative']['agreed_score'] ?? '' }}"
-                                        @if ($appraisal->is_appraisee) disabled @endif
+                                        @if ($appraisal->is_appraisee) readonly @endif
                                         class="form-control form-control-sm score-input" min="0"
                                         max="4">
                                 </td>
@@ -1563,36 +1563,34 @@
                         return validScores.length > 0 ? (sum / (validScores.length * 6)) * 100 : 0;
                     }
 
-                    // Update the updateOverallAverage function in the initActivityRatingTable
                     function updateOverallAverage() {
-                        let totalScores = 0;
-                        rows.forEach(row => {
-                            const scores = Array.from(row.querySelectorAll('.score-cell')).map(cell => {
-                                const val = parseInt(cell.textContent);
-                                return isNaN(val) ? 0 : val;
-                            });
-                            totalScores += scores.reduce((a, b) => a + b, 0);
+                        const rowAverages = Array.from(rows).map(row => {
+                            const val = parseFloat(row.querySelector('.percentage-display')?.textContent);
+                            return isNaN(val) ? 0 : val;
                         });
 
-                        const keyDutiesContribution = (totalScores / 24) * 60;
-                        overallAverageElement.textContent = keyDutiesContribution.toFixed(1);
-                        averageProgress.style.width = `${Math.min(keyDutiesContribution, 60)}%`;
+                        const overallAvg = rowAverages.length > 0 ?
+                            rowAverages.reduce((a, b) => a + b, 0) / rowAverages.length : 0;
+                        const scaledAvg = (Math.min(overallAvg, 100) * 0.6);
+                        overallAverageElement.textContent = scaledAvg.toFixed(1); // Show 0–60%
+                        averageProgress.style.width = `${Math.min(overallAvg, 100)}%`; // Visual 0–100%
 
-                        const totalScore = keyDutiesContribution + (window.personalAttributesContribution || 0);
-                        const status = statusMessages.find(s => totalScore >= s.threshold);
+
+
+                        const status = statusMessages.find(s => overallAvg >= s.threshold);
                         performanceStatus.textContent = status.message;
                         averageProgress.className =
                             `absolute left-0 top-0 h-full bg-gradient-to-r ${status.color} transition-all duration-500`;
 
-                        window.keyDutiesContribution = keyDutiesContribution;
+                        window.keyDutiesContribution = overallAvg * 0.6;
                         updateTotalScore();
                     }
+
                     // Initial calculations
                     rows.forEach(updateRowPercentage);
                     updateOverallAverage();
                 }
 
-                // 5. Personal Attributes Table Summary
                 function initPersonalAttributesTable() {
                     const $table = $('#personal-attributes');
 
@@ -1605,22 +1603,23 @@
 
                         $table.find('tbody tr').each(function() {
                             const $row = $(this);
+                            // Get values directly from inputs
+                            const agreed = parseFloat($row.find('input[name*="[agreed_score]"]').val()) || 0;
+
+                            sumAgreed += agreed;
+                            rowCount++;
+
+                            // For display purposes only
                             const a = parseFloat($row.find('input[name*="[appraisee_score]"]').val()) || 0;
                             const b = parseFloat($row.find('input[name*="[appraiser_score]"]').val()) || 0;
-                            const avg = (a + b) / 2;
-
-                            $row.find('input[name*="[agreed_score]"]').val(avg.toFixed(2));
-
                             sumAppraisee += a;
                             sumAppraiser += b;
-                            sumAgreed += avg;
-                            rowCount++;
                         });
 
                         const $tfootTds = $table.find('tfoot tr:first td');
-                        $tfootTds.eq(0).text(sumAppraisee.toFixed(2));
-                        $tfootTds.eq(1).text(sumAppraiser.toFixed(2));
-                        $tfootTds.eq(2).text(sumAgreed.toFixed(2));
+                        $tfootTds.eq(0).text(sumAppraisee.toFixed(2)); // Appraisee total
+                        $tfootTds.eq(1).text(sumAppraiser.toFixed(2)); // Appraiser total
+                        $tfootTds.eq(2).text(sumAgreed.toFixed(2)); // Agreed total
 
                         const totalMax = rowCount * maxPerRow;
                         const pct40 = totalMax > 0 ? (sumAgreed / totalMax) * 40 : 0;
@@ -1630,8 +1629,9 @@
                         updateTotalScore();
                     }
 
-                    $table.on('input', '.score-input', recalc);
-                    recalc();
+                    // Listen for changes on ALL score input types
+                    $table.on('input change', '.score-input', recalc);
+                    recalc(); // Initial calculation
                 }
 
                 function updateTotalScore() {
