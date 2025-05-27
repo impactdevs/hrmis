@@ -121,7 +121,14 @@ class LeaveController extends Controller
      */
     public function show(Leave $leaf)
     {
-        return view('leaves.show', compact('leaf'));
+        $users = User::pluck('name', 'id')->toArray() ?? [];
+
+        // Keep the options separate for later use if needed
+        $options = [
+            'users' => $users,
+        ];
+
+        return view('leaves.show', compact('leaf', 'options'));
     }
 
     /**

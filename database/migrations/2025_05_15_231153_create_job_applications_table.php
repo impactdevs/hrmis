@@ -35,7 +35,6 @@ return new class extends Migration
             // Section 4: Family Background
             $table->string('marital_status')->nullable();
 
-
             // Section 5: Education History
             $table->json('education_history')->nullable();
 

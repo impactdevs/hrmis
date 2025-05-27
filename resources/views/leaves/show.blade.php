@@ -61,7 +61,22 @@
                     <label for="my_work_will_be_done_by">
                         <i class="fas fa-info-circle"></i> My Work Will Be done By:
                     </label>
-                    <p class="border p-2 rounded bg-light">{{ $leaf->my_work_will_be_done_by['users'] }}</p>
+                    <p>
+
+                        @if (!is_null($leaf->my_work_will_be_done_by))
+                            <ul type="disc">
+                                @foreach (explode(",",$leaf->my_work_will_be_done_by['users']) as $key => $substitute)
+                                    @if (!is_null($substitute))
+                                        <li>{{ $options["users"][$substitute] }}</li>
+                                    @else
+                                        -
+                                    @endif
+                                @endforeach
+                            </ul>
+                        @else
+                            -
+                        @endif
+                    </p>
                 </div>
             </div>
         </div>
