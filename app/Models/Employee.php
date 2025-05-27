@@ -149,7 +149,7 @@ class Employee extends Model
     public function totalLeaveDays()
     {
         //get leaves where the employee id matches employee id and were created in the current year that were confirmed by the executive secretary
-        $leaves = Leave::where('leave_type_id', 'fcc1724e-eb26-4372-bca4-2bb8409fab94')
+        $leaves = Leave::where('leave_type_id', 'c5fff868-9941-4065-b4a1-285ebdbd1bdb')
             ->where('user_id', $this->user_id)->whereYear('created_at', Carbon::now()->year)
             ->whereJsonContains('leave_request_status', ['Executive Secretary' => 'approved'])
             ->get();

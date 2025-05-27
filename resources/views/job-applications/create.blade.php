@@ -190,6 +190,16 @@
                         @enderror
                     </div>
 
+                    <div class="col-md-3">
+                        <label class="form-label">NIN</label>
+                        <input type="text"
+                            class="form-control @error('nationality_and_residence.nin') is-invalid @enderror"
+                            name="nationality_and_residence[nin]" value="{{ old('nationality_and_residence.nin') }}">
+                        @error('nationality_and_residence.nin')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
                     <div class="col-md-12 mt-3">
                         <label class="form-label">Are you a temporary or permanent resident in Uganda?</label>
                         <div class="d-flex gap-4">
@@ -337,57 +347,12 @@
                                     value="Single" {{ $maritalStatus == 'Single' ? 'checked' : '' }}>
                                 <label class="form-check-label" for="single">Single</label>
                             </div>
-                            <div class="form-check">
-                                <input
-                                    class="form-check-input @error('family_background.marital_status') is-invalid @enderror"
-                                    type="radio" name="family_background[marital_status]" id="widowed"
-                                    value="Widowed" {{ $maritalStatus == 'Widowed' ? 'checked' : '' }}>
-                                <label class="form-check-label" for="widowed">Widowed</label>
-                            </div>
-                            <div class="form-check">
-                                <input
-                                    class="form-check-input @error('family_background.marital_status') is-invalid @enderror"
-                                    type="radio" name="family_background[marital_status]" id="divorced"
-                                    value="Divorced" {{ $maritalStatus == 'Divorced' ? 'checked' : '' }}>
-                                <label class="form-check-label" for="divorced">Divorced</label>
-                            </div>
-                            <div class="form-check">
-                                <input
-                                    class="form-check-input @error('family_background.marital_status') is-invalid @enderror"
-                                    type="radio" name="family_background[marital_status]" id="separated"
-                                    value="Separated" {{ $maritalStatus == 'Separated' ? 'checked' : '' }}>
-                                <label class="form-check-label" for="separated">Separated</label>
-                            </div>
                         </div>
                         @error('family_background.marital_status')
                             <div class="invalid-feedback d-block">{{ $message }}</div>
                         @enderror
                     </div>
 
-                    <div class="col-md-6">
-                        <label class="form-label">Number and age of Children</label>
-                        <div class="children-fields">
-                            <div class="input-group mb-2">
-                                <input type="number"
-                                    class="form-control @error('family_background.number_of_children') is-invalid @enderror"
-                                    name="family_background[number_of_children]" placeholder="Number of children"
-                                    value="{{ old('family_background.number_of_children') }}">
-                                @error('family_background.number_of_children')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="input-group mb-2">
-                                <input type="text"
-                                    class="form-control @error('family_background.ages') is-invalid @enderror"
-                                    name="family_background[ages]" placeholder="Ages (e.g., 5, 8, 12)"
-                                    value="{{ old('family_background.ages') }}">
-                                @error('family_background.ages')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                        <div class="form-text">Example: 3 children aged 5, 8, and 12 years</div>
-                    </div>
                 </div>
             </div>
 
@@ -438,9 +403,161 @@
                 </table>
             </div>
 
+            <!-- University Education Section -->
+            <div class="form-section">
+                <h4 class="section-title">6. University Education Details</h4>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">University Name</label>
+                        <input type="text" name="university[name]"
+                            class="form-control @error('university.name') is-invalid @enderror"
+                            value="{{ old('university.name') }}" placeholder="Enter university name">
+                        @error('university.name')
+                            <div class="text-danger">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Course</label>
+                        <input type="text" name="university[course]"
+                            class="form-control @error('university.course') is-invalid @enderror"
+                            value="{{ old('university.course') }}" placeholder="Enter course of study">
+                        @error('university.course')
+                            <div class="text-danger">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Start Date</label>
+                        <input type="date" name="university[start_date]"
+                            class="form-control @error('university.start_date') is-invalid @enderror"
+                            value="{{ old('university.start_date') }}">
+                        @error('university.start_date')
+                            <div class="text-danger">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">End Date</label>
+                        <input type="date" name="university[end_date]"
+                            class="form-control @error('university.end_date') is-invalid @enderror"
+                            value="{{ old('university.end_date') }}">
+                        @error('university.end_date')
+                            <div class="text-danger">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">CGPA</label>
+                        <input type="text" name="university[cgpa]"
+                            class="form-control @error('university.cgpa') is-invalid @enderror"
+                            value="{{ old('university.cgpa') }}" placeholder="e.g., 3.75">
+                        @error('university.cgpa')
+                            <div class="text-danger">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- New UACE Section -->
+            <div class="form-section">
+                <h4 class="section-title">7. Uganda Advanced Certificate of Education (UACE) Details</h4>
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label">Have you passed Uganda Advanced Certificate of Education Exams
+                            [UACE]?</label>
+                        <div class="d-flex gap-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="uace[passed]" id="uaceYes"
+                                    value="yes" {{ old('uace.passed') == 'yes' ? 'checked' : '' }}>
+                                <label class="form-check-label" for="uaceYes">Yes</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="uace[passed]" id="uaceNo"
+                                    value="no" {{ old('uace.passed') == 'no' ? 'checked' : '' }}>
+                                <label class="form-check-label" for="uaceNo">No</label>
+                            </div>
+                        </div>
+                        @error('uace.passed')
+                            <div class="text-danger">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Year of UACE Examination</label>
+                        <input type="text" id="uaceYear"
+                            class="form-control @error('uace.year') is-invalid @enderror" name="uace[year]"
+                            value="{{ old('uace.year') }}" placeholder="Enter year (e.g., 2015)">
+                        @error('uace.year')
+                            <div class="text-danger">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-12">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Grade</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for ($i = 0; $i < 5; $i++)
+                                    <tr>
+                                        <td>
+                                            <input type="text"
+                                                class="form-control uace-score-subject @error("uace.scores.$i.subject") is-invalid @enderror"
+                                                placeholder="Subject"
+                                                name="uace[scores][{{ $i }}][subject]"
+                                                value="{{ old("uace.scores.$i.subject") }}">
+                                            @error("uace.scores.$i.subject")
+                                                <div class="text-danger">{{ $message }}</div>
+                                            @enderror
+                                        </td>
+                                        <td>
+                                            <input type="text"
+                                                class="form-control uace-score-grade @error("uace.scores.$i.grade") is-invalid @enderror"
+                                                placeholder="Grade" name="uace[scores][{{ $i }}][grade]"
+                                                value="{{ old("uace.scores.$i.grade") }}">
+                                            @error("uace.scores.$i.grade")
+                                                <div class="text-danger">{{ $message }}</div>
+                                            @enderror
+                                        </td>
+                                    </tr>
+                                @endfor
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- JavaScript -->
+            <script>
+                function toggleUaceFields() {
+                    const passed = document.querySelector('input[name="uace[passed]"]:checked')?.value;
+                    const shouldDisable = passed === 'no';
+
+                    document.getElementById('uaceYear').disabled = shouldDisable;
+
+                    document.querySelectorAll('.uace-score-subject, .uace-score-grade').forEach(input => {
+                        input.disabled = shouldDisable;
+                    });
+                }
+
+                document.addEventListener('DOMContentLoaded', function() {
+                    toggleUaceFields(); // Set initial state
+
+                    document.querySelectorAll('input[name="uace[passed]"]').forEach(radio => {
+                        radio.addEventListener('change', toggleUaceFields);
+                    });
+                });
+            </script>
+
+
             <!-- UCE Section -->
             <div class="form-section">
-                <h4 class="section-title">6. Uganda Certificate of Education (UCE) Details</h4>
+                <h4 class="section-title">8. Uganda Certificate of Education (UCE) Details</h4>
                 <div class="row g-3">
                     <div class="col-12">
                         <label class="form-label">Have you passed Uganda Certificate of Education Exams [UCE]?</label>
@@ -532,102 +649,9 @@
             </script>
 
 
-
-    <!-- New UACE Section -->
-<div class="form-section">
-    <h4 class="section-title">7. Uganda Advanced Certificate of Education (UACE) Details</h4>
-    <div class="row g-3">
-        <div class="col-12">
-            <label class="form-label">Have you passed Uganda Advanced Certificate of Education Exams [UACE]?</label>
-            <div class="d-flex gap-4">
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="uace[passed]" id="uaceYes"
-                        value="yes" {{ old('uace.passed') == 'yes' ? 'checked' : '' }}>
-                    <label class="form-check-label" for="uaceYes">Yes</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="uace[passed]" id="uaceNo"
-                        value="no" {{ old('uace.passed') == 'no' ? 'checked' : '' }}>
-                    <label class="form-check-label" for="uaceNo">No</label>
-                </div>
-            </div>
-            @error('uace.passed')
-                <div class="text-danger">{{ $message }}</div>
-            @enderror
-        </div>
-
-        <div class="col-md-4">
-            <label class="form-label">Year of UACE Examination</label>
-            <input type="text" id="uaceYear" class="form-control @error('uace.year') is-invalid @enderror"
-                name="uace[year]" value="{{ old('uace.year') }}" placeholder="Enter year (e.g., 2015)">
-            @error('uace.year')
-                <div class="text-danger">{{ $message }}</div>
-            @enderror
-        </div>
-
-        <div class="col-12">
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Subject</th>
-                        <th>Grade</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @for ($i = 0; $i < 5; $i++)
-                        <tr>
-                            <td>
-                                <input type="text"
-                                    class="form-control uace-score-subject @error("uace.scores.$i.subject") is-invalid @enderror"
-                                    placeholder="Subject" name="uace[scores][{{ $i }}][subject]"
-                                    value="{{ old("uace.scores.$i.subject") }}">
-                                @error("uace.scores.$i.subject")
-                                    <div class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </td>
-                            <td>
-                                <input type="text"
-                                    class="form-control uace-score-grade @error("uace.scores.$i.grade") is-invalid @enderror"
-                                    placeholder="Grade" name="uace[scores][{{ $i }}][grade]"
-                                    value="{{ old("uace.scores.$i.grade") }}">
-                                @error("uace.scores.$i.grade")
-                                    <div class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </td>
-                        </tr>
-                    @endfor
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-<!-- JavaScript -->
-<script>
-    function toggleUaceFields() {
-        const passed = document.querySelector('input[name="uace[passed]"]:checked')?.value;
-        const shouldDisable = passed === 'no';
-
-        document.getElementById('uaceYear').disabled = shouldDisable;
-
-        document.querySelectorAll('.uace-score-subject, .uace-score-grade').forEach(input => {
-            input.disabled = shouldDisable;
-        });
-    }
-
-    document.addEventListener('DOMContentLoaded', function () {
-        toggleUaceFields(); // Set initial state
-
-        document.querySelectorAll('input[name="uace[passed]"]').forEach(radio => {
-            radio.addEventListener('change', toggleUaceFields);
-        });
-    });
-</script>
-
-
             <!-- Section 5: Employment Record -->
             <div class="form-section">
-                <h4 class="section-title">8. Employment Record</h4>
+                <h4 class="section-title">9. Employment Record</h4>
 
                 @if ($errors->has('employment_record'))
                     <div class="text-danger mb-2">
@@ -681,7 +705,7 @@
 
 
             <div class="form-section">
-                <h4 class="section-title">9. Criminal History</h4>
+                <h4 class="section-title">10. Criminal History</h4>
                 <div class="row g-3">
                     <div class="col-12">
                         <label class="form-label">Have you ever been convicted on a criminal charge?</label>
@@ -723,7 +747,7 @@
             </div>
 
             <div class="form-section">
-                <h4 class="section-title">10. Availability & Salary Expectations</h4>
+                <h4 class="section-title">11. Availability & Salary Expectations</h4>
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label class="form-label">How soon would you be available for appointment if selected?</label>
@@ -757,7 +781,7 @@
 
 
             <div class="form-section">
-                <h4 class="section-title">11. References & Recommendations</h4>
+                <h4 class="section-title">12. References & Recommendations</h4>
                 <div class="row g-3">
                     <div class="col-12">
                         <h6>For applicants NOT in Government Service:</h6>
@@ -819,7 +843,7 @@
 
             <!-- Add this section after the References & Recommendations section -->
             <div class="form-section">
-                <h4 class="section-title">12. Document Uploads</h4>
+                <h4 class="section-title">13. Document Uploads</h4>
                 <div class="row g-3">
                     <!-- Academic Documents Upload -->
                     <div class="col-md-6">

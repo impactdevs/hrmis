@@ -13,54 +13,54 @@ class JobApplicationController extends Controller
 {
 
 
-public function index(Request $request)
-{
-    $validSorts = ['reference_number', 'full_name', 'created_at'];
-    $sort = in_array($request->sort, $validSorts) ? $request->sort : 'created_at';
-    $direction = in_array(strtolower($request->direction), ['asc', 'desc']) ? $request->direction : 'desc';
+    public function index(Request $request)
+    {
+        $validSorts = ['reference_number', 'full_name', 'created_at'];
+        $sort = in_array($request->sort, $validSorts) ? $request->sort : 'created_at';
+        $direction = in_array(strtolower($request->direction), ['asc', 'desc']) ? $request->direction : 'desc';
 
-    $companyJobs = CompanyJob::all();
+        $companyJobs = CompanyJob::all();
 
-    $query = JobApplication::query();
+        $query = JobApplication::query();
 
-    // Filter by company_job_id via reference_number prefix
-    if ($request->filled('company_job_id')) {
-        $companyJob = CompanyJob::where('company_job_id', $request->company_job_id)->first();
-        if ($companyJob) {
-            $jobCode = $companyJob->job_code;
-            $query->where('reference_number', 'like', "{$jobCode}%");
+        // Filter by company_job_id via reference_number prefix
+        if ($request->filled('company_job_id')) {
+            $companyJob = CompanyJob::where('company_job_id', $request->company_job_id)->first();
+            if ($companyJob) {
+                $jobCode = $companyJob->job_code;
+                $query->where('reference_number', 'like', "{$jobCode}%");
+            }
         }
+
+        // Filter by date range (created_at)
+        if ($request->filled('created_from')) {
+            $query->whereDate('created_at', '>=', $request->created_from);
+        }
+
+        if ($request->filled('created_to')) {
+            $query->whereDate('created_at', '<=', $request->created_to);
+        }
+
+        // Filter by general search (reference_number or full_name)
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('reference_number', 'like', "%{$search}%")
+                    ->orWhere('full_name', 'like', "%{$search}%");
+            });
+        }
+
+        $applications = $query
+            ->orderBy($sort, $direction)
+            ->filter($request->all()) // Ensure this method exists in your model
+            ->paginate($request->per_page ?? 10)
+            ->appends($request->query());
+
+        return view('job-applications.index', [
+            'applications' => $applications,
+            'companyJobs' => $companyJobs,
+        ]);
     }
-
-    // Filter by date range (created_at)
-    if ($request->filled('created_from')) {
-        $query->whereDate('created_at', '>=', $request->created_from);
-    }
-
-    if ($request->filled('created_to')) {
-        $query->whereDate('created_at', '<=', $request->created_to);
-    }
-
-    // Filter by general search (reference_number or full_name)
-    if ($request->filled('search')) {
-        $search = $request->search;
-        $query->where(function ($q) use ($search) {
-            $q->where('reference_number', 'like', "%{$search}%")
-                ->orWhere('full_name', 'like', "%{$search}%");
-        });
-    }
-
-    $applications = $query
-        ->orderBy($sort, $direction)
-        ->filter($request->all()) // Ensure this method exists in your model
-        ->paginate($request->per_page ?? 10)
-        ->appends($request->query());
-
-    return view('job-applications.index', [
-        'applications' => $applications,
-        'companyJobs' => $companyJobs,
-    ]);
-}
 
 
 
@@ -93,7 +93,14 @@ public function index(Request $request)
             'nationality_and_residence.home_district' => 'required|string|max:255',
             'nationality_and_residence.sub_county' => 'required|string|max:255',
             'nationality_and_residence.village' => 'required|string|max:255',
+            'nationality_and_residence.nin' => 'required|string|max:255',
             'nationality_and_residence.residency_type' => 'required|string|max:255',
+
+            'university.name' => 'required|string|max:255',
+            'university.course' => 'required|string|max:255',
+            'university.start_date' => 'required|date',
+            'university.end_date' => 'required|date|after_or_equal:university.start_date',
+            'university.cgpa' => 'required|numeric|between:0,5',
 
             // Section 3: Work Background
             'work_background.present_department' => 'nullable|string|max:255',
@@ -184,11 +191,18 @@ public function index(Request $request)
             'email' => $validated['personal_details']['email'],
             'telephone' => $validated['personal_details']['telephone_number'],
 
+            'university_name' => $validated['university']['name'],
+            'university_course' => $validated['university']['course'],
+            'university_start_date' => $validated['university']['start_date'],
+            'university_end_date' => $validated['university']['end_date'],
+            'university_cgpa' => $validated['university']['cgpa'],
+
             // Section 2
             'nationality' => $validated['nationality_and_residence']['nationality'],
             'home_district' => $validated['nationality_and_residence']['home_district'],
             'sub_county' => $validated['nationality_and_residence']['sub_county'],
             'village' => $validated['nationality_and_residence']['village'],
+            'nin' => $validated['nationality_and_residence']['nin'],
             'residency_type' => $validated['nationality_and_residence']['residency_type'],
 
             // Section 3
@@ -199,7 +213,7 @@ public function index(Request $request)
 
             // Section 4
             'marital_status' => $validated['family_background']['marital_status'] ?? null,
-         
+
 
             // Education
             'education_history' => $validated['education_history'],
@@ -272,6 +286,7 @@ public function index(Request $request)
             'nationality_and_residence.home_district' => 'required|string|max:255',
             'nationality_and_residence.sub_county' => 'required|string|max:255',
             'nationality_and_residence.village' => 'required|string|max:255',
+            'nationality_and_residence.nin' => 'required|string|max:255',
             'nationality_and_residence.residency_type' => 'required|in:temporary,permanent',
 
             // Section 3: Work Background

@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('home_district')->nullable();
             $table->string('sub_county')->nullable();
             $table->string('village')->nullable();
+            $table->string('nin')->nullable();
             $table->string('residency_type')->nullable();
 
             // Section 3: Work Background
@@ -43,6 +44,9 @@ return new class extends Migration
 
             // Section 7: UACE Details
             $table->json('uace_details')->nullable();
+
+            // Section 8: University Education Details
+            $table->json('university_details')->nullable();
 
             // Section 7 (duplicate number in HTML): Employment Record
             $table->json('employment_record')->nullable();
