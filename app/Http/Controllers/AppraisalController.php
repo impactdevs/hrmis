@@ -184,12 +184,22 @@ class AppraisalController extends Controller
         return view('appraisals.edit', compact('appraisal', 'users'));
     }
 
+    public function previewAppraisalDetails(Appraisal $appraisal)
+    {
+        $users = User::whereHas('employee')->get();
+
+        // Load the appraisal with its related employee and appraiser
+        $appraisal->load(['employee', 'appraiser']);
+
+        return view('appraisals.appraisal_preview', compact('appraisal', 'users'));
+    }
+
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, Appraisal $appraisal)
     {
-        $appraisal->update($request->all());
+        $appraisal->update($request->all());        
 
         return redirect()->back()->with('success', 'Appraisal updated successfully.');
     }

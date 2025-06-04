@@ -113,6 +113,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     //appraisal
     Route::get('/employee-appraisal', [AppraisalController::class, 'survey'])->name('appraisal.survey');
     Route::post('/appraisals', [AppraisalController::class, 'store'])->name('appraisals.store');
+    Route::get('preview-appraisal/{appraisal}', [AppraisalController::class, 'previewAppraisalDetails'])->name('appraisals.preview');
 
     //notifications
     Route::resource('/notifications', NotificationController::class);
