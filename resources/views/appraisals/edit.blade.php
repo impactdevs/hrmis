@@ -145,6 +145,7 @@
                         <div class="p-3 rounded form-section bg-light">
                             <div class="flex-wrap gap-4 d-flex">
                                 <label for="supervisor">Appraiser</label>
+                                {{-- put a readonly input with the head of division value --}}
                                 <select class="employees form-control" name="appraiser_id" id="appraiser_id"
                                     data-placeholder="Choose the Appraiser" required>
                                     @foreach ($users as $user)
@@ -333,7 +334,6 @@
                     </p>
                     <div class="overflow-x-auto bg-white rounded-lg shadow-lg">
                         <table class="min-w-full text-base border border-gray-200">
-
                             <thead class="text-sm text-gray-700 uppercase bg-blue-100 border-b border-gray-200">
                                 <tr>
                                     <th class="px-6 py-3 border border-gray-200 w-12">No.</th>
@@ -341,10 +341,9 @@
                                     <th class="px-6 py-3 border border-gray-200">Output / Results</th>
                                     <th class="px-6 py-3 border border-gray-200 w-32">Supervisee (/6)</th>
                                     <th class="px-6 py-3 border border-gray-200 w-32">Supervisor (/6)</th>
-                                    <th class="px-6 py-3 border border-gray-200 w-40">Average %</th>
+                                    <th class="px-6 py-3 border border-gray-200 w-40">Agreed Score (/6)</th>
                                 </tr>
                             </thead>
-
                             <tbody>
                                 @for ($i = 1; $i <= 4; $i++)
                                     @php
@@ -356,6 +355,7 @@
                                             $appraisal->appraisal_period_rate[$i - 1]['supervisee_score'] ?? 0;
                                         $supervisorScore =
                                             $appraisal->appraisal_period_rate[$i - 1]['supervisor_score'] ?? 0;
+                                        $agreedScore = $appraisal->appraisal_period_rate[$i - 1]['agreed_score'] ?? 0;
                                         $supervisorComment =
                                             $appraisal->appraisal_period_rate[$i - 1]['supervisor_comment'] ?? '';
                                     @endphp
@@ -372,12 +372,11 @@
                                                 contenteditable="{{ $appraisal->is_appraisee ? 'true' : 'false' }}"
                                                 data-placeholder="Enter task" oninput="updateHiddenInput(this)"
                                                 @unless ($appraisal->is_appraisee)
-                                                    data-bs-toggle="tooltip" 
-                                                    data-bs-placement="top"
-                                                    title="Editing is disabled for your role"
-                                                    onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()"
-                                                @endunless
-                                                oninput="updateHiddenInput(this)">
+                                 data-bs-toggle="tooltip" 
+                                 data-bs-placement="top"
+                                 title="Editing is disabled for your role"
+                                 onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()"
+                             @endunless>
                                                 {{ $plannedActivity ?: 'Enter task' }}
                                             </div>
                                             <input type="hidden"
@@ -391,11 +390,11 @@
                                                 contenteditable="{{ $appraisal->is_appraisee ? 'true' : 'false' }}"
                                                 data-placeholder="Enter result" oninput="updateHiddenInput(this)"
                                                 @unless ($appraisal->is_appraisee)
-                                                    data-bs-toggle="tooltip" 
-                                                    data-bs-placement="top"
-                                                    title="Editing is disabled for your role"
-                                                    onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()"
-                                                @endunless>
+                                 data-bs-toggle="tooltip" 
+                                 data-bs-placement="top"
+                                 title="Editing is disabled for your role"
+                                 onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()"
+                             @endunless>
                                                 {{ $outputResults ?: 'Enter result' }}
                                             </div>
                                             <input type="hidden"
@@ -409,11 +408,11 @@
                                                 contenteditable="{{ $appraisal->is_appraisee ? 'true' : 'false' }}"
                                                 data-type="score" oninput="updateScoreInput(this)"
                                                 @unless ($appraisal->is_appraisee)
-                                                    data-bs-toggle="tooltip" 
-                                                    data-bs-placement="top"
-                                                    title="Editing is disabled for your role"
-                                                    onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()"
-                                                @endunless>
+                                 data-bs-toggle="tooltip" 
+                                 data-bs-placement="top"
+                                 title="Editing is disabled for your role"
+                                 onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()"
+                             @endunless>
                                                 {{ $superviseeScore }}
                                             </div>
                                             <input type="hidden"
@@ -427,11 +426,11 @@
                                                 contenteditable="{{ $appraisal->is_appraisor ? 'true' : 'false' }}"
                                                 data-type="score" oninput="updateScoreInput(this)"
                                                 @unless ($appraisal->is_appraisor)
-                                                    data-bs-toggle="tooltip" 
-                                                    data-bs-placement="top"
-                                                    title="Editing is disabled for your role"
-                                                    onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()"
-                                                @endunless>
+                                 data-bs-toggle="tooltip" 
+                                 data-bs-placement="top"
+                                 title="Editing is disabled for your role"
+                                 onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()"
+                             @endunless>
                                                 {{ $supervisorScore }}
                                             </div>
                                             <input type="hidden"
@@ -439,25 +438,31 @@
                                                 value="{{ $supervisorScore }}">
                                         </td>
 
-                                        <td class="px-6 py-2 border border-gray-200 bg-blue-50">
-                                            <div class="percentage-display text-center font-medium">0%</div>
+                                        {{-- Agreed Score --}}
+                                        <td class="px-6 py-2 border border-gray-200">
+                                            <input type="number"
+                                                name="appraisal_period_rate[{{ $i - 1 }}][agreed_score]"
+                                                class="form-control form-control-sm agreed-score-input" min="0"
+                                                max="6" step="0.5" value="{{ $agreedScore }}"
+                                                @if ($appraisal->is_appraisee) readonly @endif
+                                                oninput="updateOverallAverage()">
                                         </td>
                                     </tr>
 
                                     {{-- Supervisor Comment --}}
                                     <tr class="hover:bg-blue-50 transition-colors">
                                         <td class="px-6 py-2 border border-gray-200 bg-gray-50 italic text-gray-600"
-                                            colspan="5">
+                                            colspan="6">
                                             <div class="editable-cell p-2 rounded {{ empty($supervisorComment) ? 'text-muted' : '' }}"
                                                 contenteditable="{{ $appraisal->is_appraisor ? 'true' : 'false' }}"
                                                 data-placeholder="Supervisor's comment..."
                                                 oninput="updateHiddenInput(this)"
                                                 @unless ($appraisal->is_appraisor)
-                                                    data-bs-toggle="tooltip" 
-                                                    data-bs-placement="top"
-                                                    title="Editing is disabled for your role"
-                                                    onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()"
-                                                @endunless>
+                                 data-bs-toggle="tooltip" 
+                                 data-bs-placement="top"
+                                 title="Editing is disabled for your role"
+                                 onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()"
+                             @endunless>
                                                 {{ $supervisorComment ?: "Supervisor's comment..." }}
                                             </div>
                                             <input type="hidden"
@@ -491,8 +496,6 @@
                                     </td>
                                 </tr>
                             </tbody>
-
-
                         </table>
                     </div>
 
@@ -1038,7 +1041,7 @@
                             </button>
 
                             <button type="submit" class="btn btn-lg btn-primary">
-                                <i class="fas fa-paper-plane me-2"></i>Update Review
+                                <i class="fas fa-paper-plane me-2"></i>Update
                             </button>
                         </div>
                     @endif
@@ -1075,7 +1078,6 @@
                             @endphp
 
                             <div class="m-2 status">
-
                                 {{-- Current User's Decision --}}
                                 @if (isset($appraisal->appraisal_request_status[$userRole]) &&
                                         $appraisal->appraisal_request_status[$userRole] === 'approved')
@@ -1525,70 +1527,74 @@
                         }
                     ];
 
+                    // Add event to score cells only for clamping
                     rows.forEach(row => {
                         row.querySelectorAll('.score-cell').forEach(cell => {
-                            cell.addEventListener('input', handleScoreInput);
-                            cell.addEventListener('focus', () => cell.classList.add('ring-2',
-                                'ring-blue-200'));
-                            cell.addEventListener('blur', () => cell.classList.remove('ring-2',
-                                'ring-blue-200'));
+                            cell.addEventListener('input', function() {
+                                clampScoreCell(this);
+                            });
                         });
                     });
 
-                    function handleScoreInput(e) {
-                        const cell = e.target;
+                    // Add event to agreed score inputs
+                    const agreedInputs = document.querySelectorAll('.agreed-score-input');
+                    agreedInputs.forEach(input => {
+                        input.addEventListener('input', function() {
+                            // Clamp value between 0 and 6
+                            let val = parseFloat(this.value);
+                            if (val > 6) this.value = 6;
+                            else if (val < 0 || isNaN(val)) this.value = '';
+                            updateOverallAverage();
+                        });
+                        input.addEventListener('focus', function() {
+                            // If value is default (e.g. 0), clear on focus for easier entry
+                            if (this.value == '0') this.value = '';
+                        });
+                        input.addEventListener('blur', function() {
+                            // If left empty, set to 0
+                            if (this.value === '') this.value = 0;
+                            updateOverallAverage();
+                        });
+                    });
+
+                    // Initial calculation
+                    updateOverallAverage();
+
+                    function clampScoreCell(cell) {
                         let value = parseInt(cell.textContent);
                         cell.textContent = isNaN(value) ? '' : Math.min(Math.max(value, 0), 6);
-                        updateRowPercentage(cell.closest('tr'));
-                        updateOverallAverage();
-                    }
-
-                    function updateRowPercentage(row) {
-                        const scores = Array.from(row.querySelectorAll('.score-cell')).map(cell => {
-                            const val = parseInt(cell.textContent);
-                            return isNaN(val) ? 0 : Math.min(Math.max(val, 0), 6);
-                        });
-
-                        const avg = calculateRowAverage(scores);
-                        const percentageDisplay = row.querySelector('.percentage-display');
-                        percentageDisplay.textContent = `${avg.toFixed(1)}%`;
-                        percentageDisplay.style.color = avg >= 75 ? '#16a34a' : avg >= 50 ? '#2563eb' : avg >= 25 ?
-                            '#ca8a04' : '#dc2626';
-                        return avg;
-                    }
-
-                    function calculateRowAverage(scores) {
-                        const validScores = scores.filter(score => !isNaN(score));
-                        const sum = validScores.reduce((a, b) => a + b, 0);
-                        return validScores.length > 0 ? (sum / (validScores.length * 6)) * 100 : 0;
                     }
 
                     function updateOverallAverage() {
-                        const rowAverages = Array.from(rows).map(row => {
-                            const val = parseFloat(row.querySelector('.percentage-display')?.textContent);
-                            return isNaN(val) ? 0 : val;
+                        let totalAgreed = 0;
+                        let rowCount = 0;
+
+                        // Calculate based on agreed scores only
+                        agreedInputs.forEach(input => {
+                            const value = parseFloat(input.value);
+                            if (!isNaN(value) && value >= 0 && value <= 6) {
+                                totalAgreed += value;
+                                rowCount++;
+                            }
                         });
 
-                        const overallAvg = rowAverages.length > 0 ?
-                            rowAverages.reduce((a, b) => a + b, 0) / rowAverages.length : 0;
-                        const scaledAvg = (Math.min(overallAvg, 100) * 0.6);
-                        overallAverageElement.textContent = scaledAvg.toFixed(1); // Show 0–60%
-                        averageProgress.style.width = `${Math.min(overallAvg, 100)}%`; // Visual 0–100%
+                        const averagePerRow = rowCount > 0 ? totalAgreed / rowCount : 0;
+                        const averagePercentage = (averagePerRow / 6) * 100;
+                        const scaledAvg = averagePercentage * 0.6; // 60% weight
 
+                        overallAverageElement.textContent = scaledAvg.toFixed(1);
+                        averageProgress.style.width = `${averagePercentage}%`;
 
+                        const status = statusMessages.find(s => averagePercentage >= s.threshold);
+                        if (status) {
+                            performanceStatus.textContent = status.message;
+                            averageProgress.className =
+                                `absolute left-0 top-0 h-full bg-gradient-to-r ${status.color} transition-all duration-500`;
+                        }
 
-                        const status = statusMessages.find(s => overallAvg >= s.threshold);
-                        performanceStatus.textContent = status.message;
-                        averageProgress.className =
-                            `absolute left-0 top-0 h-full bg-gradient-to-r ${status.color} transition-all duration-500`;
-
-                        window.keyDutiesContribution = overallAvg * 0.6;
+                        window.keyDutiesContribution = scaledAvg;
                         updateTotalScore();
                     }
-
-                    // Initial calculations
-                    rows.forEach(updateRowPercentage);
-                    updateOverallAverage();
                 }
 
                 function initPersonalAttributesTable() {
