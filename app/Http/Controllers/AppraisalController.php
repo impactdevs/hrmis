@@ -134,7 +134,7 @@ class AppraisalController extends Controller
         $employeeAppraisee = \App\Models\Employee::withoutGlobalScope(EmployeeScope::class)
             ->where('email', auth()->user()->email)->first();
 
-        $appraisorUser = User::find($employeeAppraisor->user_id); // Removed ->first()
+        $appraisorUser = User::find($employeeAppraisor->user_id);
 
         Notification::send($appraisorUser, new AppraisalApplication($appraisal, $employeeAppraisee->first_name, $employeeAppraisee->last_name));
 
