@@ -1041,7 +1041,7 @@
                             </button>
 
                             <button type="submit" class="btn btn-lg btn-primary">
-                                <i class="fas fa-paper-plane me-2"></i>Update
+                                <i class="fas fa-paper-plane me-2"></i>Review & Submit
                             </button>
                         </div>
                     @endif
