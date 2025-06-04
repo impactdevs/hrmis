@@ -270,85 +270,85 @@
                     </div>
 
                     <div class="col-md-6">
-                 
 
-                    <div class="col-md-6">
-                        <label class="form-label">Terms of Employment</label>
-                        <div class="d-flex gap-4 flex-wrap">
-                            @php $employment = old('work_background.terms_of_employment'); @endphp
 
-                            <div class="form-check">
-                                <input
-                                    class="form-check-input @error('work_background.terms_of_employment') is-invalid @enderror"
-                                    type="radio" name="work_background[terms_of_employment]" id="temp"
-                                    value="Temporary" {{ $employment == 'Temporary' ? 'checked' : '' }}>
-                                <label class="form-check-label" for="temp">Temporary</label>
+                        <div class="col-md-6">
+                            <label class="form-label">Terms of Employment</label>
+                            <div class="d-flex gap-4 flex-wrap">
+                                @php $employment = old('work_background.terms_of_employment'); @endphp
+
+                                <div class="form-check">
+                                    <input
+                                        class="form-check-input @error('work_background.terms_of_employment') is-invalid @enderror"
+                                        type="radio" name="work_background[terms_of_employment]" id="temp"
+                                        value="Temporary" {{ $employment == 'Temporary' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="temp">Temporary</label>
+                                </div>
+
+                                <div class="form-check">
+                                    <input
+                                        class="form-check-input @error('work_background.terms_of_employment') is-invalid @enderror"
+                                        type="radio" name="work_background[terms_of_employment]" id="contract"
+                                        value="Contract" {{ $employment == 'Contract' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="contract">Contract</label>
+                                </div>
+
+                                <div class="form-check">
+                                    <input
+                                        class="form-check-input @error('work_background.terms_of_employment') is-invalid @enderror"
+                                        type="radio" name="work_background[terms_of_employment]" id="probation"
+                                        value="Probation" {{ $employment == 'Probation' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="probation">Probation</label>
+                                </div>
+
+                                <div class="form-check">
+                                    <input
+                                        class="form-check-input @error('work_background.terms_of_employment') is-invalid @enderror"
+                                        type="radio" name="work_background[terms_of_employment]" id="perm"
+                                        value="Permanent" {{ $employment == 'Permanent' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="perm">Permanent</label>
+                                </div>
                             </div>
-
-                            <div class="form-check">
-                                <input
-                                    class="form-check-input @error('work_background.terms_of_employment') is-invalid @enderror"
-                                    type="radio" name="work_background[terms_of_employment]" id="contract"
-                                    value="Contract" {{ $employment == 'Contract' ? 'checked' : '' }}>
-                                <label class="form-check-label" for="contract">Contract</label>
-                            </div>
-
-                            <div class="form-check">
-                                <input
-                                    class="form-check-input @error('work_background.terms_of_employment') is-invalid @enderror"
-                                    type="radio" name="work_background[terms_of_employment]" id="probation"
-                                    value="Probation" {{ $employment == 'Probation' ? 'checked' : '' }}>
-                                <label class="form-check-label" for="probation">Probation</label>
-                            </div>
-
-                            <div class="form-check">
-                                <input
-                                    class="form-check-input @error('work_background.terms_of_employment') is-invalid @enderror"
-                                    type="radio" name="work_background[terms_of_employment]" id="perm"
-                                    value="Permanent" {{ $employment == 'Permanent' ? 'checked' : '' }}>
-                                <label class="form-check-label" for="perm">Permanent</label>
-                            </div>
+                            @error('work_background.terms_of_employment')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
                         </div>
-                        @error('work_background.terms_of_employment')
-                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                        @enderror
                     </div>
                 </div>
-            </div>
 
-            <!-- Section 4: Family Background -->
-            <div class="form-section">
-                <h4 class="section-title">4. Family Background</h4>
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label">Marital Status</label>
-                        <div class="d-flex gap-4 flex-wrap">
-                            @php $maritalStatus = old('family_background.marital_status'); @endphp
+                <!-- Section 4: Family Background -->
+                <div class="form-section">
+                    <h4 class="section-title">4. Family Background</h4>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Marital Status</label>
+                            <div class="d-flex gap-4 flex-wrap">
+                                @php $maritalStatus = old('family_background.marital_status'); @endphp
 
-                            <div class="form-check">
-                                <input
-                                    class="form-check-input @error('family_background.marital_status') is-invalid @enderror"
-                                    type="radio" name="family_background[marital_status]" id="married"
-                                    value="Married" {{ $maritalStatus == 'Married' ? 'checked' : '' }}>
-                                <label class="form-check-label" for="married">Married</label>
+                                <div class="form-check">
+                                    <input
+                                        class="form-check-input @error('family_background.marital_status') is-invalid @enderror"
+                                        type="radio" name="family_background[marital_status]" id="married"
+                                        value="Married" {{ $maritalStatus == 'Married' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="married">Married</label>
+                                </div>
+                                <div class="form-check">
+                                    <input
+                                        class="form-check-input @error('family_background.marital_status') is-invalid @enderror"
+                                        type="radio" name="family_background[marital_status]" id="single"
+                                        value="Single" {{ $maritalStatus == 'Single' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="single">Single</label>
+                                </div>
                             </div>
-                            <div class="form-check">
-                                <input
-                                    class="form-check-input @error('family_background.marital_status') is-invalid @enderror"
-                                    type="radio" name="family_background[marital_status]" id="single"
-                                    value="Single" {{ $maritalStatus == 'Single' ? 'checked' : '' }}>
-                                <label class="form-check-label" for="single">Single</label>
-                            </div>
+                            @error('family_background.marital_status')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
                         </div>
-                        @error('family_background.marital_status')
-                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                        @enderror
+
                     </div>
-
                 </div>
-            </div>
 
-            <!-- Section 3: Education History -->
+                {{-- <!-- Section 3: Education History -->
             <div class="form-section">
                 <h4 class="section-title">5. Education History</h4>
                 <table class="table table-bordered">
@@ -393,53 +393,53 @@
                         @endfor
                     </tbody>
                 </table>
-            </div>
+            </div> --}}
 
-            <!-- University Education Section -->
-            <div class="form-section">
-                <h4 class="section-title">6. University Education Details</h4>
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label">University Name</label>
-                        <input type="text" name="university[name]"
-                            class="form-control @error('university.name') is-invalid @enderror"
-                            value="{{ old('university.name') }}" placeholder="Enter university name">
-                        @error('university.name')
-                            <div class="text-danger">{{ $message }}</div>
-                        @enderror
-                    </div>
+                <!-- University Education Section -->
+                <div class="form-section">
+                    <h4 class="section-title">6. University Education Details(Latest Degree Credentials)</h4>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">University Name</label>
+                            <input type="text" name="university[name]"
+                                class="form-control @error('university.name') is-invalid @enderror"
+                                value="{{ old('university.name') }}" placeholder="Enter university name">
+                            @error('university.name')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
 
-                    <div class="col-md-6">
-                        <label class="form-label">Course</label>
-                        <input type="text" name="university[course]"
-                            class="form-control @error('university.course') is-invalid @enderror"
-                            value="{{ old('university.course') }}" placeholder="Enter course of study">
-                        @error('university.course')
-                            <div class="text-danger">{{ $message }}</div>
-                        @enderror
-                    </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Course</label>
+                            <input type="text" name="university[course]"
+                                class="form-control @error('university.course') is-invalid @enderror"
+                                value="{{ old('university.course') }}" placeholder="Enter course of study">
+                            @error('university.course')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
 
-                    <div class="col-md-4">
-                        <label class="form-label">Start Date</label>
-                        <input type="date" name="university[start_date]"
-                            class="form-control @error('university.start_date') is-invalid @enderror"
-                            value="{{ old('university.start_date') }}">
-                        @error('university.start_date')
-                            <div class="text-danger">{{ $message }}</div>
-                        @enderror
-                    </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Start Date</label>
+                            <input type="date" name="university[start_date]"
+                                class="form-control @error('university.start_date') is-invalid @enderror"
+                                value="{{ old('university.start_date') }}">
+                            @error('university.start_date')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
 
-                    <div class="col-md-4">
-                        <label class="form-label">End Date</label>
-                        <input type="date" name="university[end_date]"
-                            class="form-control @error('university.end_date') is-invalid @enderror"
-                            value="{{ old('university.end_date') }}">
-                        @error('university.end_date')
-                            <div class="text-danger">{{ $message }}</div>
-                        @enderror
-                    </div>
+                        <div class="col-md-4">
+                            <label class="form-label">End Date</label>
+                            <input type="date" name="university[end_date]"
+                                class="form-control @error('university.end_date') is-invalid @enderror"
+                                value="{{ old('university.end_date') }}">
+                            @error('university.end_date')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
 
-                    <div class="col-md-4">
+                        {{-- <div class="col-md-4">
                         <label class="form-label">CGPA</label>
                         <input type="text" name="university[cgpa]"
                             class="form-control @error('university.cgpa') is-invalid @enderror"
@@ -447,436 +447,422 @@
                         @error('university.cgpa')
                             <div class="text-danger">{{ $message }}</div>
                         @enderror
+                    </div> --}}
                     </div>
                 </div>
-            </div>
 
 
-            <!-- New UACE Section -->
-            <div class="form-section">
-                <h4 class="section-title">7. Uganda Advanced Certificate of Education (UACE) Details</h4>
-                <div class="row g-3">
-                    <div class="col-12">
-                        <label class="form-label">Have you passed Uganda Advanced Certificate of Education Exams
-                            [UACE]?</label>
-                        <div class="d-flex gap-4">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="uace[passed]" id="uaceYes"
-                                    value="yes" {{ old('uace.passed') == 'yes' ? 'checked' : '' }}>
-                                <label class="form-check-label" for="uaceYes">Yes</label>
+                <!-- New UACE Section -->
+                <div class="form-section">
+                    <h4 class="section-title">7. Uganda Advanced Certificate of Education (UACE) Details</h4>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Have you passed Uganda Advanced Certificate of Education Exams
+                                [UACE]?</label>
+                            <div class="d-flex gap-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="uace[passed]"
+                                        id="uaceYes" value="yes"
+                                        {{ old('uace.passed') == 'yes' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="uaceYes">Yes</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="uace[passed]"
+                                        id="uaceNo" value="no"
+                                        {{ old('uace.passed') == 'no' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="uaceNo">No</label>
+                                </div>
                             </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="uace[passed]" id="uaceNo"
-                                    value="no" {{ old('uace.passed') == 'no' ? 'checked' : '' }}>
-                                <label class="form-check-label" for="uaceNo">No</label>
-                            </div>
+                            @error('uace.passed')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
                         </div>
-                        @error('uace.passed')
-                            <div class="text-danger">{{ $message }}</div>
-                        @enderror
-                    </div>
 
-                    <div class="col-md-4">
-                        <label class="form-label">Year of UACE Examination</label>
-                        <input type="text" id="uaceYear"
-                            class="form-control @error('uace.year') is-invalid @enderror" name="uace[year]"
-                            value="{{ old('uace.year') }}" placeholder="Enter year (e.g., 2015)">
-                        @error('uace.year')
-                            <div class="text-danger">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="col-12">
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Subject</th>
-                                    <th>Grade</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @for ($i = 0; $i < 5; $i++)
-                                    <tr>
-                                        <td>
-                                            <input type="text"
-                                                class="form-control uace-score-subject @error("uace.scores.$i.subject") is-invalid @enderror"
-                                                placeholder="Subject"
-                                                name="uace[scores][{{ $i }}][subject]"
-                                                value="{{ old("uace.scores.$i.subject") }}">
-                                            @error("uace.scores.$i.subject")
-                                                <div class="text-danger">{{ $message }}</div>
-                                            @enderror
-                                        </td>
-                                        <td>
-                                            <input type="text"
-                                                class="form-control uace-score-grade @error("uace.scores.$i.grade") is-invalid @enderror"
-                                                placeholder="Grade" name="uace[scores][{{ $i }}][grade]"
-                                                value="{{ old("uace.scores.$i.grade") }}">
-                                            @error("uace.scores.$i.grade")
-                                                <div class="text-danger">{{ $message }}</div>
-                                            @enderror
-                                        </td>
-                                    </tr>
-                                @endfor
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- JavaScript -->
-            <script>
-                function toggleUaceFields() {
-                    const passed = document.querySelector('input[name="uace[passed]"]:checked')?.value;
-                    const shouldDisable = passed === 'no';
-
-                    document.getElementById('uaceYear').disabled = shouldDisable;
-
-                    document.querySelectorAll('.uace-score-subject, .uace-score-grade').forEach(input => {
-                        input.disabled = shouldDisable;
-                    });
-                }
-
-                document.addEventListener('DOMContentLoaded', function() {
-                    toggleUaceFields(); // Set initial state
-
-                    document.querySelectorAll('input[name="uace[passed]"]').forEach(radio => {
-                        radio.addEventListener('change', toggleUaceFields);
-                    });
-                });
-            </script>
-
-
-            <!-- UCE Section -->
-            <div class="form-section">
-                <h4 class="section-title">8. Uganda Certificate of Education (UCE) Details</h4>
-                <div class="row g-3">
-                    <div class="col-12">
-                        <label class="form-label">Have you passed Uganda Certificate of Education Exams [UCE]?</label>
-                        <div class="d-flex gap-4">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="uce[passed]" id="uceYes"
-                                    value="yes" {{ old('uce.passed') == 'yes' ? 'checked' : '' }}>
-                                <label class="form-check-label" for="uceYes">Yes</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="uce[passed]" id="uceNo"
-                                    value="no" {{ old('uce.passed') == 'no' ? 'checked' : '' }}>
-                                <label class="form-check-label" for="uceNo">No</label>
-                            </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Year of UACE Examination</label>
+                            <input type="text" id="uaceYear"
+                                class="form-control @error('uace.year') is-invalid @enderror" name="uace[year]"
+                                value="{{ old('uace.year') }}" placeholder="Enter year (e.g., 2015)">
+                            @error('uace.year')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
                         </div>
-                        @error('uce.passed')
-                            <small class="text-danger">{{ $message }}</small>
-                        @enderror
-                    </div>
 
-                    <div class="col-md-4">
-                        <label class="form-label">Year of UCE Examination</label>
-                        <input type="text" id="uceYear"
-                            class="form-control @error('uce.year') is-invalid @enderror"
-                            placeholder="Enter year (e.g., 2015)" name="uce[year]" value="{{ old('uce.year') }}">
-                        @error('uce.year')
-                            <small class="text-danger">{{ $message }}</small>
-                        @enderror
-                    </div>
-
-                    <div class="col-12">
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Subject</th>
-                                    <th>Grade</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @for ($i = 0; $i < 10; $i++)
+                        <div class="col-12">
+                            <table class="table table-bordered">
+                                <thead>
                                     <tr>
-                                        <td>
-                                            <input type="text"
-                                                class="form-control uce-score-subject @error("uce.scores.$i.subject") is-invalid @enderror"
-                                                placeholder="Subject"
-                                                name="uce[scores][{{ $i }}][subject]"
-                                                value="{{ old("uce.scores.$i.subject") }}">
-                                            @error("uce.scores.$i.subject")
-                                                <small class="text-danger">{{ $message }}</small>
-                                            @enderror
-                                        </td>
-                                        <td>
-                                            <input type="text"
-                                                class="form-control uce-score-grade @error("uce.scores.$i.grade") is-invalid @enderror"
-                                                placeholder="Grade" name="uce[scores][{{ $i }}][grade]"
-                                                value="{{ old("uce.scores.$i.grade") }}">
-                                            @error("uce.scores.$i.grade")
-                                                <small class="text-danger">{{ $message }}</small>
-                                            @enderror
-                                        </td>
+                                        <th>Subject</th>
+                                        <th>Grade</th>
                                     </tr>
-                                @endfor
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    @for ($i = 0; $i < 5; $i++)
+                                        <tr>
+                                            <td>
+                                                <input type="text"
+                                                    class="form-control uace-score-subject @error("uace.scores.$i.subject") is-invalid @enderror"
+                                                    placeholder="Subject"
+                                                    name="uace[scores][{{ $i }}][subject]"
+                                                    value="{{ old("uace.scores.$i.subject") }}">
+                                                @error("uace.scores.$i.subject")
+                                                    <div class="text-danger">{{ $message }}</div>
+                                                @enderror
+                                            </td>
+                                            <td>
+                                                <input type="text"
+                                                    class="form-control uace-score-grade @error("uace.scores.$i.grade") is-invalid @enderror"
+                                                    placeholder="Grade"
+                                                    name="uace[scores][{{ $i }}][grade]"
+                                                    value="{{ old("uace.scores.$i.grade") }}">
+                                                @error("uace.scores.$i.grade")
+                                                    <div class="text-danger">{{ $message }}</div>
+                                                @enderror
+                                            </td>
+                                        </tr>
+                                    @endfor
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- JavaScript -->
-            <script>
-                function toggleUceFields() {
-                    const passed = document.querySelector('input[name="uce[passed]"]:checked')?.value;
-                    const shouldDisable = passed === 'no';
+                <!-- JavaScript -->
+                <script>
+                    function toggleUaceFields() {
+                        const passed = document.querySelector('input[name="uace[passed]"]:checked')?.value;
+                        const shouldDisable = passed === 'no';
 
-                    document.getElementById('uceYear').disabled = shouldDisable;
+                        document.getElementById('uaceYear').disabled = shouldDisable;
 
-                    document.querySelectorAll('.uce-score-subject, .uce-score-grade').forEach(input => {
-                        input.disabled = shouldDisable;
+                        document.querySelectorAll('.uace-score-subject, .uace-score-grade').forEach(input => {
+                            input.disabled = shouldDisable;
+                        });
+                    }
+
+                    document.addEventListener('DOMContentLoaded', function() {
+                        toggleUaceFields(); // Set initial state
+
+                        document.querySelectorAll('input[name="uace[passed]"]').forEach(radio => {
+                            radio.addEventListener('change', toggleUaceFields);
+                        });
                     });
-                }
-
-                document.addEventListener('DOMContentLoaded', function() {
-                    toggleUceFields(); // Run on load for old() data
-
-                    document.querySelectorAll('input[name="uce[passed]"]').forEach(radio => {
-                        radio.addEventListener('change', toggleUceFields);
-                    });
-                });
-            </script>
+                </script>
 
 
-            <!-- Section 5: Employment Record -->
-            <div class="form-section">
-                <h4 class="section-title">9. Employment Record</h4>
+                <!-- UCE Section -->
+                <div class="form-section">
+                    <h4 class="section-title">8. Uganda Certificate of Education (UCE) Details</h4>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Have you passed Uganda Certificate of Education Exams
+                                [UCE]?</label>
+                            <div class="d-flex gap-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="uce[passed]" id="uceYes"
+                                        value="yes" {{ old('uce.passed') == 'yes' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="uceYes">Yes</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="uce[passed]" id="uceNo"
+                                        value="no" {{ old('uce.passed') == 'no' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="uceNo">No</label>
+                                </div>
+                            </div>
+                            @error('uce.passed')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
 
-                @if ($errors->has('employment_record'))
-                    <div class="text-danger mb-2">
-                        Please correct the errors in the employment record section below.
+                        <div class="col-md-4">
+                            <label class="form-label">Year of UCE Examination</label>
+                            <input type="text" id="uceYear"
+                                class="form-control @error('uce.year') is-invalid @enderror"
+                                placeholder="Enter year (e.g., 2015)" name="uce[year]"
+                                value="{{ old('uce.year') }}">
+                            @error('uce.year')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+
+                        <div class="col-12">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Subject</th>
+                                        <th>Grade</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for ($i = 0; $i < 10; $i++)
+                                        <tr>
+                                            <td>
+                                                <input type="text"
+                                                    class="form-control uce-score-subject @error("uce.scores.$i.subject") is-invalid @enderror"
+                                                    placeholder="Subject"
+                                                    name="uce[scores][{{ $i }}][subject]"
+                                                    value="{{ old("uce.scores.$i.subject") }}">
+                                                @error("uce.scores.$i.subject")
+                                                    <small class="text-danger">{{ $message }}</small>
+                                                @enderror
+                                            </td>
+                                            <td>
+                                                <input type="text"
+                                                    class="form-control uce-score-grade @error("uce.scores.$i.grade") is-invalid @enderror"
+                                                    placeholder="Grade"
+                                                    name="uce[scores][{{ $i }}][grade]"
+                                                    value="{{ old("uce.scores.$i.grade") }}">
+                                                @error("uce.scores.$i.grade")
+                                                    <small class="text-danger">{{ $message }}</small>
+                                                @enderror
+                                            </td>
+                                        </tr>
+                                    @endfor
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                @endif
+                </div>
 
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Year/Period</th>
-                            <th>Position Held</th>
-                            <th>Employer Details</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @for ($i = 0; $i < 10; $i++)
+                <!-- JavaScript -->
+                <script>
+                    function toggleUceFields() {
+                        const passed = document.querySelector('input[name="uce[passed]"]:checked')?.value;
+                        const shouldDisable = passed === 'no';
+
+                        document.getElementById('uceYear').disabled = shouldDisable;
+
+                        document.querySelectorAll('.uce-score-subject, .uce-score-grade').forEach(input => {
+                            input.disabled = shouldDisable;
+                        });
+                    }
+
+                    document.addEventListener('DOMContentLoaded', function() {
+                        toggleUceFields(); // Run on load for old() data
+
+                        document.querySelectorAll('input[name="uce[passed]"]').forEach(radio => {
+                            radio.addEventListener('change', toggleUceFields);
+                        });
+                    });
+                </script>
+
+
+                <!-- Section 5: Employment Record -->
+                <div class="form-section">
+                    <h4 class="section-title">9. Employment Record</h4>
+
+                    @if ($errors->has('employment_record'))
+                        <div class="text-danger mb-2">
+                            Please correct the errors in the employment record section below.
+                        </div>
+                    @endif
+
+                    <table class="table table-bordered">
+                        <thead>
                             <tr>
-                                <td>
-                                    <input type="text"
-                                        class="form-control @error("employment_record.$i.period") is-invalid @enderror"
-                                        name="employment_record[{{ $i }}][period]"
-                                        value="{{ old("employment_record.$i.period") }}">
-                                    @error("employment_record.$i.period")
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </td>
-                                <td>
-                                    <input type="text"
-                                        class="form-control @error("employment_record.$i.position") is-invalid @enderror"
-                                        name="employment_record[{{ $i }}][position]"
-                                        value="{{ old("employment_record.$i.position") }}">
-                                    @error("employment_record.$i.position")
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </td>
-                                <td>
-                                    <input type="text"
-                                        class="form-control @error("employment_record.$i.details") is-invalid @enderror"
-                                        name="employment_record[{{ $i }}][details]"
-                                        value="{{ old("employment_record.$i.details") }}">
-                                    @error("employment_record.$i.details")
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </td>
+                                <th>Year/Period</th>
+                                <th>Position Held</th>
+                                <th>Employer Details</th>
                             </tr>
-                        @endfor
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                            @for ($i = 0; $i < 10; $i++)
+                                <tr>
+                                    <td>
+                                        <input type="text"
+                                            class="form-control @error("employment_record.$i.period") is-invalid @enderror"
+                                            name="employment_record[{{ $i }}][period]"
+                                            value="{{ old("employment_record.$i.period") }}">
+                                        @error("employment_record.$i.period")
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </td>
+                                    <td>
+                                        <input type="text"
+                                            class="form-control @error("employment_record.$i.position") is-invalid @enderror"
+                                            name="employment_record[{{ $i }}][position]"
+                                            value="{{ old("employment_record.$i.position") }}">
+                                        @error("employment_record.$i.position")
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </td>
+                                    <td>
+                                        <input type="text"
+                                            class="form-control @error("employment_record.$i.details") is-invalid @enderror"
+                                            name="employment_record[{{ $i }}][details]"
+                                            value="{{ old("employment_record.$i.details") }}">
+                                        @error("employment_record.$i.details")
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </td>
+                                </tr>
+                            @endfor
+                        </tbody>
+                    </table>
+                </div>
 
 
-            <div class="form-section">
-                <h4 class="section-title">10. Criminal History</h4>
-                <div class="row g-3">
-                    <div class="col-12">
-                        <label class="form-label">Have you ever been convicted on a criminal charge?</label>
-                        <div class="d-flex gap-4 mb-3">
-                            <div class="form-check">
-                                <input class="form-check-input @error('criminalHistory') is-invalid @enderror"
-                                    type="radio" name="criminalHistory" id="crimeYes" value="yes"
-                                    {{ old('criminalHistory') === 'yes' ? 'checked' : '' }}>
-                                <label class="form-check-label" for="crimeYes">Yes</label>
+                <div class="form-section">
+                    <h4 class="section-title">10. Criminal History</h4>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Have you ever been convicted on a criminal charge?</label>
+                            <div class="d-flex gap-4 mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input @error('criminalHistory') is-invalid @enderror"
+                                        type="radio" name="criminalHistory" id="crimeYes" value="yes"
+                                        {{ old('criminalHistory') === 'yes' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="crimeYes">Yes</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input @error('criminalHistory') is-invalid @enderror"
+                                        type="radio" name="criminalHistory" id="crimeNo" value="no"
+                                        {{ old('criminalHistory') === 'no' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="crimeNo">No</label>
+                                </div>
+                                @error('criminalHistory')
+                                    <div class="invalid-feedback d-block">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
                             </div>
-                            <div class="form-check">
-                                <input class="form-check-input @error('criminalHistory') is-invalid @enderror"
-                                    type="radio" name="criminalHistory" id="crimeNo" value="no"
-                                    {{ old('criminalHistory') === 'no' ? 'checked' : '' }}>
-                                <label class="form-check-label" for="crimeNo">No</label>
+                            <div class="mb-3">
+                                <label class="form-label">If yes, provide details including sentence imposed:</label>
+                                <textarea class="form-control @error('criminal_history_details') is-invalid @enderror" rows="3"
+                                    name="criminal_history_details">{{ old('criminal_history_details') }}</textarea>
+                                @error('criminal_history_details')
+                                    <div class="invalid-feedback d-block">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
                             </div>
-                            @error('criminalHistory')
-                                <div class="invalid-feedback d-block">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4 class="section-title">11. Availability & Salary Expectations</h4>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">How soon would you be available for appointment if
+                                selected?</label>
+                            <input type="text"
+                                class="form-control @error('availability_if_appointed') is-invalid @enderror"
+                                placeholder="e.g. Immediately, 2 weeks notice" name="availability_if_appointed"
+                                value="{{ old('availability_if_appointed') }}">
+                            @error('availability_if_appointed')
+                                <div class="invalid-feedback">
                                     {{ $message }}
                                 </div>
                             @enderror
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">If yes, provide details including sentence imposed:</label>
-                            <textarea class="form-control @error('criminal_history_details') is-invalid @enderror" rows="3"
-                                name="criminal_history_details">{{ old('criminal_history_details') }}</textarea>
-                            @error('criminal_history_details')
-                                <div class="invalid-feedback d-block">
-                                    {{ $message }}
+                        <div class="col-md-6">
+                            <label class="form-label">Minimum salary expectation</label>
+                            <div class="input-group">
+                                <span class="input-group-text">UGX</span>
+                                <input type="number"
+                                    class="form-control @error('minimum_salary_expected') is-invalid @enderror"
+                                    placeholder="Expected monthly salary" name="minimum_salary_expected"
+                                    value="{{ old('minimum_salary_expected') }}">
+                                @error('minimum_salary_expected')
+                                    <div class="invalid-feedback d-block">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="form-section">
+                    <h4 class="section-title">12. References & Recommendations</h4>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <h6>Provide Names, Telephone Numbers and Email addresses of three refrees to be contacted
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Reference 1 (Name, Telephone Number & Address)</label>
+                                    <textarea class="form-control @error('reference.0') is-invalid @enderror" rows="2" name="reference[0]">{{ old('reference.0') }}</textarea>
+                                    @error('reference.0')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
                                 </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Reference 2 (Name, Telephone Number & Address)</label>
+                                    <textarea class="form-control @error('reference.1') is-invalid @enderror" rows="2" name="reference[1]">{{ old('reference.1') }}</textarea>
+                                    @error('reference.1')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Reference 3 (Name, Telephone Number & Address)</label>
+                                    <textarea class="form-control @error('reference.2') is-invalid @enderror" rows="2" name="reference[2]">{{ old('reference.2') }}</textarea>
+                                    @error('reference.2')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="form-text mt-2">Provide two responsible persons (not relatives) for character
+                                reference</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add this section after the References & Recommendations section -->
+                <div class="form-section">
+                    <h4 class="section-title">13. Document Uploads</h4>
+                    <div class="row g-3">
+                        <!-- Academic Documents Upload -->
+                        <div class="col-md-6">
+                            <label class="form-label">Academic Documents (Combined PDF)</label>
+                            <input type="file"
+                                class="form-control @error('academic_documents') is-invalid @enderror"
+                                name="academic_documents[]" multiple accept="application/pdf">
+                            @error('academic_documents')
+                                <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                             <div class="form-text">
-                                Note: Conviction for a criminal offence will not necessarily prevent employment in the
-                                Public Service, but false information is an offence.
+                                Upload all academic certificates/documents in PDF format (Max 2MB each)
+                            </div>
+                        </div>
+
+                        <!-- Other Documents Upload -->
+                        <div class="col-md-6">
+                            <label class="form-label">Supporting Documents</label>
+                            <div class="mb-3">
+                                <input type="file" class="form-control @error('cv') is-invalid @enderror"
+                                    name="cv" accept="application/pdf">
+                                @error('cv')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                                <div class="form-text">CV/Resume (PDF, Max 2MB)</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <input type="file"
+                                    class="form-control @error('other_documents') is-invalid @enderror"
+                                    name="other_documents[]" multiple accept="application/pdf,image/*">
+                                @error('other_documents')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                                <div class="form-text">Other relevant documents (PDF/Images, Max 2MB each)</div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="form-section">
-                <h4 class="section-title">11. Availability & Salary Expectations</h4>
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label">How soon would you be available for appointment if selected?</label>
-                        <input type="text"
-                            class="form-control @error('availability_if_appointed') is-invalid @enderror"
-                            placeholder="e.g. Immediately, 2 weeks notice" name="availability_if_appointed"
-                            value="{{ old('availability_if_appointed') }}">
-                        @error('availability_if_appointed')
-                            <div class="invalid-feedback">
-                                {{ $message }}
-                            </div>
-                        @enderror
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Minimum salary expectation</label>
-                        <div class="input-group">
-                            <span class="input-group-text">UGX</span>
-                            <input type="number"
-                                class="form-control @error('minimum_salary_expected') is-invalid @enderror"
-                                placeholder="Expected monthly salary" name="minimum_salary_expected"
-                                value="{{ old('minimum_salary_expected') }}">
-                            @error('minimum_salary_expected')
-                                <div class="invalid-feedback d-block">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-                        </div>
-                    </div>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary btn-lg" type="submit">Submit Application</button>
                 </div>
-            </div>
-
-
-            <div class="form-section">
-                <h4 class="section-title">12. References & Recommendations</h4>
-                <div class="row g-3">
-                    <div class="col-12">
-                        <h6>For applicants NOT in Government Service:</h6>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Reference 1 (Name & Address)</label>
-                                <textarea class="form-control @error('reference.0') is-invalid @enderror" rows="2" name="reference[0]">{{ old('reference.0') }}</textarea>
-                                @error('reference.0')
-                                    <div class="invalid-feedback">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Reference 2 (Name & Address)</label>
-                                <textarea class="form-control @error('reference.1') is-invalid @enderror" rows="2" name="reference[1]">{{ old('reference.1') }}</textarea>
-                                @error('reference.1')
-                                    <div class="invalid-feedback">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                            </div>
-                        </div>
-                        <div class="form-text mt-2">Provide two responsible persons (not relatives) for character
-                            reference</div>
-                    </div>
-
-                    <!-- For Government Applicants -->
-                    <div class="col-12 mt-4">
-                        <h6>For applicants IN Government Service:</h6>
-                        <div class="row g-3">
-                            <div class="col-md-4">
-                                <label class="form-label">Name of Recommending Officer</label>
-                                <input type="text"
-                                    class="form-control @error('recommender_name') is-invalid @enderror"
-                                    name="recommender_name" value="{{ old('recommender_name') }}">
-                                @error('recommender_name')
-                                    <div class="invalid-feedback">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Title/Designation</label>
-                                <input type="text"
-                                    class="form-control @error('recommender_title') is-invalid @enderror"
-                                    name="recommender_title" value="{{ old('recommender_title') }}">
-                                @error('recommender_title')
-                                    <div class="invalid-feedback">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                            </div>
-                        </div>
-                        <div class="form-text mt-2">Permanent Secretary/Responsible Officer's recommendation</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Add this section after the References & Recommendations section -->
-            <div class="form-section">
-                <h4 class="section-title">13. Document Uploads</h4>
-                <div class="row g-3">
-                    <!-- Academic Documents Upload -->
-                    <div class="col-md-6">
-                        <label class="form-label">Academic Documents (Combined PDF)</label>
-                        <input type="file" class="form-control @error('academic_documents') is-invalid @enderror"
-                            name="academic_documents[]" multiple accept="application/pdf">
-                        @error('academic_documents')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                        <div class="form-text">
-                            Upload all academic certificates/documents in PDF format (Max 2MB each)
-                        </div>
-                    </div>
-
-                    <!-- Other Documents Upload -->
-                    <div class="col-md-6">
-                        <label class="form-label">Supporting Documents</label>
-                        <div class="mb-3">
-                            <input type="file" class="form-control @error('cv') is-invalid @enderror"
-                                name="cv" accept="application/pdf">
-                            @error('cv')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                            <div class="form-text">CV/Resume (PDF, Max 2MB)</div>
-                        </div>
-
-                        <div class="mb-3">
-                            <input type="file" class="form-control @error('other_documents') is-invalid @enderror"
-                                name="other_documents[]" multiple accept="application/pdf,image/*">
-                            @error('other_documents')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                            <div class="form-text">Other relevant documents (PDF/Images, Max 2MB each)</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="d-grid gap-2">
-                <button class="btn btn-primary btn-lg" type="submit">Submit Application</button>
-            </div>
         </form>
     </div>
 

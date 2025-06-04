@@ -100,7 +100,7 @@ class JobApplicationController extends Controller
             'university.course' => 'required|string|max:255',
             'university.start_date' => 'required|date',
             'university.end_date' => 'required|date|after_or_equal:university.start_date',
-            'university.cgpa' => 'required|numeric|between:0,5',
+            // 'university.cgpa' => 'required|numeric|between:0,5',
 
             // Section 3: Work Background
             'work_background.present_department' => 'nullable|string|max:255',
