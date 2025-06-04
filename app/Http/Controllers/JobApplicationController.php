@@ -110,11 +110,6 @@ class JobApplicationController extends Controller
 
             'family_background.marital_status' => 'nullable|string|max:255',
 
-            // Section 5: Education History
-            'education_history' => 'nullable|array',
-            'education_history.*.period' => 'nullable|string',
-            'education_history.*.institution' => 'nullable|string',
-            'education_history.*.award' => 'nullable|string',
 
             // Section 6: UCE Details
             'uce.passed' => 'required|in:yes,no',
@@ -212,7 +207,7 @@ class JobApplicationController extends Controller
 
 
             // Education
-            'education_history' => $validated['education_history'],
+            'education_history' => $validated['education_history']??null,
             'uce_details' => $validated['uce'],
             'uace_details' => $validated['uace'],
             'university_details' => [
@@ -300,12 +295,6 @@ class JobApplicationController extends Controller
 
             // Section 4: Family Background
             'family_background.marital_status' => 'required|in:married,single,widowed,divorced,separated',
-
-            // Section 5: Education History
-            'education_history' => 'required|array',
-            'education_history.*.period' => 'required|string',
-            'education_history.*.institution' => 'required|string',
-            'education_history.*.award' => 'required|string',
 
             // Sections 6 & 7: UCE/UACE Details
             'uce.passed' => 'required|in:yes,no',
