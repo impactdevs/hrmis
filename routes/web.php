@@ -130,9 +130,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 Route::get('job-applications/create', [JobApplicationController::class, 'create'])->name('job-applications.create');
 
-Route::get("test-route", function() {
-    return "OK";
-})->name('test-route');
 
 
 Route::get('/import', [EmployeeController::class, 'import_employees']);
