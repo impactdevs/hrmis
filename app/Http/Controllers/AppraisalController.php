@@ -25,8 +25,7 @@ class AppraisalController extends Controller
      */
     public function index()
     {
-        $appraisals = Appraisal::with('employee')->latest()->paginate();
-        return view('appraisals.index', compact('appraisals'));
+        return "OK";
     }
 
     /**

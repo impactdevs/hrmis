@@ -50,7 +50,7 @@
                 <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('appraisals.index')) bg-secondary @endif"
                     href="{{ route('appraisals.index') }}">
                     <i class="bi bi-arrow-bar-up"></i>
-                    {{ auth()->user()->isAdminOrSecretary ? 'Appraisals-testing pull' : 'My Appraisals' }}
+                    {{ auth()->user()->isAdminOrSecretary ? 'Appraisals' : 'My Appraisals' }}
                 </a>
             </li>
 
