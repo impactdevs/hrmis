@@ -73,7 +73,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/appraisal/appraisal-approval', [AppraisalController::class, 'approveOrReject'])
         ->name('appraisals.approveOrReject');
     Route::post('/appraisals/{appraisal}/status', [AppraisalController::class, 'approveOrReject'])
-        ->name('appraisals.approveOrReject');
+        ->name('appraisals.status');
     Route::get('/appraisals/{appraisal}/download', [AppraisalController::class, 'downloadPDF'])
         ->name('appraisals.download');
     Route::resource('events', EventController::class);

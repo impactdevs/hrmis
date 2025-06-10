@@ -123,38 +123,6 @@
                     </div>
                 </div>
 
-                <!-- Education Section -->
-                <div class="section-card mb-4">
-                    <h5 class="section-title"><i class="fas fa-graduation-cap mr-2"></i>Education History</h5>
-                    @if (!empty($application->education_history))
-                        <div class="table-responsive">
-                            <table class="table table-hover table-striped">
-                                <thead class="bg-light">
-                                    <tr>
-                                        <th>Period</th>
-                                        <th>Institution</th>
-                                        <th>Award</th>
-                                        <th>Class</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($application->education_history as $edu)
-                                        <tr>
-                                            <td>{{ $edu['period'] ?? '-' }}</td>
-                                            <td>{{ $edu['institution'] ?? '-' }}</td>
-                                            <td>{{ $edu['award'] ?? '-' }}</td>
-                                            <td>{{ $edu['class'] ?? '-' }}</td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    @else
-                        <div class="alert alert-info">No education history provided</div>
-                    @endif
-                </div>
-
-                <!-- Examination Results -->
                 <!-- Examination Results -->
                 <div class="row mb-4">
                     <!-- UCE Section -->
