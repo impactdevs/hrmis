@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\AppraisalController;
+use App\Http\Controllers\AppraisalsController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\CompanyJobController;
 use App\Http\Controllers\DepartmentController;
@@ -69,7 +70,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('recruitments', StaffRecruitmentController::class);
     Route::post('/recruitments/{recruitment}/status', [StaffRecruitmentController::class, 'approveOrReject'])
         ->name('recruitmentments.approveOrReject');
-    Route::resource('appraisals', AppraisalController::class);
+    Route::resource('appraisals', AppraisalsController::class);
     Route::post('/appraisal/appraisal-approval', [AppraisalController::class, 'approveOrReject'])
         ->name('appraisals.approveOrReject');
     Route::post('/appraisals/{appraisal}/status', [AppraisalController::class, 'approveOrReject'])
