@@ -99,7 +99,7 @@
             @if (auth()->user()->hasRole('HR'))
                 <li class="nav-item">
                     <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('applications.index')) bg-secondary @endif"
-                        href="{{ route('applications.index') }}">
+                        href="{{ route('uncst-job-applications.index') }}">
                         <i class="bi bi-activity"></i>
                         Applications
                     </a>

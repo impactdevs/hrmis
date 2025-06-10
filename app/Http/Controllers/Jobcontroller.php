@@ -56,7 +56,7 @@ class JobController extends Controller
             ->paginate($request->per_page ?? 10)
             ->appends($request->query());
 
-        return view('job-applications.index', [
+        return view('job-uncst-job-applications.index', [
             'applications' => $applications,
             'companyJobs' => $companyJobs,
         ]);
@@ -71,7 +71,7 @@ class JobController extends Controller
     public function create()
     {
         $companyJobs = CompanyJob::all();
-        return view('job-applications.create', compact('companyJobs'));
+        return view('job-uncst-job-applications.create', compact('companyJobs'));
     }
 
     /**
@@ -245,7 +245,7 @@ class JobController extends Controller
 
         Mail::to($validated['personal_details']['email'])
             ->send(new ApplicationReceivedMail($JobApplication, $validated['personal_details']['full_name']));
-        return view('job-applications.received');
+        return view('job-uncst-job-applications.received');
     }
 
     /**
@@ -253,7 +253,7 @@ class JobController extends Controller
      */
     public function show(JobApplication $application)
     {
-        return view('job-applications.show', compact('application'));
+        return view('job-uncst-job-applications.show', compact('application'));
     }
 
     /**
@@ -261,7 +261,7 @@ class JobController extends Controller
      */
     public function edit(JobApplication $application)
     {
-        return view('job-applications.edit', compact('application'));
+        return view('job-uncst-job-applications.edit', compact('application'));
     }
 
     /**
@@ -339,7 +339,7 @@ class JobController extends Controller
 
         try {
             $application->update($validated);
-            return redirect()->route('applications.show', $application)
+            return redirect()->route('uncst-job-applications.show', $application)
                 ->with('success', 'Application updated successfully!');
         } catch (\Exception $e) {
             return back()->withInput()
@@ -354,7 +354,7 @@ class JobController extends Controller
     {
         try {
             $application->delete();
-            return redirect()->route('applications.index')
+            return redirect()->route('uncst-job-applications.index')
                 ->with('success', 'Application deleted successfully!');
         } catch (\Exception $e) {
             return back()->with('error', 'Error deleting application: ' . $e->getMessage());
