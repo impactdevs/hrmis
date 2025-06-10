@@ -73,11 +73,9 @@
                     $title = 'Create an Event';
                 }
 
-
                 if (request()->routeIs('events.edit')) {
                     $title = 'Edit an Event';
                 }
-
 
                 if (request()->routeIs('employees.index')) {
                     $title = auth()->user()->isAdminOrSecretary ? 'Employees' : 'About Me';
@@ -91,7 +89,7 @@
                     $title = 'Add An Employee';
                 }
 
-                if (request()->routeIs('applications.index')) {
+                if (request()->routeIs('uncst-job-applications.index')) {
                     $title = 'Applications';
                 }
 

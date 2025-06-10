@@ -56,7 +56,7 @@ class JobController extends Controller
             ->paginate($request->per_page ?? 10)
             ->appends($request->query());
 
-        return view('job-uncst-job-applications.index', [
+        return view('job-uncst-job-uncst-job-applications.index', [
             'applications' => $applications,
             'companyJobs' => $companyJobs,
         ]);
@@ -354,7 +354,7 @@ class JobController extends Controller
     {
         try {
             $application->delete();
-            return redirect()->route('uncst-job-applications.index')
+            return redirect()->route('uncst-job-uncst-job-applications.index')
                 ->with('success', 'Application deleted successfully!');
         } catch (\Exception $e) {
             return back()->with('error', 'Error deleting application: ' . $e->getMessage());

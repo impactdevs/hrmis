@@ -11,7 +11,7 @@
         <div class="card-body">
             {{-- Enhanced Filters Section --}}
             <div class="mb-4 border-bottom pb-3">
-                <form method="GET" action="{{ route('applications.index') }}">
+                <form method="GET" action="{{ route('uncst-job-applications.index') }}">
                     <div class="row g-3 align-items-end">
                         {{-- Job Post Filter --}}
                         <div class="col-md-3">
@@ -55,7 +55,7 @@
                                 <button type="submit" class="btn btn-primary">
                                     <i class="fas fa-filter me-2"></i>Apply Filters
                                 </button>
-                                <a href="{{ route('applications.index') }}" class="btn btn-outline-secondary">
+                                <a href="{{ route('uncst-job-applications.index') }}" class="btn btn-outline-secondary">
                                     Clear Filters
                                 </a>
                             </div>
@@ -82,7 +82,7 @@
                         <tr>
                             <th>
                                 <a href="{{ route(
-                                    'applications.index',
+                                    'uncst-job-applications.index',
                                     array_merge(request()->except(['sort', 'direction']), [
                                         'sort' => 'reference_number',
                                         'direction' => $currentSort === 'reference_number' && $currentDirection === 'asc' ? 'desc' : 'asc',
@@ -95,7 +95,7 @@
                             </th>
                             <th>
                                 <a href="{{ route(
-                                    'applications.index',
+                                    'uncst-job-applications.index',
                                     array_merge(request()->except(['sort', 'direction']), [
                                         'sort' => 'full_name',
                                         'direction' => $currentSort === 'full_name' && $currentDirection === 'asc' ? 'desc' : 'asc',
@@ -109,7 +109,7 @@
                             <th>Post Applied</th>
                             <th>
                                 <a href="{{ route(
-                                    'applications.index',
+                                    'uncst-job-applications.index',
                                     array_merge(request()->except(['sort', 'direction']), [
                                         'sort' => 'created_at',
                                         'direction' => $currentSort === 'created_at' && $currentDirection === 'asc' ? 'desc' : 'asc',
@@ -126,14 +126,14 @@
                     <tbody>
                         @forelse($applications as $application)
                             <tr style="cursor: pointer;"
-                                onclick="window.location='{{ route('applications.show', $application->id) }}'">
+                                onclick="window.location='{{ route('uncst-job-applications.index', $application->id) }}'">
                                 <td>{{ $application->reference_number }}</td>
                                 <td>{{ $application->full_name }}</td>
-                                <td>{{ \App\Models\CompanyJob::where('job_code',$application->reference_number)->first()->job_title ?? 'N/A' }}
+                                <td>{{ \App\Models\CompanyJob::where('job_code', $application->reference_number)->first()->job_title ?? 'N/A' }}
                                 </td>
                                 <td>{{ $application->created_at->format('Y-m-d H:i') }}</td>
                                 <td>
-                                    <a href="{{ route('applications.show', $application->id) }}"
+                                    <a href="{{ route('uncst-job-applications.index', $application->id) }}"
                                         class="btn btn-sm btn-primary" onclick="event.stopPropagation()">
                                         View
                                     </a>
@@ -150,7 +150,7 @@
                 {{-- Pagination and Per Page Selector --}}
                 <div class="d-flex justify-content-between align-items-center mt-4">
                     <div class="form-group mb-0">
-                        <form method="GET" action="{{ route('applications.index') }}">
+                        <form method="GET" action="{{ route('uncst-job-applications.index') }}">
                             <select name="per_page" class="form-select" onchange="this.form.submit()">
                                 <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10 per
                                     page</option>

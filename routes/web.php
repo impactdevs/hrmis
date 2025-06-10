@@ -15,8 +15,6 @@ use App\Http\Controllers\Form\FormSettingController;
 use App\Http\Controllers\Form\SectionController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\JobApplicationController;
-use App\Http\Controllers\JobController;
-use App\Http\Controllers\JobsController;
 use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\LeaveRosterController;
 use App\Http\Controllers\LeaveTypesController;
@@ -124,9 +122,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/get-count', [NotificationController::class, 'getCount']);
 
-    Route::get('/uncst-matrix', [DocumentController::class, 'uncst_matrix'])->name('uncst-matrix');
+    Route::get('/uncst-mat rix', [DocumentController::class, 'uncst_matrix'])->name('uncst-matrix');
 
-    Route::resource('uncst-job-applications', JobsController::class)
+    Route::resource('uncst-job-applications', JobApplicationController::class)
         ->except(['create']); // exclude create because it's public
 });
 

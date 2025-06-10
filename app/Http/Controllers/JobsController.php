@@ -56,7 +56,7 @@ class JobsController extends Controller
             ->paginate($request->per_page ?? 10)
             ->appends($request->query());
 
-        return view('job-applications.index', [
+        return view('job-uncst-job-applications.index', [
             'applications' => $applications,
             'companyJobs' => $companyJobs,
         ]);
@@ -159,12 +159,12 @@ class JobsController extends Controller
 
         // Handle Academic Documents
         $academicDocumentsPaths = [];
-        if ($request->hasFile('academic_documents')){
-        foreach ($request->file('academic_documents') as $file) {
-            $path = $file->store('academic_docs', 'public');
-            $academicDocumentsPaths[] = $path;
+        if ($request->hasFile('academic_documents')) {
+            foreach ($request->file('academic_documents') as $file) {
+                $path = $file->store('academic_docs', 'public');
+                $academicDocumentsPaths[] = $path;
+            }
         }
-    }
 
         // Handle CV
         $cvPath = $request->file('cv')->store('cvs', 'public');
@@ -207,7 +207,7 @@ class JobsController extends Controller
 
 
             // Education
-            'education_history' => $validated['education_history']??null,
+            'education_history' => $validated['education_history'] ?? null,
             'uce_details' => $validated['uce'],
             'uace_details' => $validated['uace'],
             'university_details' => [
@@ -354,7 +354,7 @@ class JobsController extends Controller
     {
         try {
             $application->delete();
-            return redirect()->route('uncst-job-applications.index')
+            return redirect()->route('uncst-job-uncst-job-applications.index')
                 ->with('success', 'Application deleted successfully!');
         } catch (\Exception $e) {
             return back()->with('error', 'Error deleting application: ' . $e->getMessage());

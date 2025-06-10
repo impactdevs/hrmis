@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="py-12">
         <div class="d-flex flex-row justify-content-between align-items-center mb-4 ms-5">
-            <form method="GET" action="{{ route('applications.index') }}">
+            <form method="GET" action="{{ route('uncst-job-applications.index') }}">
                 <select name="job_id" class="form-select" onchange="this.form.submit()">
                     <option value="">Select Job</option>
                     @foreach ($company_jobs as $job)

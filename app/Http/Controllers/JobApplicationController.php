@@ -7,7 +7,6 @@ use App\Models\CompanyJob;
 use App\Models\JobApplication;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Validation\Rule;
 
 class JobApplicationController extends Controller
 {
@@ -159,12 +158,12 @@ class JobApplicationController extends Controller
 
         // Handle Academic Documents
         $academicDocumentsPaths = [];
-        if ($request->hasFile('academic_documents')){
-        foreach ($request->file('academic_documents') as $file) {
-            $path = $file->store('academic_docs', 'public');
-            $academicDocumentsPaths[] = $path;
+        if ($request->hasFile('academic_documents')) {
+            foreach ($request->file('academic_documents') as $file) {
+                $path = $file->store('academic_docs', 'public');
+                $academicDocumentsPaths[] = $path;
+            }
         }
-    }
 
         // Handle CV
         $cvPath = $request->file('cv')->store('cvs', 'public');
@@ -207,7 +206,7 @@ class JobApplicationController extends Controller
 
 
             // Education
-            'education_history' => $validated['education_history']??null,
+            'education_history' => $validated['education_history'] ?? null,
             'uce_details' => $validated['uce'],
             'uace_details' => $validated['uace'],
             'university_details' => [
@@ -339,7 +338,7 @@ class JobApplicationController extends Controller
 
         try {
             $application->update($validated);
-            return redirect()->route('applications.show', $application)
+            return redirect()->route('uncst-job-applications.show', $application)
                 ->with('success', 'Application updated successfully!');
         } catch (\Exception $e) {
             return back()->withInput()
@@ -354,7 +353,7 @@ class JobApplicationController extends Controller
     {
         try {
             $application->delete();
-            return redirect()->route('applications.index')
+            return redirect()->route('uncst-job-applications.index')
                 ->with('success', 'Application deleted successfully!');
         } catch (\Exception $e) {
             return back()->with('error', 'Error deleting application: ' . $e->getMessage());
