@@ -102,7 +102,7 @@
                         href="{{ route('uncst-job-applications.index') }}">
                         <i class="bi bi-activity"></i>
                         Applications
-                    </a>=
+                    </a>
                 </li>
             @endif
             @if (auth()->user()->isAdminOrSecretary)
