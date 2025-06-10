@@ -150,7 +150,7 @@ class AppraisalsController extends Controller
 
         Notification::send($esUser, new AppraisalApplication($appraisal, $employeeAppraisee->first_name, $employeeAppraisee->last_name));
 
-        return to_route('appraisals.edit', ['appraisal' => $appraisal->appraisal_id]);
+        return to_route('uncst-appraisals.edit', ['appraisal' => $appraisal->appraisal_id]);
     }
 
 
@@ -171,7 +171,7 @@ class AppraisalsController extends Controller
      */
     public function show(Appraisal $appraisal)
     {
-        return to_route('appraisals.edit', ['appraisal' => $appraisal->appraisal_id]);
+        return to_route('uncst-appraisals.edit', ['appraisal' => $appraisal->appraisal_id]);
     }
 
     /**
@@ -210,7 +210,7 @@ class AppraisalsController extends Controller
     public function destroy(Request $request, Appraisal $appraisal)
     {
         $appraisal->delete();
-        return to_route('appraisals.index');
+        return to_route('uncst-appraisals.index');
     }
 
     public function survey(Request $request)

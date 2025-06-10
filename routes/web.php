@@ -70,7 +70,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('recruitments', StaffRecruitmentController::class);
     Route::post('/recruitments/{recruitment}/status', [StaffRecruitmentController::class, 'approveOrReject'])
         ->name('recruitmentments.approveOrReject');
-    Route::resource('appraisals', AppraisalsController::class);
+    Route::resource('uncst-appraisals', AppraisalsController::class);
     Route::post('/appraisal/appraisal-approval', [AppraisalController::class, 'approveOrReject'])
         ->name('appraisals.approveOrReject');
     Route::post('/appraisals/{appraisal}/status', [AppraisalController::class, 'approveOrReject'])
