@@ -128,7 +128,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->except(['create']); // exclude create because it's public
 });
 
-Route::get('job-applications/create', [JobApplicationController::class, 'create'])->name('job-applications.create');
+Route::get('job-applications', [JobApplicationController::class, 'create'])->name('job-applications.create');
 
 
 
