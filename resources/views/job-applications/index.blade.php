@@ -133,7 +133,7 @@
                                 </td>
                                 <td>{{ $application->created_at->format('Y-m-d H:i') }}</td>
                                 <td>
-                                    <a href="{{ route('uncst-job-applications', $application->id) }}"
+                                    <a href="{{ route('uncst-job-applications.show', $application->id) }}"
                                         class="btn btn-sm btn-primary" onclick="event.stopPropagation()">
                                         View
                                     </a>
