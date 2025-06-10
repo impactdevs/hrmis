@@ -71,7 +71,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('recruitmentments.approveOrReject');
     Route::resource('appraisals', AppraisalController::class);
     Route::post('/appraisal/appraisal-approval', [AppraisalController::class, 'approveOrReject'])
-        ->name('appraisals.approveOrReject');
+        ->name('appraisal.approveOrReject');
     Route::post('/appraisals/{appraisal}/status', [AppraisalController::class, 'approveOrReject'])
         ->name('appraisals.status');
     Route::get('/appraisals/{appraisal}/download', [AppraisalController::class, 'downloadPDF'])
@@ -125,9 +125,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/uncst-matrix', [DocumentController::class, 'uncst_matrix'])->name('uncst-matrix');
 
     Route::resource('applications', JobApplicationController::class);
+    Route::get('job-applications/create', [JobApplicationController::class, 'create'])->name('job-applications.create');
 });
 
-Route::get('job-applications/create', [JobApplicationController::class, 'create'])->name('job-applications.create');
+
 
 
 
