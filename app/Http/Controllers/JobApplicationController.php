@@ -250,8 +250,9 @@ class JobApplicationController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(JobApplication $application)
+    public function show(JobApplication $uncst_job_application)
     {
+        $application = $uncst_job_application;
         return view('job-applications.show', compact('application'));
     }
 
