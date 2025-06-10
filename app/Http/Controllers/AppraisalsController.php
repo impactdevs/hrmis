@@ -292,7 +292,6 @@ class AppraisalsController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        // Save the updated leave_request_status
         $appraisal->appraisal_request_status = $appraisalRequestStatus;
         $appraisal->save();
 
