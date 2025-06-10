@@ -125,7 +125,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/uncst-matrix', [DocumentController::class, 'uncst_matrix'])->name('uncst-matrix');
 
-    Route::resource('applications', JobController::class)
+    Route::resource('uncst-job-applications', JobController::class)
         ->except(['create']); // exclude create because it's public
 });
 
