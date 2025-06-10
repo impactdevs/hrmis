@@ -70,12 +70,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/recruitments/{recruitment}/status', [StaffRecruitmentController::class, 'approveOrReject'])
         ->name('recruitmentments.approveOrReject');
     Route::resource('appraisals', AppraisalController::class);
-    // Route::post('/appraisal/appraisal-approval', [AppraisalController::class, 'approveOrReject'])
-    //     ->name('appraisals.approveOrReject');
-    // Route::post('/appraisals/{appraisal}/status', [AppraisalController::class, 'approveOrReject'])
-    //     ->name('appraisals.status');
-    // Route::get('/appraisals/{appraisal}/download', [AppraisalController::class, 'downloadPDF'])
-    //     ->name('appraisals.download');
+    Route::post('/appraisal/appraisal-approval', [AppraisalController::class, 'approveOrReject'])
+        ->name('appraisals.approveOrReject');
+    Route::post('/appraisals/{appraisal}/status', [AppraisalController::class, 'approveOrReject'])
+        ->name('appraisals.status');
+    Route::get('/appraisals/{appraisal}/download', [AppraisalController::class, 'downloadPDF'])
+        ->name('appraisals.download');
     Route::resource('events', EventController::class);
     Route::resource('trainings', TrainingController::class);
     Route::resource('out-of-station-trainings', OutOfStationTrainingController::class);
@@ -112,8 +112,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     //appraisal
     Route::get('/employee-appraisal', [AppraisalController::class, 'survey'])->name('appraisal.survey');
-    // Route::post('/appraisals', [AppraisalController::class, 'store'])->name('appraisals.store');
-    // Route::get('preview-appraisal/{appraisal}', [AppraisalController::class, 'previewAppraisalDetails'])->name('appraisals.preview');
+    Route::post('/appraisals', [AppraisalController::class, 'store'])->name('appraisals.store');
+    Route::get('preview-appraisal/{appraisal}', [AppraisalController::class, 'previewAppraisalDetails'])->name('appraisals.preview');
 
     //notifications
     Route::resource('/notifications', NotificationController::class);
