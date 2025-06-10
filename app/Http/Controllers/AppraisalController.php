@@ -30,7 +30,7 @@ class AppraisalController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show the form for creating a new resource controller
      */
     public function create()
     {
