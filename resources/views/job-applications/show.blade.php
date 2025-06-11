@@ -39,7 +39,7 @@
                                 <dd>{{ $application->nationality ?? '-' }}</dd>
 
                                 <dt>Post Applied</dt>
-                                <dd>{{ $application->post_applied ?? '-' }}</dd>
+                                <dd>{{ $application->companyJob->job_title ?? '-' }}</dd>
                             </dl>
                         </div>
                     </div>
