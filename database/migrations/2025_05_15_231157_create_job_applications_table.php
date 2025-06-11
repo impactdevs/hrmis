@@ -21,32 +21,15 @@ return new class extends Migration
 
             // Section 2: Nationality & Residence
             $table->string('nationality')->nullable();
-            $table->string('home_district')->nullable();
-            $table->string('sub_county')->nullable();
-            $table->string('village')->nullable();
             $table->string('nin')->nullable();
             $table->string('residency_type')->nullable();
-
-            // Section 3: Work Background
-            $table->string('present_department')->nullable();
-            $table->string('present_post')->nullable();
-            $table->date('date_of_appointment_present_post')->nullable();
-            $table->string('terms_of_employment')->nullable();
 
             // Section 4: Family Background
             $table->string('marital_status')->nullable();
 
-            // Section 5: Education History
-            $table->json('education_history')->nullable();
+            // Section 5: Education training
+            $table->json('education_training')->nullable();
 
-            // Section 6: UCE Details
-            $table->json('uce_details')->nullable();
-
-            // Section 7: UACE Details
-            $table->json('uace_details')->nullable();
-
-            // Section 8: University Education Details
-            $table->json('university_details')->nullable();
 
             // Section 7 (duplicate number in HTML): Employment Record
             $table->json('employment_record')->nullable();

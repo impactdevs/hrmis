@@ -89,45 +89,14 @@ class JobApplicationController extends Controller
 
             // Section 2: Nationality & Residence
             'nationality_and_residence.nationality' => 'required|string|max:255',
-            'nationality_and_residence.home_district' => 'required|string|max:255',
-            'nationality_and_residence.sub_county' => 'required|string|max:255',
-            'nationality_and_residence.village' => 'required|string|max:255',
             'nationality_and_residence.nin' => 'required|string|max:255',
             'nationality_and_residence.residency_type' => 'required|string|max:255',
 
-            'university.name' => 'required|string|max:255',
-            'university.course' => 'required|string|max:255',
-            'university.start_date' => 'required|date',
-            'university.end_date' => 'required|date|after_or_equal:university.start_date',
-            // 'university.cgpa' => 'required|numeric|between:0,5',
-
-            // Section 3: Work Background
-            'work_background.present_department' => 'nullable|string|max:255',
-            'work_background.present_post' => 'nullable|string|max:255',
-            'work_background.date_of_appointment_to_present_post' => 'nullable|date',
-            'work_background.terms_of_employment' => 'nullable|string|max:255',
-
             'family_background.marital_status' => 'nullable|string|max:255',
 
-
-            // Section 6: UCE Details
-            'uce.passed' => 'required|in:yes,no',
-            'uce.year' => 'required_if:uce.passed,yes|nullable|digits:4',
-            'uce.scores' => 'required_if:uce.passed,yes|array',
-
-            // These rules only apply to rows that are actually filled
-            'uce.scores.*.subject' => 'nullable|required_with:uce.scores.*.grade|string',
-            'uce.scores.*.grade' => 'nullable|required_with:uce.scores.*.subject|string',
-
-            'uace.passed' => 'required|in:yes,no',
-            'uace.year' => 'required_if:uace.passed,yes|nullable|digits:4',
-            'uace.scores' => 'required_if:uace.passed,yes|array',
-
-            // Only require subject if grade is present, and vice versa
-            'uace.scores.*.subject' => 'nullable|required_with:uace.scores.*.grade|string',
-            'uace.scores.*.grade' => 'nullable|required_with:uace.scores.*.subject|string',
-
-
+            'education_training.qualification'=> 'nullable|string|max:255',
+            'education_training.institution' => 'nullable|string|max:255',
+            'education_training.year' => 'nullable|string',
             // Employment Record
             'employment_record' => 'nullable|array',
             'employment_record.*.period' => 'nullable|string',
@@ -189,33 +158,15 @@ class JobApplicationController extends Controller
 
             // Section 2
             'nationality' => $validated['nationality_and_residence']['nationality'],
-            'home_district' => $validated['nationality_and_residence']['home_district'],
-            'sub_county' => $validated['nationality_and_residence']['sub_county'],
-            'village' => $validated['nationality_and_residence']['village'],
             'nin' => $validated['nationality_and_residence']['nin'],
             'residency_type' => $validated['nationality_and_residence']['residency_type'],
-
-            // Section 3
-            'present_department' => $validated['work_background']['present_department'],
-            'present_post' => $validated['work_background']['present_post'],
-            'date_of_appointment_present_post' => $validated['work_background']['date_of_appointment_to_present_post'],
-            'terms_of_employment' => $validated['work_background']['terms_of_employment'] ?? null,
 
             // Section 4
             'marital_status' => $validated['family_background']['marital_status'] ?? null,
 
-
-            // Education
-            'education_history' => $validated['education_history'] ?? null,
-            'uce_details' => $validated['uce'],
-            'uace_details' => $validated['uace'],
-            'university_details' => [
-                'name' => $validated['university']['name'] ?? null,
-                'course' => $validated['university']['course'] ?? null,
-                'start_date' => $validated['university']['start_date'] ?? null,
-                'end_date' => $validated['university']['end_date'] ?? null,
-                'cgpa' => $validated['university']['cgpa'] ?? null,
-            ],
+            // Education & Training
+            'education_training' => $validated['education_training']??null,
+        
 
             // Employment
             'employment_record' => $validated['employment_record'],
@@ -241,6 +192,7 @@ class JobApplicationController extends Controller
 
 
         $JobApplication = JobApplication::create($applicationData);
+
 
         Mail::to($validated['personal_details']['email'])
             ->send(new ApplicationReceivedMail($JobApplication, $validated['personal_details']['full_name']));
@@ -281,33 +233,11 @@ class JobApplicationController extends Controller
 
             // Section 2: Nationality & Residence
             'nationality_and_residence.nationality' => 'required|string|max:255',
-            'nationality_and_residence.home_district' => 'required|string|max:255',
-            'nationality_and_residence.sub_county' => 'required|string|max:255',
-            'nationality_and_residence.village' => 'required|string|max:255',
             'nationality_and_residence.nin' => 'required|string|max:255',
             'nationality_and_residence.residency_type' => 'required|in:temporary,permanent',
 
-            // Section 3: Work Background
-            'work_background.present_department' => 'required|string|max:255',
-            'work_background.present_post' => 'required|string|max:255',
-            'work_background.date_of_appointment_to_present_post' => 'required|date',
-            'work_background.terms_of_employment' => 'required|in:temp,contract,probation,perm',
-
             // Section 4: Family Background
             'family_background.marital_status' => 'required|in:married,single,widowed,divorced,separated',
-
-            // Sections 6 & 7: UCE/UACE Details
-            'uce.passed' => 'required|in:yes,no',
-            // 'uce.year' => 'required_if:uce.passed,yes|nullable|digits:4',
-            // 'uce.scores' => 'required_if:uce.passed,yes|array',
-            'uce.scores.*.subject' => 'required_with:uce.scores|string',
-            'uce.scores.*.grade' => 'required_with:uce.scores|string',
-
-            'uace.passed' => 'required|in:yes,no',
-            // 'uace.year' => 'required_if:uace.passed,yes|nullable|digits:4',
-            // 'uace.scores' => 'required_if:uace.passed,yes|array',
-            'uace.scores.*.subject' => 'required_with:uace.scores|string',
-            'uace.scores.*.grade' => 'required_with:uace.scores|string',
 
             // Employment Record
             'employment_record' => 'required|array',

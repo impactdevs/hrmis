@@ -48,7 +48,7 @@
                     <ul class="list-unstyled">
                         <li class="mb-2">✓ You will receive an email confirmation shortly</li>
                         <li class="mb-2">✓ Our team will review your application</li>
-                        <li class="mb-2">✓ Shortlisted candidates will be contacted within 3 weeks</li>
+                        <li class="mb-2">✓ Only Shortlisted candidates will be contacted</li>
                     </ul>
                 </div>
 

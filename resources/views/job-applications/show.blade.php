@@ -51,18 +51,6 @@
                     <div class="row">
                         <div class="col-md-4">
                             <dl>
-                                <dt>Home District</dt>
-                                <dd>{{ $application->home_district ?? '-' }}</dd>
-
-                                <dt>Sub County</dt>
-                                <dd>{{ $application->sub_county ?? '-' }}</dd>
-                            </dl>
-                        </div>
-                        <div class="col-md-4">
-                            <dl>
-                                <dt>Village</dt>
-                                <dd>{{ $application->village ?? '-' }}</dd>
-
                                 <dt>Residency Type</dt>
                                 <dd>{{ $application->residency_type ?? '-' }}</dd>
                             </dl>
@@ -223,8 +211,6 @@
                                         {{ $application->university_details['start_date'] ?? '-' }}</li>
                                     <li class="list-group-item"><strong>End Date:</strong>
                                         {{ $application->university_details['end_date'] ?? '-' }}</li>
-                                    <li class="list-group-item"><strong>CGPA:</strong>
-                                        {{ $application->university_details['cgpa'] ?? '-' }}</li>
                                 </ul>
                             @else
                                 <div class="alert alert-info py-2 mb-0">No university education details provided</div>
