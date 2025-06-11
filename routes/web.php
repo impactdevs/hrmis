@@ -130,7 +130,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 Route::get('uncst-job-application-form', [JobApplicationController::class, 'create'])->name('job-applications.create');
-
+Route::get("uncst-thank-you-for-application", [JobApplicationController::class, 'thankyou'])->name('thankyou');
 
 
 Route::get('/import', [EmployeeController::class, 'import_employees']);

@@ -198,7 +198,12 @@ class JobApplicationController extends Controller
 
         Mail::to($validated['personal_details']['email'])
             ->send(new ApplicationReceivedMail($JobApplication, $validated['personal_details']['full_name']));
-        return view('job-applications.received');
+        return to_route('thankyou');
+    }
+
+    public function thankyou()
+    {
+       return view('job-applications.received');
     }
 
     /**
