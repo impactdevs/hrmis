@@ -14,10 +14,8 @@ class JobApplication extends Model
         'date_of_birth' => 'date',
         'date_of_appointment_present_post' => 'date',
         'education_history' => 'array',
-        'uce_details' => 'array',
-        'uace_details' => 'array',
-        'university_details' => 'array',
         'employment_record' => 'array',
+        'education_training' => 'array',
         'references' => 'array',
         'salary_expectation' => 'decimal:2',
         'academic_documents' => 'array',
@@ -52,18 +50,15 @@ class JobApplication extends Model
         'marital_status',
 
         // Section 5-7
-        'education_history',
-        'uce_details',
-        'uace_details',
-        'university_details',
         'employment_record',
 
         // Section 8-9
         'criminal_convicted',
         'criminal_details',
-        'university_details',
         'availability',
         'salary_expectation',
+
+        'education_training',
 
         // Section 10
         'references',

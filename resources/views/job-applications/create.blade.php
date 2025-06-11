@@ -204,7 +204,7 @@
 
             <!-- Section 5: Employment Record -->
             <div class="form-section">
-                <h4 class="section-title">3. Employment Record</h4>
+                <h4 class="section-title">3. Employment Record(only if you have ever been employed)</h4>
 
                 @if ($errors->has('employment_record'))
                     <div class="text-danger mb-2">
@@ -549,8 +549,6 @@
                                 @enderror
                             </div>
                         </div>
-                        <div class="form-text mt-2">Provide two responsible persons (not relatives) for character
-                            reference</div>
                     </div>
                 </div>
             </div>

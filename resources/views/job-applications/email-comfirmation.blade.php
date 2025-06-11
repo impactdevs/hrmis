@@ -47,7 +47,7 @@
                     <h5 class="mb-3">What's Next?</h5>
                     <ul class="list-unstyled">
                         <li class="mb-2">✓ Our team will review your application</li>
-                        <li class="mb-2">✓ Shortlisted candidates will be contacted within 3 weeks</li>
+                        <li class="mb-2">✓ Shortlisted candidates will be contacted.</li>
                     </ul>
                 </div>
 

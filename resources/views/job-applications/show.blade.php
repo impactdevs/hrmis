@@ -67,34 +67,6 @@
                     </div>
                 </div>
 
-                <!-- Work Background -->
-                <div class="section-card mb-4">
-                    <h5 class="section-title"><i class="fas fa-briefcase mr-2"></i>Work Background</h5>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <dl>
-                                <dt>Current Department</dt>
-                                <dd>{{ $application->present_department ?? '-' }}</dd>
-
-                                <dt>Current Post</dt>
-                                <dd>{{ $application->present_post ?? '-' }}</dd>
-                            </dl>
-                        </div>
-                        <div class="col-md-4">
-                            <dl>
-                                <dt>Appointment Date</dt>
-                                <dd>{{ $application->date_of_appointment_present_post ? $application->date_of_appointment_present_post->format('d/m/Y') : '-' }}
-                                </dd>
-                            </dl>
-                        </div>
-                        <div class="col-md-4">
-                            <dl>
-                                <dt>Employment Terms</dt>
-                                <dd>{{ $application->terms_of_employment ?? '-' }}</dd>
-                            </dl>
-                        </div>
-                    </div>
-                </div>
 
                 <!-- Family Background -->
                 <div class="section-card mb-4">
@@ -106,119 +78,38 @@
                                 <dd>{{ $application->marital_status ?? '-' }}</dd>
                             </dl>
                         </div>
-                  
-           
                     </div>
                 </div>
 
-                <!-- Examination Results -->
-                <div class="row mb-4">
-                    <!-- UCE Section -->
-                    <div class="col-md-4">
-                        <div class="section-card h-100">
-                            <h5 class="section-title"><i class="fas fa-file-alt mr-2"></i>UCE Details</h5>
-                            @if (!empty($application->uce_details))
-                                <div class="mb-3">
-                                    <span
-                                        class="badge {{ $application->uce_details['passed'] == 'yes' ? 'badge-success' : 'badge-danger' }}">
-                                        {{ $application->uce_details['passed'] == 'yes' ? 'Passed' : 'Not Passed' }}
-                                    </span>
-                                    <span class="text-muted ml-2">Year:
-                                        {{ $application->uce_details['year'] ?? '-' }}</span>
-                                </div>
-
-                                @if (!empty($application->uce_details['scores']))
-                                    <div class="table-responsive">
-                                        <table class="table table-sm table-bordered">
-                                            <thead class="bg-light">
-                                                <tr>
-                                                    <th>Subject</th>
-                                                    <th>Grade</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach ($application->uce_details['scores'] as $score)
-                                                    <tr>
-                                                        <td>{{ $score['subject'] ?? '-' }}</td>
-                                                        <td>{{ $score['grade'] ?? '-' }}</td>
-                                                    </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                @else
-                                    <div class="alert alert-warning py-2 mb-0">No UCE subjects recorded</div>
-                                @endif
-                            @else
-                                <div class="alert alert-info py-2 mb-0">No UCE details provided</div>
-                            @endif
+                {{-- education and training summary --}}
+                                <!-- Employment Record -->
+                <div class="section-card mb-4">
+                    <h5 class="section-title"><i class="fas fa-history mr-2"></i>Education Training</h5>
+                    @if (!empty($application->education_training))
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th>Qualification</th>
+                                        <th>Institution</th>
+                                        <th>Year Of Award</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($application->education_training as $record)
+                                        <tr>
+                                            <td>{{ $record['qualification'] ?? '-' }}</td>
+                                            <td>{{ $record['institution'] ?? '-' }}</td>
+                                            <td>{{ $record['year'] ?? '-' }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
-                    </div>
-
-                    <!-- UACE Section -->
-                    <div class="col-md-4">
-                        <div class="section-card h-100">
-                            <h5 class="section-title"><i class="fas fa-file-certificate mr-2"></i>UACE Details</h5>
-                            @if (!empty($application->uace_details))
-                                <div class="mb-3">
-                                    <span
-                                        class="badge {{ $application->uace_details['passed'] == 'yes' ? 'badge-success' : 'badge-danger' }}">
-                                        {{ $application->uace_details['passed'] == 'yes' ? 'Passed' : 'Not Passed' }}
-                                    </span>
-                                    <span class="text-muted ml-2">Year:
-                                        {{ $application->uace_details['year'] ?? '-' }}</span>
-                                </div>
-
-                                @if (!empty($application->uace_details['scores']))
-                                    <div class="table-responsive">
-                                        <table class="table table-sm table-bordered">
-                                            <thead class="bg-light">
-                                                <tr>
-                                                    <th>Subject</th>
-                                                    <th>Grade</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach ($application->uace_details['scores'] as $score)
-                                                    <tr>
-                                                        <td>{{ $score['subject'] ?? '-' }}</td>
-                                                        <td>{{ $score['grade'] ?? '-' }}</td>
-                                                    </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                @else
-                                    <div class="alert alert-warning py-2 mb-0">No UACE subjects recorded</div>
-                                @endif
-                            @else
-                                <div class="alert alert-info py-2 mb-0">No UACE details provided</div>
-                            @endif
-                        </div>
-                    </div>
-
-                    <!-- University Section -->
-                    <div class="col-md-4">
-                        <div class="section-card h-100">
-                            <h5 class="section-title"><i class="fas fa-university mr-2"></i>University Education</h5>
-                            @if (!empty($application->university_details))
-                                <ul class="list-group list-group-flush">
-                                    <li class="list-group-item"><strong>University:</strong>
-                                        {{ $application->university_details['name'] ?? '-' }}</li>
-                                    <li class="list-group-item"><strong>Course:</strong>
-                                        {{ $application->university_details['course'] ?? '-' }}</li>
-                                    <li class="list-group-item"><strong>Start Date:</strong>
-                                        {{ $application->university_details['start_date'] ?? '-' }}</li>
-                                    <li class="list-group-item"><strong>End Date:</strong>
-                                        {{ $application->university_details['end_date'] ?? '-' }}</li>
-                                </ul>
-                            @else
-                                <div class="alert alert-info py-2 mb-0">No university education details provided</div>
-                            @endif
-                        </div>
-                    </div>
+                    @else
+                        <div class="alert alert-info">No Education training provided</div>
+                    @endif
                 </div>
-
 
                 <!-- Employment Record -->
                 <div class="section-card mb-4">
@@ -229,18 +120,16 @@
                                 <thead class="bg-light">
                                     <tr>
                                         <th>Period</th>
-                                        <th>Employer</th>
                                         <th>Position</th>
-                                        <th>Duties</th>
+                                        <th>Employer Details</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($application->employment_record as $record)
                                         <tr>
                                             <td>{{ $record['period'] ?? '-' }}</td>
-                                            <td>{{ $record['employer'] ?? '-' }}</td>
                                             <td>{{ $record['position'] ?? '-' }}</td>
-                                            <td>{{ $record['duties'] ?? '-' }}</td>
+                                            <td>{{ $record['details'] ?? '-' }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -250,6 +139,8 @@
                         <div class="alert alert-info">No employment records provided</div>
                     @endif
                 </div>
+
+
 
                 <!-- Criminal History -->
                 <div class="section-card mb-4">

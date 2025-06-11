@@ -94,9 +94,9 @@ class JobApplicationController extends Controller
 
             'family_background.marital_status' => 'nullable|string|max:255',
 
-            'education_training.qualification'=> 'nullable|string|max:255',
-            'education_training.institution' => 'nullable|string|max:255',
-            'education_training.year' => 'nullable|string',
+            'education_training.*.qualification'=> 'nullable|string|max:255',
+            'education_training.*.institution' => 'nullable|string|max:255',
+            'education_training.*.year' => 'nullable|string',
             // Employment Record
             'employment_record' => 'nullable|array',
             'employment_record.*.period' => 'nullable|string',
@@ -124,6 +124,8 @@ class JobApplicationController extends Controller
             'other_documents' => 'nullable|array|max:5',
             'other_documents.*' => 'file|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
+
+        
 
         // Handle Academic Documents
         $academicDocumentsPaths = [];

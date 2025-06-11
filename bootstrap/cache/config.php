@@ -684,18 +684,18 @@
   ),
   'mail' => 
   array (
-    'default' => 'infobip',
+    'default' => 'smtp',
     'mailers' => 
     array (
       'smtp' => 
       array (
         'transport' => 'smtp',
         'url' => NULL,
-        'host' => '127.0.0.1',
-        'port' => 2525,
+        'host' => 'smtp.gmail.com',
+        'port' => '587',
         'encryption' => 'tls',
-        'username' => NULL,
-        'password' => NULL,
+        'username' => 'nsengiyumvawilberforce@gmail.com',
+        'password' => 'cukvhsxrlbmwhzoy',
         'timeout' => NULL,
         'local_domain' => 'localhost',
       ),
@@ -750,8 +750,8 @@
     ),
     'from' => 
     array (
-      'address' => 'hello@example.com',
-      'name' => 'Example',
+      'address' => 'nsengiyumvawilberforce@gmail.com',
+      'name' => 'UNCST HUMAN RESOURCE MANAGEMENT SOFTWARE',
     ),
     'markdown' => 
     array (
@@ -964,9 +964,9 @@
     ),
     'infobip' => 
     array (
-      'base_url' => 'e55w41.api.infobip.com',
-      'api_key' => '97306d6c3190ca9273e58ececfd20a05-d5f14c49-e34e-4c96-8ef2-12b930ca3b2c',
-      'email_from' => 'dev@impact-outsourcing.com',
+      'base_url' => NULL,
+      'api_key' => NULL,
+      'email_from' => NULL,
       'name' => 'UNCST HUMAN RESOURCE MANAGEMENT SOFTWARE',
     ),
   ),
