@@ -39,7 +39,10 @@
                                 <dd>{{ $application->nationality ?? '-' }}</dd>
 
                                 <dt>Post Applied</dt>
-                                <dd>{{ $application->companyJob->job_title ?? '-' }}</dd>
+                                @php
+                                    $jobTitle = \App\Models\CompanyJob::where('job_code', $application->reference_number)->value('job_title');
+                                @endphp
+                                <dd>{{ $jobTitle }}</dd>
                             </dl>
                         </div>
                     </div>
