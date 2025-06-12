@@ -46,7 +46,7 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('uncst-job-applications.store') }}" enctype="multipart/form-data">
+        <form method="POST" action="{{ route('job-applications.store') }}" enctype="multipart/form-data">
             @csrf
             <!-- Section 1: Post & Personal Details -->
             <div class="form-section">

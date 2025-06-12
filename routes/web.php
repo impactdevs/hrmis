@@ -126,10 +126,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/uncst-mat rix', [DocumentController::class, 'uncst_matrix'])->name('uncst-matrix');
 
     Route::resource('uncst-job-applications', JobApplicationController::class)
-        ->except(['create']); // exclude create because it's public
+        ->except(['create','store']); // exclude create because it's public
 });
 
 Route::get('uncst-job-application-form', [JobApplicationController::class, 'create'])->name('job-applications.create');
+Route::post('uncst-job-application-form', [JobApplicationController::class, 'store'])->name('job-applications.store');
 Route::get("uncst-thank-you-for-application", [JobApplicationController::class, 'thankyou'])->name('thankyou');
 
 
