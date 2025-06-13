@@ -137,6 +137,13 @@
                                         class="btn btn-sm btn-primary" onclick="event.stopPropagation()">
                                         View
                                     </a>
+
+                                    {{-- edit --}}
+                                    <a href="{{ route('job-applications.edit', $application->id) }}"
+                                        class="btn btn-sm btn-secondary" onclick="event.stopPropagation()">
+                                        Edit
+
+                                    </a>
                                 </td>
                             </tr>
                         @empty

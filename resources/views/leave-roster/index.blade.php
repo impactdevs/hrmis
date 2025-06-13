@@ -138,7 +138,8 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="applyModalLabel">
-                        <i class="bi bi-calendar-plus"></i> Add Leave Roster
+                        <i class="bi bi-calendar-plus"></i> Add Leave Days(<span id="display-entitled"></span> and
+                        <span id="display-scheduled"></span>)
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -232,7 +233,6 @@
                 var percentageUsed = Math.min((totalLeaveDaysScheduled / totalLeaveDaysEntitled) * 100, 100);
                 var canSelect = balanceToSchedule > 0;
                 var public_holidays = @json($public_holidays);
-                console.log(public_holidays);
 
                 // Update the progress bar
                 $('#leaveProgressBar').css('width', percentageUsed + '%')
@@ -273,6 +273,18 @@
                             .attr('aria-valuenow', percentageUsed)
                             .text(Math.round(percentageUsed) + '%');
                     });
+
+                // 2) when modal is shown (fires each time you open it)
+                $('#applyModal').on('shown.bs.modal', function() {
+                    //get the total leave days entitled and scheduled from the employee model
+                    totalLeaveDaysEntitled = @json(auth()->user()->employee->entitled_leave_days);
+                    totalLeaveDaysScheduled = @json(auth()->user()->employee->overallRosterDays());
+                    // (optional) If you have badges/spans to show these:
+                    $('#display-entitled').text("Entitled to " + totalLeaveDaysEntitled);
+                    $('#display-scheduled').text("Have Scheduled " + totalLeaveDaysScheduled);
+
+                });
+
 
                 //calculate scheduled Leave days before saving a schedule to make sure the user does not exceed the entitled leave days
                 function calculateScheduledLeaveDays(start_date, end_date, publicHolidays = [],
@@ -647,6 +659,14 @@
                     window.location.href = "/apply-for-leave/" + currentEvent.id;
                 });
 
+                //addLeaveRoster
+                $('#addLeaveRoster').click(function() {
+                    // show applyModal
+                    $('#applyModal').modal('show');
+
+                });
+
+
 
 
                 $('#applyButton').click(function() {
@@ -771,6 +791,8 @@
 
                             //close the modal
                             $('#applyModal').modal('hide');
+
+                            // update the progress bar
 
                             Toastify({
                                 text: response.message,

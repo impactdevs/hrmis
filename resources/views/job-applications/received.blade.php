@@ -10,8 +10,9 @@
         .thank-you-card {
             border: none;
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
+
         .check-icon {
             width: 80px;
             height: 80px;
@@ -22,6 +23,7 @@
             justify-content: center;
             margin: -40px auto 20px;
         }
+
         .highlight {
             color: #0d6efd;
             font-weight: 600;
@@ -35,13 +37,16 @@
             <div class="card-body text-center">
                 <!-- Checkmark icon -->
                 <div class="check-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="white" class="bi bi-check2" viewBox="0 0 16 16">
-                        <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="white"
+                        class="bi bi-check2" viewBox="0 0 16 16">
+                        <path
+                            d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z" />
                     </svg>
                 </div>
 
                 <h1 class="mb-4">Thank You for Applying!</h1>
-                <p class="lead">Your application has been successfully submitted to the Uganda National Council for Science and Technology.</p>
+                <p class="lead">Your application has been successfully submitted to the Uganda National Council for
+                    Science and Technology.</p>
 
                 <div class="next-steps mb-4">
                     <h5 class="mb-3">What's Next?</h5>
@@ -50,6 +55,16 @@
                         <li class="mb-2">✓ Our team will review your application</li>
                         <li class="mb-2">✓ Only Shortlisted candidates will be contacted</li>
                     </ul>
+
+                    {{-- to update your application details, follow this link --}}
+                    @if (session('encodedId'))
+                        <div class="mt-4">
+                            <a href="{{ route('job-applications.edit', session('encodedId')) }}"
+                                class="btn btn-primary">
+                                Update Your Application
+                            </a>
+                        </div>
+                    @endif
                 </div>
 
                 <div class="contact-info mt-4 pt-3 border-top">
@@ -66,4 +81,5 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

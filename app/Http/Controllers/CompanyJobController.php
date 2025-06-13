@@ -31,7 +31,9 @@ class CompanyJobController extends Controller
     {
         $validated = $request->validate([
             'job_code' => 'required',
-            'job_title' => 'required'
+            'job_title' => 'required',
+            'will_become_active_at' => 'required|date',
+            'will_become_inactive_at' => 'nullable|date|after_or_equal:will_become_active_at',
         ]);
         CompanyJob::create($request->all());
 
@@ -68,8 +70,10 @@ class CompanyJobController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(CompanyJob $companyJob)
     {
-        //
+        $companyJob->delete();
+        return redirect()->route('company-jobs.index')->with('success', 'Company Job deleted successfully.');
     }
+ 
 }

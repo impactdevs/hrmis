@@ -348,130 +348,159 @@
                                                     let statusDiv =
                                                         '<div class="status mt-2">';
 
-                                                    // Check if there is a leave request status
-                                                    if (row[5] && row[5]
-                                                        .leave_request_status) {
-                                                        var role =
-                                                            @json(Auth::user()->roles->pluck('name')[0] ?? '');
+                                                    const now = new Date();
+                                                    const endDate = new Date(
+                                                        row[3].split(' - ')[
+                                                            1]);
 
-                                                        // Check if role exists in the leave request status
-                                                        if (row[5]
-                                                            .leave_request_status[
-                                                                role] ===
-                                                            'approved') {
-                                                            statusDiv +=
-                                                                '<span class="badge bg-success">You Approved this Leave Request.</span>';
-                                                        } else if (row[5]
-                                                            .leave_request_status[
-                                                                role] ===
-                                                            'rejected') {
-                                                            statusDiv +=
-                                                                '<span class="badge bg-danger">You rejected this Request</span>';
+                                                    if ((endDate >= now) || ((
+                                                                endDate < now
+                                                                ) && (row[5]) &&
+                                                            (row[5]
+                                                                .leave_request_status
+                                                                ))) {
+                                                        // Check if there is a leave request status
+                                                        if (row[5] && row[5]
+                                                            .leave_request_status
+                                                        ) {
+                                                            var role =
+                                                                @json(Auth::user()->roles->pluck('name')[0] ?? '');
+
+                                                            // Check if role exists in the leave request status
                                                             if (row[5]
-                                                                .rejection_reason
-                                                            ) {
-                                                                statusDiv +=
-                                                                    '<p class="mt-1"><strong>Rejection Reason:</strong> ' +
-                                                                    row[5]
-                                                                    .rejection_reason +
-                                                                    '</p>';
-                                                            }
-                                                        } else {
-                                                            console.log(row[5])
-                                                            // If the status is neither approved nor rejected
-                                                            if (role ===
-                                                                'Staff' && row[
-                                                                    5]
                                                                 .leave_request_status[
-                                                                    'Executive Secretary'
-                                                                ]) {
-                                                                const
-                                                                    executiveStatus =
-                                                                    row[5]
+                                                                    role] ===
+                                                                'approved') {
+                                                                statusDiv +=
+                                                                    '<span class="badge bg-success">You Approved this Leave Request.</span>';
+                                                            } else if (row[5]
+                                                                .leave_request_status[
+                                                                    role] ===
+                                                                'rejected') {
+                                                                statusDiv +=
+                                                                    '<span class="badge bg-danger">You rejected this Request</span>';
+                                                                if (row[5]
+                                                                    .rejection_reason
+                                                                ) {
+                                                                    statusDiv +=
+                                                                        '<p class="mt-1"><strong>Rejection Reason:</strong> ' +
+                                                                        row[5]
+                                                                        .rejection_reason +
+                                                                        '</p>';
+                                                                }
+                                                            } else {
+                                                                console.log(row[
+                                                                    5])
+                                                                // If the status is neither approved nor rejected
+                                                                if (role ===
+                                                                    'Staff' &&
+                                                                    row[
+                                                                        5]
                                                                     .leave_request_status[
                                                                         'Executive Secretary'
-                                                                    ];
-                                                                if (executiveStatus ===
-                                                                    'approved'
-                                                                ) {
-                                                                    statusDiv +=
-                                                                        '<span class="badge bg-success">This leave request was fully approved</span>';
-                                                                } else if (
-                                                                    executiveStatus ===
-                                                                    'rejected'
-                                                                ) {
-                                                                    statusDiv +=
-                                                                        '<span class="badge bg-danger">This leave request was rejected</span>';
+                                                                    ]) {
+                                                                    const
+                                                                        executiveStatus =
+                                                                        row[5]
+                                                                        .leave_request_status[
+                                                                            'Executive Secretary'
+                                                                        ];
+                                                                    if (executiveStatus ===
+                                                                        'approved'
+                                                                    ) {
+                                                                        statusDiv
+                                                                            +=
+                                                                            '<span class="badge bg-success">This leave request was fully approved</span>';
+                                                                    } else if (
+                                                                        executiveStatus ===
+                                                                        'rejected'
+                                                                    ) {
+                                                                        statusDiv
+                                                                            +=
+                                                                            '<span class="badge bg-danger">This leave request was rejected</span>';
+                                                                    } else {
+                                                                        statusDiv
+                                                                            +=
+                                                                            '<span class="badge bg-warning">Pending</span>';
+                                                                    }
                                                                 } else {
                                                                     statusDiv +=
                                                                         '<span class="badge bg-warning">Pending</span>';
                                                                 }
+                                                            }
+                                                        } else {
+                                                            if (row[5]
+                                                                .leave_id) {
+                                                                statusDiv +=
+                                                                    '<span class="badge bg-success">Application review in progress</span>';
                                                             } else {
                                                                 statusDiv +=
-                                                                    '<span class="badge bg-warning">Pending</span>';
+                                                                    '<span class="badge bg-warning">No Application</span>';
                                                             }
                                                         }
-                                                    } else {
-                                                        if (row[5].leave_id) {
-                                                            statusDiv +=
-                                                                '<span class="badge bg-success">Application review in progress</span>';
-                                                        } else {
-                                                            statusDiv +=
-                                                                '<span class="badge bg-warning">No Application</span>';
-                                                        }
-                                                    }
 
-                                                    statusDiv +=
-                                                        '<p>Leave Approved By:</p>';
-                                                    if (row[5] && row[5]
-                                                        .leave_request_status) {
-                                                        roles.forEach((
-                                                            role) => {
-                                                            const
-                                                                status =
-                                                                row[5]
-                                                                .leave_request_status[
-                                                                    role
-                                                                ];
+                                                        statusDiv +=
+                                                            '<p>Leave Approved By:</p>';
+                                                        if (row[5] && row[5]
+                                                            .leave_request_status
+                                                        ) {
+                                                            roles.forEach((
+                                                                role
+                                                            ) => {
+                                                                const
+                                                                    status =
+                                                                    row[
+                                                                        5
+                                                                    ]
+                                                                    .leave_request_status[
+                                                                        role
+                                                                    ];
 
-                                                            // Determine the badge with improved Bootstrap styling
-                                                            if (status ===
-                                                                'approved'
-                                                            ) {
-                                                                statusDiv
-                                                                    += `
+                                                                // Determine the badge with improved Bootstrap styling
+                                                                if (status ===
+                                                                    'approved'
+                                                                ) {
+                                                                    statusDiv
+                                                                        += `
                 <div class="d-flex align-items-center mb-2">
                     <i class="bi bi-check-circle-fill text-success me-2"></i>
                     <span class="fw-semibold text-success">${role}: Approved</span>
                 </div>`;
-                                                            } else if (
-                                                                status ===
-                                                                'rejected'
-                                                            ) {
-                                                                statusDiv
-                                                                    += `
+                                                                } else if (
+                                                                    status ===
+                                                                    'rejected'
+                                                                ) {
+                                                                    statusDiv
+                                                                        += `
                 <div class="d-flex align-items-center mb-2">
                     <i class="bi bi-x-circle-fill text-danger me-2"></i>
                     <span class="fw-semibold text-danger">${role}: Rejected</span>
                 </div>`;
-                                                            } else if (
-                                                                status ===
-                                                                null ||
-                                                                status ===
-                                                                undefined
-                                                            ) {
-                                                                // Handle both `null` and missing roles as "Pending"
-                                                                statusDiv
-                                                                    += `
+                                                                } else if (
+                                                                    status ===
+                                                                    null ||
+                                                                    status ===
+                                                                    undefined
+                                                                ) {
+                                                                    // Handle both `null` and missing roles as "Pending"
+                                                                    statusDiv
+                                                                        += `
                 <div class="d-flex align-items-center mb-2">
                     <i class="bi bi-hourglass-split text-warning me-2"></i>
                     <span class="fw-semibold text-warning">${role}: Pending</span>
                 </div>`;
-                                                            }
-                                                        });
+                                                                }
+                                                            });
+                                                        } else {
+                                                            statusDiv +=
+                                                                '<span class="badge bg-warning">No Approval Yet</span>';
+                                                        }
                                                     } else {
                                                         statusDiv +=
-                                                            '<span class="badge bg-warning">No Approval Yet</span>';
+                                                            '<span class="badge bg-secondary">Expired</span>';
+                                                        // give a hint to reclaim the days by rescheduling
+                                                        statusDiv +=
+                                                            '<a href="{{ route('leave-roster.index') }}" class="d-block text-muted small mt-1" style="font-size: 11px; line-height: 1.2; text-decoration: underline;">Reclaim days: reschedule roster.</a>';
                                                     }
 
                                                     statusDiv +=
@@ -544,7 +573,11 @@
                                         row[5] = event.leave;
 
                                         if (event.leave.length == 0) {
-                                            row[4] = `
+                                            // Check if the end date is in the future or today
+                                            const now = new Date();
+                                            const endDate = new Date(event.end);
+                                            if (endDate >= now) {
+                                                row[4] = `
                                                     <div class="dropdown">
                                                         <button class="btn btn-secondary btn-sm dropdown-toggle d-flex align-items-center gap-1" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                                                             <i class="bi bi-three-dots-vertical"></i> Actions
@@ -558,7 +591,11 @@
                                                         </ul>
                                                     </div>
                                                 `;
-
+                                            } else {
+                                                row[4] = `
+                                                    <span class="badge bg-secondary">Expired</span>
+                                                `;
+                                            }
                                         } else {
                                             if (canApproveLeave) {
                                                 row[4] = `

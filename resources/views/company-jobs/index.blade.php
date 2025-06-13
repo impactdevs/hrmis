@@ -1,6 +1,5 @@
 <x-app-layout>
     <div class="mt-3">
-        <h5 class="text-center mt-5">Company Jobs</h5>
         <div class="mt-3">
             <a href="{{ route('company-jobs.create') }}" class="btn btn-primary">Add Job</a>
         </div>
@@ -10,15 +9,38 @@
                 <thead>
                     <tr>
                         <th>Job Code</th>
-                        <td>Role</td>
+                        <th>Role</th>
+                        <th>Will Become Active On</th>
+                        <th>Will Become Inactive On</th>
+                        <th>Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($companyJobs as $companyJob)
                         <tr>
-                            <td>{{ $companyJob->job_code }}</td>
+                            <th>{{ $companyJob->job_code }}</th>
                             <td>{{ $companyJob->job_title }}</td>
+                            <td>
+                                {{ $companyJob->will_become_active_at ? $companyJob->will_become_active_at->format('Y-m-d H:i') : 'N/A' }}
+                            </td>
+                            <td>
+                                {{ $companyJob->will_become_inactive_at ? $companyJob->will_become_inactive_at->format('Y-m-d H:i') : 'N/A' }}
+                            </td>
+                            <td>
+                               {{-- use a switch statement to display status depending on will_become_active_at and  will_become_inactive_at, expect pending, running, expired--}}
+                                @if ($companyJob->will_become_active_at && $companyJob->will_become_inactive_at)
+                                    @if (now()->isBefore($companyJob->will_become_active_at))
+                                        Pending
+                                    @elseif (now()->isBetween($companyJob->will_become_active_at, $companyJob->will_become_inactive_at))
+                                        Running
+                                    @else
+                                        Expired
+                                    @endif
+                                @else
+                                    N/A
+                                @endif
+                            </td>
                             <td>
                                 <a href="{{ route('company-jobs.edit', $companyJob->company_job_id) }}"
                                     class="btn btn-primary">Edit</a>

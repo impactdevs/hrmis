@@ -222,7 +222,8 @@ class LeaveController extends Controller
         $leave->leave_request_status = $leaveRequestStatus;
         $leave->save();
 
-        return response()->json(['message' => 'Leave application updated successfully.', 'status' => $leave->leave_request_status]);
+        $message = $request->input('status') === 'approved' ? 'Leave approved successfully.' : 'Leave rejected successfully.';
+        return response()->json(['message' => $message, 'status' => $leave->leave_request_status]);
     }
 
     public function leaveManagement()

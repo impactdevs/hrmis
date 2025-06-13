@@ -150,7 +150,7 @@ class AppraisalsController extends Controller
 
         Notification::send($esUser, new AppraisalApplication($appraisal, $employeeAppraisee->first_name, $employeeAppraisee->last_name));
 
-        return to_route('uncst-appraisals.edit', ['appraisal' => $appraisal->appraisal_id]);
+        return to_route('uncst-appraisals.edit', ['uncst_appraisal' => $appraisal->appraisal_id]);
     }
 
 
@@ -177,8 +177,9 @@ class AppraisalsController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Appraisal $appraisal)
+    public function edit(Appraisal $uncst_appraisal)
     {
+        $appraisal = $uncst_appraisal;
         $users = User::whereHas('employee')->get();
 
         return view('appraisals.edit', compact('appraisal', 'users'));
@@ -197,9 +198,9 @@ class AppraisalsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Appraisal $appraisal)
+    public function update(Request $request, Appraisal $uncst_appraisal)
     {
-        $appraisal->update($request->all());        
+        $$uncst_appraisal->update($request->all());        
 
         return redirect()->back()->with('success', 'Appraisal updated successfully.');
     }
@@ -207,23 +208,10 @@ class AppraisalsController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request, Appraisal $appraisal)
+    public function destroy(Appraisal $uncst_appraisal)
     {
-        $appraisal->delete();
+        $uncst_appraisal->delete();
         return to_route('uncst-appraisals.index');
-    }
-
-    public function survey(Request $request)
-    {
-        //appraisal type
-        $type = 'appraisal';
-        //get the form
-        $form = Form::where('uuid', '6156ada8-c020-4cdf-af47-9d6eaf1dd16c')->firstOrFail();
-
-        // Load sections with their related fields
-        $form->load(['sections.fields']);
-
-        return view('appraisals.form', compact('form'));
     }
 
 

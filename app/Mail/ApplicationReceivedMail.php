@@ -17,14 +17,16 @@ class ApplicationReceivedMail extends Mailable implements ShouldQueue
 
     public JobApplication $application;
     public string $name;
+    public string $url;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(JobApplication $application, string $name)
+    public function __construct(JobApplication $application, string $name, string $url = '')
     {
         $this->application = $application;
         $this->name = $name;
+        $this->url = $url;
     }
 
     /**
@@ -44,6 +46,11 @@ class ApplicationReceivedMail extends Mailable implements ShouldQueue
     {
         return new Content(
             view: 'job-applications.email-comfirmation',
+            with: [
+                'application' => $this->application,
+                'name' => $this->name,
+                'url' => $this->url,
+            ],
         );
     }
 

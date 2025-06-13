@@ -53,7 +53,7 @@
     @endif
 
 
-    <form action="{{ route('appraisals.update', $appraisal->appraisal_id) }}" method="post" class="m-2"
+    <form action="{{ route('uncst-appraisals.update', ['uncst_appraisal'=>$appraisal->appraisal_id]) }}" method="post" class="m-2"
         id="appraisalForm">
         @csrf
         @method('PUT')
@@ -977,14 +977,14 @@
                     <div class="col-md-12">
                         <x-forms.text-area name="employee_strength"
                             label="i. Strengths - Summarize employee's strengths" id="employee_strength"
-                            :value="old('employee_strength', $appraisal->employee_strength ?? '')" :isDisabled="$appraisal->is_appraisor" />
+                            :value="old('employee_strength', $appraisal->employee_strength ?? '')" :isDisabled="!$appraisal->is_appraisor" />
 
                     </div>
 
                     <div class="col-md-12">
                         <x-forms.text-area name="employee_improvement"
                             label="ii.	Areas for Improvement - Summarize employee’s areas for improvement"
-                            id="employee_improvement" :value="old('employee_improvement', $appraisal->employee_improvement ?? '')" :isDisabled="$appraisal->is_appraisor" />
+                            id="employee_improvement" :value="old('employee_improvement', $appraisal->employee_improvement ?? '')" :isDisabled="!$appraisal->is_appraisor" />
                     </div>
 
 
@@ -994,13 +994,13 @@
                             id="superviser_overall_assessment" :value="old(
                                 'superviser_overall_assessment',
                                 $appraisal->superviser_overall_assessment ?? '',
-                            )" :isDisabled="$appraisal->is_appraisor" />
+                            )" :isDisabled="!$appraisal->is_appraisor" />
                     </div>
 
                     <div class="col-md-12">
                         <x-forms.text-area name="recommendations"
                             label="iv. Recommendations: Recommendations with reasons on whether the employee under review should be promoted, confirmed, remain on probation, redeployed, terminated from Council Service, contract renewed, go for further training, needs counseling, status quo should be maintained, etc.)."
-                            id="recommendations" :value="old('recommendations', $appraisal->recommendations ?? '')" :isDisabled="$appraisal->is_appraisor" />
+                            id="recommendations" :value="old('recommendations', $appraisal->recommendations ?? '')" :isDisabled="!$appraisal->is_appraisor" />
                     </div>
                 </div>
             </fieldset>

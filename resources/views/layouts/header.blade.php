@@ -26,11 +26,11 @@
                     $title = 'Leave Management';
                 }
 
-                if (request()->routeIs('appraisals.index')) {
+                if (request()->routeIs('uncst-appraisals.index')) {
                     $title = auth()->user()->isAdminOrSecretary ? 'Appraisals' : 'My Appraisals';
                 }
-                if (request()->routeIs('appraisals.edit')) {
-                    $appraisal = request()->route('appraisal'); // This is likely a model, not an ID
+                if (request()->routeIs('uncst-appraisals.edit')) {
+                    $appraisal = request()->route('uncst_appraisal'); // This is likely a model, not an ID
                     $title =
                         'Appraisal for ' . $appraisal->employee->first_name . ' ' . $appraisal->employee->last_name;
                 }

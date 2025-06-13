@@ -8,7 +8,7 @@
                     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Manage employee performance evaluations</p>
                 </div>
                 @if (!auth()->user()->isAdminOrSecretary)
-                    <a href="{{ route('appraisals.create') }}"
+                    <a href="{{ route('uncst-appraisals.create') }}"
                         class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -132,7 +132,7 @@
                                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                                     <div class="flex items-center justify-end space-x-3">
 
-                                                        <a href="{{ route('appraisals.edit', $appraisal->appraisal_id) }}"
+                                                        <a href="{{ route('uncst-appraisals.edit', $appraisal->appraisal_id) }}"
                                                             class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-500">
                                                             <svg class="w-5 h-5" fill="none" stroke="currentColor"
                                                                 viewBox="0 0 24 24">
@@ -146,7 +146,7 @@
                                                         </a>
                                                         @if (auth()->user()->employee->employee_id == $appraisal->employee_id)
                                                             <form
-                                                                action="{{ route('appraisals.destroy', $appraisal->appraisal_id) }}"
+                                                                action="{{ route('uncst-appraisals.destroy', $appraisal->appraisal_id) }}"
                                                                 method="POST" class="inline">
                                                                 @csrf
                                                                 @method('DELETE')
@@ -277,7 +277,7 @@
                                         {{-- Timeline End --}}
 
                                         <div class="flex items-center justify-end space-x-3 mt-4">
-                                            <a href="{{ route('appraisals.edit', $appraisal->appraisal_id) }}"
+                                            <a href="{{ route('uncst-appraisals.edit', $appraisal->appraisal_id) }}"
                                                 class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-500"
                                                 title="View">
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor"
@@ -291,7 +291,7 @@
                                             </a>
                                             @if (auth()->user()->employee->user_id == $appraisal->employee->user_id)
                                                 <form
-                                                    action="{{ route('appraisals.destroy', $appraisal->appraisal_id) }}"
+                                                    action="{{ route('uncst-appraisals.destroy', $appraisal->appraisal_id) }}"
                                                     method="POST" class="inline">
                                                     @csrf
                                                     @method('DELETE')

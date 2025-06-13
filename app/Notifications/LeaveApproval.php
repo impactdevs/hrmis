@@ -81,7 +81,9 @@ class LeaveApproval extends Notification implements ShouldQueue
             'end_date' => $this->leave->end_date,
             'reason' => $this->leave->reason,
             'status' => $this->leave->leave_request_status,
-            'message' => $this->user->name . ' requested for a leave',
+            'message' => $this->leave->leave_request_status === 'rejected'
+                ? 'Your leave application has been rejected.'
+                : 'Your leave application has been approved.',
             'rejection_reason' => $this->leave->rejection_reason,
             'approved_by' => $this->approver->name, // Include who approved
         ];
@@ -100,7 +102,9 @@ class LeaveApproval extends Notification implements ShouldQueue
             'reason' => $this->leave->reason,
             'status' => $this->leave->leave_request_status,
             'user' => $this->user,
-            'message' => $this->user->name . ' approved a leave',
+            'message' => $this->leave->leave_request_status === 'rejected'
+                ? 'Your leave application has been rejected by ' . $this->approver->name . '.'
+                : 'Your leave application has been approved by ' . $this->approver->name . '.',
             'rejection_reason' => $this->leave->rejection_reason,
             'approved_by' => $this->approver->name, // Include who approved
         ]);
