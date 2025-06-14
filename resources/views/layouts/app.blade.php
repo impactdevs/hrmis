@@ -87,9 +87,9 @@
         < script src = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js" >
     </script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-   
+
     </script>
     <!-- Vendor JS Files -->
 
@@ -187,6 +187,21 @@
                                 </li>
                                 <li><hr class="dropdown-divider"></li>
                                 `;
+                    }
+
+                    if (notification.reminder_category) {
+                        var category = notification.reminder_category
+
+                        if (category == 'appraisal') {
+                            notificationItem = `
+                                <li>
+                                <a class="dropdown-item" href="/uncst-appraisals">
+                                ${notification.message}
+                                </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                `;
+                        }
                     }
 
                     // Append the notification to the dropdown

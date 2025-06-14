@@ -18,7 +18,7 @@
 
     </div>
 
-    <div class="top-0 p-3 toast-container position-fixed start-50 translate-middle-x text-bg-danger approval"
+    <div class="top-0 p-3 toast-container position-fixed start-50 translate-middle-x text-bg-success approval"
         role="alert" aria-live="assertive" aria-atomic="true">
         <div class="toast-header">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
