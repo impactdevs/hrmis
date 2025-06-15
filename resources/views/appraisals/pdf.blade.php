@@ -38,7 +38,7 @@
     @endif
 
 
-    <form action="{{ route('appraisals.update', $appraisal->appraisal_id) }}" method="post" class="m-2">
+    <form action="{{ route('uncst-appraisals.update', $appraisal->appraisal_id) }}" method="post" class="m-2">
         @csrf
         @method('PUT')
         <!-- IMPORTANT NOTES -->

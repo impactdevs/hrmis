@@ -898,28 +898,28 @@
 
                         <div id="performance-table-wrapper" class="table-responsive">
                             <h6 class="h1">PERFORMANCE PLANNING</h6>
-                            <p>The Appraiser and Appraisee discuss and agree on the key outputs for the next performance
-                                cycle.
-                            </p>
-                            <table class="table table-hover table-striped mb-0">
+                            <p>The Appraiser and Appraisee discuss and agree on the key outputs for the next performance cycle.</p>
+                            <table class="table table-hover table-striped mb-0" id="performance-planning-table">
                                 <thead class="bg-light">
                                     <tr>
                                         <th class="py-3 text-center">No.</th>
                                         <th class="py-3">Key Output Description</th>
                                         <th class="py-3">Agreed Performance Targets</th>
                                         <th class="py-3">Target Dates</th>
+                                        <th class="py-3 no-print"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @for ($j = 0; $j < 8; $j++)
+                                    @php
+                                        $planningRows = max(8, isset($appraisal->performance_planning) ? count($appraisal->performance_planning) : 0);
+                                    @endphp
+                                    @for ($j = 0; $j < $planningRows; $j++)
                                         <tr>
-                                            <td class="text-center align-middle">{{ $j + 1 }}.</td>
-
+                                            <td class="text-center align-middle row-number">{{ $j + 1 }}.</td>
                                             {{-- Key Output --}}
                                             <td>
                                                 @php
-                                                    $keyOutput =
-                                                        $appraisal->performance_planning[$j]['description'] ?? '';
+                                                    $keyOutput = $appraisal->performance_planning[$j]['description'] ?? '';
                                                 @endphp
                                                 <div class="editable-cell {{ empty($keyOutput) ? 'text-muted' : '' }}"
                                                     contenteditable="{{ $appraisal->is_appraisee || $appraisal->is_appraisor ? 'true' : 'false' }}"
@@ -930,13 +930,10 @@
                                                     name="performance_planning[{{ $j }}][description]"
                                                     value="{{ $keyOutput }}">
                                             </td>
-
                                             {{-- Performance Targets --}}
                                             <td>
                                                 @php
-                                                    $target =
-                                                        $appraisal->performance_planning[$j]['performance_target'] ??
-                                                        '';
+                                                    $target = $appraisal->performance_planning[$j]['performance_target'] ?? '';
                                                 @endphp
                                                 <div class="editable-cell {{ empty($target) ? 'text-muted' : '' }}"
                                                     contenteditable="{{ $appraisal->is_appraisee || $appraisal->is_appraisor ? 'true' : 'false' }}"
@@ -947,19 +944,106 @@
                                                     name="performance_planning[{{ $j }}][performance_target]"
                                                     value="{{ $target }}">
                                             </td>
-
                                             {{-- Target Date --}}
                                             <td>
                                                 <input type="date" class="form-control form-control-sm date-input"
                                                     name="performance_planning[{{ $j }}][target_date]"
                                                     value="{{ $appraisal->performance_planning[$j]['target_date'] ?? '' }}">
                                             </td>
+                                            <td class="no-print align-middle text-center">
+                                                <button type="button" class="btn btn-sm btn-danger remove-row-btn" title="Remove row" style="display: none;">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
                                         </tr>
                                     @endfor
-
                                 </tbody>
                             </table>
+                            <div class="mt-2 no-print">
+                                <button type="button" class="btn btn-outline-primary btn-sm" id="add-performance-row">
+                                    <i class="fas fa-plus"></i> Add Row
+                                </button>
+                            </div>
                         </div>
+                        @push('scripts')
+                        <script>
+                        $(function() {
+                            // Add row button
+                            $('#add-performance-row').on('click', function() {
+                                let $table = $('#performance-planning-table');
+                                let $tbody = $table.find('tbody');
+                                let rowCount = $tbody.find('tr').length;
+                                let canEdit = @json($appraisal->is_appraisee || $appraisal->is_appraisor);
+
+                                let newRow = `
+                                    <tr>
+                                        <td class="text-center align-middle row-number">${rowCount + 1}.</td>
+                                        <td>
+                                            <div class="editable-cell text-muted"
+                                                contenteditable="${canEdit ? 'true' : 'false'}"
+                                                data-placeholder="Enter key output..."
+                                                oninput="updateHiddenInput(this)">Enter key output...</div>
+                                            <input type="hidden" name="performance_planning[${rowCount}][description]" value="">
+                                        </td>
+                                        <td>
+                                            <div class="editable-cell text-muted"
+                                                contenteditable="${canEdit ? 'true' : 'false'}"
+                                                data-placeholder="Enter performance targets..."
+                                                oninput="updateHiddenInput(this)">Enter performance target...</div>
+                                            <input type="hidden" name="performance_planning[${rowCount}][performance_target]" value="">
+                                        </td>
+                                        <td>
+                                            <input type="date" class="form-control form-control-sm date-input"
+                                                name="performance_planning[${rowCount}][target_date]" value="">
+                                        </td>
+                                        <td class="no-print align-middle text-center">
+                                            <button type="button" class="btn btn-sm btn-danger remove-row-btn" title="Remove row">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `;
+                                $tbody.append(newRow);
+                                updateRowNumbers();
+                                showRemoveButtons();
+                            });
+
+                            // Remove row button
+                            $('#performance-planning-table').on('click', '.remove-row-btn', function() {
+                                let $row = $(this).closest('tr');
+                                $row.remove();
+                                updateRowNumbers();
+                                updateInputNames();
+                                showRemoveButtons();
+                            });
+
+                            // Show remove buttons only if more than 1 row
+                            function showRemoveButtons() {
+                                let $rows = $('#performance-planning-table tbody tr');
+                                if ($rows.length > 1) {
+                                    $rows.find('.remove-row-btn').show();
+                                } else {
+                                    $rows.find('.remove-row-btn').hide();
+                                }
+                            }
+                            showRemoveButtons();
+
+                            // Update row numbers and input names after add/remove
+                            function updateRowNumbers() {
+                                $('#performance-planning-table tbody tr').each(function(i, tr) {
+                                    $(tr).find('.row-number').text((i + 1) + '.');
+                                });
+                            }
+                            function updateInputNames() {
+                                $('#performance-planning-table tbody tr').each(function(i, tr) {
+                                    $(tr).find('input[type="hidden"]').eq(0).attr('name', `performance_planning[${i}][description]`);
+                                    $(tr).find('input[type="hidden"]').eq(1).attr('name', `performance_planning[${i}][performance_target]`);
+                                    $(tr).find('input[type="date"]').attr('name', `performance_planning[${i}][target_date]`);
+                                });
+                            }
+                        });
+                        </script>
+                        @endpush
 
 
                     </div>
@@ -1401,7 +1485,7 @@
                 initPersonalAttributesTable();
                 initPerformanceTableAutoSave();
 
-                // on submiting the form, update the hidden inputs
+                // on submitting the form, update the hidden inputs
                 $('#appraisalForm').on('submit', function(e) {
                     e.preventDefault();
 
@@ -1413,16 +1497,11 @@
 
                     // Helper: get label for a field
                     function getLabel(name) {
-                        // Try to find a label with for=...
                         let label = $(`label[for="${name}"]`).text();
                         if (!label) {
-                            // Try to find by input name (for arrays)
-                            label = $(`[name="${name}"]`).closest('.form-group, .form-section, td').find(
-                                'label').first().text();
+                            label = $(`[name="${name}"]`).closest('.form-group, .form-section, td').find('label').first().text();
                         }
-                        // Remove duplicate labels if any (caused by repeated field names in different sections)
                         if (label) {
-                            // Remove repeated label text (e.g. "iv. Recommendations: ...iv. Recommendations: ...")
                             label = label.replace(/^(.*?)(\1)+$/, '$1');
                         }
                         return label || name.replace(/_/g, ' ').replace(/\[|\]/g, ' ');
@@ -1440,20 +1519,15 @@
 
                     // Helper: get radio value (even if not selected)
                     function getRadioDisplay(name) {
-                        // Find all radios with this name
                         const $radios = $(`input[type="radio"][name="${name}"]`);
                         if ($radios.length) {
                             const $checked = $radios.filter(':checked');
                             if ($checked.length) {
-                                // Try to get label text
                                 const id = $checked.attr('id');
                                 let label = id ? $(`label[for="${id}"]`).text() : '';
                                 return label || $checked.val();
                             } else {
-                                // Not selected
-                                // Try to get the question label
-                                let groupLabel = $radios.closest('.form-section, .form-group').find('label')
-                                    .first().text();
+                                let groupLabel = $radios.closest('.form-section, .form-group').find('label').first().text();
                                 if (groupLabel) {
                                     groupLabel = groupLabel.replace(/^(.*?)(\1)+$/, '$1');
                                 }
@@ -1517,9 +1591,7 @@
                     $('input[type="radio"]').each(function() {
                         const name = $(this).attr('name');
                         if (name && !radioQuestions[name]) {
-                            // Try to get the group label
-                            let groupLabel = $(this).closest('.form-section, .form-group').find('label')
-                                .first().text();
+                            let groupLabel = $(this).closest('.form-section, .form-group').find('label').first().text();
                             if (groupLabel) {
                                 groupLabel = groupLabel.replace(/^(.*?)(\1)+$/, '$1');
                             }
@@ -1531,27 +1603,66 @@
                         if (name && !textareaQuestions[name]) {
                             let label = $(`label[for="${name}"]`).text();
                             if (!label) {
-                                label = $(this).closest('.form-section, .form-group').find('label')
-                                    .first().text();
+                                label = $(this).closest('.form-section, .form-group').find('label').first().text();
                             }
                             if (label) {
-                                // Remove repeated label text
                                 label = label.replace(/^(.*?)(\1)+$/, '$1');
                             }
                             textareaQuestions[name] = label || name.replace(/_/g, ' ');
                         }
                     });
 
-                    // Helper for missing fields
-                    function displayValue(val) {
-                        return val && val !== 'Not provided' && val.trim() !== '' ?
-                            `<span class="text-success fw-semibold">${val}</span>` :
-                            `<span class="text-danger fw-semibold">Not provided</span>`;
+                    // Helper: check if a field is readonly/disabled or contenteditable and not editable
+                    function isReadonlyField(name) {
+                        // Try input, textarea, select
+                        let $el = $(`[name="${name}"]`);
+                        if (!$el.length) {
+                            // Try for array fields (e.g. appraisal_period_rate[0][planned_activity])
+                            $el = $(`[name^="${name}"]`);
+                        }
+                        if ($el.length) {
+                            if ($el.prop('readonly') || $el.prop('disabled') || $el.is('[readonly]') || $el.is('[disabled]')) {
+                                return true;
+                            }
+                        }
+                        // For radio groups, check all radios
+                        if (name && name.includes('[')) {
+                            // Try to match for array fields
+                            let base = name.replace(/\[\d+\]/, '');
+                            let $radios = $(`input[type="radio"][name^="${base}"]`);
+                            if ($radios.length) {
+                                return $radios.prop('readonly') || $radios.prop('disabled');
+                            }
+                        }
+                        // Check for contenteditable fields (e.g. supervisor_comment)
+                        // Try to find a .editable-cell or .score-cell with a matching input[name]
+                        let $input = $(`[name="${name}"]`);
+                        if ($input.length) {
+                            let $editable = $input.prev('.editable-cell, .score-cell');
+                            if ($editable.length) {
+                                // If contenteditable is false or not present, treat as readonly
+                                if ($editable.attr('contenteditable') !== 'true') {
+                                    return true;
+                                }
+                            }
+                        }
+                        return false;
+                    }
+
+                    // Helper for missing fields, now also checks for contenteditable fields
+                    function displayValue(val, name = null) {
+                        if (val && val !== 'Not provided' && val.trim() !== '') {
+                            return `<span class="text-success fw-semibold">${val}</span>`;
+                        }
+                        // If name is provided, check if field is readonly or not editable (including contenteditable)
+                        if (name && isReadonlyField(name)) {
+                            return `<span class="text-warning fw-semibold">The user who is supposed to fill this has not filled it yet</span>`;
+                        }
+                        return `<span class="text-danger fw-semibold">Not provided</span>`;
                     }
 
                     // Helper: for each section, get all textarea fields in that section
                     function getSectionTextareaNames(sectionKey) {
-                        // Map sectionKey to DOM selector for that section
                         const sectionSelectors = {
                             personal_details: '.form-section:has(textarea[name="if_no_job_compatibility"]), .form-section:has(textarea[name="unanticipated_constraints"]), .form-section:has(textarea[name="personal_initiatives"]), .form-section:has(textarea[name="training_support_needs"])',
                             supervisor_report: 'fieldset:has(textarea[name="employee_strength"])',
@@ -1569,40 +1680,27 @@
                     }
 
                     formData.forEach(function(item) {
-                        // Skip put and token
                         if (item.name === '_method' || item.name === '_token') return;
 
-                        // Section grouping
                         if (item.name.startsWith('appraisal_period_rate')) {
-                            // e.g. appraisal_period_rate[0][planned_activity]
                             const match = item.name.match(/appraisal_period_rate\[(\d+)\]\[(.+?)\]/);
                             if (match) {
-                                const idx = match[1],
-                                    key = match[2];
-                                if (!sectionFields.appraisal_period_rate[idx]) sectionFields
-                                    .appraisal_period_rate[idx] = {};
+                                const idx = match[1], key = match[2];
+                                if (!sectionFields.appraisal_period_rate[idx]) sectionFields.appraisal_period_rate[idx] = {};
                                 sectionFields.appraisal_period_rate[idx][key] = item.value || '';
                             }
                         } else if (item.name.startsWith('personal_attributes_assessment')) {
-                            // e.g. personal_attributes_assessment[technical_knowledge][agreed_score]
-                            const match = item.name.match(
-                                /personal_attributes_assessment\[(.+?)\]\[(.+?)\]/);
+                            const match = item.name.match(/personal_attributes_assessment\[(.+?)\]\[(.+?)\]/);
                             if (match) {
-                                const attr = match[1],
-                                    key = match[2];
-                                if (!sectionFields.personal_attributes_assessment[attr]) sectionFields
-                                    .personal_attributes_assessment[attr] = {};
-                                sectionFields.personal_attributes_assessment[attr][key] = item.value ||
-                                    '';
+                                const attr = match[1], key = match[2];
+                                if (!sectionFields.personal_attributes_assessment[attr]) sectionFields.personal_attributes_assessment[attr] = {};
+                                sectionFields.personal_attributes_assessment[attr][key] = item.value || '';
                             }
                         } else if (item.name.startsWith('performance_planning')) {
-                            // e.g. performance_planning[0][description]
                             const match = item.name.match(/performance_planning\[(\d+)\]\[(.+?)\]/);
                             if (match) {
-                                const idx = match[1],
-                                    key = match[2];
-                                if (!sectionFields.performance_planning[idx]) sectionFields
-                                    .performance_planning[idx] = {};
+                                const idx = match[1], key = match[2];
+                                if (!sectionFields.performance_planning[idx]) sectionFields.performance_planning[idx] = {};
                                 sectionFields.performance_planning[idx][key] = item.value || '';
                             }
                         } else if (sectionMap[item.name]) {
@@ -1615,7 +1713,6 @@
                         }
                     });
 
-                    // Section builder
                     function sectionBlock(title, icon, html, opts = {}) {
                         return `
                         <section class="preview-section-block mb-4 border rounded shadow-sm bg-white">
@@ -1637,7 +1734,7 @@
                             let value = getSelectDisplay(item.name, item.value) || '';
                             reviewHtml += `<div class="col-md-6 mb-2">
                                 <strong>${label}:</strong>
-                                ${displayValue(value)}
+                                ${displayValue(value, item.name)}
                             </div>`;
                         });
                         reviewHtml += '</div>';
@@ -1645,19 +1742,15 @@
 
                     // 2. Personal Details Section (handle missing radios/textareas)
                     let personalHtml = '';
-                    if (sectionFields.personal_details.length || Object.keys(radioQuestions).length || Object
-                        .keys(textareaQuestions).length) {
+                    if (sectionFields.personal_details.length || Object.keys(radioQuestions).length || Object.keys(textareaQuestions).length) {
                         personalHtml += '<div class="row">';
                         // Show all radio questions, even if not answered
                         Object.entries(radioQuestions).forEach(([name, label]) => {
-                            // Remove duplicate label text
                             if (label) {
                                 label = label.replace(/^(.*?)(\1)+$/, '$1');
                             }
-                            // Find value in formData
                             let value = formData.find(f => f.name === name);
                             if (value && value.value) {
-                                // Try to get label for selected radio
                                 const $checked = $(`input[type="radio"][name="${name}"]:checked`);
                                 let radioLabel = '';
                                 if ($checked.length) {
@@ -1666,12 +1759,12 @@
                                 }
                                 personalHtml += `<div class="col-md-6 mb-2">
                                     <strong>${label}:</strong>
-                                    ${displayValue(radioLabel || value.value)}
+                                    ${displayValue(radioLabel || value.value, name)}
                                 </div>`;
                             } else {
                                 personalHtml += `<div class="col-md-6 mb-2">
                                     <strong>${label}:</strong>
-                                    <span class="text-danger fw-semibold">Not provided</span>
+                                    ${displayValue('', name)}
                                 </div>`;
                             }
                         });
@@ -1685,12 +1778,11 @@
                             let value = valueObj ? valueObj.value : '';
                             personalHtml += `<div class="col-md-6 mb-2">
                                 <strong>${label}:</strong>
-                                ${displayValue(value)}
+                                ${displayValue(value, name)}
                             </div>`;
                         });
                         // Also show any other personal_details fields
                         sectionFields.personal_details.forEach(function(item) {
-                            // Avoid duplicate display for radios/textareas
                             if (!radioQuestions[item.name] && !textareaQuestions[item.name]) {
                                 let label = getLabel(item.name);
                                 if (label) {
@@ -1698,7 +1790,7 @@
                                 }
                                 personalHtml += `<div class="col-md-6 mb-2">
                                     <strong>${label}:</strong>
-                                    ${displayValue(item.value)}
+                                    ${displayValue(item.value, item.name)}
                                 </div>`;
                             }
                         });
@@ -1728,12 +1820,12 @@
                             if (!row) return;
                             dutiesHtml += `<tr>
                                 <td>${i + 1}</td>
-                                <td>${displayValue(row.planned_activity)}</td>
-                                <td>${displayValue(row.output_results)}</td>
-                                <td>${displayValue(row.supervisee_score)}</td>
-                                <td>${displayValue(row.supervisor_score)}</td>
-                                <td>${displayValue(row.agreed_score)}</td>
-                                <td>${displayValue(row.supervisor_comment)}</td>
+                                <td>${displayValue(row.planned_activity, `appraisal_period_rate[${i}][planned_activity]`)}</td>
+                                <td>${displayValue(row.output_results, `appraisal_period_rate[${i}][output_results]`)}</td>
+                                <td>${displayValue(row.supervisee_score, `appraisal_period_rate[${i}][supervisee_score]`)}</td>
+                                <td>${displayValue(row.supervisor_score, `appraisal_period_rate[${i}][supervisor_score]`)}</td>
+                                <td>${displayValue(row.agreed_score, `appraisal_period_rate[${i}][agreed_score]`)}</td>
+                                <td>${displayValue(row.supervisor_comment, `appraisal_period_rate[${i}][supervisor_comment]`)}</td>
                             </tr>`;
                         });
                         dutiesHtml += '</tbody></table></div>';
@@ -1755,14 +1847,12 @@
                             </thead>
                             <tbody>
                         `;
-                        Object.entries(sectionFields.personal_attributes_assessment).forEach(([attr,
-                            scores
-                        ]) => {
+                        Object.entries(sectionFields.personal_attributes_assessment).forEach(([attr, scores]) => {
                             attributesHtml += `<tr>
                                 <td>${attr.replace(/_/g, ' ')}</td>
-                                <td>${displayValue(scores.appraisee_score)}</td>
-                                <td>${displayValue(scores.appraiser_score)}</td>
-                                <td>${displayValue(scores.agreed_score)}</td>
+                                <td>${displayValue(scores.appraisee_score, `personal_attributes_assessment[${attr}][appraisee_score]`)}</td>
+                                <td>${displayValue(scores.appraiser_score, `personal_attributes_assessment[${attr}][appraiser_score]`)}</td>
+                                <td>${displayValue(scores.agreed_score, `personal_attributes_assessment[${attr}][agreed_score]`)}</td>
                             </tr>`;
                         });
                         attributesHtml += '</tbody></table></div>';
@@ -1788,9 +1878,9 @@
                             if (!row) return;
                             planningHtml += `<tr>
                                 <td>${i + 1}</td>
-                                <td>${displayValue(row.description)}</td>
-                                <td>${displayValue(row.performance_target)}</td>
-                                <td>${displayValue(row.target_date)}</td>
+                                <td>${displayValue(row.description, `performance_planning[${i}][description]`)}</td>
+                                <td>${displayValue(row.performance_target, `performance_planning[${i}][performance_target]`)}</td>
+                                <td>${displayValue(row.target_date, `performance_planning[${i}][target_date]`)}</td>
                             </tr>`;
                         });
                         planningHtml += '</tbody></table></div>';
@@ -1798,10 +1888,8 @@
 
                     // 6. Supervisor Report
                     let supervisorHtml = '';
-                    if (sectionFields.supervisor_report.length || getSectionTextareaNames('supervisor_report')
-                        .length) {
+                    if (sectionFields.supervisor_report.length || getSectionTextareaNames('supervisor_report').length) {
                         supervisorHtml += '<div class="row">';
-                        // Show all textarea questions in this section, even if not answered
                         getSectionTextareaNames('supervisor_report').forEach(name => {
                             let label = textareaQuestions[name] || name.replace(/_/g, ' ');
                             if (label) {
@@ -1811,10 +1899,9 @@
                             let value = valueObj ? valueObj.value : '';
                             supervisorHtml += `<div class="col-md-12 mb-2">
                                 <strong>${label}:</strong>
-                                ${displayValue(value)}
+                                ${displayValue(value, name)}
                             </div>`;
                         });
-                        // Also show any other supervisor_report fields
                         sectionFields.supervisor_report.forEach(function(item) {
                             if (!textareaQuestions[item.name]) {
                                 let label = getLabel(item.name);
@@ -1823,7 +1910,7 @@
                                 }
                                 supervisorHtml += `<div class="col-md-12 mb-2">
                                     <strong>${label}:</strong>
-                                    ${displayValue(item.value)}
+                                    ${displayValue(item.value, item.name)}
                                 </div>`;
                             }
                         });
@@ -1832,8 +1919,7 @@
 
                     // 7. Panel Evaluation
                     let panelHtml = '';
-                    if (sectionFields.panel_evaluation.length || getSectionTextareaNames('panel_evaluation')
-                        .length) {
+                    if (sectionFields.panel_evaluation.length || getSectionTextareaNames('panel_evaluation').length) {
                         panelHtml += '<div class="row">';
                         getSectionTextareaNames('panel_evaluation').forEach(name => {
                             let label = textareaQuestions[name] || name.replace(/_/g, ' ');
@@ -1844,7 +1930,7 @@
                             let value = valueObj ? valueObj.value : '';
                             panelHtml += `<div class="col-md-12 mb-2">
                                 <strong>${label}:</strong>
-                                ${displayValue(value)}
+                                ${displayValue(value, name)}
                             </div>`;
                         });
                         sectionFields.panel_evaluation.forEach(function(item) {
@@ -1855,7 +1941,7 @@
                                 }
                                 panelHtml += `<div class="col-md-12 mb-2">
                                     <strong>${label}:</strong>
-                                    ${displayValue(item.value)}
+                                    ${displayValue(item.value, item.name)}
                                 </div>`;
                             }
                         });
@@ -1875,7 +1961,7 @@
                             let value = valueObj ? valueObj.value : '';
                             esHtml += `<div class="col-md-12 mb-2">
                                 <strong>${label}:</strong>
-                                ${displayValue(value)}
+                                ${displayValue(value, name)}
                             </div>`;
                         });
                         sectionFields.es_comments.forEach(function(item) {
@@ -1886,7 +1972,7 @@
                                 }
                                 esHtml += `<div class="col-md-12 mb-2">
                                     <strong>${label}:</strong>
-                                    ${displayValue(item.value)}
+                                    ${displayValue(item.value, item.name)}
                                 </div>`;
                             }
                         });
@@ -1983,55 +2069,33 @@
                         esHtml
                     );
 
-                    // Set the preview section content
                     $('.preview-section').html(previewHtml);
 
-                    // show proceed button
                     $('#proceed-btn').removeClass('d-none');
-
-                    // show back to form button
                     $('#backToFormBtn').removeClass('d-none');
 
-                    //attach back to form
                     $('#backToFormBtn').on('click', function(event) {
                         event.preventDefault();
-                        //remove the d-none class from the entire form
                         $('.entire-form').removeClass('d-none');
-                        //hide the preview section
                         $('.preview-section').addClass('d-none');
-
-                        //hide the proceed button
                         $('#proceed-btn').addClass('d-none');
-
-                        //hide the back to form button
                         $('#backToFormBtn').addClass('d-none');
-
-                        //scroll to the top of the form
                         $('html, body').animate({
                             scrollTop: $('#appraisalForm').offset().top
                         }, 500);
-                    } );
+                    });
 
-
-                    //attach the submit event to proceed button
                     $('#proceed-btn').on('click', function(event) {
                         event.preventDefault();
-                        //remove the d-none class from the entire form
                         $('.entire-form').removeClass('d-none');
-                        //detach the submit event handler
                         $('#appraisalForm').off('submit');
-                        //then submit the form
                         $('#appraisalForm').submit();
                     });
 
-                    // hide the whole form
                     $('.entire-form').addClass('d-none');
-
-                    //scroll to the preview section
                     $('html, body').animate({
                         scrollTop: $('.preview-section').offset().top
                     }, 500);
-                              
                 });
 
 
