@@ -18,6 +18,10 @@
                     $title = auth()->user()->isAdminOrSecretary ? 'Staff Leave Requests' : 'Apply For Leave';
                 }
 
+                if (request()->routeIs('leaves.create')) {
+                    $title = auth()->user()->isAdminOrSecretary ? 'Staff Leave Requests' : 'Apply For Leave';
+                }
+
                 if (request()->routeIs('leave-roster.index') || request()->routeIs('leave-roster-tabular.index')) {
                     $title = auth()->user()->isAdminOrSecretary ? 'Leave Roster' : 'My Leave Schedule';
                 }

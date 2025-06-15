@@ -184,7 +184,16 @@ class Employee extends Model
     //overall roster days for an employee
     public function overallRosterDays()
     {
-        $leaves = LeaveRoster::where('employee_id', $this->employee_id)->get();
+        $today = Carbon::today();
+        // Get all leave roster entries for this employee where end_date is in the future
+        // and where the leave_roster_id does NOT exist in the leaves table (leave_roster_id column)
+        $leaves = LeaveRoster::where('employee_id', $this->employee_id)
+            ->whereDate('end_date', '>=', $today)
+            ->whereDoesntHave('leave', function ($query) {
+            // Assuming Leave has a leave_roster_id column
+            $query->whereColumn('leave_roster_id', 'leave_rosters.leave_roster_id');
+            })
+            ->get();
 
         // Fetch all public holidays as an array of dates
         $publicHolidays = PublicHoliday::pluck('holiday_date')->toArray();
