@@ -70,10 +70,13 @@ class JobApplicationController extends Controller
      */
     public function create()
     {
-        $companyJobs = CompanyJob::where('will_become_active_at', '<=', now())
+        $companyJobs = CompanyJob::where(function ($query) {
+            $query->where('will_become_active_at', '<=', now())
+                  ->orWhereNull('will_become_active_at');
+            })
             ->where(function ($query) {
-                $query->whereNull('will_become_inactive_at')
-                    ->orWhere('will_become_inactive_at', '>=', now());
+            $query->whereNull('will_become_inactive_at')
+                  ->orWhere('will_become_inactive_at', '>=', now());
             })
             ->get();
 

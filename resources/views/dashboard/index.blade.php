@@ -809,6 +809,30 @@
             @endif
         @endif
     </section>
+    <!-- Modal -->
+    <div class="modal fade" id="consent" tabindex="-1" aria-labelledby="consent" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="applyModalLabel">
+                        <i class="bi bi-calendar-plus"></i> Data Protection Law
+                    </h5>
+                    {{-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> --}}
+                </div>
+                <div class="modal-body">
+                    <p>
+                        In accordance with the Data Protection and Privacy Act of Uganda, we request your consent to collect, process, and use your personal data for employment and HR management purposes. Your information will be handled securely and only used for legitimate business operations as required by law.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="applyButton"
+                        data-bs-dismiss="modal">Accept</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     @push('scripts')
         @vite(['resources/js/custom-dashboard.js'])
@@ -819,6 +843,10 @@
                 var allocatedDays = {!! $chartDataJson !!}; // Allocated leave days
                 var employeeData = {!! $chartEmployeeDataJson !!};
                 console.log(window.isAdminOrSecretary);
+                // open the consent modal here
+                var consentModal = new bootstrap.Modal(document.getElementById('consent'));
+                consentModal.show();
+
 
                 var budgetChart = echarts.init(document.querySelector("#budgetChart"));
                 budgetChart.setOption({

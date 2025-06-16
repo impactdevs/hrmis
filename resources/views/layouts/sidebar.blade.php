@@ -47,7 +47,7 @@
             @endif
 
             <li class="nav-item">
-                <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('appraisals.index')) bg-secondary @endif"
+                <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('uncst-appraisals.index') || request()->routeIs('uncst-appraisals.edit')) bg-secondary @endif"
                     href="{{ route('uncst-appraisals.index') }}">
                     <i class="bi bi-arrow-bar-up"></i>
                     {{ auth()->user()->isAdminOrSecretary ? 'Appraisals' : 'My Appraisals' }}
