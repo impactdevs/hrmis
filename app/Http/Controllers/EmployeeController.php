@@ -302,6 +302,7 @@ class EmployeeController extends Controller
         return view('employees.create_contract', compact('employee', 'users'));
     }
 
+
     public function store_contract(Request $request)
     {
         //get the data for processing
@@ -365,6 +366,13 @@ class EmployeeController extends Controller
         $contract->load('employee');
         $users = User::all();
         return view('employees.edit_contract', compact('contract', 'users'));
+    }
+
+    public function show_contract(Request $request, Contract $contract)
+    {
+        $contract->load('employee');
+        $users = User::all();
+        return view('employees.show_contract', compact('contract', 'users'));
     }
 
 

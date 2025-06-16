@@ -24,6 +24,10 @@ return new class extends Migration {
             $table->date('appraisal_start_date')->nullable();
             $table->date('appraisal_end_date')->nullable();
 
+            // contract_id
+            $table->uuid('contract_id')->nullable();
+            $table->foreign('contract_id')->references('id')->on('employee_contracts')->onDelete('cascade');
+
             // Section 1
             $table->string('job_compatibility')->nullable();
             $table->text('if_no_job_compatibility')->nullable();

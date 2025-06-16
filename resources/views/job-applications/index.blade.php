@@ -107,6 +107,7 @@
                                 </a>
                             </th>
                             <th>Post Applied</th>
+                            <th>Age</th>
                             <th>
                                 <a href="{{ route(
                                     'uncst-job-applications.index',
@@ -131,18 +132,12 @@
                                 <td>{{ $application->full_name }}</td>
                                 <td>{{ \App\Models\CompanyJob::where('job_code', $application->reference_number)->first()->job_title ?? 'N/A' }}
                                 </td>
+                                <td>{{ $application->date_of_birth->age }}</td>
                                 <td>{{ $application->created_at->format('Y-m-d H:i') }}</td>
                                 <td>
                                     <a href="{{ route('uncst-job-applications.show', $application->id) }}"
                                         class="btn btn-sm btn-primary" onclick="event.stopPropagation()">
                                         View
-                                    </a>
-
-                                    {{-- edit --}}
-                                    <a href="{{ route('job-applications.edit', $application->id) }}"
-                                        class="btn btn-sm btn-secondary" onclick="event.stopPropagation()">
-                                        Edit
-
                                     </a>
                                 </td>
                             </tr>

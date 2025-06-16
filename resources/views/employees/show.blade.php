@@ -204,6 +204,8 @@
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </form>
+
+                                            <a href="{{ route('contract.show', $contract->id) }}">show</a>
                                         </div>
                                     </td>
                                     @endcan

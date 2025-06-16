@@ -39,6 +39,7 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', [HomeController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
+Route::post('/agree', [HomeController::class, 'agree'])->middleware(['auth', 'verified'])->name('agree');
 Route::get('/upload-employee', [UploadEmployees::class, 'process_csv_for_arrears']);
 Route::get('/employees/{employee}/generate-pdf', [EmployeeController::class, 'generatePDF'])
     ->name('employees.generate-pdf');
@@ -46,9 +47,7 @@ Route::get('/employees/{employee}/print', function (Employee $employee) {
     return view('employees.pdf', ['employee' => $employee]);
 })->name('employees.print');
 
-Route::get('/send-email', [AppraisalController::class, 'sendEmails'])
-    ->name('send-email');
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', 'data.usage.agreement'])->group(function () {
     Route::resource('roles', RoleController::class);
     Route::resource('permissions', PermissionController::class);
     Route::resource('users', UsersController::class);
@@ -60,6 +59,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/contract/{contract}/edit', [EmployeeController::class, 'edit_contract'])->name('contract.edit');
     Route::put('/contract/{contract}/update', [EmployeeController::class, 'update_contract'])->name('contract.update');
     Route::delete('/contract/{contract}/delete', [EmployeeController::class, 'destroy_contract'])->name('contract.destroy');
+    Route::get('/contract/{contract}/show', [EmployeeController::class, 'show_contract'])->name('contract.show');
 
 
 
@@ -71,11 +71,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/recruitments/{recruitment}/status', [StaffRecruitmentController::class, 'approveOrReject'])
         ->name('recruitmentments.approveOrReject');
     Route::resource('uncst-appraisals', AppraisalsController::class);
-    Route::post('/appraisal/appraisal-approval', [AppraisalController::class, 'approveOrReject'])
+    Route::post('/appraisal/appraisal-approval', [AppraisalsController::class, 'approveOrReject'])
         ->name('appraisals.approveOrReject');
-    Route::post('/appraisals/{appraisal}/status', [AppraisalController::class, 'approveOrReject'])
+    Route::post('/appraisals/{appraisal}/status', [AppraisalsController::class, 'approveOrReject'])
         ->name('appraisals.status');
-    Route::get('/appraisals/{appraisal}/download', [AppraisalController::class, 'downloadPDF'])
+    Route::get('/appraisals/{appraisal}/download', [AppraisalsController::class, 'downloadPDF'])
         ->name('appraisals.download');
     Route::resource('events', EventController::class);
     Route::resource('trainings', TrainingController::class);
@@ -112,9 +112,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 
     //appraisal
-    Route::get('/employee-appraisal', [AppraisalController::class, 'survey'])->name('appraisal.survey');
-    Route::post('/appraisals', [AppraisalController::class, 'store'])->name('appraisals.store');
-    Route::get('preview-appraisal/{appraisal}', [AppraisalController::class, 'previewAppraisalDetails'])->name('appraisals.preview');
+    Route::get('/employee-appraisal', [AppraisalsController::class, 'survey'])->name('appraisal.survey');
+    Route::post('/appraisals', [AppraisalsController::class, 'store'])->name('appraisals.store');
+    Route::get('preview-appraisal/{appraisal}', [AppraisalsController::class, 'previewAppraisalDetails'])->name('appraisals.preview');
 
     //notifications
     Route::resource('/notifications', NotificationController::class);

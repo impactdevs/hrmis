@@ -27,7 +27,7 @@
                     d="M11.46.146A.5.5 0 0 1 12 .5v3.793a.5.5 0 0 1-.146.354l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 0 1 0-.708l7-7A.5.5 0 0 1 8.207.146L11.46.146z" />
             </svg>
             <strong class="me-auto" id="totalScore"></strong>
-            <button type="button" class="btn-close no-print" data-bs-dismiss="toast" aria-label="Close"></button>
+            {{-- <button type="button" class="btn-close no-print" data-bs-dismiss="toast" aria-label="Close"></button> --}}
         </div>
 
     </div>
@@ -53,8 +53,8 @@
     @endif
 
 
-    <form action="{{ route('uncst-appraisals.update', ['uncst_appraisal'=>$appraisal->appraisal_id]) }}" method="post" class="m-2"
-        id="appraisalForm">
+    <form action="{{ route('uncst-appraisals.update', ['uncst_appraisal' => $appraisal->appraisal_id]) }}"
+        method="post" class="m-2" id="appraisalForm">
         @csrf
         @method('PUT')
         <div class="entire-form">
@@ -108,16 +108,121 @@
                             <div class="p-3 rounded form-section bg-light">
                                 <h5 class="mb-3 text-muted">Review Type</h5>
                                 <div class="flex-wrap gap-4 d-flex">
-                                    <x-forms.radio name="review_type" label="Select the type of review" id="review_type"
-                                        value="{{ $appraisal->review_type ?? '' }}" :options="[
-                                            'confirmation' => 'Confirmation',
-                                            'end_of_contract' => 'End of Contract',
-                                            'mid_financial_year' => 'Mid Financial Year',
-                                        ]"
-                                        :selected="$appraisal->review_type ?? ''" />
+                                    <div class="form-group">
+                                        <label for="review_type">Select the type of review</label>
+
+                                        @php
+                                            $options = [
+                                                'confirmation' => 'Confirmation',
+                                                'end_of_contract' => 'End of Contract',
+                                                'mid_financial_year' => 'Mid Financial Year',
+                                            ];
+                                            $selected = old('review_type', $appraisal->review_type ?? '');
+                                        @endphp
+
+                                        @foreach ($options as $value => $text)
+                                            <div class="form-check">
+                                                <input type="radio" name="review_type"
+                                                    id="review_type_{{ $value }}" value="{{ $value }}"
+                                                    class="form-check-input @error('review_type') is-invalid @enderror"
+                                                    {{ $selected === $value ? 'checked' : '' }}
+                                                    @if ($value === 'end_of_contract') onclick="document.getElementById('expireContractDetails').classList.remove('d-none');" @else onclick="document.getElementById('expireContractDetails').classList.add('d-none');" @endif>
+                                                <label class="form-check-label" for="review_type_{{ $value }}">
+                                                    {{ $text }}
+                                                </label>
+                                            </div>
+                                        @endforeach
+
+                                        @error('review_type')
+                                            <div class="invalid-feedback d-block">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
+                                    </div>
                                 </div>
                             </div>
+
+                            <div id="expireContractDetails"
+                                class="{{ $selected === 'end_of_contract' ? '' : 'd-none' }}">
+                                {{-- contract --}}
+                                @if (isset($expiredContract))
+                                    <div class="alert alert-info mt-3">
+                                        <strong>Contract being Appraised Details</strong>
+                                        <ul class="mb-0">
+                                            <li>
+                                                <strong>Contract Start Date:</strong>
+                                                {{ isset($expiredContract) && $expiredContract->start_date ? $expiredContract->start_date->toDateString() : 'N/A' }}
+                                            </li>
+                                            <li>
+                                                <strong>Contract End Date:</strong>
+                                                {{ isset($expiredContract) && $expiredContract->end_date ? $expiredContract->end_date->toDateString() : 'N/A' }}
+                                            </li>
+                                            <li>
+                                                <strong>Contract Description:</strong>
+                                                {{ $expiredContract->description ?? 'N/A' }}
+                                            </li>
+                                            <li>
+                                                <strong>Contract Documents:</strong>
+                                                @if (!empty($expiredContract->contract_documents))
+                                                    <div class="flex-wrap gap-2 d-flex">
+                                                        @foreach ($expiredContract->contract_documents as $attachment)
+                                                            <a href="{{ asset('storage/' . $attachment['proof']) }}"
+                                                                target="_blank"
+                                                                class="btn btn-sm btn-outline-secondary d-flex align-items-center">
+                                                                @if (Str::endsWith($attachment['proof'], ['.pdf']))
+                                                                    <i class="fas fa-file-pdf text-danger me-2"></i>
+                                                                @else
+                                                                    <i class="fas fa-file-image text-primary me-2"></i>
+                                                                @endif
+                                                                {{ Str::limit($attachment['title'], 15) }}
+                                                            </a>
+                                                        @endforeach
+                                                    </div>
+                                                @else
+                                                    <span class="text-muted">No attachments</span>
+                                                @endif
+                                            </li>
+                                        </ul>
+                                        {{-- Add hidden contract_id input if end_of_contract --}}
+                                        @if ($selected === 'end_of_contract' && isset($expiredContract))
+                                            <input type="hidden" name="contract_id" id="contract_id_input"
+                                                value="{{ $expiredContract->id }}">
+                                        @endif
+                                    </div>
+                                @else
+                                    <div class="alert alert-warning mt-3">
+                                        No contract expiry details available.
+                                    </div>
+                                @endif
+                            </div>
                         </div>
+
+                        @push('scripts')
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    // Show/hide contract details on page load if needed
+                                    var selected = document.querySelector('input[name="review_type"]:checked');
+                                    var expireDiv = document.getElementById('expireContractDetails');
+                                    if (selected && selected.value === 'end_of_contract') {
+                                        expireDiv.classList.remove('d-none');
+                                    } else {
+                                        expireDiv.classList.add('d-none');
+                                    }
+
+                                    // Listen for changes
+                                    document.querySelectorAll('input[name="review_type"]').forEach(function(radio) {
+                                        radio.addEventListener('change', function() {
+                                            if (this.value === 'end_of_contract') {
+                                                expireDiv.classList.remove('d-none');
+                                            } else {
+                                                expireDiv.classList.add('d-none');
+
+                                            }
+                                        });
+                                    });
+                                });
+                            </script>
+                        @endpush
 
                         <div class="col-lg-6">
                             <div class="p-3 rounded form-section bg-light">
@@ -354,7 +459,7 @@
                             duties.
                         </p>
                         <div class="overflow-x-auto bg-white rounded-lg shadow-lg">
-                            <table class="min-w-full text-base border border-gray-200">
+                            <table class="min-w-full text-base border border-gray-200" id="key-duties-table">
                                 <thead class="text-sm text-gray-700 uppercase bg-blue-100 border-b border-gray-200">
                                     <tr>
                                         <th class="px-6 py-3 border border-gray-200 w-12">No.</th>
@@ -363,10 +468,19 @@
                                         <th class="px-6 py-3 border border-gray-200 w-32">Supervisee (/6)</th>
                                         <th class="px-6 py-3 border border-gray-200 w-32">Supervisor (/6)</th>
                                         <th class="px-6 py-3 border border-gray-200 w-40">Agreed Score (/6)</th>
+                                        <th class="px-6 py-3 border border-gray-200 w-10 no-print"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @for ($i = 1; $i <= 4; $i++)
+                                    @php
+                                        $rowCount = max(
+                                            4,
+                                            isset($appraisal->appraisal_period_rate)
+                                                ? count($appraisal->appraisal_period_rate)
+                                                : 0,
+                                        );
+                                    @endphp
+                                    @for ($i = 1; $i <= $rowCount; $i++)
                                         @php
                                             $plannedActivity =
                                                 $appraisal->appraisal_period_rate[$i - 1]['planned_activity'] ?? '';
@@ -386,7 +500,7 @@
                                             data-row="{{ $i }}">
                                             <td class="px-6 py-4 border border-gray-200 font-bold text-gray-900 align-top"
                                                 rowspan="2">
-                                                {{ $i }}.
+                                                <span class="row-number">{{ $i }}.</span>
                                             </td>
 
                                             {{-- Planned Activity --}}
@@ -395,11 +509,11 @@
                                                     contenteditable="{{ $appraisal->is_appraisee ? 'true' : 'false' }}"
                                                     data-placeholder="Enter task" oninput="updateHiddenInput(this)"
                                                     @unless ($appraisal->is_appraisee)
-                                 data-bs-toggle="tooltip" 
-                                 data-bs-placement="top"
-                                 title="Editing is disabled for your role"
-                                 onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()"
-                             @endunless>
+                                                        data-bs-toggle="tooltip" 
+                                                        data-bs-placement="top"
+                                                        title="Editing is disabled for your role"
+                                                        onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()"
+                                                    @endunless>
                                                     {{ $plannedActivity ?: 'Enter task' }}
                                                 </div>
                                                 <input type="hidden"
@@ -413,11 +527,11 @@
                                                     contenteditable="{{ $appraisal->is_appraisee ? 'true' : 'false' }}"
                                                     data-placeholder="Enter result" oninput="updateHiddenInput(this)"
                                                     @unless ($appraisal->is_appraisee)
-                                 data-bs-toggle="tooltip" 
-                                 data-bs-placement="top"
-                                 title="Editing is disabled for your role"
-                                 onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()"
-                             @endunless>
+                                                        data-bs-toggle="tooltip" 
+                                                        data-bs-placement="top"
+                                                        title="Editing is disabled for your role"
+                                                        onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()"
+                                                    @endunless>
                                                     {{ $outputResults ?: 'Enter result' }}
                                                 </div>
                                                 <input type="hidden"
@@ -431,11 +545,11 @@
                                                     contenteditable="{{ $appraisal->is_appraisee ? 'true' : 'false' }}"
                                                     data-type="score" oninput="updateScoreInput(this)"
                                                     @unless ($appraisal->is_appraisee)
-                                 data-bs-toggle="tooltip" 
-                                 data-bs-placement="top"
-                                 title="Editing is disabled for your role"
-                                 onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()"
-                             @endunless>
+                                                        data-bs-toggle="tooltip" 
+                                                        data-bs-placement="top"
+                                                        title="Editing is disabled for your role"
+                                                        onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()"
+                                                    @endunless>
                                                     {{ $superviseeScore }}
                                                 </div>
                                                 <input type="hidden"
@@ -449,11 +563,11 @@
                                                     contenteditable="{{ $appraisal->is_appraisor ? 'true' : 'false' }}"
                                                     data-type="score" oninput="updateScoreInput(this)"
                                                     @unless ($appraisal->is_appraisor)
-                                 data-bs-toggle="tooltip" 
-                                 data-bs-placement="top"
-                                 title="Editing is disabled for your role"
-                                 onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()"
-                             @endunless>
+                                                        data-bs-toggle="tooltip" 
+                                                        data-bs-placement="top"
+                                                        title="Editing is disabled for your role"
+                                                        onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()"
+                                                    @endunless>
                                                     {{ $supervisorScore }}
                                                 </div>
                                                 <input type="hidden"
@@ -471,6 +585,13 @@
                                                     @if ($appraisal->is_appraisee) readonly @endif
                                                     oninput="updateOverallAverage()">
                                             </td>
+                                            <td
+                                                class="px-2 py-2 border border-gray-200 align-middle text-center no-print">
+                                                <button type="button" class="btn btn-sm btn-danger remove-duty-row"
+                                                    title="Remove row" style="display: none;">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
                                         </tr>
 
                                         {{-- Supervisor Comment --}}
@@ -482,11 +603,11 @@
                                                     data-placeholder="Supervisor's comment..."
                                                     oninput="updateHiddenInput(this)"
                                                     @unless ($appraisal->is_appraisor)
-                                 data-bs-toggle="tooltip" 
-                                 data-bs-placement="top"
-                                 title="Editing is disabled for your role"
-                                 onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()"
-                             @endunless>
+                                                        data-bs-toggle="tooltip" 
+                                                        data-bs-placement="top"
+                                                        title="Editing is disabled for your role"
+                                                        onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()"
+                                                    @endunless>
                                                     {{ $supervisorComment ?: "Supervisor's comment..." }}
                                                 </div>
                                                 <input type="hidden"
@@ -496,15 +617,18 @@
                                         </tr>
                                     @endfor
 
+
+                                
                                     <!-- Total Row -->
                                     <tr class="bg-gradient-to-r from-blue-50 to-indigo-50 font-semibold">
-                                        <td class="px-6 py-4 border border-gray-200" colspan="6">
+                                        <td class="px-6 py-4 border border-gray-200" colspan="7">
                                             <div class="flex items-center justify-between">
                                                 <div class="flex items-center space-x-4">
                                                     <div class="text-lg font-bold text-blue-700">
                                                         Overall Average:
                                                         <span id="overallAverage" class="text-2xl ml-2">0</span>%
                                                     </div>
+                                                    
                                                     <div
                                                         class="relative w-48 h-3 bg-gray-200 rounded-full overflow-hidden">
                                                         <div id="averageProgress"
@@ -512,15 +636,179 @@
                                                             style="width: 0%">
                                                         </div>
                                                     </div>
+
+                                                    <div class="mt-2 no-print">
+                                               
+                                            </div>
                                                 </div>
                                                 <div id="performanceStatus" class="text-sm font-medium text-gray-600">
                                                     Enter scores to view performance
                                                 </div>
+
+                                                 <button type="button" class="btn btn-outline-primary btn-sm"
+                                                    id="add-duty-row">
+                                                    <i class="fas fa-plus"></i> Add Row
+                                                </button>
                                             </div>
+                                            
                                         </td>
                                     </tr>
                                 </tbody>
                             </table>
+
+                            @push('scripts')
+                                <script>
+                                    $(function() {
+                                        // Add row button for Key Duties table
+                                        $('#add-duty-row').on('click', function() {
+                                            let $table = $('#key-duties-table');
+                                            let $tbody = $table.find('tbody');
+                                            // Find last data-row index
+                                            let rowCount = $tbody.find('tr[data-row]').length;
+                                            let i = rowCount + 1;
+                                            let canAppraisee = @json($appraisal->is_appraisee);
+                                            let canAppraisor = @json($appraisal->is_appraisor);
+
+                                            let newRow = `
+                                    <tr class="hover:bg-blue-50 transition-colors" data-row="${i}">
+                                        <td class="px-6 py-4 border border-gray-200 font-bold text-gray-900 align-top" rowspan="2">
+                                            <span class="row-number">${i}.</span>
+                                        </td>
+                                        <td class="px-6 py-2 border border-gray-200">
+                                            <div class="editable-cell p-2 rounded text-muted"
+                                                contenteditable="${canAppraisee ? 'true' : 'false'}"
+                                                data-placeholder="Enter task"
+                                                oninput="updateHiddenInput(this)"
+                                                onfocus="if(this.classList.contains('text-muted')){this.textContent='';this.classList.remove('text-muted');}">
+                                                Enter task
+                                            </div>
+                                            <input type="hidden"
+                                                name="appraisal_period_rate[${i - 1}][planned_activity]"
+                                                value="">
+                                        </td>
+                                        <td class="px-6 py-2 border border-gray-200">
+                                            <div class="editable-cell p-2 rounded text-muted"
+                                                contenteditable="${canAppraisee ? 'true' : 'false'}"
+                                                data-placeholder="Enter result"
+                                                oninput="updateHiddenInput(this)"
+                                                onfocus="if(this.classList.contains('text-muted')){this.textContent='';this.classList.remove('text-muted');}">
+                                                Enter result
+                                            </div>
+                                            <input type="hidden"
+                                                name="appraisal_period_rate[${i - 1}][output_results]"
+                                                value="">
+                                        </td>
+                                        <td class="px-6 py-2 border border-gray-200">
+                                            <div class="score-cell"
+                                                contenteditable="${canAppraisee ? 'true' : 'false'}"
+                                                data-type="score" oninput="updateScoreInput(this)">
+                                                0
+                                            </div>
+                                            <input type="hidden"
+                                                name="appraisal_period_rate[${i - 1}][supervisee_score]"
+                                                value="0">
+                                        </td>
+                                        <td class="px-6 py-2 border border-gray-200">
+                                            <div class="score-cell"
+                                                contenteditable="${canAppraisor ? 'true' : 'false'}"
+                                                data-type="score" oninput="updateScoreInput(this)">
+                                                0
+                                            </div>
+                                            <input type="hidden"
+                                                name="appraisal_period_rate[${i - 1}][supervisor_score]"
+                                                value="0">
+                                        </td>
+                                        <td class="px-6 py-2 border border-gray-200">
+                                            <input type="number"
+                                                name="appraisal_period_rate[${i - 1}][agreed_score]"
+                                                class="form-control form-control-sm agreed-score-input"
+                                                min="0" max="6" step="0.5"
+                                                value="0"
+                                                ${canAppraisee ? 'readonly' : ''}
+                                                oninput="updateOverallAverage()">
+                                        </td>
+                                        <td class="px-2 py-2 border border-gray-200 align-middle text-center no-print">
+                                            <button type="button" class="btn btn-sm btn-danger remove-duty-row" title="Remove row">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-blue-50 transition-colors">
+                                        <td class="px-6 py-2 border border-gray-200 bg-gray-50 italic text-gray-600" colspan="6">
+                                            <div class="editable-cell p-2 rounded text-muted"
+                                                contenteditable="${canAppraisor ? 'true' : 'false'}"
+                                                data-placeholder="Supervisor's comment..."
+                                                oninput="updateHiddenInput(this)"
+                                                onfocus="if(this.classList.contains('text-muted')){this.textContent='';this.classList.remove('text-muted');}">
+                                                Supervisor's comment...
+                                            </div>
+                                            <input type="hidden"
+                                                name="appraisal_period_rate[${i - 1}][supervisor_comment]"
+                                                value="">
+                                        </td>
+                                    </tr>
+                                    `;
+                                            // Insert before the total row (last tr)
+                                            $tbody.find('tr').last().before(newRow);
+                                            updateDutyRowNumbers();
+                                            showDutyRemoveButtons();
+                                        });
+
+                                        // Remove row button for Key Duties table
+                                        $('#key-duties-table').on('click', '.remove-duty-row', function() {
+                                            let $row = $(this).closest('tr');
+                                            // Remove both the main row and the comment row
+                                            let $next = $row.next();
+                                            if ($next && !$next.attr('data-row')) {
+                                                $next.remove();
+                                            }
+                                            $row.remove();
+                                            updateDutyRowNumbers();
+                                            updateDutyInputNames();
+                                            showDutyRemoveButtons();
+                                        });
+
+                                        function updateDutyRowNumbers() {
+                                            $('#key-duties-table tbody tr[data-row]').each(function(i, tr) {
+                                                $(tr).find('.row-number').text((i + 1) + '.');
+                                            });
+                                        }
+
+                                        function updateDutyInputNames() {
+                                            let idx = 0;
+                                            $('#key-duties-table tbody tr[data-row]').each(function() {
+                                                // Main row
+                                                $(this).find('input[name^="appraisal_period_rate"]').each(function() {
+                                                    let name = $(this).attr('name');
+                                                    let field = name.match(/\]\[(.*?)\]$/)[1];
+                                                    $(this).attr('name', `appraisal_period_rate[${idx}][${field}]`);
+                                                });
+                                                // Comment row (next)
+                                                let $commentRow = $(this).next();
+                                                if ($commentRow && $commentRow.find('input[name^="appraisal_period_rate"]').length) {
+                                                    $commentRow.find('input[name^="appraisal_period_rate"]').attr('name',
+                                                        `appraisal_period_rate[${idx}][supervisor_comment]`);
+                                                }
+                                                idx++;
+                                            });
+                                        }
+
+                                        function showDutyRemoveButtons() {
+                                            let $rows = $('#key-duties-table tbody tr[data-row]');
+                                            if ($rows.length > 1) {
+                                                $rows.each(function() {
+                                                    $(this).find('.remove-duty-row').show();
+                                                });
+                                            } else {
+                                                $rows.each(function() {
+                                                    $(this).find('.remove-duty-row').hide();
+                                                });
+                                            }
+                                        }
+                                        showDutyRemoveButtons();
+                                    });
+                                </script>
+                            @endpush
                         </div>
 
                     </div>
@@ -898,7 +1186,8 @@
 
                         <div id="performance-table-wrapper" class="table-responsive">
                             <h6 class="h1">PERFORMANCE PLANNING</h6>
-                            <p>The Appraiser and Appraisee discuss and agree on the key outputs for the next performance cycle.</p>
+                            <p>The Appraiser and Appraisee discuss and agree on the key outputs for the next performance
+                                cycle.</p>
                             <table class="table table-hover table-striped mb-0" id="performance-planning-table">
                                 <thead class="bg-light">
                                     <tr>
@@ -911,7 +1200,12 @@
                                 </thead>
                                 <tbody>
                                     @php
-                                        $planningRows = max(8, isset($appraisal->performance_planning) ? count($appraisal->performance_planning) : 0);
+                                        $planningRows = max(
+                                            8,
+                                            isset($appraisal->performance_planning)
+                                                ? count($appraisal->performance_planning)
+                                                : 0,
+                                        );
                                     @endphp
                                     @for ($j = 0; $j < $planningRows; $j++)
                                         <tr>
@@ -919,7 +1213,8 @@
                                             {{-- Key Output --}}
                                             <td>
                                                 @php
-                                                    $keyOutput = $appraisal->performance_planning[$j]['description'] ?? '';
+                                                    $keyOutput =
+                                                        $appraisal->performance_planning[$j]['description'] ?? '';
                                                 @endphp
                                                 <div class="editable-cell {{ empty($keyOutput) ? 'text-muted' : '' }}"
                                                     contenteditable="{{ $appraisal->is_appraisee || $appraisal->is_appraisor ? 'true' : 'false' }}"
@@ -933,7 +1228,9 @@
                                             {{-- Performance Targets --}}
                                             <td>
                                                 @php
-                                                    $target = $appraisal->performance_planning[$j]['performance_target'] ?? '';
+                                                    $target =
+                                                        $appraisal->performance_planning[$j]['performance_target'] ??
+                                                        '';
                                                 @endphp
                                                 <div class="editable-cell {{ empty($target) ? 'text-muted' : '' }}"
                                                     contenteditable="{{ $appraisal->is_appraisee || $appraisal->is_appraisor ? 'true' : 'false' }}"
@@ -951,7 +1248,8 @@
                                                     value="{{ $appraisal->performance_planning[$j]['target_date'] ?? '' }}">
                                             </td>
                                             <td class="no-print align-middle text-center">
-                                                <button type="button" class="btn btn-sm btn-danger remove-row-btn" title="Remove row" style="display: none;">
+                                                <button type="button" class="btn btn-sm btn-danger remove-row-btn"
+                                                    title="Remove row" style="display: none;">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </td>
@@ -960,22 +1258,23 @@
                                 </tbody>
                             </table>
                             <div class="mt-2 no-print">
-                                <button type="button" class="btn btn-outline-primary btn-sm" id="add-performance-row">
+                                <button type="button" class="btn btn-outline-primary btn-sm"
+                                    id="add-performance-row">
                                     <i class="fas fa-plus"></i> Add Row
                                 </button>
                             </div>
                         </div>
                         @push('scripts')
-                        <script>
-                        $(function() {
-                            // Add row button
-                            $('#add-performance-row').on('click', function() {
-                                let $table = $('#performance-planning-table');
-                                let $tbody = $table.find('tbody');
-                                let rowCount = $tbody.find('tr').length;
-                                let canEdit = @json($appraisal->is_appraisee || $appraisal->is_appraisor);
+                            <script>
+                                $(function() {
+                                    // Add row button
+                                    $('#add-performance-row').on('click', function() {
+                                        let $table = $('#performance-planning-table');
+                                        let $tbody = $table.find('tbody');
+                                        let rowCount = $tbody.find('tr').length;
+                                        let canEdit = @json($appraisal->is_appraisee || $appraisal->is_appraisor);
 
-                                let newRow = `
+                                        let newRow = `
                                     <tr>
                                         <td class="text-center align-middle row-number">${rowCount + 1}.</td>
                                         <td>
@@ -1003,46 +1302,50 @@
                                         </td>
                                     </tr>
                                 `;
-                                $tbody.append(newRow);
-                                updateRowNumbers();
-                                showRemoveButtons();
-                            });
+                                        $tbody.append(newRow);
+                                        updateRowNumbers();
+                                        showRemoveButtons();
+                                    });
 
-                            // Remove row button
-                            $('#performance-planning-table').on('click', '.remove-row-btn', function() {
-                                let $row = $(this).closest('tr');
-                                $row.remove();
-                                updateRowNumbers();
-                                updateInputNames();
-                                showRemoveButtons();
-                            });
+                                    // Remove row button
+                                    $('#performance-planning-table').on('click', '.remove-row-btn', function() {
+                                        let $row = $(this).closest('tr');
+                                        $row.remove();
+                                        updateRowNumbers();
+                                        updateInputNames();
+                                        showRemoveButtons();
+                                    });
 
-                            // Show remove buttons only if more than 1 row
-                            function showRemoveButtons() {
-                                let $rows = $('#performance-planning-table tbody tr');
-                                if ($rows.length > 1) {
-                                    $rows.find('.remove-row-btn').show();
-                                } else {
-                                    $rows.find('.remove-row-btn').hide();
-                                }
-                            }
-                            showRemoveButtons();
+                                    // Show remove buttons only if more than 1 row
+                                    function showRemoveButtons() {
+                                        let $rows = $('#performance-planning-table tbody tr');
+                                        if ($rows.length > 1) {
+                                            $rows.find('.remove-row-btn').show();
+                                        } else {
+                                            $rows.find('.remove-row-btn').hide();
+                                        }
+                                    }
+                                    showRemoveButtons();
 
-                            // Update row numbers and input names after add/remove
-                            function updateRowNumbers() {
-                                $('#performance-planning-table tbody tr').each(function(i, tr) {
-                                    $(tr).find('.row-number').text((i + 1) + '.');
+                                    // Update row numbers and input names after add/remove
+                                    function updateRowNumbers() {
+                                        $('#performance-planning-table tbody tr').each(function(i, tr) {
+                                            $(tr).find('.row-number').text((i + 1) + '.');
+                                        });
+                                    }
+
+                                    function updateInputNames() {
+                                        $('#performance-planning-table tbody tr').each(function(i, tr) {
+                                            $(tr).find('input[type="hidden"]').eq(0).attr('name',
+                                                `performance_planning[${i}][description]`);
+                                            $(tr).find('input[type="hidden"]').eq(1).attr('name',
+                                                `performance_planning[${i}][performance_target]`);
+                                            $(tr).find('input[type="date"]').attr('name',
+                                                `performance_planning[${i}][target_date]`);
+                                        });
+                                    }
                                 });
-                            }
-                            function updateInputNames() {
-                                $('#performance-planning-table tbody tr').each(function(i, tr) {
-                                    $(tr).find('input[type="hidden"]').eq(0).attr('name', `performance_planning[${i}][description]`);
-                                    $(tr).find('input[type="hidden"]').eq(1).attr('name', `performance_planning[${i}][performance_target]`);
-                                    $(tr).find('input[type="date"]').attr('name', `performance_planning[${i}][target_date]`);
-                                });
-                            }
-                        });
-                        </script>
+                            </script>
                         @endpush
 
 
@@ -1264,7 +1567,8 @@
             <button class="btn btn-outline-secondary btn-lg d-none" id="backToFormBtn" style="min-width: 180px;">
                 <i class="fas fa-arrow-left me-2"></i>Back to Form
             </button>
-            <button type="submit" class="btn btn-outline-primary btn-lg d-none" id="proceed-btn" style="min-width: 180px;">
+            <button type="submit" class="btn btn-outline-primary btn-lg d-none" id="proceed-btn"
+                style="min-width: 180px;">
                 <i class="fas fa-paper-plane me-2"></i>Proceed
             </button>
         </div>
@@ -1489,6 +1793,17 @@
                 $('#appraisalForm').on('submit', function(e) {
                     e.preventDefault();
 
+                    if ($('input[name="review_type"]:checked').val() === 'end_of_contract') {
+                        // If contract details are missing, show message and return
+                        var contractDetails = $('#expireContractDetails');
+                        if (contractDetails.length && contractDetails.find('.alert-info').length === 0) {
+                            alert(
+                                'No contract expiry details available. Please comfirm the Review type you selected and try updating again'
+                                );
+                            return;
+                        }
+                    }
+
                     // show the preview section
                     $('.preview-section').removeClass('d-none');
 
@@ -1499,7 +1814,8 @@
                     function getLabel(name) {
                         let label = $(`label[for="${name}"]`).text();
                         if (!label) {
-                            label = $(`[name="${name}"]`).closest('.form-group, .form-section, td').find('label').first().text();
+                            label = $(`[name="${name}"]`).closest('.form-group, .form-section, td').find(
+                                'label').first().text();
                         }
                         if (label) {
                             label = label.replace(/^(.*?)(\1)+$/, '$1');
@@ -1527,7 +1843,8 @@
                                 let label = id ? $(`label[for="${id}"]`).text() : '';
                                 return label || $checked.val();
                             } else {
-                                let groupLabel = $radios.closest('.form-section, .form-group').find('label').first().text();
+                                let groupLabel = $radios.closest('.form-section, .form-group').find('label')
+                                    .first().text();
                                 if (groupLabel) {
                                     groupLabel = groupLabel.replace(/^(.*?)(\1)+$/, '$1');
                                 }
@@ -1591,7 +1908,8 @@
                     $('input[type="radio"]').each(function() {
                         const name = $(this).attr('name');
                         if (name && !radioQuestions[name]) {
-                            let groupLabel = $(this).closest('.form-section, .form-group').find('label').first().text();
+                            let groupLabel = $(this).closest('.form-section, .form-group').find('label')
+                                .first().text();
                             if (groupLabel) {
                                 groupLabel = groupLabel.replace(/^(.*?)(\1)+$/, '$1');
                             }
@@ -1603,7 +1921,8 @@
                         if (name && !textareaQuestions[name]) {
                             let label = $(`label[for="${name}"]`).text();
                             if (!label) {
-                                label = $(this).closest('.form-section, .form-group').find('label').first().text();
+                                label = $(this).closest('.form-section, .form-group').find('label')
+                                    .first().text();
                             }
                             if (label) {
                                 label = label.replace(/^(.*?)(\1)+$/, '$1');
@@ -1621,7 +1940,8 @@
                             $el = $(`[name^="${name}"]`);
                         }
                         if ($el.length) {
-                            if ($el.prop('readonly') || $el.prop('disabled') || $el.is('[readonly]') || $el.is('[disabled]')) {
+                            if ($el.prop('readonly') || $el.prop('disabled') || $el.is('[readonly]') || $el.is(
+                                    '[disabled]')) {
                                 return true;
                             }
                         }
@@ -1685,22 +2005,30 @@
                         if (item.name.startsWith('appraisal_period_rate')) {
                             const match = item.name.match(/appraisal_period_rate\[(\d+)\]\[(.+?)\]/);
                             if (match) {
-                                const idx = match[1], key = match[2];
-                                if (!sectionFields.appraisal_period_rate[idx]) sectionFields.appraisal_period_rate[idx] = {};
+                                const idx = match[1],
+                                    key = match[2];
+                                if (!sectionFields.appraisal_period_rate[idx]) sectionFields
+                                    .appraisal_period_rate[idx] = {};
                                 sectionFields.appraisal_period_rate[idx][key] = item.value || '';
                             }
                         } else if (item.name.startsWith('personal_attributes_assessment')) {
-                            const match = item.name.match(/personal_attributes_assessment\[(.+?)\]\[(.+?)\]/);
+                            const match = item.name.match(
+                                /personal_attributes_assessment\[(.+?)\]\[(.+?)\]/);
                             if (match) {
-                                const attr = match[1], key = match[2];
-                                if (!sectionFields.personal_attributes_assessment[attr]) sectionFields.personal_attributes_assessment[attr] = {};
-                                sectionFields.personal_attributes_assessment[attr][key] = item.value || '';
+                                const attr = match[1],
+                                    key = match[2];
+                                if (!sectionFields.personal_attributes_assessment[attr]) sectionFields
+                                    .personal_attributes_assessment[attr] = {};
+                                sectionFields.personal_attributes_assessment[attr][key] = item.value ||
+                                    '';
                             }
                         } else if (item.name.startsWith('performance_planning')) {
                             const match = item.name.match(/performance_planning\[(\d+)\]\[(.+?)\]/);
                             if (match) {
-                                const idx = match[1], key = match[2];
-                                if (!sectionFields.performance_planning[idx]) sectionFields.performance_planning[idx] = {};
+                                const idx = match[1],
+                                    key = match[2];
+                                if (!sectionFields.performance_planning[idx]) sectionFields
+                                    .performance_planning[idx] = {};
                                 sectionFields.performance_planning[idx][key] = item.value || '';
                             }
                         } else if (sectionMap[item.name]) {
@@ -1742,7 +2070,8 @@
 
                     // 2. Personal Details Section (handle missing radios/textareas)
                     let personalHtml = '';
-                    if (sectionFields.personal_details.length || Object.keys(radioQuestions).length || Object.keys(textareaQuestions).length) {
+                    if (sectionFields.personal_details.length || Object.keys(radioQuestions).length || Object
+                        .keys(textareaQuestions).length) {
                         personalHtml += '<div class="row">';
                         // Show all radio questions, even if not answered
                         Object.entries(radioQuestions).forEach(([name, label]) => {
@@ -1847,7 +2176,9 @@
                             </thead>
                             <tbody>
                         `;
-                        Object.entries(sectionFields.personal_attributes_assessment).forEach(([attr, scores]) => {
+                        Object.entries(sectionFields.personal_attributes_assessment).forEach(([attr,
+                            scores
+                        ]) => {
                             attributesHtml += `<tr>
                                 <td>${attr.replace(/_/g, ' ')}</td>
                                 <td>${displayValue(scores.appraisee_score, `personal_attributes_assessment[${attr}][appraisee_score]`)}</td>
@@ -1888,7 +2219,8 @@
 
                     // 6. Supervisor Report
                     let supervisorHtml = '';
-                    if (sectionFields.supervisor_report.length || getSectionTextareaNames('supervisor_report').length) {
+                    if (sectionFields.supervisor_report.length || getSectionTextareaNames('supervisor_report')
+                        .length) {
                         supervisorHtml += '<div class="row">';
                         getSectionTextareaNames('supervisor_report').forEach(name => {
                             let label = textareaQuestions[name] || name.replace(/_/g, ' ');
@@ -1919,7 +2251,8 @@
 
                     // 7. Panel Evaluation
                     let panelHtml = '';
-                    if (sectionFields.panel_evaluation.length || getSectionTextareaNames('panel_evaluation').length) {
+                    if (sectionFields.panel_evaluation.length || getSectionTextareaNames('panel_evaluation')
+                        .length) {
                         panelHtml += '<div class="row">';
                         getSectionTextareaNames('panel_evaluation').forEach(name => {
                             let label = textareaQuestions[name] || name.replace(/_/g, ' ');
@@ -2307,8 +2640,18 @@
                             updateOverallAverage();
                         });
                         input.addEventListener('focus', function() {
-                            // If value is default (e.g. 0), clear on focus for easier entry
-                            if (this.value == '0') this.value = '';
+                            // If input is readonly, show a tooltip and do not clear value
+                            if (this.hasAttribute('readonly') || this.hasAttribute('disabled')) {
+                                this.title = "You are not allowed to update this value.";
+                                // Optionally, show a Bootstrap tooltip if available
+                                if (typeof bootstrap !== 'undefined') {
+                                    bootstrap.Tooltip.getOrCreateInstance(this).show();
+                                }
+                                return;
+                            } else {
+                                // If value is default (e.g. 0), clear on focus for easier entry
+                                if (this.value == '0') this.value = '';
+                            }
                         });
                         input.addEventListener('blur', function() {
                             // If left empty, set to 0

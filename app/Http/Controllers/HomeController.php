@@ -13,7 +13,10 @@ use App\Models\Scopes\EmployeeScope;
 use App\Models\Training;
 use Carbon\Carbon;
 use App\Models\Event;
+use App\Models\User;
+use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Request;
 
 class HomeController extends Controller
 {
@@ -41,15 +44,15 @@ class HomeController extends Controller
             ->count();
 
 
-        $completeAppraisals= Appraisal::whereJsonContains('appraisal_request_status', ['HR' => 'approved'])
+        $completeAppraisals = Appraisal::whereJsonContains('appraisal_request_status', ['HR' => 'approved'])
             ->whereJsonContains('appraisal_request_status', ['Executive Secretary' => 'approved'])
             ->count();
         // contracts
-        $contracts = Contract::where('employee_id', $employee->employee_id)->orWhereTodayOrAfter('end_date')->get();
+        $contracts = Contract::whereTodayOrAfter('end_date')->get();
 
-        $runningContracts = Contract::where('employee_id', $employee->employee_id)->orWhereTodayOrBefore('end_date')->count();
+        $runningContracts = Contract::where('end_date', '>=', Carbon::today())->count();
 
-        $expiredContracts=Contract::where('employee_id', $employee->employee_id)->orWhereTodayOrAfter('end_date')->count();
+        $expiredContracts = Contract::where('end_date', '<', Carbon::today())->count();
 
         $leaveTypes = LeaveType::all()->keyBy('leave_type_id');
 
@@ -249,6 +252,18 @@ class HomeController extends Controller
             ->whereDay('date_of_birth', Carbon::today()->day)
             ->get();
 
-        return view('dashboard.index', compact('number_of_employees', 'contracts', 'runningContracts','expiredContracts','attendances', 'available_leave', 'hours', 'todayCounts', 'yesterdayCounts', 'lateCounts', 'chartDataJson', 'leaveTypesJson', 'chartEmployeeDataJson', 'events', 'trainings', 'entries', 'appraisals', 'leaveApprovalData', 'totalLeaves', 'totalDays', 'todayBirthdays', 'isAdmin', 'completeAppraisals', 'ongoingAppraisals', 'pendingAppraisals'));
+        $user = User::find(auth()->id());
+        $notifications = $user->unreadNotifications()->latest()->take(10)->get();
+
+        return view('dashboard.index', compact('number_of_employees', 'notifications', 'contracts', 'runningContracts', 'expiredContracts', 'attendances', 'available_leave', 'hours', 'todayCounts', 'yesterdayCounts', 'lateCounts', 'chartDataJson', 'leaveTypesJson', 'chartEmployeeDataJson', 'events', 'trainings', 'entries', 'appraisals', 'leaveApprovalData', 'totalLeaves', 'totalDays', 'todayBirthdays', 'isAdmin', 'completeAppraisals', 'ongoingAppraisals', 'pendingAppraisals'));
+    }
+
+    public function agree()
+    {
+        // Store the agreement in the user's profile or session
+        $user = auth()->user();
+        $user->agreed_to_data_usage = true;
+        $user->save();
+        return redirect()->back()->with('success', 'Thank you for agreeing to data usage.');
     }
 }

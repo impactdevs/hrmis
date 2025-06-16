@@ -270,6 +270,6 @@ class Employee extends Model
 
     public function contracts()
     {
-        return $this->hasMany(Contract::class, 'employee_id', 'employee_id');
+        return $this->hasMany(Contract::class, 'employee_id', 'employee_id')->withoutGlobalScopes();
     }
 }

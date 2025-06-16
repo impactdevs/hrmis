@@ -51,8 +51,16 @@
                     $title = 'Add contract';
                 }
 
+                                if (request()->routeIs('notifications.index')) {
+                    $title = 'Software Notifications';
+                }
+
                 if (request()->routeIs('contract.edit')) {
                     $title = 'Edit contract';
+                }
+
+                if (request()->routeIs('contract.show')) {
+                    $title = 'Contract Details';
                 }
 
                 if (

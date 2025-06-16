@@ -49,6 +49,7 @@ class Appraisal extends Model
         'panel_recommendation',
         'overall_assessment',
         'executive_secretary_comments',
+        'contract_id'
     ];
 
     protected $casts = [

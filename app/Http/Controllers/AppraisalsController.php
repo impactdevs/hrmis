@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\Summit;
 use App\Models\Appraisal;
-
+use App\Models\Contract;
 use App\Models\User;
 use App\Notifications\AppraisalApproval;
 use App\Notifications\AppraisalApplication;
@@ -14,8 +14,7 @@ use App\Models\Scopes\EmployeeScope;
 use Illuminate\Support\Facades\Notification;
 
 use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Log;
+
 
 
 class AppraisalsController extends Controller
@@ -139,14 +138,14 @@ class AppraisalsController extends Controller
         Notification::send($appraisorUser, new AppraisalApplication($appraisal, $employeeAppraisee->first_name, $employeeAppraisee->last_name));
 
         $hrUser = User::role('HR')->first();
-        $hrEmployee = \App\Models\Employee::withoutGlobalScope(EmployeeScope::class)
-            ->where('email', $hrUser->email)->first();
+        // $hrEmployee = \App\Models\Employee::withoutGlobalScope(EmployeeScope::class)
+        //     ->where('email', $hrUser->email)->first();
 
         Notification::send($hrUser, new AppraisalApplication($appraisal, $employeeAppraisee->first_name, $employeeAppraisee->last_name));
 
         $esUser = User::role('Executive Secretary')->first();
-        $esEmployee = \App\Models\Employee::withoutGlobalScope(EmployeeScope::class)
-            ->where('email', $esUser->email)->first();
+        // $esEmployee = \App\Models\Employee::withoutGlobalScope(EmployeeScope::class)
+        //     ->where('email', $esUser->email)->first();
 
         Notification::send($esUser, new AppraisalApplication($appraisal, $employeeAppraisee->first_name, $employeeAppraisee->last_name));
 
@@ -180,9 +179,24 @@ class AppraisalsController extends Controller
     public function edit(Appraisal $uncst_appraisal)
     {
         $appraisal = $uncst_appraisal;
-        $users = User::whereHas('employee')->get();
+        $users = User::role('Head of Division')->whereHas('employee')->get();
 
-        return view('appraisals.edit', compact('appraisal', 'users'));
+        if ($uncst_appraisal->contract_id!=null) {
+            $expiredContract = Contract::find($uncst_appraisal->contract_id);
+
+            dd("not null");
+
+        } else {
+            $contractAppraisals = Appraisal::where('employee_id', auth()->user()->employee->employee_id)->whereNotNull('contract_id')->pluck('contract_id')->toArray();
+            // Get the most recent contract for the user that has not been appraised
+            $expiredContract = Contract::where('employee_id', auth()->user()->employee->employee_id)
+                ->wherePast('end_date')
+                ->whereNotIn('id', $contractAppraisals)
+                ->orderBy('end_date', 'desc')
+                ->first();
+        }
+
+        return view('appraisals.edit', compact('appraisal', 'users', 'expiredContract'));
     }
 
     public function previewAppraisalDetails(Appraisal $appraisal)
@@ -200,7 +214,11 @@ class AppraisalsController extends Controller
      */
     public function update(Request $request, Appraisal $uncst_appraisal)
     {
-        $$uncst_appraisal->update($request->all());        
+        $requestedData = $request->all();
+        if (!empty($requestedData['review_type']) && $requestedData['review_type'] != 'end_of_contract') {
+            $requestedData['contract_id'] = null;
+        }
+        $uncst_appraisal->update($requestedData);
 
         return redirect()->back()->with('success', 'Appraisal updated successfully.');
     }
@@ -292,5 +310,4 @@ class AppraisalsController extends Controller
         $pdf = PDf::loadView('appraisals.pdf', compact('appraisal', 'users'));
         return $pdf->download("appraisal-{$appraisal->appraisal_id}.pdf");
     }
-
 }

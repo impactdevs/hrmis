@@ -735,6 +735,131 @@
 
                         </div>
                     </div><!-- End Events & Trainings -->
+
+                    {{-- Un read Notification Reminders --}}
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body pb-0">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="card-title mb-0">
+                                    <i class="bi bi-bell-fill text-primary"></i> Latest Notifications <span class="badge bg-primary text-light">{{ $notifications->count() }}</span>
+                                </h5>
+                                <a href="{{ route('notifications.index') }}" class="btn btn-link btn-sm text-decoration-none">View All</a>
+                            </div>
+                            <section class="section dashboard px-1">
+                                <div class="row">
+                                    <div class="col-12">
+                                        @if ($notifications->isNotEmpty())
+                                            <ul class="list-group list-group-flush">
+                                                @foreach ($notifications as $notification)
+                                                    @php
+                                                        $url = '';
+                                                        if (isset($notification->data['leave_id'])) {
+                                                            $url = url('leaves', $notification->data['leave_id']);
+                                                        }
+                                                        if (isset($notification->data['training_id'])) {
+                                                            $url = url('trainings', $notification->data['training_id']);
+                                                        }
+                                                        if (isset($notification->data['event_id'])) {
+                                                            $url = url('events', $notification->data['event_id']);
+                                                        }
+                                                        if (isset($notification->data['appraisal_id'])) {
+                                                            $url = url('uncst-appraisals', $notification->data['appraisal_id']);
+                                                        }
+                                                        if (isset($notification->data['travel_training_id'])) {
+                                                            $url = url('out-of-station-trainings', $notification->data['travel_training_id']);
+                                                        }
+                                                        if (isset($notification->data['reminder_category'])) {
+                                                            if ($notification->data['reminder_category'] == 'appraisal') {
+                                                                $url = url('uncst-appraisals');
+                                                            }
+                                                        }
+                                                        $isUnread = is_null($notification->read_at);
+                                                    @endphp
+                                                    <li class="list-group-item notification-item d-flex align-items-start justify-content-between gap-2 rounded-2 mb-2 px-3 py-2 border-0 {{ $isUnread ? 'bg-light shadow-sm' : '' }}"
+                                                        data-url="{{ $url }}"
+                                                        data-id="{{ $notification->id }}"
+                                                        data-type="{{ $notification->type }}"
+                                                        style="cursor:pointer; transition: background 0.2s;">
+                                                        <div class="flex-grow-1">
+                                                            <div class="d-flex align-items-center gap-2 mb-1">
+                                                                <i class="bi bi-dot {{ $isUnread ? 'text-primary' : 'text-secondary' }} fs-5"></i>
+                                                                <span class="fw-semibold">{{ $notification->data['message'] }}</span>
+                                                            </div>
+                                                            <small class="text-muted">
+                                                                <i class="bi bi-clock"></i> {{ $notification->created_at->diffForHumans() }}
+                                                            </small>
+                                                        </div>
+                                                        <button class="btn-close ms-2 mt-1" aria-label="Close" title="Mark as read & dismiss"></button>
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                        @else
+                                            <div class="text-center py-4">
+                                                <i class="bi bi-inbox fs-1 text-muted"></i>
+                                                <p class="mt-2 text-muted">No new notifications.</p>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+
+                    @push('scripts')
+                        <script>
+                            $(document).ready(function() {
+                                $('.notification-item').on('click', function() {
+                                    const notificationUrl = $(this).data('url');
+                                    const notificationId = $(this).data('id');
+
+                                    // AJAX request to mark notification as read
+                                    $.ajax({
+                                        url: `/notifications/${notificationId}/read`,
+                                        type: 'POST',
+                                        headers: {
+                                            'X-CSRF-TOKEN': '{{ csrf_token() }}' // Include CSRF token
+                                        },
+                                        success: function(data) {
+                                            if (data.success) {
+                                                $(this).addClass(
+                                                    'list-group-item-success'); // Optionally add a success class
+                                                window.location.href = notificationUrl;
+                                            }
+                                        }.bind(this), // Bind 'this' to access the clicked element
+                                        error: function(xhr) {
+                                            console.error('Error:', xhr);
+                                        }
+                                    });
+                                });
+
+                                $('.btn-close').on('click', function(event) {
+                                    event.stopPropagation(); // Prevent the parent click event
+
+                                    const notificationItem = $(this).closest('.notification-item');
+                                    const notificationId = notificationItem.data('id');
+                                    const notificationUrl = notificationItem.data('url');
+
+                                    // AJAX request to mark notification as read
+                                    $.ajax({
+                                        url: `/notifications/${notificationId}/read`,
+                                        type: 'POST',
+                                        headers: {
+                                            'X-CSRF-TOKEN': '{{ csrf_token() }}' // Include CSRF token
+                                        },
+                                        success: function(data) {
+                                            if (data.success) {
+                                                notificationItem
+                                            .remove(); // Remove the notification item from the UI
+                                            }
+                                        },
+                                        error: function(xhr) {
+                                            console.error('Error:', xhr);
+                                        }
+                                    });
+                                });
+                            });
+                        </script>
+                    @endpush
                 </div><!-- End Right side columns -->
 
             </div>
@@ -820,8 +945,16 @@
                     {{-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> --}}
                 </div>
                 <div class="modal-body">
+                    <form id="consentForm" action="{{ route('agree') }}" method="post">
+                        @csrf
+                        <input type="hidden" name="agreed_to_data_usage" value="true">
+                    </form>
                     <p>
-                        In accordance with the Data Protection and Privacy Act of Uganda, we request your consent to collect, process, and use your personal data for employment and HR management purposes. Your information will be handled securely and only used for legitimate business operations as required by law.
+                        In accordance with the Data Protection and Privacy Act of Uganda, we request your consent to
+                        collect, process, and use your personal data for employment and human resource management
+                        purposes. Your information will be handled securely and in compliance with applicable laws and
+                        regulations. It will only be used for legitimate employment-related purposes and other
+                        authorized activities in line with the policies and obligations of the Government of Uganda.
                     </p>
                 </div>
                 <div class="modal-footer">
@@ -833,7 +966,6 @@
         </div>
     </div>
 
-
     @push('scripts')
         @vite(['resources/js/custom-dashboard.js'])
 
@@ -844,8 +976,14 @@
                 var employeeData = {!! $chartEmployeeDataJson !!};
                 console.log(window.isAdminOrSecretary);
                 // open the consent modal here
-                var consentModal = new bootstrap.Modal(document.getElementById('consent'));
-                consentModal.show();
+                @if (!auth()->user()->agreed_to_data_usage)
+                    var consentModal = new bootstrap.Modal(document.getElementById('consent'));
+                    consentModal.show();
+                @endif
+
+                document.getElementById('applyButton').addEventListener('click', function() {
+                    document.getElementById('consentForm').submit();
+                });
 
 
                 var budgetChart = echarts.init(document.querySelector("#budgetChart"));

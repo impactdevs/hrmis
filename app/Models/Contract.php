@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\ContractScope;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 
+#[ScopedBy([ContractScope::class])]
 class Contract extends Model
 {
     protected $table = "employee_contracts";
@@ -33,7 +36,7 @@ class Contract extends Model
 
     public function employee()
     {
-        return $this->belongsTo(Employee::class, 'employee_id', 'employee_id');
+        return $this->belongsTo(Employee::class, 'employee_id', 'employee_id')->withoutGlobalScopes();
     }
 
     public function getDaysUntilEndAttribute()
@@ -41,4 +44,11 @@ class Contract extends Model
         return floor(Carbon::now()->diffInRealDays($this->end_date, false));
 
     }
+
+    //each contract can belong to 0 or 1 appraisal
+    public function appraisal()
+    {
+        return $this->hasOne(Appraisal::class, 'contract_id', 'id');
+    }
+
 }
