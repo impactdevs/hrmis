@@ -6,5 +6,5 @@ use Illuminate\Support\Facades\Schedule;
 Schedule::command('reminders:send-birthday')->daily();
 
 //send AppraisalReminder at every 1st of june
-Schedule::command('app:appraisal-reminder')->dailyAt('12:36');
+Schedule::command('app:appraisal-reminder')->dailyAt('12:42');
 
