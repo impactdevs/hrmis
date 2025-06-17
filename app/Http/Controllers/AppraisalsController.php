@@ -134,20 +134,19 @@ class AppraisalsController extends Controller
             ->where('email', auth()->user()->email)->first();
 
         $appraisorUser = User::find($employeeAppraisor->user_id);
-
-        Notification::send($appraisorUser, new AppraisalApplication($appraisal, $employeeAppraisee->first_name, $employeeAppraisee->last_name));
+        if ($appraisorUser) {
+            Notification::send($appraisorUser, new AppraisalApplication($appraisal, $employeeAppraisee->first_name, $employeeAppraisee->last_name));
+        }
 
         $hrUser = User::role('HR')->first();
-        // $hrEmployee = \App\Models\Employee::withoutGlobalScope(EmployeeScope::class)
-        //     ->where('email', $hrUser->email)->first();
-
-        Notification::send($hrUser, new AppraisalApplication($appraisal, $employeeAppraisee->first_name, $employeeAppraisee->last_name));
+        if ($hrUser) {
+            Notification::send($hrUser, new AppraisalApplication($appraisal, $employeeAppraisee->first_name, $employeeAppraisee->last_name));
+        }
 
         $esUser = User::role('Executive Secretary')->first();
-        // $esEmployee = \App\Models\Employee::withoutGlobalScope(EmployeeScope::class)
-        //     ->where('email', $esUser->email)->first();
-
-        Notification::send($esUser, new AppraisalApplication($appraisal, $employeeAppraisee->first_name, $employeeAppraisee->last_name));
+        if ($esUser) {
+            Notification::send($esUser, new AppraisalApplication($appraisal, $employeeAppraisee->first_name, $employeeAppraisee->last_name));
+        }
 
         return to_route('uncst-appraisals.edit', ['uncst_appraisal' => $appraisal->appraisal_id]);
     }
