@@ -13,15 +13,15 @@ return new class extends Migration
     {
         Schema::create('salary_advances', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->decimal('amount_applied_for', 15, 2)->nullable();
+            $table->bigInteger('amount_applied_for')->nullable();
             $table->text('reasons')->nullable();
             $table->uuid('employee_id');
             $table->foreign('employee_id')->references('employee_id')->on('employees')->onDelete('cascade');
             $table->date('repayment_start_date')->nullable();
             $table->date('repayment_end_date')->nullable();
             $table->date('date_of_contract_expiry')->nullable();
-            $table->decimal('net_monthly_pay', 15, 2)->nullable();
-            $table->decimal('outstanding_loan', 15, 2)->nullable();
+            $table->bigInteger('net_monthly_pay')->nullable();
+            $table->bigInteger('outstanding_loan')->nullable();
             $table->text('comments')->nullable();
             $table->json('loan_request_status')->nullable();
             $table->timestamps();

@@ -35,7 +35,7 @@
                                 {{-- Assuming you have a relation or can access employee name --}}
                                 {{ $advance->employee->first_name . ' ' . $advance->employee->first_name }}
                             </td>
-                            <td>{{ number_format($advance->amount_applied_for, 2) }}</td>
+                            <td>{{ number_format($advance->amount_applied_for) }}</td>
                             <td>{{ $advance->reasons }}</td>
                             <td>{{ $advance->repayment_start_date ? \Carbon\Carbon::parse($advance->repayment_start_date)->format('d/m/Y') : '-' }}
                             </td>
@@ -43,8 +43,8 @@
                             </td>
                             <td>{{ $advance->date_of_contract_expiry ? \Carbon\Carbon::parse($advance->date_of_contract_expiry)->format('d/m/Y') : '-' }}
                             </td>
-                            <td>{{ number_format($advance->net_monthly_pay, 2) }}</td>
-                            <td>{{ number_format($advance->outstanding_loan, 2) }}</td>
+                            <td>{{ number_format($advance->net_monthly_pay) }}</td>
+                            <td>{{ number_format($advance->outstanding_loan) }}</td>
                             <td>
                                 @if (!is_null($advance->loan_request_status))
                                     <div class="status m-2">

@@ -22,7 +22,7 @@
                         <div class="form-group">
                             <label for="amount_applied_for">Amount Applied For</label>
                             <input type="number" class="form-control" name="amount_applied_for" id="amount_applied_for"
-                                @if ($role != 'Staff') readonly @endif placeholder="Enter Amount Applied For"
+                                @if ($role != 'Staff') readonly title="Editing is disabled for your role" onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()" @endif placeholder="Enter Amount Applied For"
                                 value="{{ old('amount_applied_for', $salary_advance->amount_applied_for ?? '') }}">
                         </div>
                     </div>
@@ -30,7 +30,7 @@
                         <div class="form-group">
                             <label for="reasons">Reason(s)</label>
                             <textarea class="form-control" name="reasons" id="reasons" rows="3"
-                                @if ($role != 'Staff') readonly @endif>{{ old('reasons', $salary_advance->reasons ?? '') }}</textarea>
+                                @if ($role != 'Staff') readonly title="Editing is disabled for your role" onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()" @endif>{{ old('reasons', $salary_advance->reasons ?? '') }}</textarea>
                         </div>
                     </div>
                 </div>
@@ -39,7 +39,7 @@
                         <div class="form-group">
                             <label for="repayment_start_date">Repayment Start Date</label>
                             <input type="date" class="form-control" name="repayment_start_date"
-                                id="repayment_start_date" @if ($role != 'Staff') readonly @endif
+                                id="repayment_start_date" @if ($role != 'Staff') readonly title="Editing is disabled for your role" onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()" @endif
                                 value="{{ old('repayment_start_date', isset($salary_advance) && $salary_advance->repayment_start_date ? $salary_advance->repayment_start_date->toDateString() : '') }}">
                         </div>
                     </div>
@@ -47,7 +47,7 @@
                         <div class="form-group">
                             <label for="repayment_end_date">Repayment End Date</label>
                             <input type="date" class="form-control" name="repayment_end_date" id="repayment_end_date"
-                                @if ($role != 'Staff') readonly @endif
+                                @if ($role != 'Staff') readonly title="Editing is disabled for your role" onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()" @endif
                                 value="{{ old('repayment_end_date', isset($salary_advance) && $salary_advance->repayment_end_date ? $salary_advance->repayment_end_date->toDateString() : '') }}">
                         </div>
                     </div>
@@ -67,7 +67,7 @@
                         <div class="form-group">
                             <label for="date_of_contract_expiry">Date of contract expiry for the Applicant</label>
                             <input type="date" class="form-control" name="date_of_contract_expiry"
-                                @if ($role != 'HR') readonly @endif id="date_of_contract_expiry"
+                                @if ($role != 'HR') readonly title="Editing is disabled for your role" onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()" @endif id="date_of_contract_expiry"
                                 value="{{ old('date_of_contract_expiry', isset($salary_advance) && $salary_advance->date_of_contract_expiry ? $salary_advance->date_of_contract_expiry->toDateString() : '') }}">
                         </div>
                     </div>
@@ -75,7 +75,7 @@
                         <div class="form-group">
                             <label for="net_monthly_pay">Net Monthly Pay</label>
                             <input type="number" class="form-control" name="net_monthly_pay" id="net_monthly_pay"
-                                @if ($role != 'HR') readonly @endif placeholder="Enter Net Monthly"
+                                @if ($role != 'HR') readonly title="Editing is disabled for your role" onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()" @endif placeholder="Enter Net Monthly"
                                 value="{{ old('net_monthly_pay', $salary_advance->net_monthly_pay ?? '') }}">
                         </div>
                     </div>
@@ -95,7 +95,7 @@
                         <div class="form-group">
                             <label for="outstanding_loan">Outstanding Salary Advance/Loan if any</label>
                             <input type="number" class="form-control" name="outstanding_loan" id="outstanding_loan"
-                                @if ($role != 'Finance Department') readonly @endif
+                                @if ($role != 'Finance Department') readonly title="Editing is disabled for your role" onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()" @endif
                                 placeholder="Outstanding Salary Advance/Loan if any"
                                 value="{{ old('outstanding_loan', $salary_advance->outstanding_loan ?? '') }}">
                         </div>
@@ -104,7 +104,7 @@
                         <div class="form-group">
                             <label for="comments">Comments</label>
                             <textarea class="form-control" name="comments" id="comments" rows="3"
-                                @if ($role != 'Finance Department') readonly @endif>{{ old('comments', $salary_advance->comments ?? '') }}</textarea>
+                                @if ($role != 'Finance Department') readonly title="Editing is disabled for your role" onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()" @endif>{{ old('comments', $salary_advance->comments ?? '') }}</textarea>
                         </div>
                     </div>
                 </div>

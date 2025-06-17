@@ -91,8 +91,8 @@ class SalaryAdvanceController extends Controller
             'reasons' => 'required|string',
             'repayment_start_date' => 'required|date|after_or_equal:today',
             'repayment_end_date' => 'required|date|after:repayment_start_date',
-            'date_of_contract_expiry' => 'required|date|after_or_equal:today',
-            'net_monthly_pay' => 'required|numeric|min:0',
+            'date_of_contract_expiry' => 'nullable|date|after_or_equal:today',
+            'net_monthly_pay' => 'nullable|numeric|min:0',
             'outstanding_loan' => 'nullable|numeric|min:0',
             'comments' => 'nullable|string',
         ]);
