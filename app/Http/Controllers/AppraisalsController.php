@@ -182,12 +182,10 @@ class AppraisalsController extends Controller
 
         if ($uncst_appraisal->contract_id != null) {
             $expiredContract = Contract::find($uncst_appraisal->contract_id);
-
-            dd("not null");
         } else {
-            $contractAppraisals = Appraisal::where('employee_id', auth()->user()->employee->employee_id)->whereNotNull('contract_id')->pluck('contract_id')->toArray();
+            $contractAppraisals = Appraisal::where('employee_id', $appraisal->employee_id)->whereNotNull('contract_id')->pluck('contract_id')->toArray();
             // Get the most recent contract for the user that has not been appraised
-            $expiredContract = Contract::where('employee_id', auth()->user()->employee->employee_id)
+            $expiredContract = Contract::where('employee_id', $appraisal->employee_id)
                 ->wherePast('end_date')
                 ->whereNotIn('id', $contractAppraisals)
                 ->orderBy('end_date', 'desc')

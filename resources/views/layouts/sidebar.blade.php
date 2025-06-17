@@ -61,6 +61,14 @@
                     {{ auth()->user()->isAdminOrSecretary ? 'Attendances' : 'My Attendance History' }} </a>
             </li>
 
+                <li class="nav-item">
+                    <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('salary-advances.index')) bg-secondary @endif"
+                        href="{{ route('salary-advances.index') }}">
+                        <i class="bi bi-check2-all"></i>
+                        {{ auth()->user()->isAdminOrSecretary ? 'Salary Advances' : 'My Salary Advances' }} </a>
+                </li>
+            
+
             <li class="nav-item">
                 <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('trainings.index') ||
                         request()->routeIs('trainings.show') ||

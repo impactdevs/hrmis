@@ -161,7 +161,7 @@ class OutOfStationTrainingController extends Controller
             // Send notification
             $trainingRequester = User::find($training->user_id); // Get the user who requested the leave
             $approver = User::find(auth()->user()->id);
-            Notification::send($trainingRequester, new OutOfStationApproval($training, $approver));
+            Notification::send($trainingRequester, new OutOfStationApproval($training, $approver, $trainingRequestStatus['Executive Secretary']));
         } else {
             return response()->json(['error' => 'Unauthorized'], 403);
         }

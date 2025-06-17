@@ -26,6 +26,7 @@ use App\Http\Controllers\PositionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicHolidayController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SalaryAdvanceController;
 use App\Http\Controllers\StaffRecruitmentController;
 use App\Http\Controllers\TrainingController;
 use App\Http\Controllers\UploadEmployees;
@@ -127,6 +128,11 @@ Route::middleware(['auth', 'verified', 'data.usage.agreement'])->group(function 
 
     Route::resource('uncst-job-applications', JobApplicationController::class)
         ->except(['create','store','edit','update']); // exclude create because it's public
+
+        Route::resource('salary-advances', SalaryAdvanceController::class);
+
+        Route::post('/salary-advances/loan-approval', [SalaryAdvanceController::class, 'approveOrReject'])
+        ->name('salary-advances.approveOrReject');
 });
 
 Route::get('uncst-job-application-form', [JobApplicationController::class, 'create'])->name('job-applications.create');

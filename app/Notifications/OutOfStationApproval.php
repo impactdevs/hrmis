@@ -17,15 +17,17 @@ class OutOfStationApproval extends Notification implements ShouldQueue
     public OutOfStationTraining $training;
     public User $user;
     public User $approver; // User who approved/rejected the leave
+    public $type;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(OutOfStationTraining $training, User $approver)
+    public function __construct(OutOfStationTraining $training, User $approver, $type)
     {
         $this->user = User::find($training->user_id);
         $this->training = $training;
         $this->approver = $approver; // Store the approver
+        $this->type = $type;
     }
 
     /**
@@ -43,7 +45,7 @@ class OutOfStationApproval extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
-        if ("approval" === 'rejected') {
+        if ($this->type == 'rejected') {
             return (new MailMessage)
                 ->subject('Travel Clearance Rejected')
                 ->line('Your travel clearance has been rejected.')
@@ -51,7 +53,7 @@ class OutOfStationApproval extends Notification implements ShouldQueue
                 ->line('Departure Date: ' . $this->training->departure_date->format('Y-m-d'))
                 ->line('Return Date: ' . $this->training->return_date->format('Y-m-d'))
                 ->line('Reason: ' . $this->training->rejection_reason)
-                ->line('Approved By: ' . $this->approver->name)
+                ->line('Rejected By: ' . $this->approver->name)
                 ->action('View Training Details', url('/out-of-station-trainings/' . $this->training->training_id))
                 ->line('Thank you for using our application!');
         } else {

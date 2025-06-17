@@ -51,7 +51,7 @@
                     $title = 'Add contract';
                 }
 
-                                if (request()->routeIs('notifications.index')) {
+                if (request()->routeIs('notifications.index')) {
                     $title = 'Software Notifications';
                 }
 
@@ -124,6 +124,14 @@
 
                 if (request()->routeIs('positions.index')) {
                     $title = 'Positions';
+                }
+
+                if (request()->routeIs('salary-advances.index')) {
+                    $title = 'Salary Advances';
+                }
+
+                if (request()->routeIs('salary-advances.create')) {
+                    $title = 'Applying for Salary Advance';
                 }
 
                 if (request()->routeIs('roles.index')) {
