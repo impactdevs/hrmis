@@ -31,6 +31,7 @@ class Appraisal extends Model
         'employee_id',
         'appraiser_id',
         'review_type',
+        'review_type_other',
         'appraisal_start_date',
         'appraisal_end_date',
         'job_compatibility',

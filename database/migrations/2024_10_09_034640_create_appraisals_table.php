@@ -21,6 +21,7 @@ return new class extends Migration {
 
             // Type of Review
             $table->string('review_type')->nullable();
+            $table->string('review_type_other')->nullable();
             $table->date('appraisal_start_date')->nullable();
             $table->date('appraisal_end_date')->nullable();
 

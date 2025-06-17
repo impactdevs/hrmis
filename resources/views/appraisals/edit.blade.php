@@ -115,9 +115,11 @@
                                             $options = [
                                                 'confirmation' => 'Confirmation',
                                                 'end_of_contract' => 'End of Contract',
-                                                'mid_financial_year' => 'Mid Financial Year',
+                                                'mid_financial_year' => 'End of Financial Year',
+                                                'other' => 'Other',
                                             ];
                                             $selected = old('review_type', $appraisal->review_type ?? '');
+                                            $otherValue = old('review_type_other', $appraisal->review_type_other ?? '');
                                         @endphp
 
                                         @foreach ($options as $value => $text)
@@ -126,12 +128,25 @@
                                                     id="review_type_{{ $value }}" value="{{ $value }}"
                                                     class="form-check-input @error('review_type') is-invalid @enderror"
                                                     {{ $selected === $value ? 'checked' : '' }}
-                                                    @if ($value === 'end_of_contract') onclick="document.getElementById('expireContractDetails').classList.remove('d-none');" @else onclick="document.getElementById('expireContractDetails').classList.add('d-none');" @endif>
+                                                    @if ($value === 'end_of_contract') 
+                                                        onclick="document.getElementById('expireContractDetails').classList.remove('d-none');document.getElementById('review_type_other_input').classList.add('d-none');"
+                                                    @elseif ($value === 'other')
+                                                        onclick="document.getElementById('expireContractDetails').classList.add('d-none');document.getElementById('review_type_other_input').classList.remove('d-none');"
+                                                    @else 
+                                                        onclick="document.getElementById('expireContractDetails').classList.add('d-none');document.getElementById('review_type_other_input').classList.add('d-none');"
+                                                    @endif
+                                                >
                                                 <label class="form-check-label" for="review_type_{{ $value }}">
                                                     {{ $text }}
                                                 </label>
                                             </div>
                                         @endforeach
+
+                                        <div id="review_type_other_input" class="mt-2 {{ $selected === 'other' ? '' : 'd-none' }}">
+                                            <input type="text" name="review_type_other" class="form-control"
+                                                placeholder="Please specify other review type"
+                                                value="{{ $otherValue }}">
+                                        </div>
 
                                         @error('review_type')
                                             <div class="invalid-feedback d-block">
@@ -140,6 +155,18 @@
                                         @enderror
                                     </div>
                                 </div>
+                                <script>
+                                    // Ensure correct visibility on page load
+                                    document.addEventListener('DOMContentLoaded', function() {
+                                        var selected = document.querySelector('input[name="review_type"]:checked');
+                                        var otherInput = document.getElementById('review_type_other_input');
+                                        if (selected && selected.value === 'other') {
+                                            otherInput.classList.remove('d-none');
+                                        } else {
+                                            otherInput.classList.add('d-none');
+                                        }
+                                    });
+                                </script>
                             </div>
 
                             <div id="expireContractDetails"

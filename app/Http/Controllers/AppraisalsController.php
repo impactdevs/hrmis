@@ -180,11 +180,10 @@ class AppraisalsController extends Controller
         $appraisal = $uncst_appraisal;
         $users = User::role('Head of Division')->whereHas('employee')->get();
 
-        if ($uncst_appraisal->contract_id!=null) {
+        if ($uncst_appraisal->contract_id != null) {
             $expiredContract = Contract::find($uncst_appraisal->contract_id);
 
             dd("not null");
-
         } else {
             $contractAppraisals = Appraisal::where('employee_id', auth()->user()->employee->employee_id)->whereNotNull('contract_id')->pluck('contract_id')->toArray();
             // Get the most recent contract for the user that has not been appraised
@@ -216,6 +215,10 @@ class AppraisalsController extends Controller
         $requestedData = $request->all();
         if (!empty($requestedData['review_type']) && $requestedData['review_type'] != 'end_of_contract') {
             $requestedData['contract_id'] = null;
+        }
+
+        if (!empty($requestedData['review_type_other']) && $requestedData['review_type_other'] != 'other') {
+            $requestedData['review_type_other'] = null;
         }
         $uncst_appraisal->update($requestedData);
 
