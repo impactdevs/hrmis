@@ -112,7 +112,7 @@
                         <div class="form-group">
                             <label for="outstanding_loan">Outstanding Salary Advance/Loan if any</label>
                             <input type="number" class="form-control" name="outstanding_loan" id="outstanding_loan"
-                                @if (!($role == 'Finance Department' || $isFinanceHead)) readonly disabled title="Editing is disabled for your role" onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()" @endif
+                                @if (!($role == 'Finance Department' || $isFinanceHead)) readonly title="Editing is disabled for your role" onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()" @endif
                                 placeholder="Outstanding Salary Advance/Loan if any"
                                 value="{{ old('outstanding_loan', $salary_advance->outstanding_loan ?? 0) }}">
                         </div>
@@ -121,7 +121,7 @@
                         <div class="form-group">
                             <label for="comments">Comments</label>
                             <textarea class="form-control" name="comments" id="comments" rows="3"
-                                @if (!($role == 'Finance Department' || $isFinanceHead)) readonly disabled title="Editing is disabled for your role" onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()" @endif>{{ old('comments', $salary_advance->comments ?? '') }}</textarea>
+                                @if (!($role == 'Finance Department' || $isFinanceHead)) readonly title="Editing is disabled for your role" onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()" @endif>{{ old('comments', $salary_advance->comments ?? '') }}</textarea>
                         </div>
                     </div>
                 </div>
