@@ -40,7 +40,7 @@ class AdvanceScope implements Scope
                 if (
                     $user->employee &&
                     $user->employee->department &&
-                    $user->employee->department->department_name === 'FINANCE DEPARTMENT'
+                    $user->employee->department->department_name === 'FINANCE AND ADMINISTRATION (F&A)'
                 ) {
                     $isFinanceDept = true;
                 }

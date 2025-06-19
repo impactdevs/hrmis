@@ -95,7 +95,7 @@
         if (
             $userRole === 'Head of Division' &&
             isset($user->employee->department) &&
-            strtoupper(trim($user->employee->department->department_name)) === 'FINANCE DEPARTMENT'
+            strtoupper(trim($user->employee->department->department_name)) === 'FINANCE AND ADMINISTRATION (F&A)'
         ) {
             $isFinanceHead = true;
         }
@@ -146,7 +146,7 @@
                         if (
                             $userRole === 'Head of Division' &&
                             isset($user->employee->department) &&
-                            strtoupper(trim($user->employee->department->department_name)) === 'FINANCE DEPARTMENT'
+                            strtoupper(trim($user->employee->department->department_name)) === 'FINANCE AND ADMINISTRATION (F&A)'
                         ) {
                             $userRole = 'Finance Department';
                         }
