@@ -50,7 +50,7 @@ class LeaveRoster extends Model
     // A leave roster belongs to an employee
     public function employee()
     {
-        return $this->belongsTo(Employee::class, 'employee_id', 'employee_id');
+        return $this->belongsTo(Employee::class, 'employee_id', 'employee_id')->withoutGlobalScopes();
     }
 
     // A leave roster belongs to 0 or 1 leave

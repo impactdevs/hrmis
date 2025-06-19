@@ -36,7 +36,12 @@
                                             $url = url('uncst-appraisals');
                                         }
                                     }
-
+                                    if (isset($notification->data['leave_roster_id'])) {
+                                        $url = url(
+                                            'apply-for-leave',
+                                            $notification->data['leave_roster_id'],
+                                        );
+                                    }
                                 @endphp
                                 <li class="list-group-item notification-item m-2 d-flex justify-content-between"
                                     data-url="{{ $url }}" data-id="{{ $notification->id }}"

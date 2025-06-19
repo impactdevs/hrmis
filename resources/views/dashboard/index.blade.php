@@ -553,57 +553,160 @@
 
                         <!-- End Customers Card -->
                         @if (count($leaveApprovalData) > 0)
-                            <!-- Leave Approval Progress -->
+                            <!-- Leave Requests Timeline -->
                             <div class="col-xxl-12 col-md-12">
-                                <div class="border card info-card leave-approval-card border-5 border-primary">
+                                <div class="card info-card border-0 shadow-sm leave-approval-card">
                                     <div class="card-body">
-                                        <h6 class="mb-2">Leave Requests</h6>
-
-                                        @foreach ($leaveApprovalData as $leaveData)
-                                            <div class="mb-3 leave-approval-item">
-                                                @if ($leaveData['esStatus'] === 'Approved')
-                                                    <!-- Hide progress area -->
-                                                    <div class="congratulations-message">
-                                                        <div class="balloons-css">
-                                                            <div class="balloon"></div>
-                                                            <div class="balloon"></div>
-                                                            <div class="balloon"></div>
-                                                            <div class="balloon"></div>
-                                                        </div>
-                                                        <p class="text-success fw-bold">🎉 Congratulations! 🎈 Your
-                                                            Leave Request was approved!!</p>
-                                                        @if ($leaveData['daysRemaining'] == 'Leave has not started')
-                                                            <p>Leave has not started yet!!</p>
+                                        <h5 class="mb-4 fw-bold text-primary">
+                                            <i class="bi bi-calendar-check"></i> My Recent Leave Requests
+                                        </h5>
+                                        <ul class="timeline list-unstyled">
+                                            @foreach ($leaveApprovalData as $leaveData)
+                                                <li class="timeline-item mb-5 position-relative ps-4">
+                                                    <div class="d-flex align-items-center mb-2">
+                                                        <span class="badge bg-primary me-2">{{ $leaveData['leave_type_name'] ?? 'Leave' }}</span>
+                                                        <span class="fw-semibold">{{ \Carbon\Carbon::parse($leaveData['start_date'])->format('d M') }} - {{ \Carbon\Carbon::parse($leaveData['end_date'])->format('d M, Y') }}</span>
+                                                        @if ($leaveData['esStatus'] === 'Approved')
+                                                            <span class="badge bg-success ms-2">Approved</span>
+                                                        @elseif ($leaveData['status'] === 'Rejected')
+                                                            <span class="badge bg-danger ms-2">Rejected</span>
                                                         @else
-                                                            <p class="text-success fw-bold">Days remaining to complete
-                                                                leave:
-                                                                {{ $leaveData['daysRemaining'] }}</p>
+                                                            <span class="badge bg-warning text-dark ms-2">Pending</span>
                                                         @endif
                                                     </div>
-                                                @elseif ($leaveData['status'] === 'Pending' && isset($leaveData['rejection_reason']))
-                                                    <div class="rejected-message">
-                                                        <h6>Status: Rejected</h6>
-                                                        <p>Reason: {{ $leaveData['rejection_reason'] }}</p>
+                                                    <div class="ms-1 mb-2">
+                                                        <small>
+                                                            <i class="bi bi-chat-left-text"></i>
+                                                            <strong>Reason:</strong> {{ $leaveData['reason'] ?? '-' }}
+                                                        </small>
                                                     </div>
-                                                @else
-                                                    <div class="progress">
-                                                        <div class="progress-bar" role="progressbar"
-                                                            style="width: {{ $leaveData['progress'] }}%;"
-                                                            aria-valuenow="{{ $leaveData['progress'] }}"
-                                                            aria-valuemin="0" aria-valuemax="100">
-                                                            {{ $leaveData['status'] }}
+                                                    <div class="ms-1 mb-2">
+                                                        <small>
+                                                            <i class="bi bi-person-check"></i>
+                                                            <strong>Handover:</strong>
+                                                            @if(!empty($leaveData['my_work_will_be_done_by']))
+                                                                {{ is_array($leaveData['my_work_will_be_done_by']) ? implode(', ', $leaveData['my_work_will_be_done_by']) : $leaveData['my_work_will_be_done_by'] }}
+                                                            @else
+                                                                N/A
+                                                            @endif
+                                                        </small>
+                                                    </div>
+                                                    <div class="ms-1 mb-2">
+                                                        <small>
+                                                            <i class="bi bi-telephone"></i>
+                                                            <strong>Contact:</strong> {{ $leaveData['phone_number'] ?? '-' }}
+                                                        </small>
+                                                    </div>
+                                                    <!-- Approval Progress Bar -->
+                                                    <div class="progress my-3" style="height: 8px;">
+                                                        <div class="progress-bar bg-{{ $leaveData['hrStatus'] === 'Approved' ? 'success' : ($leaveData['hrStatus'] === 'Rejected' ? 'danger' : 'warning') }}"
+                                                            role="progressbar" style="width: 33%;" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100"></div>
+                                                        <div class="progress-bar bg-{{ strtolower($leaveData['hodStatus']) === 'approved' ? 'success' : (strtolower($leaveData['hodStatus']) === 'rejected' ? 'danger' : 'warning') }}"
+                                                            role="progressbar" style="width: 33%;" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100"></div>
+                                                        <div class="progress-bar bg-{{ $leaveData['esStatus'] === 'Approved' ? 'success' : ($leaveData['esStatus'] === 'Rejected' ? 'danger' : 'warning') }}"
+                                                            role="progressbar" style="width: 34%;" aria-valuenow="34" aria-valuemin="0" aria-valuemax="100"></div>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between text-center small mb-2">
+                                                        <span>
+                                                            <i class="bi bi-person-badge"></i>
+                                                            HR<br>
+                                                            @if ($leaveData['hrStatus'] === 'Approved')
+                                                                <i class="bi bi-check-circle-fill text-success"></i>
+                                                            @elseif ($leaveData['hrStatus'] === 'Rejected')
+                                                                <i class="bi bi-x-circle-fill text-danger"></i>
+                                                            @else
+                                                                <i class="bi bi-hourglass-split text-warning"></i>
+                                                            @endif
+                                                        </span>
+                                                        <span>
+                                                            <i class="bi bi-person-workspace"></i>
+                                                            HOD<br>
+                                                            @if (strtolower($leaveData['hodStatus']) === 'approved' || strtolower($leaveData['hodStatus']) === 'apprroved')
+                                                                <i class="bi bi-check-circle-fill text-success"></i>
+                                                            @elseif (strtolower($leaveData['hodStatus']) === 'rejected')
+                                                                <i class="bi bi-x-circle-fill text-danger"></i>
+                                                            @else
+                                                                <i class="bi bi-hourglass-split text-warning"></i>
+                                                            @endif
+                                                        </span>
+                                                        <span>
+                                                            <i class="bi bi-person-lines-fill"></i>
+                                                            Executive<br>
+                                                            @if ($leaveData['esStatus'] === 'Approved')
+                                                                <i class="bi bi-check-circle-fill text-success"></i>
+                                                            @elseif ($leaveData['esStatus'] === 'Rejected')
+                                                                <i class="bi bi-x-circle-fill text-danger"></i>
+                                                            @else
+                                                                <i class="bi bi-hourglass-split text-warning"></i>
+                                                            @endif
+                                                        </span>
+                                                    </div>
+                                                    <!-- Status & Actions -->
+                                                    @if ($leaveData['esStatus'] === 'Approved')
+                                                        <div class="alert alert-success py-2 px-3 mt-2 mb-0 d-flex align-items-center gap-2">
+                                                            <i class="bi bi-emoji-laughing fs-4"></i>
+                                                            <div>
+                                                                <strong>Congratulations!</strong> Your leave is fully approved.
+                                                                @if ($leaveData['daysRemaining'] == 'Leave has not started')
+                                                                    <span class="d-block">Leave has not started yet.</span>
+                                                                @else
+                                                                    <span class="d-block">Days remaining: <strong>{{ $leaveData['daysRemaining'] }}</strong></span>
+                                                                @endif
+                                                            </div>
                                                         </div>
+                                                    @elseif ($leaveData['status'] === 'Rejected' && isset($leaveData['rejection_reason']))
+                                                        <div class="alert alert-danger py-2 px-3 mt-2 mb-0">
+                                                            <strong>Rejected:</strong> {{ $leaveData['rejection_reason'] }}
+                                                        </div>
+                                                    @elseif ($leaveData['status'] === 'Pending')
+                                                        <div class="alert alert-warning py-2 px-3 mt-2 mb-0">
+                                                            <span class="fw-semibold">Pending Approval</span>
+                                                        </div>
+                                                    @endif
+                                                    <!-- Handover Note Download & Text -->
+                                                    <div class="d-flex flex-wrap gap-3 mt-2">
+                                                        @if (!empty($leaveData['handover_note_file']))
+                                                            <a href="{{ asset('storage/' . $leaveData['handover_note_file']) }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                                                <i class="bi bi-file-earmark-arrow-down"></i> Handover Note
+                                                            </a>
+                                                        @endif
+                                                        @if (!empty($leaveData['handover_note']))
+                                                            <span class="badge bg-light text-dark border border-primary">
+                                                                <i class="bi bi-journal-text"></i>
+                                                                {{ $leaveData['handover_note'] }}
+                                                            </span>
+                                                        @endif
                                                     </div>
-                                                    <small>HR Review: {{ $leaveData['hrStatus'] }}</small><br>
-                                                    <small>HOD Review: {{ $leaveData['hodStatus'] }}</small><br>
-                                                    <small>Executive Staff Review: {{ $leaveData['esStatus'] }}</small>
-                                                @endif
-                                            </div>
-                                        @endforeach
+                                                    <hr class="my-4">
+                                                </li>
+                                            @endforeach
+                                        </ul>
                                     </div>
                                 </div>
-                            </div><!-- End Leave Approval Progress Card -->
+                            </div>
                         @endif
+
+                        @push('styles')
+                        <style>
+                            .timeline {
+                                border-left: 3px solid #0d6efd;
+                                margin-left: 1.5rem;
+                                padding-left: 0.5rem;
+                            }
+                            .timeline-item:before {
+                                content: '';
+                                position: absolute;
+                                left: -1.2rem;
+                                top: 0.5rem;
+                                width: 1rem;
+                                height: 1rem;
+                                background: #fff;
+                                border: 3px solid #0d6efd;
+                                border-radius: 50%;
+                                z-index: 1;
+                            }
+                        </style>
+                        @endpush
                         @foreach ($contracts as $contract)
                             @if ($contract->days_until_end >= 0 && $contract->days_until_end <= 90)
                                 <div class="col-xxl-12 col-md-12">

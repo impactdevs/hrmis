@@ -209,7 +209,7 @@ class HomeController extends Controller
         // Prepare leave approval progress data
         $leaveApprovalData = [];
         foreach ($leaves as $leave) {
-            if (($leave->leave_request_status != 'rejected') || ($leave->remainingLeaveDays() >= 0)) {
+            if ((($leave->leave_request_status != 'rejected') || ($leave->remainingLeaveDays() >= 0)) && (!$leave->is_cancelled)) {
                 $progress = 0;
                 $status = '';
 
@@ -239,6 +239,9 @@ class HomeController extends Controller
                     'leave' => $leave,
                     'daysRemaining' => $leave->remainingLeaveDays(),
                     'progress' => $progress,
+                    'start_date' => $leave->start_date->format('Y-m-d'),
+                    'end_date' => $leave->end_date->format('Y-m-d'),
+                    'is_cancelled' => $leave->is_cancelled,
                     'status' => $status,
                     'hrStatus' => $leave->leave_request_status["HR"] ?? "" === 'approved' ? 'Approved' : 'Pending',
                     'hodStatus' => $leave->leave_request_status["Head of Division"] ?? "" === 'approved' ? 'Apprroved' : 'Pending',

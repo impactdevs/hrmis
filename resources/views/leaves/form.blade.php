@@ -5,10 +5,15 @@
 
             <select name="leave_type_id" id="leave_type_id"
                 class="form-control @error('leave_type_id') is-invalid @enderror">
-                @foreach ($leaveTypes as $value => $text)
-                    <option value="{{ $value }}" {{ old('leave_type_id') == $value ? 'selected' : '' }}>
-                        {{ $text }}</option>
-                @endforeach
+                @if (isset($leaveRoster))
+                    <option value="annual" selected>Annual Leave</option>
+                @else
+                    @foreach ($leaveTypes as $value => $text)
+                        <option value="{{ $value }}" {{ old('leave_type_id') == $value ? 'selected' : '' }}>
+                            {{ $text }}
+                        </option>
+                    @endforeach
+                @endif
             </select>
 
             @error('leave_type_id')

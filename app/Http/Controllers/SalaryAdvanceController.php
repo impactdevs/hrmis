@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Notifications\SalaryAdvanceNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
+use App\Notifications\SalaryAdvanceApplication;
 
 
 class SalaryAdvanceController extends Controller
@@ -58,6 +59,17 @@ class SalaryAdvanceController extends Controller
         $salaryAdvance->comments = $validated['comments'] ?? null;
         $salaryAdvance->loan_request_status = []; // You can replace this with a default status like 'pending'
         $salaryAdvance->save();
+
+        // Find all users with the HR role
+        $hrUsers = User::role('HR')->get();
+
+        // Get applicant's first and last name
+        $employee = auth()->user()->employee ?? null;
+        $firstName = $employee ? $employee->first_name : '';
+        $lastName = $employee ? $employee->last_name : '';
+
+        // Send notification to HR users
+        Notification::send($hrUsers, new SalaryAdvanceApplication($salaryAdvance, $firstName, $lastName));
 
         return redirect()->route('salary-advances.index')
             ->with('success', 'Salary advance request submitted successfully.');

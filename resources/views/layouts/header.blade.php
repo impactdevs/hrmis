@@ -126,6 +126,12 @@
                     $title = 'Positions';
                 }
 
+                   if (request()->routeIs('apply-for-leave')) {
+                    $title = 'Applying for leave';
+                }
+
+                
+
                 if (request()->routeIs('salary-advances.index')) {
                     $title = 'Salary Advances';
                 }
