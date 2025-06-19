@@ -206,79 +206,144 @@
                         </div><!-- End Reports -->
 
                         <!-- Applications -->
-                        {{-- <div class="col-12">
-                            <div class="overflow-auto card recent-sales">
+                        <div class="col-12">
+                            <div class="card shadow-sm border-0 recent-sales">
                                 <div class="card-body">
-                                    <h5 class="card-title">Applications <span>| Today</span></h5>
-
-                                    <table class="table table-borderless datatable">
-                                        <thead>
-                                            <tr>
-                                                <th scope="col">#</th>
-                                                <th scope="col">First Name</th>
-                                                <th scope="col">Last Name</th>
-                                                <th scope="col">Job</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody> --}}
-                        {{-- @foreach ($entries as $entry)
-                                                @php --}}
-                        {{-- // Assuming $response contains the JSON string
-                                                    $data = json_decode($entry->entry->responses, true); // true for associative array
-                                                @endphp --}}
-                        {{-- <tr>
-                                                    <td><a href="#"
-                                                            class="btn btn-outline-danger">{{ $entry->job->job_code }}</a>
-                                                        </th>
-                                                    <td>{{ $data[93] }}</td>
-                                                    <td>{{ $data[94] }}</td>
-                                                    <td><span
-                                                            class="badge bg-success">{{ $entry->job->job_title }}</span>
-                                                    </td>
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h5 class="card-title mb-0">
+                                            <i class="bi bi-person-lines-fill text-primary"></i>
+                                            Latest Applications <span class="badge bg-primary">{{ $entries->count() }}</span>
+                                            <small class="text-muted">(Latest 5 | Today)</small>
+                                        </h5>
+                                        <a href="{{ route('uncst-job-applications.index') }}" class="btn btn-sm btn-outline-primary">View All</a>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table align-middle table-hover mb-0">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th scope="col">#</th>
+                                                    <th scope="col"><i class="bi bi-person"></i> Full Name</th>
+                                                    <th scope="col"><i class="bi bi-briefcase"></i> Position</th>
+                                                    <th scope="col"><i class="bi bi-calendar-event"></i> Applied On</th>
                                                 </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-
+                                            </thead>
+                                            <tbody>
+                                                @forelse ($entries as $entry)
+                                                    <tr>
+                                                        <td>
+                                                            <span class="badge bg-secondary">{{ $entry->id }}</span>
+                                                        </td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center gap-2">
+                                                                <span class="avatar rounded-circle bg-primary text-white fw-bold"
+                                                                    style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;">
+                                                                    {{ strtoupper(substr($entry->full_name, 0, 1)) }}
+                                                                </span>
+                                                                <span>{{ $entry->full_name }}</span>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <span class="badge bg-info text-dark">
+                                                                {{ \App\Models\CompanyJob::where('job_code', $entry->reference_number)->first()->job_title ?? 'N/A' }}
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <span class="text-nowrap">
+                                                                <i class="bi bi-clock text-primary"></i>
+                                                                {{ $entry->created_at->format('d M, Y H:i') }}
+                                                            </span>
+                                                            <br>
+                                                            <small class="text-muted">{{ $entry->created_at->diffForHumans() }}</small>
+                                                        </td>
+                                                    </tr>
+                                                @empty
+                                                    <tr>
+                                                        <td colspan="4" class="text-center text-muted py-4">
+                                                            <i class="bi bi-emoji-frown fs-2"></i>
+                                                            <div>No applications found for today.</div>
+                                                        </td>
+                                                    </tr>
+                                                @endforelse
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
-
                             </div>
-                        </div> --}}
+                        </div>
 
                         <!-- Ongoing Appraisals -->
-                        {{-- <div class="col-12">
+                        <div class="col-12">
                             <div class="overflow-auto card top-selling">
 
-                                <div class="pb-0 card-body">
-                                    <h5 class="card-title">On Going Appraisals</h5>
-
-                                    <table class="table table-borderless">
-                                        <thead>
-                                            <tr>
-                                                <th scope="col">Full Name</th>
-                                                <th scope="col">Position</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($appraisals as $appraisal)
-                                                @php
-                                                    // Assuming $response contains the JSON string
-                                                    $data = json_decode($appraisal->entry->responses, true); // true for associative array
-                                                @endphp
+                                <div class="card-body pb-0">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h5 class="card-title mb-0">
+                                            <i class="bi bi-arrow-repeat text-primary"></i>
+                                            Ongoing Appraisals <span
+                                                class="badge bg-primary">{{ $appraisals->count() }}</span>
+                                            <small class="text-muted">(Latest 5)</small>
+                                        </h5>
+                                        <a href="{{ route('uncst-appraisals.index') }}"
+                                            class="btn btn-sm btn-outline-primary">View All</a>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table align-middle table-hover mb-0">
+                                            <thead class="table-light">
                                                 <tr>
-                                                    <td>{{ $appraisal->employee->first_name . ' ' . $appraisal->employee->first_name }}
-                                                    </td>
-                                                    <td>{{ $appraisal->employee->position->position_name }}</td>
+                                                    <th scope="col"><i class="bi bi-person"></i> Full Name</th>
+                                                    <th scope="col"><i class="bi bi-diagram-3"></i> Department</th>
+                                                    <th scope="col"><i class="bi bi-calendar-event"></i> Applied On
+                                                    </th>
                                                 </tr>
-                                            @endforeach
-
-                                        </tbody>
-                                    </table>
-
+                                            </thead>
+                                            <tbody>
+                                                @forelse ($appraisals as $appraisal)
+                                                    <tr>
+                                                        <td>
+                                                            <div class="d-flex align-items-center gap-2">
+                                                                <span
+                                                                    class="avatar rounded-circle bg-primary text-white fw-bold"
+                                                                    style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;">
+                                                                    {{ strtoupper(substr($appraisal->employee->first_name, 0, 1)) }}{{ strtoupper(substr($appraisal->employee->last_name ?? $appraisal->employee->first_name, 0, 1)) }}
+                                                                </span>
+                                                                <span>
+                                                                    {{ $appraisal->employee->first_name . ' ' . ($appraisal->employee->last_name ?? $appraisal->employee->first_name) }}
+                                                                    <br>
+                                                                    <small
+                                                                        class="text-muted">{{ $appraisal->employee->job_title ?? '' }}</small>
+                                                                </span>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <span class="badge bg-info text-dark">
+                                                                {{ $appraisal->employee->department->department_name ?? '-' }}
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <span class="text-nowrap">
+                                                                <i class="bi bi-clock text-primary"></i>
+                                                                {{ \Carbon\Carbon::parse($appraisal->created_at)->format('d M, Y') }}
+                                                            </span>
+                                                            <br>
+                                                            <small
+                                                                class="text-muted">{{ \Carbon\Carbon::parse($appraisal->created_at)->diffForHumans() }}</small>
+                                                        </td>
+                                                    </tr>
+                                                @empty
+                                                    <tr>
+                                                        <td colspan="3" class="text-center text-muted py-4">
+                                                            <i class="bi bi-emoji-frown fs-2"></i>
+                                                            <div>No ongoing appraisals found.</div>
+                                                        </td>
+                                                    </tr>
+                                                @endforelse
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
 
                             </div>
-                        </div> --}}
+                        </div>
                         <!-- End Ongoing Appraisals -->
 
                         {{-- <div class="col-12">
@@ -401,7 +466,88 @@
                         </div>
                     </div><!-- End Events & Trainings -->
 
-
+                    {{-- Un read Notification Reminders --}}
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body pb-0">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="card-title mb-0">
+                                    <i class="bi bi-bell-fill text-primary"></i> Latest Notifications <span
+                                        class="badge bg-primary text-light">{{ $notifications->count() }}</span>
+                                </h5>
+                                <a href="{{ route('notifications.index') }}"
+                                    class="btn btn-link btn-sm text-decoration-none">View All</a>
+                            </div>
+                            <section class="section dashboard px-1">
+                                <div class="row">
+                                    <div class="col-12">
+                                        @if ($notifications->isNotEmpty())
+                                            <ul class="list-group list-group-flush">
+                                                @foreach ($notifications as $notification)
+                                                    @php
+                                                        $url = '';
+                                                        if (isset($notification->data['leave_id'])) {
+                                                            $url = url('leaves', $notification->data['leave_id']);
+                                                        }
+                                                        if (isset($notification->data['training_id'])) {
+                                                            $url = url('trainings', $notification->data['training_id']);
+                                                        }
+                                                        if (isset($notification->data['event_id'])) {
+                                                            $url = url('events', $notification->data['event_id']);
+                                                        }
+                                                        if (isset($notification->data['appraisal_id'])) {
+                                                            $url = url(
+                                                                'uncst-appraisals',
+                                                                $notification->data['appraisal_id'],
+                                                            );
+                                                        }
+                                                        if (isset($notification->data['travel_training_id'])) {
+                                                            $url = url(
+                                                                'out-of-station-trainings',
+                                                                $notification->data['travel_training_id'],
+                                                            );
+                                                        }
+                                                        if (isset($notification->data['reminder_category'])) {
+                                                            if (
+                                                                $notification->data['reminder_category'] == 'appraisal'
+                                                            ) {
+                                                                $url = url('uncst-appraisals');
+                                                            }
+                                                        }
+                                                        $isUnread = is_null($notification->read_at);
+                                                    @endphp
+                                                    <li class="list-group-item notification-item d-flex align-items-start justify-content-between gap-2 rounded-2 mb-2 px-3 py-2 border-0 {{ $isUnread ? 'bg-light shadow-sm' : '' }}"
+                                                        data-url="{{ $url }}"
+                                                        data-id="{{ $notification->id }}"
+                                                        data-type="{{ $notification->type }}"
+                                                        style="cursor:pointer; transition: background 0.2s;">
+                                                        <div class="flex-grow-1">
+                                                            <div class="d-flex align-items-center gap-2 mb-1">
+                                                                <i
+                                                                    class="bi bi-dot {{ $isUnread ? 'text-primary' : 'text-secondary' }} fs-5"></i>
+                                                                <span
+                                                                    class="fw-semibold">{{ $notification->data['message'] }}</span>
+                                                            </div>
+                                                            <small class="text-muted">
+                                                                <i class="bi bi-clock"></i>
+                                                                {{ $notification->created_at->diffForHumans() }}
+                                                            </small>
+                                                        </div>
+                                                        <button class="btn-close ms-2 mt-1" aria-label="Close"
+                                                            title="Mark as read & dismiss"></button>
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                        @else
+                                            <div class="text-center py-4">
+                                                <i class="bi bi-inbox fs-1 text-muted"></i>
+                                                <p class="mt-2 text-muted">No new notifications.</p>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
 
 
                 </div><!-- End Right side columns -->
@@ -564,14 +710,19 @@
                                             @foreach ($leaveApprovalData as $leaveData)
                                                 <li class="timeline-item mb-5 position-relative ps-4">
                                                     <div class="d-flex align-items-center mb-2">
-                                                        <span class="badge bg-primary me-2">{{ $leaveData['leave_type_name'] ?? 'Leave' }}</span>
-                                                        <span class="fw-semibold">{{ \Carbon\Carbon::parse($leaveData['start_date'])->format('d M') }} - {{ \Carbon\Carbon::parse($leaveData['end_date'])->format('d M, Y') }}</span>
+                                                        <span
+                                                            class="badge bg-primary me-2">{{ $leaveData['leave_type_name'] ?? 'Leave' }}</span>
+                                                        <span
+                                                            class="fw-semibold">{{ \Carbon\Carbon::parse($leaveData['start_date'])->format('d M') }}
+                                                            -
+                                                            {{ \Carbon\Carbon::parse($leaveData['end_date'])->format('d M, Y') }}</span>
                                                         @if ($leaveData['esStatus'] === 'Approved')
                                                             <span class="badge bg-success ms-2">Approved</span>
                                                         @elseif ($leaveData['status'] === 'Rejected')
                                                             <span class="badge bg-danger ms-2">Rejected</span>
                                                         @else
-                                                            <span class="badge bg-warning text-dark ms-2">Pending</span>
+                                                            <span
+                                                                class="badge bg-warning text-dark ms-2">Pending</span>
                                                         @endif
                                                     </div>
                                                     <div class="ms-1 mb-2">
@@ -584,7 +735,7 @@
                                                         <small>
                                                             <i class="bi bi-person-check"></i>
                                                             <strong>Handover:</strong>
-                                                            @if(!empty($leaveData['my_work_will_be_done_by']))
+                                                            @if (!empty($leaveData['my_work_will_be_done_by']))
                                                                 {{ is_array($leaveData['my_work_will_be_done_by']) ? implode(', ', $leaveData['my_work_will_be_done_by']) : $leaveData['my_work_will_be_done_by'] }}
                                                             @else
                                                                 N/A
@@ -594,17 +745,21 @@
                                                     <div class="ms-1 mb-2">
                                                         <small>
                                                             <i class="bi bi-telephone"></i>
-                                                            <strong>Contact:</strong> {{ $leaveData['phone_number'] ?? '-' }}
+                                                            <strong>Contact:</strong>
+                                                            {{ $leaveData['phone_number'] ?? '-' }}
                                                         </small>
                                                     </div>
                                                     <!-- Approval Progress Bar -->
                                                     <div class="progress my-3" style="height: 8px;">
                                                         <div class="progress-bar bg-{{ $leaveData['hrStatus'] === 'Approved' ? 'success' : ($leaveData['hrStatus'] === 'Rejected' ? 'danger' : 'warning') }}"
-                                                            role="progressbar" style="width: 33%;" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100"></div>
+                                                            role="progressbar" style="width: 33%;" aria-valuenow="33"
+                                                            aria-valuemin="0" aria-valuemax="100"></div>
                                                         <div class="progress-bar bg-{{ strtolower($leaveData['hodStatus']) === 'approved' ? 'success' : (strtolower($leaveData['hodStatus']) === 'rejected' ? 'danger' : 'warning') }}"
-                                                            role="progressbar" style="width: 33%;" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100"></div>
+                                                            role="progressbar" style="width: 33%;" aria-valuenow="33"
+                                                            aria-valuemin="0" aria-valuemax="100"></div>
                                                         <div class="progress-bar bg-{{ $leaveData['esStatus'] === 'Approved' ? 'success' : ($leaveData['esStatus'] === 'Rejected' ? 'danger' : 'warning') }}"
-                                                            role="progressbar" style="width: 34%;" aria-valuenow="34" aria-valuemin="0" aria-valuemax="100"></div>
+                                                            role="progressbar" style="width: 34%;" aria-valuenow="34"
+                                                            aria-valuemin="0" aria-valuemax="100"></div>
                                                     </div>
                                                     <div class="d-flex justify-content-between text-center small mb-2">
                                                         <span>
@@ -643,20 +798,25 @@
                                                     </div>
                                                     <!-- Status & Actions -->
                                                     @if ($leaveData['esStatus'] === 'Approved')
-                                                        <div class="alert alert-success py-2 px-3 mt-2 mb-0 d-flex align-items-center gap-2">
+                                                        <div
+                                                            class="alert alert-success py-2 px-3 mt-2 mb-0 d-flex align-items-center gap-2">
                                                             <i class="bi bi-emoji-laughing fs-4"></i>
                                                             <div>
-                                                                <strong>Congratulations!</strong> Your leave is fully approved.
+                                                                <strong>Congratulations!</strong> Your leave is fully
+                                                                approved.
                                                                 @if ($leaveData['daysRemaining'] == 'Leave has not started')
-                                                                    <span class="d-block">Leave has not started yet.</span>
+                                                                    <span class="d-block">Leave has not started
+                                                                        yet.</span>
                                                                 @else
-                                                                    <span class="d-block">Days remaining: <strong>{{ $leaveData['daysRemaining'] }}</strong></span>
+                                                                    <span class="d-block">Days remaining:
+                                                                        <strong>{{ $leaveData['daysRemaining'] }}</strong></span>
                                                                 @endif
                                                             </div>
                                                         </div>
                                                     @elseif ($leaveData['status'] === 'Rejected' && isset($leaveData['rejection_reason']))
                                                         <div class="alert alert-danger py-2 px-3 mt-2 mb-0">
-                                                            <strong>Rejected:</strong> {{ $leaveData['rejection_reason'] }}
+                                                            <strong>Rejected:</strong>
+                                                            {{ $leaveData['rejection_reason'] }}
                                                         </div>
                                                     @elseif ($leaveData['status'] === 'Pending')
                                                         <div class="alert alert-warning py-2 px-3 mt-2 mb-0">
@@ -666,12 +826,16 @@
                                                     <!-- Handover Note Download & Text -->
                                                     <div class="d-flex flex-wrap gap-3 mt-2">
                                                         @if (!empty($leaveData['handover_note_file']))
-                                                            <a href="{{ asset('storage/' . $leaveData['handover_note_file']) }}" class="btn btn-sm btn-outline-primary" target="_blank">
-                                                                <i class="bi bi-file-earmark-arrow-down"></i> Handover Note
+                                                            <a href="{{ asset('storage/' . $leaveData['handover_note_file']) }}"
+                                                                class="btn btn-sm btn-outline-primary"
+                                                                target="_blank">
+                                                                <i class="bi bi-file-earmark-arrow-down"></i> Handover
+                                                                Note
                                                             </a>
                                                         @endif
                                                         @if (!empty($leaveData['handover_note']))
-                                                            <span class="badge bg-light text-dark border border-primary">
+                                                            <span
+                                                                class="badge bg-light text-dark border border-primary">
                                                                 <i class="bi bi-journal-text"></i>
                                                                 {{ $leaveData['handover_note'] }}
                                                             </span>
@@ -687,25 +851,26 @@
                         @endif
 
                         @push('styles')
-                        <style>
-                            .timeline {
-                                border-left: 3px solid #0d6efd;
-                                margin-left: 1.5rem;
-                                padding-left: 0.5rem;
-                            }
-                            .timeline-item:before {
-                                content: '';
-                                position: absolute;
-                                left: -1.2rem;
-                                top: 0.5rem;
-                                width: 1rem;
-                                height: 1rem;
-                                background: #fff;
-                                border: 3px solid #0d6efd;
-                                border-radius: 50%;
-                                z-index: 1;
-                            }
-                        </style>
+                            <style>
+                                .timeline {
+                                    border-left: 3px solid #0d6efd;
+                                    margin-left: 1.5rem;
+                                    padding-left: 0.5rem;
+                                }
+
+                                .timeline-item:before {
+                                    content: '';
+                                    position: absolute;
+                                    left: -1.2rem;
+                                    top: 0.5rem;
+                                    width: 1rem;
+                                    height: 1rem;
+                                    background: #fff;
+                                    border: 3px solid #0d6efd;
+                                    border-radius: 50%;
+                                    z-index: 1;
+                                }
+                            </style>
                         @endpush
                         @foreach ($contracts as $contract)
                             @if ($contract->days_until_end >= 0 && $contract->days_until_end <= 90)
@@ -844,9 +1009,11 @@
                         <div class="card-body pb-0">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h5 class="card-title mb-0">
-                                    <i class="bi bi-bell-fill text-primary"></i> Latest Notifications <span class="badge bg-primary text-light">{{ $notifications->count() }}</span>
+                                    <i class="bi bi-bell-fill text-primary"></i> Latest Notifications <span
+                                        class="badge bg-primary text-light">{{ $notifications->count() }}</span>
                                 </h5>
-                                <a href="{{ route('notifications.index') }}" class="btn btn-link btn-sm text-decoration-none">View All</a>
+                                <a href="{{ route('notifications.index') }}"
+                                    class="btn btn-link btn-sm text-decoration-none">View All</a>
                             </div>
                             <section class="section dashboard px-1">
                                 <div class="row">
@@ -866,13 +1033,21 @@
                                                             $url = url('events', $notification->data['event_id']);
                                                         }
                                                         if (isset($notification->data['appraisal_id'])) {
-                                                            $url = url('uncst-appraisals', $notification->data['appraisal_id']);
+                                                            $url = url(
+                                                                'uncst-appraisals',
+                                                                $notification->data['appraisal_id'],
+                                                            );
                                                         }
                                                         if (isset($notification->data['travel_training_id'])) {
-                                                            $url = url('out-of-station-trainings', $notification->data['travel_training_id']);
+                                                            $url = url(
+                                                                'out-of-station-trainings',
+                                                                $notification->data['travel_training_id'],
+                                                            );
                                                         }
                                                         if (isset($notification->data['reminder_category'])) {
-                                                            if ($notification->data['reminder_category'] == 'appraisal') {
+                                                            if (
+                                                                $notification->data['reminder_category'] == 'appraisal'
+                                                            ) {
                                                                 $url = url('uncst-appraisals');
                                                             }
                                                         }
@@ -885,14 +1060,18 @@
                                                         style="cursor:pointer; transition: background 0.2s;">
                                                         <div class="flex-grow-1">
                                                             <div class="d-flex align-items-center gap-2 mb-1">
-                                                                <i class="bi bi-dot {{ $isUnread ? 'text-primary' : 'text-secondary' }} fs-5"></i>
-                                                                <span class="fw-semibold">{{ $notification->data['message'] }}</span>
+                                                                <i
+                                                                    class="bi bi-dot {{ $isUnread ? 'text-primary' : 'text-secondary' }} fs-5"></i>
+                                                                <span
+                                                                    class="fw-semibold">{{ $notification->data['message'] }}</span>
                                                             </div>
                                                             <small class="text-muted">
-                                                                <i class="bi bi-clock"></i> {{ $notification->created_at->diffForHumans() }}
+                                                                <i class="bi bi-clock"></i>
+                                                                {{ $notification->created_at->diffForHumans() }}
                                                             </small>
                                                         </div>
-                                                        <button class="btn-close ms-2 mt-1" aria-label="Close" title="Mark as read & dismiss"></button>
+                                                        <button class="btn-close ms-2 mt-1" aria-label="Close"
+                                                            title="Mark as read & dismiss"></button>
                                                     </li>
                                                 @endforeach
                                             </ul>
@@ -952,7 +1131,7 @@
                                         success: function(data) {
                                             if (data.success) {
                                                 notificationItem
-                                            .remove(); // Remove the notification item from the UI
+                                                    .remove(); // Remove the notification item from the UI
                                             }
                                         },
                                         error: function(xhr) {

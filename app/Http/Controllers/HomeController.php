@@ -181,12 +181,11 @@ class HomeController extends Controller
         $chartEmployeeDataJson = json_encode($chartEmployeeData);
 
         //applications
-        $entries = Application::with('job')->whereDate('created_at', $today)
-            ->latest()
+        $entries = Application::latest()->take(5)
             ->get();
 
-        $appraisals = Appraisal::whereDate('created_at', $today)
-            ->latest()
+        $appraisals = Appraisal::latest()
+            ->take(5)
             ->get();
 
 
