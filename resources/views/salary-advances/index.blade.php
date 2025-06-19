@@ -34,7 +34,7 @@
                             <td>{{ $salarydvances->firstItem() + $index }}</td>
                             <td>
                                 {{-- Assuming you have a relation or can access employee name --}}
-                                {{ $advance->employee->first_name . ' ' . $advance->employee->first_name }}
+                                {{ $advance->employee->first_name . ' ' . $advance->employee->last_name }}
                             </td>
                             <td>{{ number_format($advance->amount_applied_for) }}</td>
                             <td>{{ $advance->repayment_start_date ? \Carbon\Carbon::parse($advance->repayment_start_date)->format('d/m/Y') : '-' }}

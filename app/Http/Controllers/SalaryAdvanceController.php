@@ -26,7 +26,7 @@ class SalaryAdvanceController extends Controller
     public function create()
     {
         $role = auth()->user()->getRoleNames()->first();
-        
+
         return view('salary-advances.create', compact('role'));
     }
 
@@ -77,7 +77,7 @@ class SalaryAdvanceController extends Controller
      */
     public function edit(SalaryAdvance $salary_advance)
     {
-         $role = auth()->user()->getRoleNames()->first();
+        $role = auth()->user()->getRoleNames()->first();
         return view('salary-advances.edit', compact('salary_advance', 'role'));
     }
 
@@ -107,7 +107,7 @@ class SalaryAdvanceController extends Controller
         $salary_advance->comments = $validated['comments'] ?? null;
         $salary_advance->save();
 
-        return redirect()->route('salary-advances.index')
+        return redirect()->route('salary-advances.edit', $salary_advance->id)
             ->with('success', 'Salary advance request updated successfully.');
     }
 
@@ -168,7 +168,7 @@ class SalaryAdvanceController extends Controller
             }
 
             // Send notification
-            $trainingRequester = User::find($salary_advance->user_id); // Get the user who requested the leave
+            $trainingRequester = User::find($salary_advance->employee->user_id); // Get the user who requested the leave
             $approver = User::find(auth()->user()->id);
             Notification::send($trainingRequester, new SalaryAdvanceNotification($salary_advance, $approver, $loanRequestStatus['Executive Secretary']));
         } else {
@@ -179,6 +179,6 @@ class SalaryAdvanceController extends Controller
         $salary_advance->loan_request_status = $loanRequestStatus;
         $salary_advance->save();
 
-        return response()->json(['message' => 'T ravel Clearance approved successfully.', 'status' => $salary_advance->loan_request_status]);
+        return response()->json(['message' => 'Salary Advance approved successfully.', 'status' => $salary_advance->loan_request_status]);
     }
 }
