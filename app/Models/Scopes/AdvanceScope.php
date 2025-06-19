@@ -8,14 +8,17 @@ use Illuminate\Database\Eloquent\Scope;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-class ContractScope implements Scope
+class AdvanceScope implements Scope
 {
+    /**
+     * Apply the scope to a given Eloquent query builder.
+     */
     /**
      * Apply the scope to a given Eloquent query builder.
      */
     public function apply(Builder $builder, Model $model): void
     {
-                // Get the currently authenticated user
+        // Get the currently authenticated user
         $user = Auth::user();
 
         if (!$user) {
@@ -33,27 +36,33 @@ class ContractScope implements Scope
 
             case 'Head of Division':
                 // Get the department_id of the authenticated user
-                $departmentId = DB::table('employees')->where('user_id', $user->id)->value('department_id');
-                if ($departmentId) {
-                    // Only show contracts from the user's department by using leaves.user_id
-                    $users = DB::table('employees')->where('department_id', $departmentId)->pluck('employee_id');
+                $isFinanceDept = false;
+                if (
+                    $user->employee &&
+                    $user->employee->department &&
+                    $user->employee->department->department_name === 'FINANCE DEPARTMENT'
+                ) {
+                    $isFinanceDept = true;
+                }
 
-                    $builder->whereIn('employee_contracts.employee_id', $users);
+                if ($isFinanceDept) {
+                    // don't constrain in any way
+
                 } else {
-                    // If there's no department, don't show anything
+                    // If there's no department or not FINANCE DEPARTMENT, don't show anything
                     $builder->whereRaw('1 = 0'); // This condition will always be false
                 }
                 break;
 
             case 'Executive Secretary':
-            // Add logic if needed
+                // Add logic if needed
             case 'Assistant Executive Secretary':
                 // Add logic if needed
                 break;
 
             case 'Staff':
                 // Filter leaves by the user's ID
-                $builder->where('employee_contracts.employee_id', $user->employee->employee_id);
+                $builder->where('salary_advances.employee_id', $user->employee->employee_id);
                 break;
 
             default:

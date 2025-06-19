@@ -102,8 +102,17 @@ class LeaveRosterController extends Controller
             'start_date' => 'required|date|before:end_date',
             'end_date' => 'required|date',
             'leave_title' => 'required|string',
-            'user_id'=> 'nullable|exists:users,id'
+            'user_id' => 'nullable|exists:users,id'
         ]);
+
+        // if start and end date are not in future, return an error
+        $now = now()->startOfDay();
+        $startDate = \Carbon\Carbon::parse($request->input('start_date'))->startOfDay();
+        $endDate = \Carbon\Carbon::parse($request->input('end_date'))->startOfDay();
+
+        if ($startDate < $now || $endDate < $now) {
+            return response()->json(['success' => false, 'message' => 'Failed to add Leave Roster! the dates must be in future']);
+        }
 
         if (!auth()->user()->hasRole('HR')) {
             $user = auth()->user();
@@ -183,13 +192,15 @@ class LeaveRosterController extends Controller
      */
     public function destroy(string $id)
     {
+        // make sure it does not have any leave attached to it before deleting
+        if ($leaveRoster = LeaveRoster::find($id)) {
+            if ($leaveRoster->leave()->exists()) {
+            return response()->json(['success' => false, 'message' => 'Cannot delete: Leave is attached to this roster.'], 400);
+            }
+        }
         $leaveRoster = LeaveRoster::findOrFail($id);  // Find the event by its leave_roster_id
         $leaveRoster->delete();
 
         return response()->json(['success' => true]);
     }
 }
-
-
-
-

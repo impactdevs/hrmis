@@ -24,6 +24,7 @@ return new class extends Migration
             $table->bigInteger('outstanding_loan')->nullable();
             $table->text('comments')->nullable();
             $table->json('loan_request_status')->nullable();
+            $table->longText('rejection_reason')->nullable();
             $table->timestamps();
         });
     }

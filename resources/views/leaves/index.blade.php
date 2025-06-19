@@ -306,6 +306,7 @@
                                 department: department // Pass the selected department filter
                             },
                             success: function(response) {
+                                console.log(response)
                                 // Check if the DataTable already exists on the #leavePlan element
                                 if ($.fn.dataTable.isDataTable('#leavePlan')) {
                                     // If it exists, you can either clear it or destroy it
@@ -355,10 +356,10 @@
 
                                                     if ((endDate >= now) || ((
                                                                 endDate < now
-                                                                ) && (row[5]) &&
+                                                            ) && (row[5]) &&
                                                             (row[5]
                                                                 .leave_request_status
-                                                                ))) {
+                                                            ))) {
                                                         // Check if there is a leave request status
                                                         if (row[5] && row[5]
                                                             .leave_request_status
@@ -513,9 +514,8 @@
                                             {
                                                 targets: 1, // Assuming the first column is the employee name
                                                 render: function(data, type, row) {
-                                                    return '<span class="fw-bold">' +
-                                                        data +
-                                                        '</span>'; // Bold employee name
+                                                    console.log(data)
+                                                    return data; // Bold employee name
                                                 }
                                             },
 
@@ -551,8 +551,11 @@
 
                                         // For the first row of the staff group, show the name and set rowspan
                                         if (index === 0) {
+                                            console.log(event.is_cancelled);
+
                                             row[1] =
-                                                `<span class="name-span" rowspan="${rowspan}">${event.first_name} ${event.last_name}</span>`;
+                                                `<span class="name-span fw-bold" rowspan="${rowspan}">${event.first_name} ${event.last_name}</span>`;
+
                                         } else {
                                             row[1] =
                                                 ''; // Empty name cell for the other rows with the same staff_id
@@ -562,9 +565,18 @@
                                         row[0] = event.numeric_id;
                                         console.log("Leave:", event);
                                         if (event.leave.length != 0) {
-                                            row[2] = event.leave.leave_category
-                                                .leave_type_name + "(" + event
-                                                .duration + ")";
+                                            console.log()
+                                            if (event.is_cancelled) {
+                                                row[2] =
+                                                    `<span class="text-danger">${event.leave.leave_category.leave_type_name} (${event.duration})</span>`;
+                                                //create a span
+
+                                            } else {
+                                                //create a span here with danger 
+                                                row[2] =
+                                                    `<span>${event.leave.leave_category.leave_type_name} (${event.duration})</span>`;
+
+                                            }
                                         } else {
                                             row[2] = "N/A";
                                         }
@@ -598,7 +610,8 @@
                                             }
                                         } else {
                                             if (canApproveLeave) {
-                                                row[4] = `
+                                                if (!event.is_cancelled) {
+                                                    row[4] = `
                                                     <div class="dropdown">
                                                         <button class="btn btn-secondary btn-sm dropdown-toggle d-flex align-items-center gap-1" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                                                             <i class="bi bi-three-dots-vertical"></i> Actions
@@ -614,28 +627,48 @@
                                                                     <i class="bi bi-x-circle"></i> Reject
                                                                 </a>
                                                             </li>
-                                                              <li>
-                                                                <a class="dropdown-item apply-btn" href="/leaves/${event.leave.leave_id}" title="Apply">
+                                                            <li>
+                                                                <a class="dropdown-item view-btn" href="/leaves/${event.leave.leave_id}" title="Apply">
                                                                     <i class="bi bi-pencil"></i> View Details
                                                                 </a>
                                                             </li>
                                                         </ul>
                                                     </div>
                                                 `;
+                                                } else {
+                                                    row[4] = `
+                                                    <span class="badge text-danger">Cancelled</span>
+                                                    `
+                                                }
                                             } else {
-                                                row[4] = `
-                                                <div class="dropdown">
+                                                if (!event.is_cancelled) {
+                                                    row[4] = `
+                                                    <div class="dropdown">
                                                         <button class="btn btn-secondary btn-sm dropdown-toggle d-flex align-items-center gap-1" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                                                             <i class="bi bi-three-dots-vertical"></i> Actions
                                                         </button>
                                                         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                              <li>
-                                                                <a class="dropdown-item apply-btn" href="/leaves/${event.leave.leave_id}" title="Apply">
+                                                            <li>
+                                                                <a class="dropdown-item apply-btn" href="/leaves/${event.leave.leave_id}" title="View">
                                                                     <i class="bi bi-pencil"></i> View
                                                                 </a>
                                                             </li>
+                                                            ${event.leave.leave_id ? `
+                                                                                                                                <li>
+                                                                                                                                    <a class="dropdown-item cancel-btn" href="/cancel-leave/${event.leave.leave_id}" title="Cancel">
+                                                                                                                                        <i class="bi bi-x-circle-fill"></i> Cancel
+                                                                                                                                     </a>
+                                                                                                                                </li>
+
+                                                                                                                                    ` : ''}
                                                         </ul>
-                                                    </div>`
+                                                    </div>
+                                                `;
+                                                } else {
+                                                    row[4] = `
+                                                    <span class="badge text-danger">Cancelled</span>
+                                                    `
+                                                }
                                             }
 
 
@@ -658,6 +691,7 @@
                                         last_name: event.last_name,
                                         isApproved: event.isApproved,
                                         end: event.end,
+                                        is_cancelled: event.is_cancelled,
                                         color: 'blue',
                                         fullDay: true
                                     });
@@ -675,6 +709,7 @@
                                     //prevent default
                                     const leaveId = $(this).data('leave-id');
                                     updateLeaveStatus(leaveId, 'approved');
+                                    calendar.refetchEvents();
                                 });
 
                                 $('.reject-btn').click(function() {
@@ -686,8 +721,10 @@
                                     if (reason) {
                                         updateLeaveStatus(currentLeaveId, 'rejected',
                                             reason);
+
                                         $('#rejectModal').modal(
                                             'hide'); // Hide the modal
+                                        calendar.refetchEvents();
                                     } else {
                                         alert('Please enter a rejection reason.');
                                     }
@@ -778,6 +815,44 @@
                     // show applyModal
                     $('#applyModal').modal('show');
 
+                });
+
+                // on clicking cancel-btn, send a delete request to route('leaves.cancel')
+                $(document).on('click', '.cancel-btn', function(e) {
+                    e.preventDefault();
+                    if (!confirm('Are you sure you want to cancel this leave?')) return;
+                    var url = $(this).attr('href');
+
+                    $.ajax({
+                        url: url,
+                        type: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function(response) {
+                            Toastify({
+                                text: response.message || 'Leave cancelled successfully.',
+                                duration: 3000,
+                                gravity: "top",
+                                position: "right",
+                                backgroundColor: "linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(121,14,9,1) 35%, rgba(0,212,255,1) 100%)",
+                            }).showToast();
+
+                            //  reload the entire calendar
+                            calendar.refetchEvents();
+
+                        },
+                        error: function(xhr) {
+                            Toastify({
+                                text: xhr.responseJSON?.error ||
+                                    'An error occurred while cancelling leave.',
+                                duration: 3000,
+                                gravity: "top",
+                                position: "right",
+                                backgroundColor: "linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(121,14,9,1) 35%, rgba(0,212,255,1) 100%)",
+                            }).showToast();
+                        }
+                    });
                 });
 
                 $('#applyButton').click(function() {
@@ -909,6 +984,10 @@
                             position: "right",
                             backgroundColor: "linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(121,14,9,1) 35%, rgba(0,212,255,1) 100%)",
                         }).showToast();
+
+                        // Redraw the table to reflect changes
+                        $('#leavePlan').DataTable().draw(false);
+
                     },
                     error: function(xhr) {
                         Toastify({

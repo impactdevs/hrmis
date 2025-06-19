@@ -2552,6 +2552,30 @@
                     }
                 }
 
+                document.querySelectorAll('.score-cell').forEach(cell => {
+                    // Only add events if cell is editable (not readonly)
+                    if (cell.getAttribute('contenteditable') === 'true') {
+                        cell.addEventListener('click', function () {
+                            if (this.textContent.trim() === '0') {
+                                this.textContent = '';
+                                const hiddenInput = this.nextElementSibling;
+                                if (hiddenInput && hiddenInput.tagName === 'INPUT') {
+                                    hiddenInput.value = '';
+                                }
+                            }
+                        });
+                        cell.addEventListener('blur', function () {
+                            if (this.textContent.trim() === '') {
+                                this.textContent = '0';
+                                const hiddenInput = this.nextElementSibling;
+                                if (hiddenInput && hiddenInput.tagName === 'INPUT') {
+                                    hiddenInput.value = 0;
+                                }
+                            }
+                        });
+                    }
+                });
+
                 // 3. Appraisal Approval Logic
                 function initAppraisalApproval() {
                     let currentAppraisalId;

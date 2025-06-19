@@ -11,20 +11,21 @@
         </div>
 
         <div class="table-wrapper mt-3">
-            <table class="table table-striped">
+            <table class="table table-striped" data-toggle="table" data-search="true" data-show-columns="true"
+                data-show-export="true" data-show-pagination-switch="true"
+                data-page-list="[20, 25, 50, 100, 500, 1000, 2000, 10000, all]" data-pagination="true">
                 <thead>
                     <tr>
-                        <th>#</th>
-                        <th>Employee</th>
-                        <th>Amount Applied For</th>
-                        <th>Reasons</th>
-                        <th>Repayment Start</th>
-                        <th>Repayment End</th>
-                        <th>Contract Expiry</th>
-                        <th>Net Monthly Pay</th>
-                        <th>Outstanding Loan</th>
-                        <th>Status</th>
-                        <th>Actions</th>
+                        <th class="text-center">#</th>
+                        <th class="text-center">Employee</th>
+                        <th class="text-center">Amount</th>
+                        <th class="text-center">Repayment Start</th>
+                        <th class="text-center">Repayment End</th>
+                        <th class="text-center">Contract Expiry</th>
+                        <th class="text-center">Net Monthly Pay</th>
+                        <th class="text-center">Outstanding Loan</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-center">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -36,7 +37,6 @@
                                 {{ $advance->employee->first_name . ' ' . $advance->employee->first_name }}
                             </td>
                             <td>{{ number_format($advance->amount_applied_for) }}</td>
-                            <td>{{ $advance->reasons }}</td>
                             <td>{{ $advance->repayment_start_date ? \Carbon\Carbon::parse($advance->repayment_start_date)->format('d/m/Y') : '-' }}
                             </td>
                             <td>{{ $advance->repayment_end_date ? \Carbon\Carbon::parse($advance->repayment_end_date)->format('d/m/Y') : '-' }}
@@ -46,16 +46,62 @@
                             <td>{{ number_format($advance->net_monthly_pay) }}</td>
                             <td>{{ number_format($advance->outstanding_loan) }}</td>
                             <td>
-                                @if (!is_null($advance->loan_request_status))
-                                    <div class="status m-2">
-                                        @foreach ($advance->loan_request_status as $key => $status)
-                                            <span
-                                                class="status-{{ $key }}">{{ $key }}-{{ $status }}</span>
-                                        @endforeach
-                                    </div>
-                                @else
-                                    <span class="badge bg-warning">Pending</span>
-                                @endif
+                                @php
+                                    $user = Auth::user();
+                                    $userRole = $user->roles->pluck('name')[0] ?? '';
+                                    if (
+                                        $userRole === 'Head of Division' &&
+                                        isset($user->employee->department) &&
+                                        strtoupper(trim($user->employee->department->department_name)) ===
+                                            'FINANCE DEPARTMENT'
+                                    ) {
+                                        $userRole = 'Finance Department';
+                                    }
+                                    $statuses = $advance->loan_request_status ?? [];
+                                    $approvalOrder = ['HR', 'Finance Department', 'Executive Secretary'];
+                                    $currentStep = null;
+                                    foreach ($approvalOrder as $role) {
+                                        if (empty($statuses[$role]) || $statuses[$role] === 'pending') {
+                                            $currentStep = $role;
+                                            break;
+                                        }
+                                    }
+                                    $status = $statuses[$userRole] ?? null;
+                                @endphp
+
+                                <div class="d-flex align-items-center justify-content-center gap-2 flex-nowrap"
+                                    style="min-width: 320px;">
+                                    @foreach ($approvalOrder as $idx => $role)
+                                        @php
+                                            $roleStatus = $statuses[$role] ?? 'pending';
+                                            $isCurrent = $currentStep === $role;
+                                        @endphp
+                                        <div class="d-flex flex-column align-items-center mx-1" style="width: 60px;">
+                                            <div class="rounded-circle
+                                                @if ($roleStatus === 'approved') bg-success text-white
+                                                @elseif($roleStatus === 'rejected') bg-danger text-white
+                                                @elseif($isCurrent) bg-warning text-dark
+                                                @else bg-light text-secondary @endif
+                                                d-flex justify-content-center align-items-center"
+                                                style="width: 18px; height: 18px; font-size: 0.85rem; border: 1px solid #ccc;">
+                                                @if ($roleStatus === 'approved')
+                                                    <i class="bi bi-check-lg" style="font-size:0.8em;"></i>
+                                                @elseif($roleStatus === 'rejected')
+                                                    <i class="bi bi-x-lg" style="font-size:0.8em;"></i>
+                                                @elseif($isCurrent)
+                                                    <i class="bi bi-hourglass-split" style="font-size:0.8em;"></i>
+                                                @else
+                                                    <span style="font-size:0.8em;">{{ $idx + 1 }}</span>
+                                                @endif
+                                            </div>
+                                            <small class="text-center"
+                                                style="font-size: 0.75em; width: 60px; white-space: normal;">{{ $role }}</small>
+                                        </div>
+                                        @if ($idx < count($approvalOrder) - 1)
+                                            <div style="width: 32px; height: 2px; background: #ccc;"></div>
+                                        @endif
+                                    @endforeach
+                                </div>
                             </td>
                             <td>
                                 <div class="dropdown">

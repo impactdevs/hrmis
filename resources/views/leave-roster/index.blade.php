@@ -41,7 +41,7 @@
                                     Days
                                     Scheduled:
                                     <span class="text-dark" style="font-weight: 400;">
-                                        {{ auth()->user()->employee->overallRosterDays() ?? 0 }}
+                                        {{ auth()->user()->employee->overallRosterDays() }}
                                     </span>
                                 </p>
 
@@ -546,39 +546,57 @@
                                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                             },
                             success: function(response) {
-                                calendar.addEvent({
-                                    title: 'New Leave',
-                                    start: info.start,
-                                    end: info.end,
-                                    backgroundColor: 'yellow',
-                                    borderColor: 'orange',
-                                    textColor: 'black',
-                                    id: response.data.leave_roster_id,
-                                    first_name: response.data.employee.first_name,
-                                    last_name: response.data.employee.last_name,
-                                });
+                                if (response.success) {
+                                    calendar.addEvent({
+                                        title: 'New Leave',
+                                        start: info.start,
+                                        end: info.end,
+                                        backgroundColor: 'yellow',
+                                        borderColor: 'orange',
+                                        textColor: 'black',
+                                        id: response.data.leave_roster_id,
+                                        first_name: response.data.employee.first_name,
+                                        last_name: response.data.employee.last_name,
+                                    });
 
-                                // Add the event to the DataTable at the top (front)
-                                var table = $('#leavePlan').DataTable();
+                                    // Add the event to the DataTable at the top (front)
+                                    var table = $('#leavePlan').DataTable();
 
-                                // Calculate the numerical id
-                                var numericId = table.rows().count() + 1;
+                                    // Calculate the numerical id
+                                    var numericId = table.rows().count() + 1;
 
-                                var row = [
-                                    numericId,
-                                    response.data.employee.first_name + ' ' + response.data
-                                    .employee.last_name,
-                                    formatDate(response.data.start_date) + ' - ' +
-                                    formatDate(response.data.end_date)
-                                ];
+                                    var row = [
+                                        numericId,
+                                        response.data.employee.first_name + ' ' + response
+                                        .data
+                                        .employee.last_name,
+                                        formatDate(response.data.start_date) + ' - ' +
+                                        formatDate(response.data.end_date)
+                                    ];
 
-                                // Insert the new row at the top (position 0)
-                                table.rows.add([row]).draw(
-                                    false
-                                ); // `false` ensures the table isn't re-sorted after adding the row
+                                    // Insert the new row at the top (position 0)
+                                    table.rows.add([row]).draw(
+                                        false
+                                    ); // `false` ensures the table isn't re-sorted after adding the row
 
-                                // Optionally, if you want to sort by numeric_id, you can add this:
-                                table.order([0, 'desc']).draw();
+                                    // Optionally, if you want to sort by numeric_id, you can add this:
+                                    table.order([0, 'desc']).draw();
+                                } else {
+                                    Toastify({
+                                        text: response.message,
+                                        duration: 3000,
+                                        destination: "",
+                                        newWindow: true,
+                                        close: true,
+                                        gravity: "top", // `top` or `bottom`
+                                        position: "right", // `left`, `center` or `right`
+                                        stopOnFocus: true, // Prevents dismissing of toast on hover
+                                        style: {
+                                            background: "linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(121,14,9,1) 35%, rgba(0,212,255,1) 100%);",
+                                        },
+                                        onClick: function() {} // Callback after click
+                                    }).showToast();
+                                }
                             },
                             error: function(xhr, status, error) {
                                 console.error(error);

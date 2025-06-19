@@ -130,6 +130,10 @@
                     $title = 'Salary Advances';
                 }
 
+                if (request()->routeIs('salary-advances.edit')) {
+                    $title = 'Salary Advance Application';
+                }
+
                 if (request()->routeIs('salary-advances.create')) {
                     $title = 'Applying for Salary Advance';
                 }

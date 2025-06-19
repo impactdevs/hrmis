@@ -37,7 +37,7 @@ class AppraisalsController extends Controller
             return back()->with("success", "No Employee record found! Ask the human resource");
         }
         if (!auth()->user()->employee->department) {
-            return back()->with("success", "Your department does not have a department head, so we cant determine a supervisor for you!.");
+            return back()->with("success", "Your department does not have a department head, so we cant determine a supervisor for you!Reach out to the administrator.");
         }
         $data =  [
             "appraisal_start_date" => null,

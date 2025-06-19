@@ -23,7 +23,6 @@ class EmployeeFactory extends Factory
             'position_id' => Position::inRandomOrder()->value('position_id'), // Get a random position_id
             'nin' => $this->faker->unique()->numerify('NIN#######'),
             'date_of_entry' => $this->faker->date(),
-            'contract_expiry_date' => $this->faker->date(),
             'department_id' => Department::inRandomOrder()->value('department_id'), // Get a random department_id
             'nssf_no' => $this->faker->unique()->numerify('NSSF####'),
             'home_district' => $this->faker->city,

@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\AdvanceScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 
+#[ScopedBy([AdvanceScope::class])]
 class SalaryAdvance extends Model
 {
     // Indicate that the primary key is not an auto-incrementing integer
@@ -23,6 +26,7 @@ class SalaryAdvance extends Model
         'outstanding_loan',
         'comments',
         'loan_request_status',
+        'rejection_reason',
         'employee_id'
     ];
 

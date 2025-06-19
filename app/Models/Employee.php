@@ -40,7 +40,6 @@ class Employee extends Model
         'position_id',
         'nin',
         'date_of_entry',
-        'contract_expiry_date',
         'department_id',
         'nssf_no',
         'home_district',
@@ -63,7 +62,6 @@ class Employee extends Model
         'qualifications_details' => 'array', // Automatically convert JSON to array
         'contract_documents' => 'array',
         'date_of_entry' => 'date',
-        'contract_expiry_date' => 'date',
         'date_of_birth' => 'date',
     ];
 
@@ -148,26 +146,29 @@ class Employee extends Model
 
     public function totalLeaveDays()
     {
+        $totalDays = 0;
         $annualLeaveType = LeaveType::where('leave_type_name', 'Annual')->first();
-        //get leaves where the employee id matches employee id and were created in the current year that were confirmed by the executive secretary
-        $leaves = Leave::where('leave_type_id', $annualLeaveType->leave_type_id)
-            ->where('user_id', $this->user_id)->whereYear('created_at', Carbon::now()->year)
-            ->whereJsonContains('leave_request_status', ['Executive Secretary' => 'approved'])
-            ->get();
+        if ($annualLeaveType) {
+            //get leaves where the employee id matches employee id and were created in the current year that were confirmed by the executive secretary
+            $leaves = Leave::where('leave_type_id', $annualLeaveType->leave_type_id)->where('is_cancelled', false)
+                ->where('user_id', $this->user_id)->whereYear('created_at', Carbon::now()->year)
+                ->whereJsonContains('leave_request_status', ['Executive Secretary' => 'approved'])
+                ->get();
 
-        //calculate the total leave days excluding weekends and public holidays
-        $publicHolidays = PublicHoliday::pluck('holiday_date')->toArray();
+            //calculate the total leave days excluding weekends and public holidays
+            $publicHolidays = PublicHoliday::pluck('holiday_date')->toArray();
 
-        $publicHolidays = array_map(function ($date) {
-            return Carbon::parse($date)->toDateString();
-        }, $publicHolidays);
+            $publicHolidays = array_map(function ($date) {
+                return Carbon::parse($date)->toDateString();
+            }, $publicHolidays);
 
-        $totalDays = $leaves->sum(function ($leave) use ($publicHolidays) {
-            return Carbon::parse($leave->start_date)
-                ->diffInDaysFiltered(function (Carbon $date) use ($publicHolidays) {
-                    return !$date->isWeekend() && !in_array($date->toDateString(), $publicHolidays);
-                }, Carbon::parse($leave->end_date));
-        });
+            $totalDays = $leaves->sum(function ($leave) use ($publicHolidays) {
+                return Carbon::parse($leave->start_date)
+                    ->diffInDaysFiltered(function (Carbon $date) use ($publicHolidays) {
+                        return !$date->isWeekend() && !in_array($date->toDateString(), $publicHolidays);
+                    }, Carbon::parse($leave->end_date));
+            });
+        }
         return $totalDays;
     }
 
@@ -189,9 +190,11 @@ class Employee extends Model
         // and where the leave_roster_id does NOT exist in the leaves table (leave_roster_id column)
         $leaves = LeaveRoster::where('employee_id', $this->employee_id)
             ->whereDate('end_date', '>=', $today)
-            ->whereDoesntHave('leave', function ($query) {
-            // Assuming Leave has a leave_roster_id column
-            $query->whereColumn('leave_roster_id', 'leave_rosters.leave_roster_id');
+            ->where(function ($query) {
+                $query->whereDoesntHave('leave')
+                    ->orWhereHas('leave', function ($q) {
+                        $q->where('is_cancelled', false);
+                    });
             })
             ->get();
 

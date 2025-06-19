@@ -149,11 +149,11 @@ class SalaryAdvanceController extends Controller
         } elseif ($user->hasRole('Head of Division')) {
             if ($request->input('status') === 'approved') {
                 // Set Head of Division status to approved
-                $loanRequestStatus['Head of Division'] = 'approved';
+                $loanRequestStatus['Finance Department'] = 'approved';
                 $salary_advance->rejection_reason = null; // Clear reason if approved
             } else {
                 // Set Head of Division status to rejected
-                $loanRequestStatus['Head of Division'] = 'rejected';
+                $loanRequestStatus['Finance Department'] = 'rejected';
                 $salary_advance->rejection_reason = $request->input('reason'); // Store rejection reason
             }
         } elseif ($user->hasRole('Executive Secretary')) {
@@ -179,6 +179,6 @@ class SalaryAdvanceController extends Controller
         $salary_advance->loan_request_status = $loanRequestStatus;
         $salary_advance->save();
 
-        return response()->json(['message' => 'Travel Clearance approved successfully.', 'status' => $salary_advance->loan_request_status]);
+        return response()->json(['message' => 'T ravel Clearance approved successfully.', 'status' => $salary_advance->loan_request_status]);
     }
 }

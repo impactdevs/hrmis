@@ -52,6 +52,9 @@ class LeaveController extends Controller
      */
     public function create()
     {
+        if (!auth()->user()->employee->department) {
+            return back()->with("error", "No department head found. Contact admin.");
+        }
         //get the logged in user email
         $user_id = auth()->user()->id;
         $leaveTypes = LeaveType::pluck('leave_type_name', 'leave_type_id')->toArray();
@@ -316,6 +319,7 @@ class LeaveController extends Controller
                 'first_name' => $leave->employee->first_name ?? null,
                 'last_name' => $leave->employee->last_name ?? null,
                 'leave' => $leave->leave,
+                'is_cancelled' => $leave->is_cancelled,
                 // Add duration by calling the durationForLeave method
                 'duration' => $leave->durationForLeave() // This will return the duration excluding weekends and holidays
             ];
@@ -337,6 +341,7 @@ class LeaveController extends Controller
                     'first_name' => $leave->employee->first_name ?? null,
                     'last_name' => $leave->employee->last_name ?? null,
                     'leave' => $leave,
+                    'is_cancelled' => $leave->is_cancelled,
                     // Add duration for orphaned leaves as well
                     'duration' => $leave->durationForLeave()
                 ];
@@ -347,5 +352,14 @@ class LeaveController extends Controller
 
         // Return the combined leave data
         return response()->json(['success' => true, 'data' => $combinedLeaves]);
+    }
+
+    public function cancel(Request $request, Leave $leaf)
+    {
+        $leaf->is_cancelled = true;
+
+        $leaf->save();
+
+        return 1;
     }
 }

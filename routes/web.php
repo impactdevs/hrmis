@@ -90,6 +90,7 @@ Route::middleware(['auth', 'verified', 'data.usage.agreement'])->group(function 
     Route::resource('positions', PositionController::class);
     Route::resource('attendances', AttendanceController::class);
     Route::resource('leaves', LeaveController::class);
+    Route::delete('cancel-leave/{leaf}', [LeaveController::class, 'cancel'])->name('leaves.cancel');
     //leave actions
     Route::post('/leaves/{leave}/status', [LeaveController::class, 'approveOrReject'])
         ->name('leaves.approveOrReject');
@@ -127,11 +128,11 @@ Route::middleware(['auth', 'verified', 'data.usage.agreement'])->group(function 
     Route::get('/uncst-mat rix', [DocumentController::class, 'uncst_matrix'])->name('uncst-matrix');
 
     Route::resource('uncst-job-applications', JobApplicationController::class)
-        ->except(['create','store','edit','update']); // exclude create because it's public
+        ->except(['create', 'store', 'edit', 'update']); // exclude create because it's public
 
-        Route::resource('salary-advances', SalaryAdvanceController::class);
+    Route::resource('salary-advances', SalaryAdvanceController::class);
 
-        Route::post('/salary-advances/loan-approval', [SalaryAdvanceController::class, 'approveOrReject'])
+    Route::post('/salary-advances/{salary_advance}/status', [SalaryAdvanceController::class, 'approveOrReject'])
         ->name('salary-advances.approveOrReject');
 });
 

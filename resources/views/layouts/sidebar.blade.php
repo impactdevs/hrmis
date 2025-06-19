@@ -64,7 +64,7 @@
                 <li class="nav-item">
                     <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('salary-advances.index')) bg-secondary @endif"
                         href="{{ route('salary-advances.index') }}">
-                        <i class="bi bi-check2-all"></i>
+                        <i class="bi bi-currency-dollar"></i>
                         {{ auth()->user()->isAdminOrSecretary ? 'Salary Advances' : 'My Salary Advances' }} </a>
                 </li>
             

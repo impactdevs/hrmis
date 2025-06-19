@@ -22,7 +22,7 @@ class DepartmentController extends Controller
      */
     public function create()
     {
-        $users = User::pluck('name', 'id')->toArray();
+        $users = User::role('Head of Division')->whereHas('employee')->pluck('name', 'id')->toArray();
         return view('departments.create', compact('users'));
     }
 
@@ -49,7 +49,7 @@ class DepartmentController extends Controller
      */
     public function edit(Department $department)
     {
-        $users = User::pluck('name', 'id')->toArray();
+        $users = User::role('Head of Division')->whereHas('employee')->pluck('name', 'id')->toArray();
 
         return view('departments.edit', compact('department', 'users'));
     }
@@ -59,6 +59,13 @@ class DepartmentController extends Controller
      */
     public function update(Request $request, Department $department)
     {
+
+        if ($request->has('department_head')) {
+            $user = User::find($request->department_head);
+            if ($department->department_id != $user->employee->department_id) {
+                return redirect()->back()->withErrors(['user_id' => 'The selected user does not belong to this department.'])->withInput();
+            }
+        }
         $department->update($request->all());
 
         return redirect()->route('departments.index')->with('success', 'Department updated successfully.');
