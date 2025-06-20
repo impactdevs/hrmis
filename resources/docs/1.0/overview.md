@@ -18,3 +18,4 @@
 6. **Trainings/Travels**: Gain insights into HR metrics, leave statistics, and employee attendance.
 7. **Recruitment**: Gain insights into HR metrics, leave statistics, and employee attendance.
 8. **Job Application**: Gain insights into HR metrics, leave statistics, and employee attendance.
+9. **Salary Advance Application**: Application of salary advances, approval and tracking.  
