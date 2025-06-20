@@ -11,6 +11,13 @@
                     </label>
                     <p class="p-2 border rounded bg-light">{{ $event->event_title }}</p>
                 </div>
+
+                <div class="mb-3 form-group">
+                    <label for="event_name">
+                        <i class="fas fa-tag"></i> Event location
+                    </label>
+                    <p class="p-2 border rounded bg-light">{{ $event->event_location }}</p>
+                </div>
                 <div class="mb-3 form-group">
                     <label for="event_start_date">
                         <i class="fas fa-clock"></i> Event Start Date

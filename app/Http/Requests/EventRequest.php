@@ -23,6 +23,7 @@ class EventRequest extends FormRequest
             'event_start_date' => 'required|date',
             'event_end_date' => 'required|date|after_or_equal:event_start_date',
             'event_title' => 'required|string|max:255',
+            'event_location' => 'required|string|max:255',
             'event_description' => 'required|string',
             'category' => 'required|array',
         ];
@@ -41,6 +42,7 @@ class EventRequest extends FormRequest
             'event_description.required' => 'The event description is required.',
             'category.required' => 'The category is required.',
             'category.json' => 'The category must be a valid JSON string.',
+            'event_location.required' => 'The event location is required.',
         ];
     }
 }

@@ -13,6 +13,13 @@
         <x-forms.input name="event_title" label="Event Title" type="text" id="event_title"
             placeholder="Enter Event Title" value="{{ old('event_title', $event->event_title ?? '') }}" />
     </div>
+
+    <div class="col-md-6">
+        <x-forms.input name="event_location" label="Event Location" type="text" id="event_location"
+            placeholder="Enter event location" value="{{ old('event_location', $event->event_location ?? '') }}" />
+    </div>
+
+
     <div class="col-md-6">
         <x-forms.text-area name="event_description" label="Event Description" id="event_description"
             :value="old('event_description', $event->event_description ?? '')" />
