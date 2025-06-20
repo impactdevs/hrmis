@@ -696,7 +696,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <!-- End Customers Card -->
                         @if (count($leaveApprovalData) > 0)
                             <!-- Leave Requests Timeline -->
@@ -845,6 +844,20 @@
                                                 </li>
                                             @endforeach
                                         </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        @else 
+                            <div class="col-xxl-12 col-md-12">
+                                <div class="card info-card border-0 shadow-sm">
+                                    <div class="card-body text-center">
+                                        <h5 class="mb-4 fw-bold text-primary">
+                                            <i class="bi bi-calendar-check"></i> No Recent Leave Requests
+                                        </h5>
+                                        <p class="text-muted">
+                                            You have not submitted any leave requests recently. Please submit a leave request
+                                            if you need to take time off.   
+                                        </p>
                                     </div>
                                 </div>
                             </div>
