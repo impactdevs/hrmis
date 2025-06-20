@@ -568,21 +568,13 @@
                                             console.log()
                                             if (event.is_cancelled) {
                                                 row[2] =
-                                                    `<span class="text-danger">${
-                                                        event.leave.leave_category && event.leave.leave_category.leave_type_name
-                                                            ? event.leave.leave_category.leave_type_name
-                                                            : 'Unknown'
-                                                    } (${event.duration})</span>`;
+                                                    `<span class="text-danger">${event.leave.leave_category.leave_type_name} (${event.duration})</span>`;
                                                 //create a span
 
                                             } else {
                                                 //create a span here with danger 
                                                 row[2] =
-                                                    `<span>${
-                                                        event.leave.leave_category && event.leave.leave_category.leave_type_name
-                                                            ? event.leave.leave_category.leave_type_name
-                                                            : 'Unknown'
-                                                    } (${event.duration})</span>`;
+                                                    `<span>${event.leave.leave_category.leave_type_name} (${event.duration})</span>`;
 
                                             }
                                         } else {
@@ -598,19 +590,20 @@
                                             const endDate = new Date(event.end);
                                             if (endDate >= now) {
                                                 row[4] = `
-                                                    <div class="dropdown">
-                                                        <button class="btn btn-secondary btn-sm dropdown-toggle d-flex align-items-center gap-1" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                                            <i class="bi bi-three-dots-vertical"></i> Actions
-                                                        </button>
-                                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                            <li>
-                                                                <a class="dropdown-item apply-btn" href="/apply-for-leave/${event.leave_roster_id}" title="Apply">
-                                                                    <i class="bi bi-pencil"></i> Apply
-                                                                </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                `;
+    <div class="dropdown">
+        <button class="btn btn-secondary btn-sm dropdown-toggle d-flex align-items-center gap-1" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-three-dots-vertical"></i> Actions
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <li>
+                <a class="dropdown-item apply-btn" href="/leave-roster/${event.leave_roster_id}/apply" title="Apply">
+                    <i class="bi bi-pencil"></i> Apply
+                </a>
+            </li>
+        </ul>
+    </div>
+`;
+
                                             } else {
                                                 row[4] = `
                                                     <span class="badge bg-secondary">Expired</span>
@@ -662,13 +655,13 @@
                                                                 </a>
                                                             </li>
                                                             ${event.leave.leave_id ? `
-                                                                                                                                <li>
-                                                                                                                                    <a class="dropdown-item cancel-btn" href="/cancel-leave/${event.leave.leave_id}" title="Cancel">
-                                                                                                                                        <i class="bi bi-x-circle-fill"></i> Cancel
-                                                                                                                                     </a>
-                                                                                                                                </li>
+                                                                                                                                                <li>
+                                                                                                                                                    <a class="dropdown-item cancel-btn" href="/cancel-leave/${event.leave.leave_id}" title="Cancel">
+                                                                                                                                                        <i class="bi bi-x-circle-fill"></i> Cancel
+                                                                                                                                                     </a>
+                                                                                                                                                </li>
 
-                                                                                                                                    ` : ''}
+                                                                                                                                                    ` : ''}
                                                         </ul>
                                                     </div>
                                                 `;
@@ -815,7 +808,8 @@
                 // apply leave
                 $('#applyLeave').click(function() {
                     //navigate to apply for leave with leave roster id current event.id
-                    window.location.href = "/apply-for-leave/" + currentEvent.id;
+                    window.location.href = "/leave-roster/" + currentEvent.id + "/apply";
+
                 });
 
                 //addLeaveRoster
