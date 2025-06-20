@@ -5,8 +5,11 @@
 
             <select name="leave_type_id" id="leave_type_id"
                 class="form-control @error('leave_type_id') is-invalid @enderror">
-                @if (isset($leaveRoster))
-                    <option value="annual" selected>Annual Leave</option>
+                @php
+                    $annualLeaveType = \App\Models\LeaveType::where('leave_type_name', 'Annual')->first();
+                @endphp
+                @if (isset($leaveRoster) && $annualLeaveType)
+                    <option value="{{ $annualLeaveType->leave_type_id }}" selected>Annual Leave</option>
                 @else
                     @foreach ($leaveTypes as $value => $text)
                         <option value="{{ $value }}" {{ old('leave_type_id') == $value ? 'selected' : '' }}>

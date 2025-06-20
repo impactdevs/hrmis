@@ -568,13 +568,21 @@
                                             console.log()
                                             if (event.is_cancelled) {
                                                 row[2] =
-                                                    `<span class="text-danger">${event.leave.leave_category.leave_type_name} (${event.duration})</span>`;
+                                                    `<span class="text-danger">${
+                                                        event.leave.leave_category && event.leave.leave_category.leave_type_name
+                                                            ? event.leave.leave_category.leave_type_name
+                                                            : 'Unknown'
+                                                    } (${event.duration})</span>`;
                                                 //create a span
 
                                             } else {
                                                 //create a span here with danger 
                                                 row[2] =
-                                                    `<span>${event.leave.leave_category.leave_type_name} (${event.duration})</span>`;
+                                                    `<span>${
+                                                        event.leave.leave_category && event.leave.leave_category.leave_type_name
+                                                            ? event.leave.leave_category.leave_type_name
+                                                            : 'Unknown'
+                                                    } (${event.duration})</span>`;
 
                                             }
                                         } else {

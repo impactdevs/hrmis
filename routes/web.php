@@ -104,7 +104,7 @@ Route::middleware(['auth', 'verified', 'data.usage.agreement'])->group(function 
     Route::resource('public_holidays', PublicHolidayController::class);
     Route::post('calender', [leaveRosterController::class, 'getcalender']);
     Route::get('leave-management', [LeaveController::class, 'leaveManagement'])->name('leave-management');
-    Route::get('apply-for-leave/{leaveRoster}', [LeaveController::class, 'applyForLeave'])->name('apply-for-leave.apply');
+    Route::get('apply-for-leave/{leaveRoster}', [LeaveController::class, 'applyForLeave'])->name('apply-for-leave');
     Route::resource('company-jobs', CompanyJobController::class);
     Route::resource('departments', DepartmentController::class);
 

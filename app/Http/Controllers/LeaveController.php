@@ -319,11 +319,13 @@ class LeaveController extends Controller
                 'first_name' => $leave->employee->first_name ?? null,
                 'last_name' => $leave->employee->last_name ?? null,
                 'leave' => $leave->leave,
-                'is_cancelled' => $leave->is_cancelled,
+                'is_cancelled' => $leave->leave->is_cancelled,
                 // Add duration by calling the durationForLeave method
                 'duration' => $leave->durationForLeave() // This will return the duration excluding weekends and holidays
             ];
         });
+
+        
 
         // Query to find leaves that are not in the leave roster
         $orphanedLeaves = Leave::with('leaveCategory')->whereNull('leave_roster_id')
