@@ -10,3 +10,4 @@
     - [Training/Travels Management](/{{route}}/{{version}}/training-travels)
     - [Recruitment Management](/{{route}}/{{version}}/recruitment)
     - [Job Applications Management](/{{route}}/{{version}}/job-applications)
+    - [Salary Advance Management](/{{route}}/{{version}}/salary-advances)
