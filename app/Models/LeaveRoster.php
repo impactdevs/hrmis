@@ -36,6 +36,11 @@ class LeaveRoster extends Model
         'end_date' => 'date',
     ];
 
+    public function getRouteKeyName()
+    {
+        return 'leave_roster_id';
+    }
+
     // Model boot method
     protected static function boot()
     {
