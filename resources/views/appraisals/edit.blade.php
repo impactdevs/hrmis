@@ -1479,7 +1479,6 @@
                                 <button type="reset" class="btn btn-lg btn-outline-secondary">
                                     <i class="fas fa-undo me-2"></i>Reset
                                 </button>
-
                                 <button type="submit" class="btn btn-lg btn-primary">
                                     <i class="fas fa-paper-plane me-2"></i>Review & Submit
                                 </button>

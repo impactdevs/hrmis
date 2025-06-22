@@ -8,6 +8,8 @@
     <meta name="description" content="">
     <meta name="author" content="Impact Outsourcing">
     <meta name="generator" content="Human Resource Management System">
+    <link rel="icon" href="{{ asset('assets/img/favicon.ico') }}" type="image/x-icon">
+    <link rel="apple-touch-icon" href="{{ asset('assets/img/favicon.ico') }}">
     <title>{{ config('app.name') }}</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3">
     <link
