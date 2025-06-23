@@ -182,8 +182,9 @@
             </li>
 
             <li class="nav-item">
-                <a class="nav-link text-white d-flex align-items-center gap-2 fs-6 fw-bold @if (request()->routeIs('docs')) bg-secondary @endif"
-                    href="https://drive.google.com/drive/folders/1Wj9XKIKxhxGoNwrPDN3I8FiHRdNEPP1X?usp=drive_link">
+                <a class="nav-link text-white d-flex align-items-center gap-2 fs-6 fw-bold"
+                    href="https://drive.google.com/drive/folders/1Wj9XKIKxhxGoNwrPDN3I8FiHRdNEPP1X?usp=drive_link"
+                    target="_blank" rel="noopener">
                     <i class="bi bi-book"></i>
                     Video tutorials
                 </a>
@@ -192,7 +193,8 @@
             @if (auth()->user()->hasRole('HR'))
                 <li class="nav-item">
                     <a class="nav-link text-white d-flex align-items-center gap-2 fs-6 fw-bold"
-                        href="https://drive.google.com/drive/folders/1-2FfImKXDZMAjhO0hNe9N7s1hjOF045Q?usp=drive_link">
+                        href="https://drive.google.com/drive/folders/1-2FfImKXDZMAjhO0hNe9N7s1hjOF045Q?usp=drive_link"
+                        target="_blank" rel="noopener">
                         <i class="bi bi-book"></i>
                         Configuration Video tutorials
                     </a>
