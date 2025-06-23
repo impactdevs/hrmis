@@ -61,13 +61,13 @@
                     {{ auth()->user()->isAdminOrSecretary ? 'Attendances' : 'My Attendance History' }} </a>
             </li>
 
-                <li class="nav-item">
-                    <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('salary-advances.index')) bg-secondary @endif"
-                        href="{{ route('salary-advances.index') }}">
-                        <i class="bi bi-currency-dollar"></i>
-                        {{ auth()->user()->isAdminOrSecretary ? 'Salary Advances' : 'My Salary Advances' }} </a>
-                </li>
-            
+            <li class="nav-item">
+                <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('salary-advances.index')) bg-secondary @endif"
+                    href="{{ route('salary-advances.index') }}">
+                    <i class="bi bi-currency-dollar"></i>
+                    {{ auth()->user()->isAdminOrSecretary ? 'Salary Advances' : 'My Salary Advances' }} </a>
+            </li>
+
 
             <li class="nav-item">
                 <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('trainings.index') ||
@@ -172,6 +172,7 @@
                     User Manual
                 </a>
             </li>
+
             <li class="nav-item">
                 <a class="nav-link text-white d-flex align-items-center gap-2 fs-6 fw-bold @if (request()->routeIs('uncst-matrix')) bg-secondary @endif"
                     href="{{ route('uncst-matrix') }}">
@@ -179,6 +180,24 @@
                     Requirements Matrix
                 </a>
             </li>
+
+            <li class="nav-item">
+                <a class="nav-link text-white d-flex align-items-center gap-2 fs-6 fw-bold @if (request()->routeIs('docs')) bg-secondary @endif"
+                    href="https://drive.google.com/drive/folders/1Wj9XKIKxhxGoNwrPDN3I8FiHRdNEPP1X?usp=drive_link">
+                    <i class="bi bi-book"></i>
+                    Video tutorials
+                </a>
+            </li>
+
+            @if (auth()->user()->hasRole('HR'))
+                <li class="nav-item">
+                    <a class="nav-link text-white d-flex align-items-center gap-2 fs-6 fw-bold"
+                        href="https://drive.google.com/drive/folders/1-2FfImKXDZMAjhO0hNe9N7s1hjOF045Q?usp=drive_link">
+                        <i class="bi bi-book"></i>
+                        Configuration Video tutorials
+                    </a>
+                </li>
+            @endif
         </ul>
 
         </h6>
