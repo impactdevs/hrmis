@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('appraisals', function (Blueprint $table) {
-            $table->boolean('is_draft')->default(false)->after('rejection_reason')->comment('Indicates if the appraisal is a draft');
+            // $table->boolean('is_draft')->default(false)->after('rejection_reason')->comment('Indicates if the appraisal is a draft');
         });
     }
 
