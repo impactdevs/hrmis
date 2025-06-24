@@ -200,47 +200,47 @@ class EmployeeController extends Controller
 
             // Handle the passport photo upload
             if ($request->hasFile('passport_photo')) {
-                // Store the photo and get the path
-                $passportPhotoPath = $request->file('passport_photo')->store('passport_photos', 'public');
-                // Add the path to the validated data
-                $validatedData['passport_photo'] = $passportPhotoPath;
+            // Store the photo and get the path
+            $passportPhotoPath = $request->file('passport_photo')->store('passport_photos', 'public');
+            // Add the path to the validated data
+            $validatedData['passport_photo'] = $passportPhotoPath;
             }
 
             // Handle the passport photo upload
             if ($request->hasFile('national_id_photo')) {
-                // Store the photo and get the path
-                $passportPhotoPath = $request->file('national_id_photo')->store('national_id_photos', 'public');
-                // Add the path to the validated data
-                $validatedData['national_id_photo'] = $passportPhotoPath;
+            // Store the photo and get the path
+            $passportPhotoPath = $request->file('national_id_photo')->store('national_id_photos', 'public');
+            // Add the path to the validated data
+            $validatedData['national_id_photo'] = $passportPhotoPath;
             }
 
             // Format (qualification details documents
             if (filled($validatedData['qualifications_details'])) {
-                foreach ($validatedData['qualifications_details'] as $key => $value) {
-                    // Check if the current qualification has a proof file
-                    if ($request->hasFile("qualifications_details.$key.proof")) {
-                        // Store the file and get the path
-                        $filePath = $request->file("qualifications_details.$key.proof")->store('proof_documents', 'public');
+            foreach ($validatedData['qualifications_details'] as $key => $value) {
+                // Check if the current qualification has a proof file
+                if ($request->hasFile("qualifications_details.$key.proof")) {
+                // Store the file and get the path
+                $filePath = $request->file("qualifications_details.$key.proof")->store('proof_documents', 'public');
 
-                        // Update the proof value to the path
-                        $qualification_details[$key]['proof'] = $filePath;
-                    }
-
-                    //check if there is title
-                    if (isset($validatedData['qualifications_details'][$key]['title'])) {
-                        $qualification_details[$key]['title'] = $validatedData['qualifications_details'][$key]['title'];
-                    }
-
-                    // Update the qualification details
-                    $validatedData['qualifications_details'] = $qualification_details;
+                // Update the proof value to the path
+                $qualification_details[$key]['proof'] = $filePath;
                 }
+
+                //check if there is title
+                if (isset($validatedData['qualifications_details'][$key]['title'])) {
+                $qualification_details[$key]['title'] = $validatedData['qualifications_details'][$key]['title'];
+                }
+
+                // Update the qualification details
+                $validatedData['qualifications_details'] = $qualification_details;
+            }
             }
 
             // Update the employee record using validated data
             $employee->update($validatedData);
 
-            // Redirect to the employees index with a success message
-            return redirect()->route('employees.index')->with('success', 'Employee Updated');
+            // Redirect to the employee show page with a success message
+            return redirect()->route('employees.show', ['employee' => $employee->employee_id])->with('success', 'Employee Updated');
         } catch (Exception $exception) {
             // Log the error for debugging
             Log::error('Error updating employee: ' . $exception->getMessage());
