@@ -123,12 +123,30 @@ class AppraisalsController extends Controller
             "panel_recommendation" => null,
             "overall_assessment" => null,
             "executive_secretary_comments" => null,
-            "is_draft" => true, // Set to true for draft
         ];
 
         $appraisal = Appraisal::create($data);
 
+        $employeeAppraisor = \App\Models\Employee::withoutGlobalScope(EmployeeScope::class)
+            ->find($appraisal->appraiser_id);
 
+        $employeeAppraisee = \App\Models\Employee::withoutGlobalScope(EmployeeScope::class)
+            ->where('email', auth()->user()->email)->first();
+
+        $appraisorUser = User::find($employeeAppraisor->user_id);
+        if ($appraisorUser) {
+            Notification::send($appraisorUser, new AppraisalApplication($appraisal, $employeeAppraisee->first_name, $employeeAppraisee->last_name));
+        }
+
+        $hrUser = User::role('HR')->first();
+        if ($hrUser) {
+            Notification::send($hrUser, new AppraisalApplication($appraisal, $employeeAppraisee->first_name, $employeeAppraisee->last_name));
+        }
+
+        $esUser = User::role('Executive Secretary')->first();
+        if ($esUser) {
+            Notification::send($esUser, new AppraisalApplication($appraisal, $employeeAppraisee->first_name, $employeeAppraisee->last_name));
+        }
 
         return to_route('uncst-appraisals.edit', ['uncst_appraisal' => $appraisal->appraisal_id]);
     }
@@ -200,31 +218,6 @@ class AppraisalsController extends Controller
         if (!empty($requestedData['review_type_other']) && $requestedData['review_type_other'] != 'other') {
             $requestedData['review_type_other'] = null;
         }
-
-        // check if the current appraisal in the db was a draft but is now being submitted
-        if ($uncst_appraisal->is_draft && !$request->input('is_draft')) {
-            $employeeAppraisor = \App\Models\Employee::withoutGlobalScope(EmployeeScope::class)
-                ->find($uncst_appraisal->appraiser_id);
-
-            $employeeAppraisee = \App\Models\Employee::withoutGlobalScope(EmployeeScope::class)
-                ->where('email', auth()->user()->email)->first();
-
-            $appraisorUser = User::find($employeeAppraisor->user_id);
-            if ($appraisorUser) {
-                Notification::send($appraisorUser, new AppraisalApplication($uncst_appraisal, $employeeAppraisee->first_name, $employeeAppraisee->last_name));
-            }
-
-            $hrUser = User::role('HR')->first();
-            if ($hrUser) {
-                Notification::send($hrUser, new AppraisalApplication($uncst_appraisal, $employeeAppraisee->first_name, $employeeAppraisee->last_name));
-            }
-
-            $esUser = User::role('Executive Secretary')->first();
-            if ($esUser) {
-                Notification::send($esUser, new AppraisalApplication($uncst_appraisal, $employeeAppraisee->first_name, $employeeAppraisee->last_name));
-            }
-        }
-        
         $uncst_appraisal->update($requestedData);
 
         return redirect()->back()->with('success', 'Appraisal updated successfully.');
