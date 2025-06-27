@@ -14,8 +14,7 @@ use App\Models\Scopes\EmployeeScope;
 use Illuminate\Support\Facades\Notification;
 
 use Barryvdh\DomPDF\Facade\Pdf;
-
-
+use Illuminate\Support\Facades\DB;
 
 class AppraisalsController extends Controller
 {
@@ -127,26 +126,34 @@ class AppraisalsController extends Controller
 
         $appraisal = Appraisal::create($data);
 
-        $employeeAppraisor = \App\Models\Employee::withoutGlobalScope(EmployeeScope::class)
-            ->find($appraisal->appraiser_id);
+        // $employeeAppraisor = \App\Models\Employee::withoutGlobalScope(EmployeeScope::class)
+        //     ->find($appraisal->appraiser_id);
 
-        $employeeAppraisee = \App\Models\Employee::withoutGlobalScope(EmployeeScope::class)
-            ->where('email', auth()->user()->email)->first();
+        // $employeeAppraisee = \App\Models\Employee::withoutGlobalScope(EmployeeScope::class)
+        //     ->where('email', auth()->user()->email)->first();
 
-        $appraisorUser = User::find($employeeAppraisor->user_id);
-        if ($appraisorUser) {
-            Notification::send($appraisorUser, new AppraisalApplication($appraisal, $employeeAppraisee->first_name, $employeeAppraisee->last_name));
-        }
+        // $appraisorUser = User::find($employeeAppraisor->user_id);
+        // if ($appraisorUser) {
+        //     Notification::send($appraisorUser, new AppraisalApplication($appraisal, $employeeAppraisee->first_name, $employeeAppraisee->last_name));
+        // }
 
-        $hrUser = User::role('HR')->first();
-        if ($hrUser) {
-            Notification::send($hrUser, new AppraisalApplication($appraisal, $employeeAppraisee->first_name, $employeeAppraisee->last_name));
-        }
+        // $hrUser = User::role('HR')->first();
+        // if ($hrUser) {
+        //     Notification::send($hrUser, new AppraisalApplication($appraisal, $employeeAppraisee->first_name, $employeeAppraisee->last_name));
+        // }
 
-        $esUser = User::role('Executive Secretary')->first();
-        if ($esUser) {
-            Notification::send($esUser, new AppraisalApplication($appraisal, $employeeAppraisee->first_name, $employeeAppraisee->last_name));
-        }
+        // $esUser = User::role('Executive Secretary')->first();
+        // if ($esUser) {
+        //     Notification::send($esUser, new AppraisalApplication($appraisal, $employeeAppraisee->first_name, $employeeAppraisee->last_name));
+        // }
+
+        // add to appraisal drafts using query builder
+        DB::table('appraisal_drafts')->insert([
+            'appraisal_id' => $appraisal->appraisal_id,
+            'employee_id' => $appraisal->employee_id,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
 
         return to_route('uncst-appraisals.edit', ['uncst_appraisal' => $appraisal->appraisal_id]);
     }
@@ -191,9 +198,9 @@ class AppraisalsController extends Controller
                 ->orderBy('end_date', 'desc')
                 ->first();
         }
-
         return view('appraisals.edit', compact('appraisal', 'users', 'expiredContract'));
     }
+
 
     public function previewAppraisalDetails(Appraisal $appraisal)
     {
@@ -218,9 +225,36 @@ class AppraisalsController extends Controller
         if (!empty($requestedData['review_type_other']) && $requestedData['review_type_other'] != 'other') {
             $requestedData['review_type_other'] = null;
         }
+
+        $message = "Appraisal has been submitted successfully.";
+
+        if (isset($requestedData['is_draft'])) {
+            if ($requestedData['is_draft'] === 'not_draft') {
+                DB::table('appraisal_drafts')->where('appraisal_id', $uncst_appraisal->appraisal_id)->delete();
+                $message = "Draft Saved Successfully. You can now proceed to submit the appraisal.";
+            } elseif ($requestedData['is_draft'] === 'draft') {
+                //if the draft with the appraisal_id and employee_id does not exist, create it
+                $draftExists = DB::table('appraisal_drafts')
+                    ->where('appraisal_id', $uncst_appraisal->appraisal_id)
+                    ->where('employee_id', auth()->user()->employee->employee_id)
+                    ->exists();
+
+            if (!$draftExists) {
+                DB::table('appraisal_drafts')->insert([
+                    'appraisal_id' => $uncst_appraisal->appraisal_id,
+                    'employee_id' => auth()->user()->employee->employee_id,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+                $message = "Appraisal has been saved as a draft successfully.";
+            }
+            unset($requestedData['is_draft']);
+        }
+
         $uncst_appraisal->update($requestedData);
 
-        return redirect()->back()->with('success', 'Appraisal updated successfully.');
+        return redirect()->back()->with('success', $message);
+    }
     }
 
     /**

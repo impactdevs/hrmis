@@ -13,7 +13,8 @@ class TextArea extends Component
         public string $label,
         public string $id,
         public ?string $value = null, // Optional value for pre-filling
-        public bool $isDisabled = false
+        public bool $isDisabled = false,
+        public bool $isDraft = false
     ) {
     }
 

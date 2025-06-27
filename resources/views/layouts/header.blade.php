@@ -35,8 +35,10 @@
                 }
                 if (request()->routeIs('uncst-appraisals.edit')) {
                     $appraisal = request()->route('uncst_appraisal'); // This is likely a model, not an ID
+                    $isDraft = $appraisal->is_draft ? 'Draft' : 'Final';
                     $title =
-                        'Appraisal for ' . $appraisal->employee->first_name . ' ' . $appraisal->employee->last_name;
+                        'Appraisal for ' . $appraisal->employee->first_name . ' ' . $appraisal->employee->last_name .
+                        ' (' . $isDraft . ')';
                 }
 
                 if (request()->routeIs('appraisals.create')) {

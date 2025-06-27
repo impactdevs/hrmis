@@ -7,6 +7,46 @@
 
         $rejectionReason = $appraisal->rejection_reason ?? 'No reason provided.';
     @endphp
+
+    @php
+        //get the role of the logged in user
+        $currentUser = auth()->user();
+        $currentRole = $currentUser->getRoleNames()->first();
+        $staffDraftValue = false;
+        $hrDraftValue = false;
+        $executiveSecretaryDraftValue = false;
+        $headOfDivisionDraftValue = false;
+        $roleDraftCheckArray = $appraisal->draft_users ?? [];
+
+        //check if Staff key is in the draft_users array
+        $isDraft = in_array('Staff', $roleDraftCheckArray);
+
+        //check for HR role
+        $isHRDraft = in_array('HR', $roleDraftCheckArray);
+
+        //check for Executive Secretary role
+        $isExecutiveSecretaryDraft = in_array('Executive Secretary', $roleDraftCheckArray);
+
+        //check for Head of Division role
+        $isHeadOfDivisionDraft = in_array('Head of Division', $roleDraftCheckArray);
+
+        //for those that exist, get the values
+        if ($isDraft) {
+            $staffDraftValue = $appraisal->draft_users['Staff'] ?? false;
+        }
+
+        if ($isHRDraft) {
+            $hrDraftValue = $appraisal->draft_users['HR'] ?? false;
+        }
+
+        if ($isExecutiveSecretaryDraft) {
+            $executiveSecretaryDraftValue = $appraisal->draft_users['Executive Secretary'] ?? false;
+        }
+
+        if ($isHeadOfDivisionDraft) {
+            $headOfDivisionDraftValue = $appraisal->draft_users['Head of Division'] ?? false;
+        }
+    @endphp
     <div class="gap-2 p-2 bg-white border rounded shadow position-fixed top-50 end-0 translate-middle-y d-flex align-items-center border-primary no-print"
         style="z-index: 9999; cursor: pointer;" role="button" onclick="window.print();" title="Print this page">
 
@@ -128,21 +168,19 @@
                                                     id="review_type_{{ $value }}" value="{{ $value }}"
                                                     class="form-check-input @error('review_type') is-invalid @enderror"
                                                     {{ $selected === $value ? 'checked' : '' }}
-                                                    @if ($value === 'end_of_contract') 
-                                                        onclick="document.getElementById('expireContractDetails').classList.remove('d-none');document.getElementById('review_type_other_input').classList.add('d-none');"
+                                                    @if ($value === 'end_of_contract') onclick="document.getElementById('expireContractDetails').classList.remove('d-none');document.getElementById('review_type_other_input').classList.add('d-none');"
                                                     @elseif ($value === 'other')
                                                         onclick="document.getElementById('expireContractDetails').classList.add('d-none');document.getElementById('review_type_other_input').classList.remove('d-none');"
                                                     @else 
-                                                        onclick="document.getElementById('expireContractDetails').classList.add('d-none');document.getElementById('review_type_other_input').classList.add('d-none');"
-                                                    @endif
-                                                >
+                                                        onclick="document.getElementById('expireContractDetails').classList.add('d-none');document.getElementById('review_type_other_input').classList.add('d-none');" @endif>
                                                 <label class="form-check-label" for="review_type_{{ $value }}">
                                                     {{ $text }}
                                                 </label>
                                             </div>
                                         @endforeach
 
-                                        <div id="review_type_other_input" class="mt-2 {{ $selected === 'other' ? '' : 'd-none' }}">
+                                        <div id="review_type_other_input"
+                                            class="mt-2 {{ $selected === 'other' ? '' : 'd-none' }}">
                                             <input type="text" name="review_type_other" class="form-control"
                                                 placeholder="Please specify other review type"
                                                 value="{{ $otherValue }}">
@@ -423,11 +461,12 @@
 
                             <div class="mt-4 col-12">
                                 <p class="fw-bold">a. Job Compatibility</p>
+
                                 <x-forms.radio name="job_compatibility" :isDisabled="!$appraisal->is_appraisee"
                                     label="Is the job and tasks performed compatible with your qualifications and experience?"
                                     value="{{ $appraisal->job_compatibility ?? '' }}" id="job_compatibility"
                                     :options="['yes' => 'Yes', 'no' => 'No']" :selected="$appraisal->job_compatibility ?? ''" />
-                                <x-forms.text-area name="if_no_job_compatibility" :isDisabled="!$appraisal->is_appraisee"
+                                <x-forms.text-area name="if_no_job_compatibility" :isDisabled="!$appraisal->is_appraisee" :isDraft="$staffDraftValue"
                                     label="If No, explain:" id="if_no_job_compatibility" :value="old(
                                         'if_no_job_compatibility',
                                         $appraisal->if_no_job_compatibility ?? '',
@@ -436,7 +475,7 @@
 
                             <div class="mt-4 col-12">
                                 <p class="fw-bold">b. Challenges</p>
-                                <x-forms.text-area name="unanticipated_constraints" :isDisabled="!$appraisal->is_appraisee"
+                                <x-forms.text-area name="unanticipated_constraints" :isDisabled="!$appraisal->is_appraisee" :isDraft="$staffDraftValue"
                                     label="Briefly state unanticipated constraints/problems that you encountered and how they affected the achievements of the objectives."
                                     id="unanticipated_constraints" :value="old(
                                         'unanticipated_constraints',
@@ -446,14 +485,14 @@
 
                             <div class="mt-4 col-12">
                                 <p class="fw-bold">c. Personal Initiatives</p>
-                                <x-forms.text-area name="personal_initiatives" :isDisabled="!$appraisal->is_appraisee"
+                                <x-forms.text-area name="personal_initiatives" :isDisabled="!$appraisal->is_appraisee" :isDraft="$staffDraftValue"
                                     label="Outline personal initiatives and any other factors that you think contributed to your achievements and successes."
                                     id="personal_initiatives" :value="old('personal_initiatives', $appraisal->personal_initiatives ?? '')" />
                             </div>
 
                             <div class="mt-4 col-12">
                                 <p class="fw-bold">d. Training Support Needs</p>
-                                <x-forms.text-area name="training_support_needs" :isDisabled="!$appraisal->is_appraisee"
+                                <x-forms.text-area name="training_support_needs" :isDisabled="!$appraisal->is_appraisee" :isDraft="$staffDraftValue"
                                     label="Indicate the nature of training support you may need to effectively perform your duties. Training support should be consistent with the job requirements and applicable to UNCST policies and regulations."
                                     id="training_support_needs" :value="old('training_support_needs', $appraisal->training_support_needs ?? '')" />
                             </div>
@@ -536,17 +575,18 @@
                                                     contenteditable="{{ $appraisal->is_appraisee ? 'true' : 'false' }}"
                                                     data-placeholder="Enter task" oninput="updateHiddenInput(this)"
                                                     @unless ($appraisal->is_appraisee)
-                                                        data-bs-toggle="tooltip" 
-                                                        data-bs-placement="top"
-                                                        title="Editing is disabled for your role"
-                                                        onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()"
-                                                    @endunless>
-                                                    {{ $plannedActivity ?: 'Enter task' }}
+                                                    data-bs-toggle="tooltip" 
+                                                    data-bs-placement="top"
+                                                    title="Editing is disabled for your role"
+                                                    onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()"
+                                                @endunless>
+                                                    {{ $staffDraftValue ? '' : ($plannedActivity ?: 'Enter task') }}
                                                 </div>
                                                 <input type="hidden"
                                                     name="appraisal_period_rate[{{ $i - 1 }}][planned_activity]"
                                                     value="{{ $plannedActivity }}">
                                             </td>
+
 
                                             {{-- Output Results --}}
                                             <td class="px-6 py-2 border border-gray-200">
@@ -559,7 +599,7 @@
                                                         title="Editing is disabled for your role"
                                                         onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()"
                                                     @endunless>
-                                                    {{ $outputResults ?: 'Enter result' }}
+                                                    {{ $staffDraftValue ? '' : ($plannedActivity ?: 'Enter Result') }}
                                                 </div>
                                                 <input type="hidden"
                                                     name="appraisal_period_rate[{{ $i - 1 }}][output_results]"
@@ -577,7 +617,8 @@
                                                         title="Editing is disabled for your role"
                                                         onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()"
                                                     @endunless>
-                                                    {{ $superviseeScore }}
+                                                    {{ $staffDraftValue ? 0 : $superviseeScore }}
+
                                                 </div>
                                                 <input type="hidden"
                                                     name="appraisal_period_rate[{{ $i - 1 }}][supervisee_score]"
@@ -595,7 +636,7 @@
                                                         title="Editing is disabled for your role"
                                                         onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()"
                                                     @endunless>
-                                                    {{ $supervisorScore }}
+                                                    {{ $headOfDivisionDraftValue ? 0 : $supervisorScore }}
                                                 </div>
                                                 <input type="hidden"
                                                     name="appraisal_period_rate[{{ $i - 1 }}][supervisor_score]"
@@ -604,14 +645,27 @@
 
                                             {{-- Agreed Score --}}
                                             <td class="px-6 py-2 border border-gray-200">
-                                                <input type="number"
-                                                    name="appraisal_period_rate[{{ $i - 1 }}][agreed_score]"
-                                                    class="form-control form-control-sm agreed-score-input"
-                                                    min="0" max="6" step="0.5"
-                                                    value="{{ $agreedScore }}"
-                                                    @if ($appraisal->is_appraisee) readonly @endif
-                                                    oninput="updateOverallAverage()">
+                                                @if ($headOfDivisionDraftValue)
+                                                    {{-- Show an empty input, but submit the actual value using hidden input --}}
+                                                    <input type="number"
+                                                        class="form-control form-control-sm agreed-score-input"
+                                                        min="0" max="6" step="0.5" value=""
+                                                        readonly>
+
+                                                    <input type="hidden"
+                                                        name="appraisal_period_rate[{{ $i - 1 }}][agreed_score]"
+                                                        value="{{ $agreedScore }}">
+                                                @else
+                                                    <input type="number"
+                                                        name="appraisal_period_rate[{{ $i - 1 }}][agreed_score]"
+                                                        class="form-control form-control-sm agreed-score-input"
+                                                        min="0" max="6" step="0.5"
+                                                        value="{{ $agreedScore }}"
+                                                        @if ($appraisal->is_appraisee) readonly @endif
+                                                        oninput="updateOverallAverage()">
+                                                @endif
                                             </td>
+
                                             <td
                                                 class="px-2 py-2 border border-gray-200 align-middle text-center no-print">
                                                 <button type="button" class="btn btn-sm btn-danger remove-duty-row"
@@ -645,7 +699,7 @@
                                     @endfor
 
 
-                                
+
                                     <!-- Total Row -->
                                     <tr class="bg-gradient-to-r from-blue-50 to-indigo-50 font-semibold">
                                         <td class="px-6 py-4 border border-gray-200" colspan="7">
@@ -655,7 +709,7 @@
                                                         Overall Average:
                                                         <span id="overallAverage" class="text-2xl ml-2">0</span>%
                                                     </div>
-                                                    
+
                                                     <div
                                                         class="relative w-48 h-3 bg-gray-200 rounded-full overflow-hidden">
                                                         <div id="averageProgress"
@@ -665,19 +719,19 @@
                                                     </div>
 
                                                     <div class="mt-2 no-print">
-                                               
-                                            </div>
+
+                                                    </div>
                                                 </div>
                                                 <div id="performanceStatus" class="text-sm font-medium text-gray-600">
                                                     Enter scores to view performance
                                                 </div>
 
-                                                 <button type="button" class="btn btn-outline-primary btn-sm"
+                                                <button type="button" class="btn btn-outline-primary btn-sm"
                                                     id="add-duty-row">
                                                     <i class="fas fa-plus"></i> Add Row
                                                 </button>
                                             </div>
-                                            
+
                                         </td>
                                     </tr>
                                 </tbody>
@@ -868,6 +922,7 @@
                                             name="personal_attributes_assessment[technical_knowledge][appraisee_score]"
                                             @if (!$appraisal->is_appraisee) readonly @endif
                                             class="form-control form-control-sm score-input" min="0"
+                                            @if ($staffDraftValue) style="color: transparent;" @endif
                                             value="{{ $appraisal->personal_attributes_assessment['technical_knowledge']['appraisee_score'] ?? '' }}"
                                             max="4"></td>
                                     <td class="text-center"><input type="number"
@@ -875,10 +930,12 @@
                                             @if ($appraisal->is_appraisee) readonly @endif
                                             class="form-control form-control-sm score-input" min="0"
                                             value="{{ $appraisal->personal_attributes_assessment['technical_knowledge']['appraiser_score'] ?? '' }}"
+                                            @if ($headOfDivisionDraftValue) style="color: transparent;" @endif
                                             max="4"></td>
                                     <td class="text-center"><input type="number"
                                             name="personal_attributes_assessment[technical_knowledge][agreed_score]"
                                             value="{{ $appraisal->personal_attributes_assessment['technical_knowledge']['agreed_score'] ?? '' }}"
+                                            @if ($headOfDivisionDraftValue) style="color: transparent;" @endif
                                             @if ($appraisal->is_appraisee) readonly @endif
                                             class="form-control form-control-sm score-input" min="0"
                                             max="4"></td>
@@ -897,6 +954,7 @@
                                             @if (!$appraisal->is_appraisee) readonly @endif
                                             value="{{ $appraisal->personal_attributes_assessment['commitment']['appraisee_score'] ?? '' }}"
                                             class="form-control form-control-sm score-input" min="0"
+                                            @if ($staffDraftValue) style="color: transparent;" @endif
                                             max="4" @if (!$appraisal->is_appraisee) readonly @endif>
                                     </td>
                                     <td class="text-center">
@@ -904,6 +962,7 @@
                                             name="personal_attributes_assessment[commitment][appraiser_score]"
                                             @if ($appraisal->is_appraisee) readonly @endif
                                             value="{{ $appraisal->personal_attributes_assessment['commitment']['appraiser_score'] ?? '' }}"
+                                            @if ($headOfDivisionDraftValue) style="color: transparent;" @endif
                                             class="form-control form-control-sm score-input" min="0"
                                             max="4">
                                     </td>
@@ -911,6 +970,7 @@
                                         <input type="number"
                                             name="personal_attributes_assessment[commitment][agreed_score]"
                                             value="{{ $appraisal->personal_attributes_assessment['commitment']['agreed_score'] ?? '' }}"
+                                            @if ($headOfDivisionDraftValue) style="color: transparent;" @endif
                                             @if ($appraisal->is_appraisee) readonly @endif
                                             class="form-control form-control-sm score-input" min="0"
                                             max="4">
@@ -932,6 +992,7 @@
                                             @if (!$appraisal->is_appraisee) readonly @endif
                                             value="{{ $appraisal->personal_attributes_assessment['team_work']['appraisee_score'] ?? '' }}"
                                             class="form-control form-control-sm score-input" min="0"
+                                            @if ($staffDraftValue) style="color: transparent;" @endif
                                             max="4">
                                     </td>
                                     <td class="text-center">
@@ -939,6 +1000,7 @@
                                             name="personal_attributes_assessment[team_work][appraiser_score]"
                                             @if ($appraisal->is_appraisee) readonly @endif
                                             value="{{ $appraisal->personal_attributes_assessment['team_work']['appraiser_score'] ?? '' }}"
+                                            @if ($headOfDivisionDraftValue) style="color: transparent;" @endif
                                             class="form-control form-control-sm score-input" min="0"
                                             max="4">
                                     </td>
@@ -946,6 +1008,7 @@
                                         <input type="number"
                                             name="personal_attributes_assessment[team_work][agreed_score]"
                                             value="{{ $appraisal->personal_attributes_assessment['team_work']['agreed_score'] ?? '' }}"
+                                            @if ($headOfDivisionDraftValue) style="color: transparent;" @endif
                                             @if ($appraisal->is_appraisee) readonly @endif
                                             class="form-control form-control-sm score-input" min="0"
                                             max="4">
@@ -966,6 +1029,7 @@
                                             @if (!$appraisal->is_appraisee) readonly @endif
                                             value="{{ $appraisal->personal_attributes_assessment['productivity']['appraisee_score'] ?? '' }}"
                                             class="form-control form-control-sm score-input" min="0"
+                                            @if ($staffDraftValue) style="color: transparent;" @endif
                                             max="4">
                                     </td>
                                     <td class="text-center">
@@ -973,6 +1037,7 @@
                                             name="personal_attributes_assessment[productivity][appraiser_score]"
                                             @if ($appraisal->is_appraisee) readonly @endif
                                             value="{{ $appraisal->personal_attributes_assessment['productivity']['appraiser_score'] ?? '' }}"
+                                            @if ($headOfDivisionDraftValue) style="color: transparent;" @endif
                                             class="form-control form-control-sm score-input" min="0"
                                             max="4">
                                     </td>
@@ -980,6 +1045,7 @@
                                         <input type="number"
                                             name="personal_attributes_assessment[productivity][agreed_score]"
                                             value="{{ $appraisal->personal_attributes_assessment['productivity']['agreed_score'] ?? '' }}"
+                                            @if ($headOfDivisionDraftValue) style="color: transparent;" @endif
                                             @if ($appraisal->is_appraisee) readonly @endif
                                             class="form-control form-control-sm score-input" min="0"
                                             max="4">
@@ -1000,6 +1066,7 @@
                                             @if (!$appraisal->is_appraisee) readonly @endif
                                             value="{{ $appraisal->personal_attributes_assessment['integrity']['appraisee_score'] ?? '' }}"
                                             class="form-control form-control-sm score-input" min="0"
+                                            @if ($staffDraftValue) style="color: transparent;" @endif
                                             max="4">
                                     </td>
                                     <td class="text-center">
@@ -1007,6 +1074,7 @@
                                             name="personal_attributes_assessment[integrity][appraiser_score]"
                                             @if ($appraisal->is_appraisee) readonly @endif
                                             value="{{ $appraisal->personal_attributes_assessment['integrity']['appraiser_score'] ?? '' }}"
+                                            @if ($headOfDivisionDraftValue) style="color: transparent;" @endif
                                             class="form-control form-control-sm score-input" min="0"
                                             max="4">
                                     </td>
@@ -1014,6 +1082,7 @@
                                         <input type="number"
                                             name="personal_attributes_assessment[integrity][agreed_score]"
                                             value="{{ $appraisal->personal_attributes_assessment['integrity']['agreed_score'] ?? '' }}"
+                                            @if ($headOfDivisionDraftValue) style="color: transparent;" @endif
                                             @if ($appraisal->is_appraisee) readonly @endif
                                             class="form-control form-control-sm score-input" min="0"
                                             max="4">
@@ -1034,6 +1103,7 @@
                                             @if (!$appraisal->is_appraisee) readonly @endif
                                             value="{{ $appraisal->personal_attributes_assessment['flexibility']['appraisee_score'] ?? '' }}"
                                             class="form-control form-control-sm score-input" min="0"
+                                            @if ($staffDraftValue) style="color: transparent;" @endif
                                             max="4">
                                     </td>
                                     <td class="text-center">
@@ -1041,6 +1111,7 @@
                                             name="personal_attributes_assessment[flexibility][appraiser_score]"
                                             @if ($appraisal->is_appraisee) readonly @endif
                                             value="{{ $appraisal->personal_attributes_assessment['flexibility']['appraiser_score'] ?? '' }}"
+                                            @if ($headOfDivisionDraftValue) style="color: transparent;" @endif
                                             class="form-control form-control-sm score-input" min="0"
                                             max="4">
                                     </td>
@@ -1048,6 +1119,7 @@
                                         <input type="number"
                                             name="personal_attributes_assessment[flexibility][agreed_score]"
                                             value="{{ $appraisal->personal_attributes_assessment['flexibility']['agreed_score'] ?? '' }}"
+                                            @if ($headOfDivisionDraftValue) style="color: transparent;" @endif
                                             @if ($appraisal->is_appraisee) readonly @endif
                                             class="form-control form-control-sm score-input" min="0"
                                             max="4">
@@ -1070,6 +1142,7 @@
                                             @if (!$appraisal->is_appraisee) readonly @endif
                                             value="{{ $appraisal->personal_attributes_assessment['attendance']['appraisee_score'] ?? '' }}"
                                             class="form-control form-control-sm score-input" min="0"
+                                            @if ($staffDraftValue) style="color: transparent;" @endif
                                             max="4">
                                     </td>
                                     <td class="text-center">
@@ -1077,6 +1150,7 @@
                                             name="personal_attributes_assessment[attendance][appraiser_score]"
                                             @if ($appraisal->is_appraisee) readonly @endif
                                             value="{{ $appraisal->personal_attributes_assessment['attendance']['appraiser_score'] ?? '' }}"
+                                            @if ($headOfDivisionDraftValue) style="color: transparent;" @endif
                                             class="form-control form-control-sm score-input" min="0"
                                             max="4">
                                     </td>
@@ -1084,6 +1158,7 @@
                                         <input type="number"
                                             name="personal_attributes_assessment[attendance][agreed_score]"
                                             value="{{ $appraisal->personal_attributes_assessment['attendance']['agreed_score'] ?? '' }}"
+                                            @if ($headOfDivisionDraftValue) style="color: transparent;" @endif
                                             @if ($appraisal->is_appraisee) readonly @endif
                                             class="form-control form-control-sm score-input" min="0"
                                             max="4">
@@ -1104,6 +1179,7 @@
                                             @if (!$appraisal->is_appraisee) readonly @endif
                                             value="{{ $appraisal->personal_attributes_assessment['appearance']['appraisee_score'] ?? '' }}"
                                             class="form-control form-control-sm score-input" min="0"
+                                            @if ($staffDraftValue) style="color: transparent;" @endif
                                             max="4">
                                     </td>
                                     <td class="text-center">
@@ -1111,6 +1187,7 @@
                                             name="personal_attributes_assessment[appearance][appraiser_score]"
                                             @if ($appraisal->is_appraisee) readonly @endif
                                             value="{{ $appraisal->personal_attributes_assessment['appearance']['appraiser_score'] ?? '' }}"
+                                            @if ($headOfDivisionDraftValue) style="color: transparent;" @endif
                                             class="form-control form-control-sm score-input" min="0"
                                             max="4">
                                     </td>
@@ -1118,6 +1195,7 @@
                                         <input type="number"
                                             name="personal_attributes_assessment[appearance][agreed_score]"
                                             value="{{ $appraisal->personal_attributes_assessment['appearance']['agreed_score'] ?? '' }}"
+                                            @if ($headOfDivisionDraftValue) style="color: transparent;" @endif
                                             @if ($appraisal->is_appraisee) readonly @endif
                                             class="form-control form-control-sm score-input" min="0"
                                             max="4">
@@ -1140,6 +1218,7 @@
                                             @if (!$appraisal->is_appraisee) readonly @endif
                                             value="{{ $appraisal->personal_attributes_assessment['interpersonal']['appraisee_score'] ?? '' }}"
                                             class="form-control form-control-sm score-input" min="0"
+                                            @if ($staffDraftValue) style="color: transparent;" @endif
                                             max="4">
                                     </td>
                                     <td class="text-center">
@@ -1147,6 +1226,7 @@
                                             name="personal_attributes_assessment[interpersonal][appraiser_score]"
                                             @if ($appraisal->is_appraisee) readonly @endif
                                             value="{{ $appraisal->personal_attributes_assessment['interpersonal']['appraiser_score'] ?? '' }}"
+                                            @if ($headOfDivisionDraftValue) style="color: transparent;" @endif
                                             class="form-control form-control-sm score-input" min="0"
                                             max="4">
                                     </td>
@@ -1154,6 +1234,7 @@
                                         <input type="number"
                                             name="personal_attributes_assessment[interpersonal][agreed_score]"
                                             value="{{ $appraisal->personal_attributes_assessment['interpersonal']['agreed_score'] ?? '' }}"
+                                            @if ($headOfDivisionDraftValue) style="color: transparent;" @endif
                                             @if ($appraisal->is_appraisee) readonly @endif
                                             class="form-control form-control-sm score-input" min="0"
                                             max="4">
@@ -1177,6 +1258,7 @@
                                             @if (!$appraisal->is_appraisee) readonly @endif
                                             value="{{ $appraisal->personal_attributes_assessment['initiative']['appraisee_score'] ?? '' }}"
                                             class="form-control form-control-sm score-input" min="0"
+                                            @if ($staffDraftValue) style="color: transparent;" @endif
                                             max="4">
                                     </td>
                                     <td class="text-center">
@@ -1184,6 +1266,7 @@
                                             name="personal_attributes_assessment[initiative][appraiser_score]"
                                             @if ($appraisal->is_appraisee) readonly @endif
                                             value="{{ $appraisal->personal_attributes_assessment['initiative']['appraiser_score'] ?? '' }}"
+                                            @if ($headOfDivisionDraftValue) style="color: transparent;" @endif
                                             class="form-control form-control-sm score-input" min="0"
                                             max="4">
                                     </td>
@@ -1191,6 +1274,7 @@
                                         <input type="number"
                                             name="personal_attributes_assessment[initiative][agreed_score]"
                                             value="{{ $appraisal->personal_attributes_assessment['initiative']['agreed_score'] ?? '' }}"
+                                            @if ($headOfDivisionDraftValue) style="color: transparent;" @endif
                                             @if ($appraisal->is_appraisee) readonly @endif
                                             class="form-control form-control-sm score-input" min="0"
                                             max="4">
@@ -1247,7 +1331,8 @@
                                                     contenteditable="{{ $appraisal->is_appraisee || $appraisal->is_appraisor ? 'true' : 'false' }}"
                                                     data-placeholder="Enter key output..."
                                                     oninput="updateHiddenInput(this)">
-                                                    {{ $keyOutput ?: 'Enter key output...' }}</div>
+                                                    {{ $staffDraftValue ? '' : ($keyOutput ?: 'Enter key output...') }}
+                                                </div>
                                                 <input type="hidden"
                                                     name="performance_planning[{{ $j }}][description]"
                                                     value="{{ $keyOutput }}">
@@ -1263,16 +1348,36 @@
                                                     contenteditable="{{ $appraisal->is_appraisee || $appraisal->is_appraisor ? 'true' : 'false' }}"
                                                     data-placeholder="Enter performance targets..."
                                                     oninput="updateHiddenInput(this)">
-                                                    {{ $target ?: 'Enter performance target...' }}</div>
+                                                    {{ $staffDraftValue ? '' : ($target ?: 'Enter key output...') }}
+                                                </div>
                                                 <input type="hidden"
                                                     name="performance_planning[{{ $j }}][performance_target]"
                                                     value="{{ $target }}">
                                             </td>
                                             {{-- Target Date --}}
                                             <td>
-                                                <input type="date" class="form-control form-control-sm date-input"
-                                                    name="performance_planning[{{ $j }}][target_date]"
-                                                    value="{{ $appraisal->performance_planning[$j]['target_date'] ?? '' }}">
+                                                @php
+                                                    $targetDate =
+                                                        $appraisal->performance_planning[$j]['target_date'] ?? '';
+                                                @endphp
+
+                                                @if ($staffDraftValue)
+                                                    {{-- Empty visible date input --}}
+                                                    <input type="date"
+                                                        class="form-control form-control-sm date-input" value=""
+                                                        disabled>
+
+                                                    {{-- Hidden input to submit the actual value --}}
+                                                    <input type="hidden"
+                                                        name="performance_planning[{{ $j }}][target_date]"
+                                                        value="{{ $targetDate }}">
+                                                @else
+                                                    {{-- Normal visible input with value --}}
+                                                    <input type="date"
+                                                        class="form-control form-control-sm date-input"
+                                                        name="performance_planning[{{ $j }}][target_date]"
+                                                        value="{{ $targetDate }}">
+                                                @endif
                                             </td>
                                             <td class="no-print align-middle text-center">
                                                 <button type="button" class="btn btn-sm btn-danger remove-row-btn"
@@ -1391,19 +1496,19 @@
                     <div class="col-md-12">
                         <x-forms.text-area name="employee_strength"
                             label="i. Strengths - Summarize employee's strengths" id="employee_strength"
-                            :value="old('employee_strength', $appraisal->employee_strength ?? '')" :isDisabled="!$appraisal->is_appraisor" />
+                            :isDraft="$headOfDivisionDraftValue" :value="old('employee_strength', $appraisal->employee_strength ?? '')" :isDisabled="!$appraisal->is_appraisor" />
 
                     </div>
 
                     <div class="col-md-12">
-                        <x-forms.text-area name="employee_improvement"
+                        <x-forms.text-area name="employee_improvement" :isDraft="$headOfDivisionDraftValue"
                             label="ii.	Areas for Improvement - Summarize employee’s areas for improvement"
                             id="employee_improvement" :value="old('employee_improvement', $appraisal->employee_improvement ?? '')" :isDisabled="!$appraisal->is_appraisor" />
                     </div>
 
 
                     <div class="col-md-12">
-                        <x-forms.text-area name="superviser_overall_assessment"
+                        <x-forms.text-area name="superviser_overall_assessment" :isDraft="$headOfDivisionDraftValue"
                             label="iii.	Supervisor’s overall assessment - Describe overall performance in accomplishing goals, fulfilling other results and responsibilities; eg Excellent, Very good, Satisfactory, Average, Unsatisfactory. "
                             id="superviser_overall_assessment" :value="old(
                                 'superviser_overall_assessment',
@@ -1412,7 +1517,7 @@
                     </div>
 
                     <div class="col-md-12">
-                        <x-forms.text-area name="recommendations"
+                        <x-forms.text-area name="recommendations" :isDraft="$headOfDivisionDraftValue"
                             label="iv. Recommendations: Recommendations with reasons on whether the employee under review should be promoted, confirmed, remain on probation, redeployed, terminated from Council Service, contract renewed, go for further training, needs counseling, status quo should be maintained, etc.)."
                             id="recommendations" :value="old('recommendations', $appraisal->recommendations ?? '')" :isDisabled="!$appraisal->is_appraisor" />
                     </div>
@@ -1428,23 +1533,23 @@
                 <div class="mb-3 row">
                     <div class="col-md-12">
                         <x-forms.text-area name="panel_comment" label="(a)	Comments of the Panel." id="panel_comment"
-                            :value="old('panel_comment', $appraisal->panel_comment ?? '')" :isDisabled="!$appraisal->is_es" />
+                            :isDraft="$executiveSecretaryDraftValue" :value="old('panel_comment', $appraisal->panel_comment ?? '')" :isDisabled="!$appraisal->is_es" />
                     </div>
 
                     <div class="col-md-12">
                         <x-forms.text-area name="panel_recommendation" label="(b)	Recommendation of the Panel"
-                            id="panel_recommendation" :value="old('panel_recommendation', $appraisal->panel_recommendation ?? '')" :isDisabled="!$appraisal->is_es" />
+                            :isDraft="$executiveSecretaryDraftValue" id="panel_recommendation" :value="old('panel_recommendation', $appraisal->panel_recommendation ?? '')" :isDisabled="!$appraisal->is_es" />
                     </div>
 
 
                     <div class="col-md-12">
-                        <x-forms.text-area name="overall_assessment"
+                        <x-forms.text-area name="overall_assessment" :isDraft="$executiveSecretaryDraftValue"
                             label="iii.	Supervisor’s overall assessment - Describe overall performance in accomplishing goals, fulfilling other results and responsibilities; eg Excellent, Very good, Satisfactory, Average, Unsatisfactory. "
                             id="overall_assessment" :value="old('overall_assessment', $appraisal->overall_assessment ?? '')" :isDisabled="!$appraisal->is_es" />
                     </div>
 
                     <div class="col-md-12">
-                        <x-forms.text-area name="recommendations"
+                        <x-forms.text-area name="recommendations" :isDraft="$executiveSecretaryDraftValue"
                             label="iv. Recommendations: Recommendations with reasons on whether the employee under review should be promoted, confirmed, remain on probation, redeployed, terminated from Council Service, contract renewed, go for further training, needs counseling, status quo should be maintained, etc.)."
                             id="recommendations" :value="old('recommendations', $appraisal->recommendations ?? '')" :isDisabled="!$appraisal->is_es" />
                     </div>
@@ -1456,7 +1561,7 @@
                 <legend>SECTION 5</legend>
                 <div class="mb-3 row">
                     <div class="col-md-12">
-                        <x-forms.text-area name="overall_assessment_and_comments"
+                        <x-forms.text-area name="overall_assessment_and_comments" :isDraft="$executiveSecretaryDraftValue"
                             label="OVERALL ASSESSMENT AND COMMENTS BY THE EXECUTIVE SECRETARY"
                             id="overall_assessment_and_comments" :value="old(
                                 'overall_assessment_and_comments',
@@ -1479,7 +1584,12 @@
                                 <button type="reset" class="btn btn-lg btn-outline-secondary">
                                     <i class="fas fa-undo me-2"></i>Reset
                                 </button>
-                                <button type="submit" class="btn btn-lg btn-primary">
+                                <button id="save-draft-btn" class="btn btn-lg btn-outline-secondary" value="draft"
+                                    name="is_draft">
+                                    <i class="fas fa-save me-2"></i>Save as Draft
+                                </button>
+                                <button type="submit" class="btn btn-lg btn-primary" name="is_draft"
+                                    value="not_draft">
                                     <i class="fas fa-paper-plane me-2"></i>Review & Submit
                                 </button>
                             </div>
@@ -1629,6 +1739,13 @@
         .notes-list {
             counter-reset: section;
             padding-left: 0;
+        }
+
+        .invisible-text {
+            color: transparent;
+            text-shadow: 0 0 0 #000;
+            caret-color: black;
+            /* Show caret for editable fields */
         }
 
         @media print {
@@ -1812,8 +1929,6 @@
                 initSelect2();
                 initAppraisalApproval();
                 initActivityRatingTable();
-                initPersonalAttributesTable();
-                initPerformanceTableAutoSave();
 
                 // on submitting the form, update the hidden inputs
                 $('#appraisalForm').on('submit', function(e) {
@@ -1825,7 +1940,7 @@
                         if (contractDetails.length && contractDetails.find('.alert-info').length === 0) {
                             alert(
                                 'No contract expiry details available. Please comfirm the Review type you selected and try updating again'
-                                );
+                            );
                             return;
                         }
                     }
@@ -1998,6 +2113,17 @@
                     // Helper for missing fields, now also checks for contenteditable fields
                     function displayValue(val, name = null) {
                         if (val && val !== 'Not provided' && val.trim() !== '') {
+                            let transparent = false;
+                            if (name) {
+                                const $textarea = $(`textarea[name="${name}"]`);
+                                if ($textarea.length && $textarea.attr('style') && $textarea.attr('style')
+                                    .includes('color: transparent')) {
+                                    transparent = true;
+                                }
+                            }
+                            if (transparent) {
+                                return `<span class="text-warning fw-semibold">The user who is supposed to fill this has not filled it yet</span>`;
+                            }
                             return `<span class="text-success fw-semibold">${val}</span>`;
                         }
                         // If name is provided, check if field is readonly or not editable (including contenteditable)
@@ -2470,6 +2596,15 @@
                     $('#appraisalForm').submit();
                 });
 
+                // on clicking save-draft button, save the form data
+                $('#save-draft-btn').click(function(event) {
+                    //detach the submit event handler
+                    $('#appraisalForm').off('submit');
+
+                    ///then submit the form
+                    $('#appraisalForm').submit();
+                });
+
                 // 1. Score Input Validation
                 function initScoreValidation() {
                     function clampScore($input, max = 4, min = 0) {
@@ -2554,7 +2689,7 @@
                 document.querySelectorAll('.score-cell').forEach(cell => {
                     // Only add events if cell is editable (not readonly)
                     if (cell.getAttribute('contenteditable') === 'true') {
-                        cell.addEventListener('click', function () {
+                        cell.addEventListener('click', function() {
                             if (this.textContent.trim() === '0') {
                                 this.textContent = '';
                                 const hiddenInput = this.nextElementSibling;
@@ -2563,7 +2698,7 @@
                                 }
                             }
                         });
-                        cell.addEventListener('blur', function () {
+                        cell.addEventListener('blur', function() {
                             if (this.textContent.trim() === '') {
                                 this.textContent = '0';
                                 const hiddenInput = this.nextElementSibling;
@@ -2750,146 +2885,10 @@
                     }
                 }
 
-                function initPersonalAttributesTable() {
-                    const $table = $('#personal-attributes');
-
-                    function recalc() {
-                        let sumAppraisee = 0,
-                            sumAppraiser = 0,
-                            sumAgreed = 0,
-                            rowCount = 0,
-                            maxPerRow = 4;
-
-                        $table.find('tbody tr').each(function() {
-                            const $row = $(this);
-                            // Get values directly from inputs
-                            const agreed = parseFloat($row.find('input[name*="[agreed_score]"]').val()) || 0;
-
-                            sumAgreed += agreed;
-                            rowCount++;
-
-                            // For display purposes only
-                            const a = parseFloat($row.find('input[name*="[appraisee_score]"]').val()) || 0;
-                            const b = parseFloat($row.find('input[name*="[appraiser_score]"]').val()) || 0;
-                            sumAppraisee += a;
-                            sumAppraiser += b;
-                        });
-
-                        const $tfootTds = $table.find('tfoot tr:first td');
-                        $tfootTds.eq(0).text(sumAppraisee.toFixed(2)); // Appraisee total
-                        $tfootTds.eq(1).text(sumAppraiser.toFixed(2)); // Appraiser total
-                        $tfootTds.eq(2).text(sumAgreed.toFixed(2)); // Agreed total
-
-                        const totalMax = rowCount * maxPerRow;
-                        const pct40 = totalMax > 0 ? (sumAgreed / totalMax) * 40 : 0;
-                        $('#overall-40pct').text(`${pct40.toFixed(2)}% of 40%`);
-
-                        window.personalAttributesContribution = pct40;
-                        updateTotalScore();
-                    }
-
-                    // Listen for changes on ALL score input types
-                    $table.on('input change', '.score-input', recalc);
-                    recalc(); // Initial calculation
-                }
-
                 function updateTotalScore() {
                     const total = (window.keyDutiesContribution || 0) +
                         (window.personalAttributesContribution || 0);
                     document.getElementById('totalScore').textContent = `${total.toFixed(1)}%`;
-                }
-
-                // 6. Performance Table Auto-Save
-                function initPerformanceTableAutoSave() {
-                    const wrapper = document.querySelector('#performance-table-wrapper');
-                    if (!wrapper) return;
-
-                    const today = new Date().toISOString().split('T')[0];
-                    let saveTimeout;
-
-                    wrapper.querySelectorAll('.date-input').forEach(input => {
-                        input.setAttribute('min', today);
-                    });
-
-                    wrapper.querySelectorAll('[ contenteditable="true"]').forEach(cell => {
-                        const placeholder = cell.getAttribute('data-placeholder');
-                        if (!cell.textContent.trim()) {
-                            cell.textContent = placeholder;
-                            cell.classList.add('text-muted');
-                        }
-
-                        cell.addEventListener('input', autoSave);
-                        cell.addEventListener('focus', handleCellFocus);
-                        cell.addEventListener('blur', handleCellBlur);
-                    });
-
-                    wrapper.querySelectorAll('.date-input').forEach(input => {
-                        input.addEventListener('change', autoSave);
-                    });
-
-                    loadSavedData();
-
-                    function autoSave() {
-                        clearTimeout(saveTimeout);
-                        saveTimeout = setTimeout(() => {
-                            const data = [];
-                            wrapper.querySelectorAll('tbody tr').forEach(row => {
-                                data.push({
-                                    keyOutput: row.querySelector('.editable-cell:nth-child(2)')
-                                        .textContent.trim(),
-                                    targets: row.querySelector('.editable-cell:nth-child(3)')
-                                        .textContent.trim(),
-                                    date: row.querySelector('input.date-input').value
-                                });
-                            });
-                            localStorage.setItem('performanceData', JSON.stringify(data));
-                            showStatus('Auto-saved successfully!', 'success');
-                        }, 1000);
-                    }
-
-                    function handleCellFocus(e) {
-                        const cell = e.target;
-                        const placeholder = cell.getAttribute('data-placeholder')?.trim() || '';
-
-                        // Remove muted style
-                        cell.classList.remove('text-muted');
-
-                        // Clear placeholder if it matches
-                        if (cell.textContent.trim() === placeholder) {
-                            cell.textContent = '';
-                        }
-
-                        // Add editing class
-                        cell.classList.add('editing');
-                    }
-
-
-                    function handleCellBlur(e) {
-                        const cell = e.target;
-                        cell.classList.remove('editing');
-                        if (!cell.textContent.trim()) {
-                            cell.textContent = cell.getAttribute('data-placeholder');
-                            cell.classList.add('text-muted');
-                        }
-                    }
-
-                    function loadSavedData() {
-                        const savedData = localStorage.getItem('performanceData');
-                        if (savedData) {
-                            JSON.parse(savedData).forEach((rowData, index) => {
-                                const row = wrapper.querySelector(`tbody tr:nth-child(${index + 1})`);
-                                if (!row) return;
-
-                                const keyOutput = row.querySelector('.editable-cell:nth-child(2)');
-                                const targets = row.querySelector('.editable-cell:nth-child(3)');
-                                const date = row.querySelector('input.date-input');
-
-                                if (keyOutput) keyOutput.textContent = rowData.keyOutput;
-                                if (targets) targets.textContent = rowData.targets;
-                                if (date) date.value = rowData.date;
-                            });
-                        }
-                    }
                 }
 
                 // Utility Functions

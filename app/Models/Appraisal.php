@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Support\Facades\DB;
 
 #[ScopedBy([AppraisalScope::class])]
 class Appraisal extends Model
@@ -50,8 +51,7 @@ class Appraisal extends Model
         'panel_recommendation',
         'overall_assessment',
         'executive_secretary_comments',
-        'contract_id',
-        'is_draft',
+        'contract_id'
     ];
 
     protected $casts = [
@@ -88,7 +88,7 @@ class Appraisal extends Model
 
     public function getIsAppraiseeAttribute()
     {
-        if(auth()->user()->employee->employee_id == $this->employee_id){
+        if (auth()->user()->employee->employee_id == $this->employee_id) {
             return true;
         }
 
@@ -97,16 +97,16 @@ class Appraisal extends Model
 
     public function getIsAppraisorAttribute()
     {
-        if(auth()->user()->employee->employee_id == $this->appraiser_id){
+        if (auth()->user()->employee->employee_id == $this->appraiser_id) {
             return true;
         }
 
         return false;
     }
 
-        public function getIsEsAttribute()
+    public function getIsEsAttribute()
     {
-        if(auth()->user()->hasRole('Executive Secretary')){
+        if (auth()->user()->hasRole('Executive Secretary')) {
             return true;
         }
 
@@ -119,43 +119,89 @@ class Appraisal extends Model
     *the next to approve is HR
     *the next to and the last to approve is the Executive Secretary
     */
-public function getCurrentApproverAttribute()
-{
-    // Expected approval flow in order
-    $approvalFlow = ['Head of Division', 'HR', 'Executive Secretary'];
+    public function getCurrentApproverAttribute()
+    {
+        // Expected approval flow in order
+        $approvalFlow = ['Head of Division', 'HR', 'Executive Secretary'];
 
-    $status = $this->appraisal_request_status ?? [];
+        $status = $this->appraisal_request_status ?? [];
 
-    foreach ($approvalFlow as $role) {
-        // If the role is not set or false, it's the next approver
-        if (empty($status[$role])) {
-            return $role; // Return key as the role (e.g., 'hod', 'hr', 'executive_secretary')
+        foreach ($approvalFlow as $role) {
+            // If the role is not set or false, it's the next approver
+            if (empty($status[$role])) {
+                return $role; // Return key as the role (e.g., 'hod', 'hr', 'executive_secretary')
+            }
         }
+
+        // All roles have approved
+        return null;
     }
 
-    // All roles have approved
-    return null;
-}
+    public function getPreviousApproverAttribute()
+    {
+        $approvalFlow = ['Head of Division', 'HR', 'Executive Secretary'];
 
-public function getPreviousApproverAttribute()
-{
-    $approvalFlow = ['Head of Division', 'HR', 'Executive Secretary'];
+        $status = $this->appraisal_request_status ?? [];
 
-    $status = $this->appraisal_request_status ?? [];
+        $previousApprover = null;
 
-    $previousApprover = null;
-
-    foreach ($approvalFlow as $role) {
-        if (!array_key_exists($role, $status)) {
-            break;
+        foreach ($approvalFlow as $role) {
+            if (!array_key_exists($role, $status)) {
+                break;
+            }
+            $previousApprover = $role;
         }
-        $previousApprover = $role;
+
+        return $previousApprover; // null if no previous approver exists
     }
 
-    return $previousApprover; // null if no previous approver exists
-}
+    public function getIsDraftAttribute()
+    {
+        // cehck in draft table using query builder
+        $draft = \Illuminate\Support\Facades\DB::table('appraisal_drafts')
+            ->where('appraisal_id', $this->appraisal_id)->where('employee_id', auth()->user()->employee->employee_id)
+            ->exists();
+        if ($draft) {
+            return true;
+        }
 
+        return false;
+    }
 
+    /**
+     * look for draft users
+     */
+    public function getDraftUsersAttribute()
+    {
+        $roles = ['Executive Secretary', 'HR', 'Head of Division', 'Staff'];
+        $currentUser = auth()->user();
+        $currentRole = $currentUser->getRoleNames()->first();
 
+        // Exclude the current user's role if it makes sense
+        $filteredRoles = array_filter($roles, function ($role) use ($currentRole) {
+            return $role !== $currentRole;
+        });
 
+        // Get employee_ids for each role except the current user's role
+        $roleEmployeeIds = [];
+        foreach ($filteredRoles as $role) {
+            $user = \App\Models\User::role($role)->first();
+            if ($user && $user->employee) {
+                $roleEmployeeIds[$role] = $user->employee->employee_id;
+            }
+        }
+
+        $drafts = DB::table('appraisal_drafts')
+            ->where('appraisal_id', $this->appraisal_id)
+            ->whereIn('employee_id', array_values($roleEmployeeIds))
+            ->get();
+
+        // Generate an array of role => true/false for draft presence
+        $draftUsers = [];
+        foreach ($roleEmployeeIds as $role => $employeeId) {
+            $draftUsers[$role] = $drafts->contains('employee_id', $employeeId);
+        }
+
+        return $draftUsers;
+    }
 }

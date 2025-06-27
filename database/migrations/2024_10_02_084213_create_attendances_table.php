@@ -14,9 +14,8 @@ return new class extends Migration
         Schema::create('attendances', function (Blueprint $table) {
             $table->uuid('attendance_id')->primary();
             $table->uuid('employee_id')->references('employee_id')->on('employees');
-            $table->datetime('access_date_and_time');
-            $table->date('access_date');
-            $table->time('access_time');
+            $table->date('attendance_date');
+            $table->time('clock_in');
             $table->timestamps();
         });
     }
