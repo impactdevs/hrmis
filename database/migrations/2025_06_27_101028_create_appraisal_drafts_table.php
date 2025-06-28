@@ -17,6 +17,10 @@ return new class extends Migration
             $table->foreign('appraisal_id')->references('appraisal_id')->on('appraisals')->onDelete('cascade');
             $table->uuid('employee_id');
             $table->foreign('employee_id')->references('employee_id')->on('employees')->onDelete('cascade');
+            // Add the is_draft column to the appraisals table
+            $table->boolean('is_submitted')->default(false);
+            // Add an index for the is_draft column for better query performance
+            $table->index('is_submitted');
             $table->timestamps();
         });
     }

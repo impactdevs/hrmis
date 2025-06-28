@@ -155,7 +155,7 @@ class Appraisal extends Model
         return $previousApprover; // null if no previous approver exists
     }
 
-    public function getIsDraftAttribute()
+    public function getHasDraftAttribute()
     {
         // cehck in draft table using query builder
         $draft = \Illuminate\Support\Facades\DB::table('appraisal_drafts')
@@ -193,6 +193,7 @@ class Appraisal extends Model
 
         $drafts = DB::table('appraisal_drafts')
             ->where('appraisal_id', $this->appraisal_id)
+            ->where('is_submitted', false) // Only consider drafts that are not submitted
             ->whereIn('employee_id', array_values($roleEmployeeIds))
             ->get();
 
@@ -203,5 +204,22 @@ class Appraisal extends Model
         }
 
         return $draftUsers;
+    }
+
+    public function getDraftWasSubmittedAttribute()
+    {
+        // Check if a draft exists for the current appraisal and user
+        $draft = \Illuminate\Support\Facades\DB::table('appraisal_drafts')
+            ->where('appraisal_id', $this->appraisal_id)
+            ->where('employee_id', auth()->user()->employee->employee_id)
+            ->first();
+
+        // If a draft exists, return its submission status
+        if ($draft) {
+            return $draft->is_submitted;
+        }
+
+        // If no draft exists, return false
+        return true;
     }
 }

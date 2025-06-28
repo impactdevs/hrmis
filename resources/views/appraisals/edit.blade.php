@@ -1579,20 +1579,22 @@
                             <i class="fas fa-info-circle text-primary me-2"></i>
                             Thank you for filling the appraisal
                         </div>
-                        @if ($appraisal->is_appraisee || $appraisal->is_appraisor)
-                            <div class="gap-3 d-flex no-print">
-                                <button type="reset" class="btn btn-lg btn-outline-secondary">
-                                    <i class="fas fa-undo me-2"></i>Reset
-                                </button>
-                                <button id="save-draft-btn" class="btn btn-lg btn-outline-secondary" value="draft"
-                                    name="is_draft">
-                                    <i class="fas fa-save me-2"></i>Save as Draft
-                                </button>
-                                <button type="submit" class="btn btn-lg btn-primary" name="is_draft"
-                                    value="not_draft">
-                                    <i class="fas fa-paper-plane me-2"></i>Review & Submit
-                                </button>
-                            </div>
+                        @if (!isset($draft) || !$draft->is_submitted)
+                            @if ($appraisal->is_appraisee || $appraisal->is_appraisor)
+                                <div class="gap-3 d-flex no-print">
+                                    <button type="reset" class="btn btn-lg btn-outline-secondary">
+                                        <i class="fas fa-undo me-2"></i>Reset
+                                    </button>
+                                    <button id="save-draft-btn" class="btn btn-lg btn-outline-secondary"
+                                        value="draft" name="is_draft">
+                                        <i class="fas fa-save me-2"></i>Save as Draft
+                                    </button>
+                                    <button type="submit" class="btn btn-lg btn-primary" name="is_draft"
+                                        value="not_draft">
+                                        <i class="fas fa-paper-plane me-2"></i>Review & Submit
+                                    </button>
+                                </div>
+                            @endif
                         @endif
                         @can('approve appraisal')
                             @if (!is_null($appraisal->employee->user_id))

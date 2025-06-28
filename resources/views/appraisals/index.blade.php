@@ -48,123 +48,137 @@
 
                                     @if (filled($appraisals))
                                         @foreach ($appraisals as $appraisal)
-                                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                                <td
-                                                    class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                                                    #{{ $loop->iteration }}
-                                                </td>
-                                                <td class="px-6 py-4 whitespace-nowrap">
-                                                    <div class="flex items-center">
-                                                        <div class="ml-4">
-                                                            <div
-                                                                class="text-sm font-medium text-gray-900 dark:text-white">
-                                                                {{ $appraisal->employee->first_name }}
-                                                                {{ $appraisal->employee->last_name }}
-                                                            </div>
-                                                            <div class="text-sm text-gray-500 dark:text-gray-400">
-                                                                {{ $appraisal->employee->email }}
+                                            @if ($appraisal->has_draft || !$appraisal->is_draft)
+                                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                                    <td
+                                                        class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                                                        #{{ $loop->iteration }}
+                                                    </td>
+                                                    <td class="px-6 py-4 whitespace-nowrap">
+                                                        <div class="flex items-center">
+                                                            <div class="ml-4">
+                                                                <div
+                                                                    class="text-sm font-medium text-gray-900 dark:text-white">
+                                                                    {{ $appraisal->employee->first_name }}
+                                                                    {{ $appraisal->employee->last_name }}
+                                                                </div>
+                                                                <div class="text-sm text-gray-500 dark:text-gray-400">
+                                                                    {{ $appraisal->employee->email }}
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                </td>
-                                                <td
-                                                    class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                                    {{ optional($appraisal->employee->position)->position_name }}
-                                                </td>
-                                                @php
-                                                    $statusHistory = collect($appraisal->appraisal_request_status);
-                                                    $approvalFlow = ['Head of Division', 'HR', 'Executive Secretary'];
+                                                    </td>
+                                                    <td
+                                                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                                        {{ optional($appraisal->employee->position)->position_name }}
+                                                    </td>
+                                                    @php
+                                                        $statusHistory = collect($appraisal->appraisal_request_status);
+                                                        $approvalFlow = [
+                                                            'Head of Division',
+                                                            'HR',
+                                                            'Executive Secretary',
+                                                        ];
 
-                                                    $roleIcons = [
-                                                        'approved' => [
-                                                            'icon' =>
-                                                                '<svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>',
-                                                            'textClass' => 'text-green-600 dark:text-green-400',
-                                                            'bgClass' => 'bg-green-100 border-green-500',
-                                                        ],
-                                                        'rejected' => [
-                                                            'icon' =>
-                                                                '<svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>',
-                                                            'textClass' => 'text-red-600 dark:text-red-400',
-                                                            'bgClass' => 'bg-red-100 border-red-500',
-                                                        ],
-                                                        'pending' => [
-                                                            'icon' =>
-                                                                '<svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3" /></svg>',
-                                                            'textClass' => 'text-gray-600 dark:text-gray-400',
-                                                            'bgClass' => 'bg-gray-100 border-gray-300',
-                                                        ],
-                                                    ];
-                                                @endphp
+                                                        $roleIcons = [
+                                                            'approved' => [
+                                                                'icon' =>
+                                                                    '<svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>',
+                                                                'textClass' => 'text-green-600 dark:text-green-400',
+                                                                'bgClass' => 'bg-green-100 border-green-500',
+                                                            ],
+                                                            'rejected' => [
+                                                                'icon' =>
+                                                                    '<svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>',
+                                                                'textClass' => 'text-red-600 dark:text-red-400',
+                                                                'bgClass' => 'bg-red-100 border-red-500',
+                                                            ],
+                                                            'pending' => [
+                                                                'icon' =>
+                                                                    '<svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3" /></svg>',
+                                                                'textClass' => 'text-gray-600 dark:text-gray-400',
+                                                                'bgClass' => 'bg-gray-100 border-gray-300',
+                                                            ],
+                                                        ];
+                                                    @endphp
 
-                                                <td class="px-6 py-4 whitespace-nowrap">
-                                                    <div class="flex items-center justify-center">
-                                                        @foreach ($approvalFlow as $index => $role)
-                                                            @php
-                                                                $status = $statusHistory[$role] ?? 'pending';
-                                                                $iconData =
-                                                                    $roleIcons[$status] ?? $roleIcons['pending'];
-                                                            @endphp
+                                                    <td class="px-6 py-4 whitespace-nowrap">
+                                                        <div class="flex items-center justify-center">
+                                                            @if ($appraisal->draft_was_submitted)
+                                                            @foreach ($approvalFlow as $index => $role)
+                                                                @php
+                                                                    $status = $statusHistory[$role] ?? 'pending';
+                                                                    $iconData =
+                                                                        $roleIcons[$status] ?? $roleIcons['pending'];
+                                                                @endphp
 
-                                                            <div
-                                                                class="flex flex-col items-center text-center relative">
-                                                                {{-- Circle around icon --}}
                                                                 <div
-                                                                    class="w-10 h-10 rounded-full flex items-center justify-center border-2 {{ $iconData['bgClass'] }}">
-                                                                    {!! $iconData['icon'] !!}
+                                                                    class="flex flex-col items-center text-center relative">
+                                                                    {{-- Circle around icon --}}
+                                                                    <div
+                                                                        class="w-10 h-10 rounded-full flex items-center justify-center border-2 {{ $iconData['bgClass'] }}">
+                                                                        {!! $iconData['icon'] !!}
+                                                                    </div>
+                                                                    {{-- Role and status label --}}
+                                                                    <span
+                                                                        class="text-xs mt-1 {{ $iconData['textClass'] }}">
+                                                                        {{ ucfirst($status) }}
+                                                                    </span>
+                                                                    <span
+                                                                        class="text-[11px] text-gray-500">{{ $role }}</span>
                                                                 </div>
-                                                                {{-- Role and status label --}}
-                                                                <span class="text-xs mt-1 {{ $iconData['textClass'] }}">
-                                                                    {{ ucfirst($status) }}
+
+                                                                @if (!$loop->last)
+                                                                    {{-- Connecting line --}}
+                                                                    <div class="w-6 h-0.5 bg-gray-300 mx-2"></div>
+                                                                @endif
+                                                            @endforeach
+                                                            @else
+                                                                <span class="text-sm text-gray-500 dark:text-gray-400">
+                                                                    Submit the draft for review.
                                                                 </span>
-                                                                <span
-                                                                    class="text-[11px] text-gray-500">{{ $role }}</span>
-                                                            </div>
+                                                            @endif  
+                                                        
+                                                    </td>
 
-                                                            @if (!$loop->last)
-                                                                {{-- Connecting line --}}
-                                                                <div class="w-6 h-0.5 bg-gray-300 mx-2"></div>
+                                                    <td
+                                                        class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                        <div class="flex items-center justify-end space-x-3">
+
+                                                            <a href="{{ route('uncst-appraisals.edit', $appraisal->appraisal_id) }}"
+                                                                class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-500">
+                                                                <svg class="w-5 h-5" fill="none"
+                                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        stroke-width="2"
+                                                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        stroke-width="2"
+                                                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                                </svg>
+                                                            </a>
+                                                            @if (auth()->user()->employee->employee_id == $appraisal->employee_id)
+                                                                <form
+                                                                    action="{{ route('uncst-appraisals.destroy', $appraisal->appraisal_id) }}"
+                                                                    method="POST" class="inline">
+                                                                    @csrf
+                                                                    @method('DELETE')
+                                                                    <button type="submit"
+                                                                        class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-500"
+                                                                        onclick="return confirm('Are you sure?')">
+                                                                        <svg class="w-5 h-5" fill="none"
+                                                                            stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path stroke-linecap="round"
+                                                                                stroke-linejoin="round" stroke-width="2"
+                                                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                                        </svg>
+                                                                    </button>
+                                                                </form>
                                                             @endif
-                                                        @endforeach
-                                                    </div>
-                                                </td>
-
-                                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                    <div class="flex items-center justify-end space-x-3">
-
-                                                        <a href="{{ route('uncst-appraisals.edit', $appraisal->appraisal_id) }}"
-                                                            class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-500">
-                                                            <svg class="w-5 h-5" fill="none" stroke="currentColor"
-                                                                viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                                    stroke-width="2"
-                                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                                    stroke-width="2"
-                                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                                            </svg>
-                                                        </a>
-                                                        @if (auth()->user()->employee->employee_id == $appraisal->employee_id)
-                                                            <form
-                                                                action="{{ route('uncst-appraisals.destroy', $appraisal->appraisal_id) }}"
-                                                                method="POST" class="inline">
-                                                                @csrf
-                                                                @method('DELETE')
-                                                                <button type="submit"
-                                                                    class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-500"
-                                                                    onclick="return confirm('Are you sure?')">
-                                                                    <svg class="w-5 h-5" fill="none"
-                                                                        stroke="currentColor" viewBox="0 0 24 24">
-                                                                        <path stroke-linecap="round"
-                                                                            stroke-linejoin="round" stroke-width="2"
-                                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                                    </svg>
-                                                                </button>
-                                                            </form>
-                                                        @endif
-                                                    </div>
-                                                </td>
-                                            </tr>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            @endif
                                         @endforeach
                                     @endif
 
@@ -180,9 +194,20 @@
                                         class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
                                         <div class="flex justify-between items-start mb-4">
                                             <div>
-                                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                                                <h3
+                                                    class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
                                                     {{ $appraisal->employee->first_name }}
                                                     {{ $appraisal->employee->last_name }}
+                                                    @if (!$appraisal->draft_was_submitted)
+                                                        <span class="ml-2" title="Draft">
+                                                            <svg class="w-5 h-5 text-yellow-500" fill="none"
+                                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    stroke-width="2"
+                                                                    d="M12 8v4l3 3M5 3a2 2 0 012-2h10a2 2 0 012 2v18a2 2 0 01-2 2H7a2 2 0 01-2-2V3z" />
+                                                            </svg>
+                                                        </span>
+                                                    @endif
                                                 </h3>
                                                 <p class="text-sm text-gray-500 dark:text-gray-400">
                                                     {{ $appraisal->employee->email }}</p>
@@ -225,56 +250,64 @@
                                                 </div>
                                             @endif
                                         </div>
+                                        @if ($appraisal->draft_was_submitted)
+                                            {{-- Timeline Start --}}
+                                            @php
+                                                $statusHistory = collect($appraisal->appraisal_request_status);
+                                                $approvalFlow = ['Head of Division', 'HR', 'Executive Secretary'];
+                                                $roleIcons = [
+                                                    'approved' => [
+                                                        'icon' =>
+                                                            '<svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>',
+                                                        'textClass' => 'text-green-600 dark:text-green-400',
+                                                        'bgClass' => 'bg-green-100 border-green-500',
+                                                    ],
+                                                    'rejected' => [
+                                                        'icon' =>
+                                                            '<svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>',
+                                                        'textClass' => 'text-red-600 dark:text-red-400',
+                                                        'bgClass' => 'bg-red-100 border-red-500',
+                                                    ],
+                                                    'pending' => [
+                                                        'icon' =>
+                                                            '<svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3" /></svg>',
+                                                        'textClass' => 'text-gray-600 dark:text-gray-400',
+                                                        'bgClass' => 'bg-gray-100 border-gray-300',
+                                                    ],
+                                                ];
+                                            @endphp
 
-                                        {{-- Timeline Start --}}
-                                        @php
-                                            $statusHistory = collect($appraisal->appraisal_request_status);
-                                            $approvalFlow = ['Head of Division', 'HR', 'Executive Secretary'];
-                                            $roleIcons = [
-                                                'approved' => [
-                                                    'icon' =>
-                                                        '<svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>',
-                                                    'textClass' => 'text-green-600 dark:text-green-400',
-                                                    'bgClass' => 'bg-green-100 border-green-500',
-                                                ],
-                                                'rejected' => [
-                                                    'icon' =>
-                                                        '<svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>',
-                                                    'textClass' => 'text-red-600 dark:text-red-400',
-                                                    'bgClass' => 'bg-red-100 border-red-500',
-                                                ],
-                                                'pending' => [
-                                                    'icon' =>
-                                                        '<svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3" /></svg>',
-                                                    'textClass' => 'text-gray-600 dark:text-gray-400',
-                                                    'bgClass' => 'bg-gray-100 border-gray-300',
-                                                ],
-                                            ];
-                                        @endphp
-
-                                        <div class="flex items-center justify-center mt-4">
-                                            @foreach ($approvalFlow as $index => $role)
-                                                @php
-                                                    $status = $statusHistory[$role] ?? 'pending';
-                                                    $iconData = $roleIcons[$status];
-                                                @endphp
-                                                <div class="flex flex-col items-center text-center relative">
-                                                    <div
-                                                        class="w-8 h-8 rounded-full flex items-center justify-center border-2 {{ $iconData['bgClass'] }}">
-                                                        {!! $iconData['icon'] !!}
+                                            <div class="flex items-center justify-center mt-4">
+                                                @foreach ($approvalFlow as $index => $role)
+                                                    @php
+                                                        $status = $statusHistory[$role] ?? 'pending';
+                                                        $iconData = $roleIcons[$status];
+                                                    @endphp
+                                                    <div class="flex flex-col items-center text-center relative">
+                                                        <div
+                                                            class="w-8 h-8 rounded-full flex items-center justify-center border-2 {{ $iconData['bgClass'] }}">
+                                                            {!! $iconData['icon'] !!}
+                                                        </div>
+                                                        <span class="text-xs mt-1 {{ $iconData['textClass'] }}">
+                                                            {{ ucfirst($status) }}
+                                                        </span>
+                                                        <span
+                                                            class="text-[11px] text-gray-500">{{ $role }}</span>
                                                     </div>
-                                                    <span class="text-xs mt-1 {{ $iconData['textClass'] }}">
-                                                        {{ ucfirst($status) }}
-                                                    </span>
-                                                    <span class="text-[11px] text-gray-500">{{ $role }}</span>
-                                                </div>
 
-                                                @if (!$loop->last)
-                                                    <div class="w-6 h-0.5 bg-gray-300 mx-2"></div>
-                                                @endif
-                                            @endforeach
-                                        </div>
-                                        {{-- Timeline End --}}
+                                                    @if (!$loop->last)
+                                                        <div class="w-6 h-0.5 bg-gray-300 mx-2"></div>
+                                                    @endif
+                                                @endforeach
+                                            </div>
+                                            {{-- Timeline End --}}
+                                        @else
+                                            {{-- still a draft --}}
+
+                                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                                                This appraisal is still a draft and has not been submitted for review.
+                                            </p>
+                                        @endif
 
                                         <div class="flex items-center justify-end space-x-3 mt-4">
                                             <a href="{{ route('uncst-appraisals.edit', $appraisal->appraisal_id) }}"

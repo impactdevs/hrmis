@@ -122,6 +122,7 @@ class AppraisalsController extends Controller
             "panel_recommendation" => null,
             "overall_assessment" => null,
             "executive_secretary_comments" => null,
+            'is_draft' => true,
         ];
 
         $appraisal = Appraisal::create($data);
@@ -187,6 +188,12 @@ class AppraisalsController extends Controller
         $appraisal = $uncst_appraisal;
         $users = User::role('Head of Division')->whereHas('employee')->get();
 
+        // get any draft with this appraisal and logged in employee
+        $draft = DB::table('appraisal_drafts')
+            ->where('appraisal_id', $appraisal->appraisal_id)
+            ->where('employee_id', auth()->user()->employee->employee_id)
+            ->first();
+
         if ($uncst_appraisal->contract_id != null) {
             $expiredContract = Contract::find($uncst_appraisal->contract_id);
         } else {
@@ -198,7 +205,7 @@ class AppraisalsController extends Controller
                 ->orderBy('end_date', 'desc')
                 ->first();
         }
-        return view('appraisals.edit', compact('appraisal', 'users', 'expiredContract'));
+        return view('appraisals.edit', compact('appraisal', 'users', 'expiredContract', 'draft'));
     }
 
 
@@ -218,44 +225,92 @@ class AppraisalsController extends Controller
     public function update(Request $request, Appraisal $uncst_appraisal)
     {
         $requestedData = $request->all();
-        if (!empty($requestedData['review_type']) && $requestedData['review_type'] != 'end_of_contract') {
+
+        // Handle conditional nullifications
+        if (!empty($requestedData['review_type']) && $requestedData['review_type'] !== 'end_of_contract') {
             $requestedData['contract_id'] = null;
         }
 
-        if (!empty($requestedData['review_type_other']) && $requestedData['review_type_other'] != 'other') {
+        if (!empty($requestedData['review_type_other']) && $requestedData['review_type_other'] !== 'other') {
             $requestedData['review_type_other'] = null;
         }
 
+        // Default message
         $message = "Appraisal has been submitted successfully.";
 
+        // Handle draft logic
         if (isset($requestedData['is_draft'])) {
             if ($requestedData['is_draft'] === 'not_draft') {
-                DB::table('appraisal_drafts')->where('appraisal_id', $uncst_appraisal->appraisal_id)->delete();
-                $message = "Draft Saved Successfully. You can now proceed to submit the appraisal.";
+                // Final submission, just update is_submitted to true for this draft
+                DB::table('appraisal_drafts')
+                    ->where('appraisal_id', $uncst_appraisal->appraisal_id)
+                    ->where('employee_id', auth()->user()->employee->employee_id)
+                    ->update(['is_submitted' => true]);
+                $uncst_appraisal->is_draft = false;
+                $uncst_appraisal->save();
+                $message = "Appraisal submitted successfully.";
             } elseif ($requestedData['is_draft'] === 'draft') {
-                //if the draft with the appraisal_id and employee_id does not exist, create it
+                // Save as draft
+                $uncst_appraisal->is_draft = true;
+                $uncst_appraisal->save();
+
+                // Check if draft already exists
                 $draftExists = DB::table('appraisal_drafts')
                     ->where('appraisal_id', $uncst_appraisal->appraisal_id)
                     ->where('employee_id', auth()->user()->employee->employee_id)
                     ->exists();
 
-            if (!$draftExists) {
-                DB::table('appraisal_drafts')->insert([
-                    'appraisal_id' => $uncst_appraisal->appraisal_id,
-                    'employee_id' => auth()->user()->employee->employee_id,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-                $message = "Appraisal has been saved as a draft successfully.";
+                if (!$draftExists) {
+                    DB::table('appraisal_drafts')->insert([
+                        'appraisal_id' => $uncst_appraisal->appraisal_id,
+                        'employee_id' => auth()->user()->employee->employee_id,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                    $message = "Appraisal has been saved as a draft successfully.";
+                }
             }
-            unset($requestedData['is_draft']);
+
+            unset($requestedData['is_draft']); // Remove flag before update
+        } else {
+            //check the role of the person submitting the appraisal, if its the Staff,
+            if (auth()->user()->hasRole('Staff')) {
+                $employeeAppraisor = \App\Models\Employee::withoutGlobalScope(EmployeeScope::class)
+                    ->find($uncst_appraisal->appraiser_id);
+
+                $employeeAppraisee = \App\Models\Employee::withoutGlobalScope(EmployeeScope::class)
+                    ->where('email', auth()->user()->email)->first();
+
+                $appraisorUser = User::find($employeeAppraisor->user_id);
+                if ($appraisorUser) {
+                    Notification::send($appraisorUser, new AppraisalApplication($uncst_appraisal, $employeeAppraisee->first_name, $employeeAppraisee->last_name));
+                }
+
+                $hrUser = User::role('HR')->first();
+                if ($hrUser) {
+                    Notification::send($hrUser, new AppraisalApplication($uncst_appraisal, $employeeAppraisee->first_name, $employeeAppraisee->last_name));
+                }
+
+                $esUser = User::role('Executive Secretary')->first();
+                if ($esUser) {
+                    Notification::send($esUser, new AppraisalApplication($uncst_appraisal, $employeeAppraisee->first_name, $employeeAppraisee->last_name));
+                }
+            }
+            // If is_draft is not set, treat it as a normal submission
+            DB::table('appraisal_drafts')
+                ->where('appraisal_id', $uncst_appraisal->appraisal_id)
+                ->where('employee_id', auth()->user()->employee->employee_id)
+                ->update(['is_submitted' => true]);
+            $uncst_appraisal->is_draft = false;
+            $uncst_appraisal->save();
         }
 
+        // Update appraisal with remaining request data
         $uncst_appraisal->update($requestedData);
 
         return redirect()->back()->with('success', $message);
     }
-    }
+
 
     /**
      * Remove the specified resource from storage.
