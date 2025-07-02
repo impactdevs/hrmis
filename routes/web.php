@@ -39,7 +39,7 @@ Route::get('/', function () {
     return redirect('dashboard');
 });
 
-Route::get('/dashboard', [HomeController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [HomeController::class, 'index'])->middleware(['auth', 'verified', 'check.employee.record'])->name('dashboard');
 Route::post('/agree', [HomeController::class, 'agree'])->middleware(['auth', 'verified'])->name('agree');
 Route::get('/upload-employee', [UploadEmployees::class, 'process_csv_for_arrears']);
 Route::get('/employees/{employee}/generate-pdf', [EmployeeController::class, 'generatePDF'])
@@ -144,5 +144,10 @@ Route::get("uncst-thank-you-for-application", [JobApplicationController::class, 
 
 
 Route::get('/import', [EmployeeController::class, 'import_employees']);
+
+// fallback for routes that are not defined
+Route::fallback(function () {
+    abort(404, 'we cant find this, sorry for the inconvenience');
+});
 
 require __DIR__ . '/auth.php';
