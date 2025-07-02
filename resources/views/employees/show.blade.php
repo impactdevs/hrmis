@@ -163,16 +163,20 @@
                                             @if ($contract->contract_documents)
                                                 <div class="flex-wrap gap-2 d-flex">
                                                     @foreach ($contract->contract_documents as $attachment)
-                                                        <a href="{{ asset('storage/' . $attachment['proof']) }}"
-                                                            target="_blank"
-                                                            class="btn btn-sm btn-outline-secondary d-flex align-items-center">
-                                                            @if (Str::endsWith($attachment['proof'], ['.pdf']))
-                                                                <i class="fas fa-file-pdf text-danger me-2"></i>
-                                                            @else
-                                                                <i class="fas fa-file-image text-primary me-2"></i>
-                                                            @endif
-                                                            {{ Str::limit($attachment['title'], 15) }}
-                                                        </a>
+                                                        @if (!empty($attachment['proof']))
+                                                            <a href="{{ asset('storage/' . $attachment['proof']) }}"
+                                                                target="_blank"
+                                                                class="btn btn-sm btn-outline-secondary d-flex align-items-center">
+                                                                @if (Str::endsWith($attachment['proof'], ['.pdf']))
+                                                                    <i class="fas fa-file-pdf text-danger me-2"></i>
+                                                                @else
+                                                                    <i class="fas fa-file-image text-primary me-2"></i>
+                                                                @endif
+                                                                {{ Str::limit($attachment['title'], 15) }}
+                                                            </a>
+                                                        @else
+                                                            <span class="text-muted">No attachment provided</span>
+                                                        @endif
                                                     @endforeach
                                                 </div>
                                             @else

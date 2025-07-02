@@ -48,7 +48,7 @@ Route::get('/employees/{employee}/print', function (Employee $employee) {
     return view('employees.pdf', ['employee' => $employee]);
 })->name('employees.print');
 
-Route::middleware(['auth', 'verified', 'data.usage.agreement'])->group(function () {
+Route::middleware(['auth', 'verified', 'check.employee.record', 'data.usage.agreement'])->group(function () {
     Route::resource('roles', RoleController::class);
     Route::resource('permissions', PermissionController::class);
     Route::resource('users', UsersController::class);

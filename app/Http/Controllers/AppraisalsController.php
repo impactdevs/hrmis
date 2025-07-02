@@ -38,6 +38,11 @@ class AppraisalsController extends Controller
         if (!auth()->user()->employee->department) {
             return back()->with("success", "Your department does not have a department head, so we cant determine a supervisor for you!Reach out to the administrator.");
         }
+
+        // if the is no department user, return to the previous page with an error message
+        if(!User::find(auth()->user()->employee->department->department_head)) {
+            return back()->with("success", "Your department does not have a department head, so we cant determine a supervisor for you!Reach out to the administrator.");
+        }
         $data =  [
             "appraisal_start_date" => null,
             "appraisal_end_date" => null,

@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'data.usage.agreement' => \App\Http\Middleware\EnsureUserAgreedToDataUsage::class,
+            'check.employee.record' => \App\Http\Middleware\CheckEmployeeRecord::class,
         ]);
         
     })
