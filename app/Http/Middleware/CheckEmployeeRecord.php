@@ -15,13 +15,18 @@ class CheckEmployeeRecord
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $user = Auth::user();
+        $user = auth()->user();
+
+        
 
         if (!$user) {
             abort(403, 'Unauthorized');
         }
 
-        $employee = Employee::where('email', $user->email)->first();
+        $employee = Employee::withoutGlobalScopes()
+            ->where('email', $user->email)
+            ->first();
+
 
         if (!$employee) {
             abort(403, 'No employee record found for this user. contact the human resource department to create an employee record with your email address.');
