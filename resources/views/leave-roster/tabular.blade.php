@@ -404,6 +404,7 @@
                             sortable: true,
                             class: 'text-primary',
                             formatter: function(value) {
+                                if (!value) return '<span class="text-muted">N/A</span>';
                                 return value.toUpperCase(); // Make names uppercase
                             },
                             headerFormatter: function() {
@@ -415,6 +416,7 @@
                             sortable: true,
                             class: 'text-primary',
                             formatter: function(value) {
+                                if (!value) return '<span class="text-muted">N/A</span>';
                                 return value.toUpperCase(); // Make names uppercase
                             },
                             headerFormatter: function() {
