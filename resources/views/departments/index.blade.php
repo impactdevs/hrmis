@@ -18,7 +18,7 @@
                     @foreach ($departments as $department)
                         <tr>
                             <td>{!! $department->department_name !!}</td>
-                            <td>{{ $department->user->name }}</td>
+                            <td>{{ optional($department->user)->name }}</td>
                             <td>
                                 <a href="{{ route('departments.edit', $department->department_id) }}"
                                     class="btn btn-primary">Edit</a>
