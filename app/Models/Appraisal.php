@@ -65,6 +65,9 @@ class Appraisal extends Model
 
     ];
 
+    //define append
+
+
     // Model boot method
     protected static function boot()
     {
@@ -154,7 +157,7 @@ class Appraisal extends Model
             if (!array_key_exists($role, $status)) {
                 break;
             }
-            $previousApprover = $role; 
+            $previousApprover = $role;
         }
 
         return $previousApprover; // null if no previous approver exists
@@ -164,13 +167,22 @@ class Appraisal extends Model
     {
         // cehck in draft table using query builder
         $draft = \Illuminate\Support\Facades\DB::table('appraisal_drafts')
-            ->where('appraisal_id', $this->appraisal_id)->where('employee_id', auth()->user()->employee->employee_id)
+            ->where('appraisal_id', $this->appraisal_id)->where('employee_id', auth()->user()->employee->employee_id)->where('is_submitted', false)
             ->exists();
         if ($draft) {
             return true;
         }
 
         return false;
+    }
+
+
+    public function getHasSomeDraftAttribute()
+    {
+
+        return \Illuminate\Support\Facades\DB::table('appraisal_drafts')
+            ->where('appraisal_id', $this->appraisal_id)->where('is_submitted', false)
+            ->exists();
     }
 
     /**
