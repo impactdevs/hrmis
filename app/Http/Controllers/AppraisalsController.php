@@ -41,12 +41,17 @@ class AppraisalsController extends Controller
                 return back()->with("success", "No Employee record found! Ask the human resource");
             }
             if (!auth()->user()->employee->department) {
-                return back()->with("success", "Your department does not have a department head, so we cant determine a supervisor for you!Reach out to the administrator.");
+                return back()->with("success", "You do not belong to a department, contact the H.R to assign you to a department.");
             }
 
             // if the is no department user, return to the previous page with an error message
             if (!User::find(auth()->user()->employee->department->department_head)) {
                 return back()->with("success", "Your department does not have a department head, so we cant determine a supervisor for you!Reach out to the administrator.");
+            } else {
+                $role = User::find(auth()->user()->employee->department->department_head)->hasRole('Head of Division');
+
+                if (!$role)
+                    return back()->with("success", "appraisal creation failed, contact the hr");
             }
 
             $appraser_id = User::find(auth()->user()->employee->department->department_head)->employee->employee_id;
@@ -62,7 +67,9 @@ class AppraisalsController extends Controller
             $appraser_id = $user->employee->employee_id;
         }
 
-
+        if (blank($appraser_id)) {
+            return back()->with("success", "Un able to assign you a supervisor!");
+        }
         $data =  [
             "appraisal_start_date" => null,
             "appraisal_end_date" => null,
