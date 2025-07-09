@@ -13,9 +13,13 @@ class DepartmentController extends Controller
      */
     public function index()
     {
-        $departments = Department::with('user')->paginate(10);
+        $departments = Department::whereHas('user')
+            ->with('user')
+            ->paginate(10);
+
         return view('departments.index', compact('departments'));
     }
+
 
     /**
      * Show the form for creating a new resource.
