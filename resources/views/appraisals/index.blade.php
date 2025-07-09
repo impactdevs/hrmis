@@ -7,7 +7,7 @@
                     <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Performance Appraisals</h1>
                     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Manage employee performance evaluations</p>
                 </div>
-                @if (!auth()->user()->hasRole('HR'))
+                @if (!auth()->user()->hasRole('HR') || !auth()->user()->hasRole('Executive Secretary'))
                     <a href="{{ route('uncst-appraisals.create') }}"
                         class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -331,7 +331,6 @@
                                                         d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                                 </svg>
                                             </a>
-                                            @if (auth()->user()->employee->user_id == $appraisal->employee->user_id && !$appraisal->draft_was_submitted)
                                                 <form
                                                     action="{{ route('uncst-appraisals.destroy', $appraisal->appraisal_id) }}"
                                                     method="POST" class="inline">
@@ -348,7 +347,6 @@
                                                         </svg>
                                                     </button>
                                                 </form>
-                                            @endif
                                         </div>
                                     </div>
                                 @endforeach
