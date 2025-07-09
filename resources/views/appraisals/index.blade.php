@@ -74,11 +74,19 @@
                                                     </td>
                                                     @php
                                                         $statusHistory = collect($appraisal->appraisal_request_status);
-                                                        $approvalFlow = [
-                                                            'Head of Division',
-                                                            'HR',
-                                                            'Executive Secretary',
-                                                        ];
+                                                        $user = \App\Models\User::find(
+                                                            \App\Models\Employee::find($appraisal->employee_id)
+                                                                ->user_id,
+                                                        );
+                                                        if ($user && $user->hasRole('Head of Division')) {
+                                                            $approvalFlow = ['Executive Secretary'];
+                                                        } else {
+                                                            $approvalFlow = [
+                                                                'Head of Division',
+                                                                'HR',
+                                                                'Executive Secretary',
+                                                            ];
+                                                        }
 
                                                         $roleIcons = [
                                                             'approved' => [
@@ -105,40 +113,41 @@
                                                     <td class="px-6 py-4 whitespace-nowrap">
                                                         <div class="flex items-center justify-center">
                                                             @if ($appraisal->draft_was_submitted)
-                                                            @foreach ($approvalFlow as $index => $role)
-                                                                @php
-                                                                    $status = $statusHistory[$role] ?? 'pending';
-                                                                    $iconData =
-                                                                        $roleIcons[$status] ?? $roleIcons['pending'];
-                                                                @endphp
+                                                                @foreach ($approvalFlow as $index => $role)
+                                                                    @php
+                                                                        $status = $statusHistory[$role] ?? 'pending';
+                                                                        $iconData =
+                                                                            $roleIcons[$status] ??
+                                                                            $roleIcons['pending'];
+                                                                    @endphp
 
-                                                                <div
-                                                                    class="flex flex-col items-center text-center relative">
-                                                                    {{-- Circle around icon --}}
                                                                     <div
-                                                                        class="w-10 h-10 rounded-full flex items-center justify-center border-2 {{ $iconData['bgClass'] }}">
-                                                                        {!! $iconData['icon'] !!}
+                                                                        class="flex flex-col items-center text-center relative">
+                                                                        {{-- Circle around icon --}}
+                                                                        <div
+                                                                            class="w-10 h-10 rounded-full flex items-center justify-center border-2 {{ $iconData['bgClass'] }}">
+                                                                            {!! $iconData['icon'] !!}
+                                                                        </div>
+                                                                        {{-- Role and status label --}}
+                                                                        <span
+                                                                            class="text-xs mt-1 {{ $iconData['textClass'] }}">
+                                                                            {{ ucfirst($status) }}
+                                                                        </span>
+                                                                        <span
+                                                                            class="text-[11px] text-gray-500">{{ $role }}</span>
                                                                     </div>
-                                                                    {{-- Role and status label --}}
-                                                                    <span
-                                                                        class="text-xs mt-1 {{ $iconData['textClass'] }}">
-                                                                        {{ ucfirst($status) }}
-                                                                    </span>
-                                                                    <span
-                                                                        class="text-[11px] text-gray-500">{{ $role }}</span>
-                                                                </div>
 
-                                                                @if (!$loop->last)
-                                                                    {{-- Connecting line --}}
-                                                                    <div class="w-6 h-0.5 bg-gray-300 mx-2"></div>
-                                                                @endif
-                                                            @endforeach
+                                                                    @if (!$loop->last)
+                                                                        {{-- Connecting line --}}
+                                                                        <div class="w-6 h-0.5 bg-gray-300 mx-2"></div>
+                                                                    @endif
+                                                                @endforeach
                                                             @else
                                                                 <span class="text-sm text-gray-500 dark:text-gray-400">
                                                                     Submit the draft for review.
                                                                 </span>
-                                                            @endif  
-                                                        
+                                                            @endif
+
                                                     </td>
 
                                                     <td
@@ -322,7 +331,7 @@
                                                         d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                                 </svg>
                                             </a>
-                                            @if (auth()->user()->employee->user_id == $appraisal->employee->user_id && !$appraisal->draft_was_submitted )
+                                            @if (auth()->user()->employee->user_id == $appraisal->employee->user_id && !$appraisal->draft_was_submitted)
                                                 <form
                                                     action="{{ route('uncst-appraisals.destroy', $appraisal->appraisal_id) }}"
                                                     method="POST" class="inline">

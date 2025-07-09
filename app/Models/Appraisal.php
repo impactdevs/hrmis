@@ -124,6 +124,11 @@ class Appraisal extends Model
         // Expected approval flow in order
         $approvalFlow = ['Head of Division', 'HR', 'Executive Secretary'];
 
+        //check if the employee who applied for appraisal is the Head of Division and set Head of Division as approved by default
+        $user = User::find(Employee::find($this->employee_id)->user_id);
+        if ($user && $user->hasRole('Head of Division')) {
+            $approvalFlow = ['Executive Secretary'];
+        }
         $status = $this->appraisal_request_status ?? [];
 
         foreach ($approvalFlow as $role) {
@@ -149,7 +154,7 @@ class Appraisal extends Model
             if (!array_key_exists($role, $status)) {
                 break;
             }
-            $previousApprover = $role;
+            $previousApprover = $role; 
         }
 
         return $previousApprover; // null if no previous approver exists

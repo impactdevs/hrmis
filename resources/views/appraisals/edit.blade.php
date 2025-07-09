@@ -1597,6 +1597,11 @@
                             @endif
                         @endif
                         @can('approve appraisal')
+                                                            @php
+                                        $userBeingapproved = \App\Models\User::find(
+                                            \App\Models\Employee::find($appraisal->employee_id)->user_id,
+                                        );
+                                    @endphp
                             @if (!is_null($appraisal->employee->user_id))
                                 @php
                                     $userRole = Auth::user()->roles->pluck('name')[0];
@@ -1608,6 +1613,13 @@
                                     $currentApprover = $appraisal->current_approver ?? 'Executive Secretary';
                                     $previousApprover = 'None';
                                     $isHR = $appraisal->appraiser_id == auth()->user()->employee->employee_id;
+                                    $isHoD =
+                                        $appraisal->employee_id == auth()->user()->employee->employee_id &&
+                                        auth()->user()->hasRole('Head of Division');
+
+                                    if ($userRole == 'Head of Division' && !$isHoD) {
+                                        $previousApprover = 'HR';
+                                    }
 
                                     if ($userRole == 'HR' && !$isHR) {
                                         $previousApprover = 'Head of Division';
@@ -1616,6 +1628,7 @@
                                     if ($userRole == 'Executive Secretary') {
                                         $previousApprover = 'HR';
                                     }
+
                                     $hasBeenRejected = collect($appraisal->appraisal_request_status)->contains(
                                         fn($status) => $status === 'rejected',
                                     );
@@ -1629,6 +1642,7 @@
                                 @endphp
 
                                 <div class="m-2 status">
+                                    @if (!($userBeingapproved && $userBeingapproved->hasRole('Head of Division')))
                                     {{-- Current User's Decision --}}
                                     @if (isset($appraisal->appraisal_request_status[$userRole]) &&
                                             $appraisal->appraisal_request_status[$userRole] === 'approved')
@@ -1643,6 +1657,9 @@
                                     @else
                                         <span class="badge bg-warning">Pending</span>
                                     @endif
+                                    @endif
+
+                                    {{-- Current Approver --}}
 
                                     {{-- Approved By List --}}
                                     @if ($approvedBy->isNotEmpty())
@@ -1654,10 +1671,12 @@
                                         <p class="mt-2"><strong>Rejected by:</strong> {{ $rejectedBy->join(', ') }}</p>
                                     @endif
                                 </div>
-
+                                {{-- {{ dd($userRole == $currentApprover, $isHR,  $isHoD) }} --}}
                                 {{-- Approval / Rejection Controls --}}
-                                @if ($userRole == $currentApprover || $isHR)
-                                    @if ($previousApprover != 'None' && $appraisal->appraisal_request_status[$previousApprover] == 'approved')
+                                @if ($userRole == $currentApprover || $isHR || $isHoD)
+                                    @if (
+                                        (!$isHoD && $appraisal->appraisal_request_status == null) ||
+                                            ($previousApprover != 'None' && $appraisal->appraisal_request_status[$previousApprover] == 'approved'))
                                         <div class="form-group no-print mt-3 d-flex gap-2">
                                             <input class="btn btn-outline-primary btn-large approve-btn" type="button"
                                                 value="Approve" data-appraisal-id="{{ $appraisal->appraisal_id }}">
@@ -1667,20 +1686,14 @@
                                         </div>
                                     @elseif ($previousApprover != 'None' && $appraisal->appraisal_request_status[$previousApprover] == 'rejected')
                                         <p>Rejected by the {{ $previousApprover }}</p>
-                                    @else
-                                        <div class="form-group no-print mt-3 d-flex gap-2">
-                                            <input class="btn btn-outline-primary btn-large approve-btn" type="button"
-                                                value="Approve" data-appraisal-id="{{ $appraisal->appraisal_id }}">
-                                            <input class="btn btn-outline-danger btn-large reject-btn" type="button"
-                                                value="Reject" data-appraisal-id="{{ $appraisal->appraisal_id }}"
-                                                data-bs-toggle="modal" data-bs-target="#rejectModal">
-                                        </div>
                                     @endif
                                 @else
-                                    <p class="mt-3">
-                                        Waiting for approval from:
-                                        <strong>{{ $roleNames[$currentApprover] ?? $currentApprover }}</strong>
-                                    </p>
+                                    @if (!($userBeingapproved && $userBeingapproved->hasRole('Head of Division')))
+                                        <p class="mt-3">
+                                            Waiting for approval from:
+                                            <strong>{{ $roleNames[$currentApprover] ?? $currentApprover }}</strong>
+                                        </p>
+                                    @endif
                                 @endif
                             @endif
                         @endcan

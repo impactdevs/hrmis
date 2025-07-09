@@ -32,22 +32,42 @@ class AppraisalsController extends Controller
      */
     public function create()
     {
-        if (!auth()->user()->employee) {
-            return back()->with("success", "No Employee record found! Ask the human resource");
-        }
-        if (!auth()->user()->employee->department) {
-            return back()->with("success", "Your department does not have a department head, so we cant determine a supervisor for you!Reach out to the administrator.");
+        //get the role of the logged in user
+        $user = auth()->user();
+        $role = $user->getRoleNames()->first();
+        //if  the user is staff, then we can create an appraisal
+        if ($role == 'Staff') {
+            if (!auth()->user()->employee) {
+                return back()->with("success", "No Employee record found! Ask the human resource");
+            }
+            if (!auth()->user()->employee->department) {
+                return back()->with("success", "Your department does not have a department head, so we cant determine a supervisor for you!Reach out to the administrator.");
+            }
+
+            // if the is no department user, return to the previous page with an error message
+            if (!User::find(auth()->user()->employee->department->department_head)) {
+                return back()->with("success", "Your department does not have a department head, so we cant determine a supervisor for you!Reach out to the administrator.");
+            }
+
+            $appraser_id = User::find(auth()->user()->employee->department->department_head)->employee->employee_id;
+        } else if ($role == 'Head of Division') {
+            //get the user with the role of Secretary
+            $user = User::role('Executive Secretary')->whereHas('employee')->first();
+
+            //get the employee_id of the user
+            if (!$user || !$user->employee) {
+                return back()->with("success", "No Employee record found for the Executive Secretary! Ask the human resource");
+            }
+
+            $appraser_id = $user->employee->employee_id;
         }
 
-        // if the is no department user, return to the previous page with an error message
-        if(!User::find(auth()->user()->employee->department->department_head)) {
-            return back()->with("success", "Your department does not have a department head, so we cant determine a supervisor for you!Reach out to the administrator.");
-        }
+
         $data =  [
             "appraisal_start_date" => null,
             "appraisal_end_date" => null,
             'employee_id' => auth()->user()->employee->employee_id,
-            "appraiser_id" => User::find(auth()->user()->employee->department->department_head)->employee->employee_id,
+            "appraiser_id" => $appraser_id,
             "if_no_job_compatibility" => null,
             "unanticipated_constraints" => null,
             "personal_initiatives" => null,
@@ -191,7 +211,11 @@ class AppraisalsController extends Controller
     public function edit(Appraisal $uncst_appraisal)
     {
         $appraisal = $uncst_appraisal;
-        $users = User::role('Head of Division')->whereHas('employee')->get();
+        $users = User::whereHas('roles', function ($query) {
+            $query->where('name', 'Head of Division');
+        })->orWhereHas('roles', function ($query) {
+            $query->where('name', 'Executive Secretary');
+        })->get();
 
         // get any draft with this appraisal and logged in employee
         $draft = DB::table('appraisal_drafts')
