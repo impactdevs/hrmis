@@ -1576,7 +1576,7 @@
                 <div class="mb-3 row">
                     <div class="col-md-12">
                         <div class="col-md-12">
-                            <x-forms.repeater name="relevant_documents" label="Attach Any Relevant Documents"
+                            <x-forms.repeater name="relevant_documents" label="Attach Any Relevant Documents(contract renewal letter and other attachments such as Job descriptions, certificates )"
                                 :values="$appraisal->relevant_documents ?? []" />
                         </div>
                     </div>
