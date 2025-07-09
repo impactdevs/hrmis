@@ -48,10 +48,10 @@ class AppraisalsController extends Controller
             if (!User::find(auth()->user()->employee->department->department_head)) {
                 return back()->with("success", "Your department does not have a department head, so we cant determine a supervisor for you!Reach out to the administrator.");
             } else {
-                $role = User::find(auth()->user()->employee->department->department_head)->hasRole('Head of Division');
+                $role = User::find(auth()->user()->employee->department->department_head)->hasRole('Head of Division') || User::find(auth()->user()->employee->department->department_head)->hasRole('HR');
 
                 if (!$role)
-                    return back()->with("success", "appraisal creation failed, contact the hr");
+                    return back()->with("success", "Appraisal creation failed, contact the HR.");
             }
 
             $appraser_id = User::find(auth()->user()->employee->department->department_head)->employee->employee_id;
@@ -222,6 +222,8 @@ class AppraisalsController extends Controller
             $query->where('name', 'Head of Division');
         })->orWhereHas('roles', function ($query) {
             $query->where('name', 'Executive Secretary');
+        })->orWhereHas('roles', function ($query) {
+            $query->where('name', 'HR');
         })->get();
 
         // get any draft with this appraisal and logged in employee
