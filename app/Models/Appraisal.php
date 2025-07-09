@@ -51,7 +51,8 @@ class Appraisal extends Model
         'panel_recommendation',
         'overall_assessment',
         'executive_secretary_comments',
-        'contract_id'
+        'contract_id',
+        'relevant_documents'
     ];
 
     protected $casts = [
@@ -62,6 +63,7 @@ class Appraisal extends Model
         'performance_planning' => 'array',
         'appraisal_period_rate' => 'array',
         'appraisal_request_status' => 'array',
+        'relevant_documents' => 'array',
 
     ];
 

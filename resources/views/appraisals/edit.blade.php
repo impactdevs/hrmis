@@ -1571,6 +1571,20 @@
                 </div>
             </fieldset>
 
+            <fieldset class="p-2 mb-4 border">
+                <legend>SECTION 5</legend>
+                <div class="mb-3 row">
+                    <div class="col-md-12">
+                        <div class="col-md-12">
+                            <x-forms.repeater name="relevant_documents" label="Attach Any Relevant Documents"
+                                :values="$appraisal->relevant_documents ?? []" />
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+
+
+
             <!-- SUBMIT SECTION -->
             <div class="py-4 bg-white sticky-bottom border-top">
                 <div class="container-lg">
@@ -1597,11 +1611,11 @@
                             @endif
                         @endif
                         @can('approve appraisal')
-                                                            @php
-                                        $userBeingapproved = \App\Models\User::find(
-                                            \App\Models\Employee::find($appraisal->employee_id)->user_id,
-                                        );
-                                    @endphp
+                            @php
+                                $userBeingapproved = \App\Models\User::find(
+                                    \App\Models\Employee::find($appraisal->employee_id)->user_id,
+                                );
+                            @endphp
                             @if (!is_null($appraisal->employee->user_id))
                                 @php
                                     $userRole = Auth::user()->roles->pluck('name')[0];
@@ -1643,20 +1657,20 @@
 
                                 <div class="m-2 status">
                                     @if (!($userBeingapproved && $userBeingapproved->hasRole('Head of Division')))
-                                    {{-- Current User's Decision --}}
-                                    @if (isset($appraisal->appraisal_request_status[$userRole]) &&
-                                            $appraisal->appraisal_request_status[$userRole] === 'approved')
-                                        <span class="badge bg-success">You Approved this Leave Request.</span>
-                                    @elseif (isset($appraisal->appraisal_request_status[$userRole]) &&
-                                            $appraisal->appraisal_request_status[$userRole] === 'rejected')
-                                        <span class="badge bg-danger">You Rejected this Request</span>
-                                        <p class="mt-1"><strong>Rejection Reason:</strong>
-                                            {{ $appraisal->rejection_reason }}</p>
-                                    @elseif ($appraisal->approval_status === 'approved')
-                                        <span class="badge bg-danger">Approved</span>
-                                    @else
-                                        <span class="badge bg-warning">Pending</span>
-                                    @endif
+                                        {{-- Current User's Decision --}}
+                                        @if (isset($appraisal->appraisal_request_status[$userRole]) &&
+                                                $appraisal->appraisal_request_status[$userRole] === 'approved')
+                                            <span class="badge bg-success">You Approved this Leave Request.</span>
+                                        @elseif (isset($appraisal->appraisal_request_status[$userRole]) &&
+                                                $appraisal->appraisal_request_status[$userRole] === 'rejected')
+                                            <span class="badge bg-danger">You Rejected this Request</span>
+                                            <p class="mt-1"><strong>Rejection Reason:</strong>
+                                                {{ $appraisal->rejection_reason }}</p>
+                                        @elseif ($appraisal->approval_status === 'approved')
+                                            <span class="badge bg-danger">Approved</span>
+                                        @else
+                                            <span class="badge bg-warning">Pending</span>
+                                        @endif
                                     @endif
 
                                     {{-- Current Approver --}}

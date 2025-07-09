@@ -276,6 +276,24 @@ class AppraisalsController extends Controller
         // Default message
         $message = "Appraisal has been submitted successfully.";
 
+        // Format (qualification details documents
+        if (filled($requestedData['relevant_documents'])) {
+            foreach ($requestedData['relevant_documents'] as $key => $value) {
+                if ($value["proof"] == null) {
+                    $requestedData['relevant_documents'][$key]['proof'] =  $uncst_appraisal['relevant_documents'][$key]['proof'];
+                }
+                // Check if a file is uploaded for this qualification
+                // Use the correct input name to check for the file
+                if ($request->hasFile("relevant_documents.$key.proof")) {
+                    // Store the file and get the path
+                    $filePath = $request->file("relevant_documents.$key.proof")->store('proof_documents', 'public');
+
+                    // Update the proof value to the path
+                    $requestedData['relevant_documents'][$key]['proof'] = $filePath;
+                }
+            }
+        }
+
         // Handle draft logic
         if (isset($requestedData['is_draft'])) {
             if ($requestedData['is_draft'] === 'not_draft') {
