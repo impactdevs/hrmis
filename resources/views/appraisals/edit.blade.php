@@ -599,7 +599,7 @@
                                                         title="Editing is disabled for your role"
                                                         onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()"
                                                     @endunless>
-                                                    {{ $staffDraftValue ? '' : ($plannedActivity ?: 'Enter Result') }}
+                                                    {{ $staffDraftValue ? '' : ($outputResults ?: 'Enter Result') }}
                                                 </div>
                                                 <input type="hidden"
                                                     name="appraisal_period_rate[{{ $i - 1 }}][output_results]"
