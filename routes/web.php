@@ -146,7 +146,7 @@ Route::get("uncst-thank-you-for-application", [JobApplicationController::class, 
 // whistle blowing
 Route::get('uncst-whistleblowing-form', [WhistleblowingController::class, 'create'])->name('whistleblowing.create');
 Route::post('uncst-whistleblowing-form', [WhistleblowingController::class, 'store'])->name('whistleblowing.store');
-Route::get('whistleblowing', [WhistleblowingController::class, 'index'])->name('whistleblowing.index');
+Route::get('whistleblowing', [WhistleblowingController::class, 'index'])->middleware(['auth'])->name('whistleblowing.index');
 Route::get('whistleblowing/{id}', [WhistleblowingController::class, 'show'])->name('whistleblowing.show');
 Route::get("uncst-thank-you-for-the-report", [WhistleblowingController::class, 'thankyou'])->name('whistle.thankyou');
 
