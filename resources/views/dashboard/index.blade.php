@@ -204,7 +204,9 @@
 
                             </div>
                         </div><!-- End Reports -->
-
+                        @if (auth()->user()->hasRole('HR'))
+                            
+                        
                         <!-- Applications -->
                         <div class="col-12">
                             <div class="card shadow-sm border-0 recent-sales">
@@ -270,6 +272,8 @@
                                 </div>
                             </div>
                         </div>
+
+                        @endif
 
                         <!-- Ongoing Appraisals -->
                         <div class="col-12">
