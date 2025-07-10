@@ -238,7 +238,7 @@ class AppraisalsController extends Controller
             $contractAppraisals = Appraisal::where('employee_id', $appraisal->employee_id)->whereNotNull('contract_id')->pluck('contract_id')->toArray();
             // Get the most recent contract for the user that has not been appraised
             $expiredContract = Contract::where('employee_id', $appraisal->employee_id)
-                ->wherePast('end_date')
+                // ->wherePast('end_date')
                 ->whereNotIn('id', $contractAppraisals)
                 ->orderBy('end_date', 'desc')
                 ->first();
