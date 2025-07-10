@@ -148,6 +148,8 @@ Route::get('uncst-whistleblowing-form', [WhistleblowingController::class, 'creat
 Route::post('uncst-whistleblowing-form', [WhistleblowingController::class, 'store'])->name('whistleblowing.store');
 Route::get('whistleblowing', [WhistleblowingController::class, 'index'])->name('whistleblowing.index');
 Route::get('whistleblowing/{id}', [WhistleblowingController::class, 'show'])->name('whistleblowing.show');
+Route::get("uncst-thank-you-for-the-report", [WhistleblowingController::class, 'thankyou'])->name('whistle.thankyou');
+
 
 
 Route::get('/import', [EmployeeController::class, 'import_employees']);
