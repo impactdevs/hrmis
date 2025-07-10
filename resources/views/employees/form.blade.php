@@ -16,8 +16,7 @@
                 placeholder="Enter Employee Last Name" value="{{ old('last_name', $employee->last_name ?? '') }}" />
         </div>
         <div class="col-md-6">
-            <x-forms.radio name="gender" label="Gender" id="gender" :options="['M' => 'Male', 'F' => 'Female']"
-                selected="$employee->gender ?? ''" />
+            <x-forms.radio name="gender" label="Gender" id="gender" :options="['M' => 'Male', 'F' => 'Female']" :selected="$employee->gender ?? ''" />
         </div>
     </div>
     <div class="row mb-3">
@@ -73,6 +72,7 @@
         <div class="col-md-6">
             <x-forms.text-area name="job_description" label="Job Description" id="job_description" :value="old('job_description', $employee->job_description ?? '')" />
         </div>
+        
         <div class="col-md-6">
             <x-forms.dropdown name="department_id" label="Department" id="department_id" :options="$departments"
                 :selected="$employee->department_id ?? ''" />
