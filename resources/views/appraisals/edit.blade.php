@@ -465,7 +465,7 @@
                                 <x-forms.radio name="job_compatibility" :isDisabled="!$appraisal->is_appraisee"
                                     label="Is the job and tasks performed compatible with your qualifications and experience?"
                                     value="{{ $appraisal->job_compatibility ?? '' }}" id="job_compatibility"
-                                    :options="['yes' => 'Yes', 'no' => 'No']" :selected="$appraisal->job_compatibility ?? ''" />
+                                    :options="['yes' => 'Yes', 'no' => 'No']" selected="$appraisal->job_compatibility ?? ''" />
                                 <x-forms.text-area name="if_no_job_compatibility" :isDisabled="!$appraisal->is_appraisee" :isDraft="$staffDraftValue"
                                     label="If No, explain:" id="if_no_job_compatibility" :value="old(
                                         'if_no_job_compatibility',

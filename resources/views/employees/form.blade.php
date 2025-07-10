@@ -16,7 +16,8 @@
                 placeholder="Enter Employee Last Name" value="{{ old('last_name', $employee->last_name ?? '') }}" />
         </div>
         <div class="col-md-6">
-            <x-forms.radio name="gender" label="Gender" id="gender" :options="['M' => 'Male', 'F' => 'Female']" :selected="$employee->gender ?? ''" />
+            <x-forms.radio name="gender" label="Gender" id="gender" :options="['M' => 'Male', 'F' => 'Female']"
+                selected="$employee->gender ?? ''" />
         </div>
     </div>
     <div class="row mb-3">

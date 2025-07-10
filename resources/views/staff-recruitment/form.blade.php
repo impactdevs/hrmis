@@ -10,6 +10,7 @@
             <x-forms.dropdown name="department_id" label="Department/Unit" id="department_id" :options="$departments"
                 :selected="isset($staffRecruitment) ? $staffRecruitment->department_id : ''" class="form-control" />
         </div>
+
     </div>
 
     <!-- Number of Staff and Date of Recruitment Row -->
