@@ -116,17 +116,6 @@
                     </span>
                 </div>
                 
-                <!-- Status -->
-                <div class="col-12">
-                    <span class="fw-semibold text-secondary">Status:</span>
-                    @if (isset($report->status))
-                    <span class="badge {{ $report->status == 'Resolved' ? 'bg-success' : 'bg-warning' }}">
-                        {{ $report->status }}
-                    </span>
-                    @else
-                    <span class="text-muted">-</span>
-                    @endif
-                </div>
             </div>
         </div>
     </div>
