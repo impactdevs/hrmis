@@ -109,15 +109,15 @@
                 <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('whistleblowing.create') || request()->routeIs('whistleblowing.create')) bg-secondary @endif"
                     href="{{ route('whistleblowing.create') }}">
                     <i class="bi bi-mic"></i>
-                    Whistle-Blow
+                    Anonymous Report
                 </a>
             </li>
             @if (auth()->user()->hasRole('HR'))
                         <li class="nav-item">
                 <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('whistleblowing.index') || request()->routeIs('whistleblowing.index')) bg-secondary @endif"
                     href="{{ route('whistleblowing.index') }}">
-                    <i class="bi bi-mic"></i>
-                    Whistle-Blow Reports
+                    <i class="bi bi-file-earmark-break-fill"></i>
+                    Manage Anonymous Reports
                 </a>
             </li>
                 <li class="nav-item">
