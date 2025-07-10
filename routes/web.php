@@ -31,6 +31,7 @@ use App\Http\Controllers\StaffRecruitmentController;
 use App\Http\Controllers\TrainingController;
 use App\Http\Controllers\UploadEmployees;
 use App\Http\Controllers\UsersController;
+use App\Http\Controllers\WhistleblowingController;
 use App\Models\Employee;
 use App\Models\StaffRecruitment;
 use Illuminate\Support\Facades\Route;
@@ -141,6 +142,12 @@ Route::post('uncst-job-application-form', [JobApplicationController::class, 'sto
 Route::get('uncst-job-application-form/{application}/edit', [JobApplicationController::class, 'edit'])->name('job-applications.edit');
 Route::put('uncst-job-application-form/{application}', [JobApplicationController::class, 'update'])->name('job-applications.update');
 Route::get("uncst-thank-you-for-application", [JobApplicationController::class, 'thankyou'])->name('thankyou');
+
+// whistle blowing
+Route::get('uncst-whistleblowing-form', [WhistleblowingController::class, 'create'])->name('whistleblowing.create');
+Route::post('uncst-whistleblowing-form', [WhistleblowingController::class, 'store'])->name('whistleblowing.store');
+Route::get('whistleblowing', [WhistleblowingController::class, 'index'])->name('whistleblowing.index');
+Route::get('whistleblowing/{id}', [WhistleblowingController::class, 'show'])->name('whistleblowing.show');
 
 
 Route::get('/import', [EmployeeController::class, 'import_employees']);

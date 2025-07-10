@@ -37,8 +37,13 @@
                     $appraisal = request()->route('uncst_appraisal'); // This is likely a model, not an ID
                     $isDraft = $appraisal->is_draft ? 'Draft' : 'Final';
                     $title =
-                        'Appraisal for ' . $appraisal->employee->first_name . ' ' . $appraisal->employee->last_name .
-                        ' (' . $isDraft . ')';
+                        'Appraisal for ' .
+                        $appraisal->employee->first_name .
+                        ' ' .
+                        $appraisal->employee->last_name .
+                        ' (' .
+                        $isDraft .
+                        ')';
                 }
 
                 if (request()->routeIs('appraisals.create')) {
@@ -128,11 +133,9 @@
                     $title = 'Positions';
                 }
 
-                   if (request()->routeIs('apply-for-leave')) {
+                if (request()->routeIs('apply-for-leave')) {
                     $title = 'Applying for leave';
                 }
-
-                
 
                 if (request()->routeIs('salary-advances.index')) {
                     $title = 'Salary Advances';
@@ -160,6 +163,16 @@
 
                 if (request()->routeIs('departments.index')) {
                     $title = 'Departments';
+                }
+
+                if (request()->routeIs('whistleblowing.index')) {
+                    $title = 'Whistleblowing Reports';
+                }
+
+                if (request()->routeIs('whistleblowing.show')) {
+                    $whistle = request()->route('id');
+                    $report = \app\Models\WhistleblowingReport::find($whistle);
+                    $title = 'Whistleblowing Report Details for '. $report->tracking_id;
                 }
             @endphp
 
