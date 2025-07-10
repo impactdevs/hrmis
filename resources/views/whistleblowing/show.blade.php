@@ -108,7 +108,6 @@
                     <span>{{ $report->ip_address }}</span>
                 </div>
                 
-                <!-- User Agent -->
                 <div class="col-12">
                     <span class="fw-semibold text-secondary">User Agent:</span>
                     <span class="d-inline-block text-break" style="word-break: break-all;">
