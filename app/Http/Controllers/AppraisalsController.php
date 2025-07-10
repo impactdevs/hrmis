@@ -262,6 +262,8 @@ class AppraisalsController extends Controller
      */
     public function update(Request $request, Appraisal $uncst_appraisal)
     {
+        ini_set('max_execution_time', 1200);
+        ini_set('memory_limit', '-1');
         $requestedData = $request->all();
 
         // Handle conditional nullifications
