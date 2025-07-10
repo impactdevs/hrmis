@@ -205,151 +205,158 @@
                             </div>
                         </div><!-- End Reports -->
                         @if (auth()->user()->hasRole('HR'))
-                            
-                        
-                        <!-- Applications -->
-                        <div class="col-12">
-                            <div class="card shadow-sm border-0 recent-sales">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center mb-3">
-                                        <h5 class="card-title mb-0">
-                                            <i class="bi bi-person-lines-fill text-primary"></i>
-                                            Latest Applications <span class="badge bg-primary">{{ $entries->count() }}</span>
-                                            <small class="text-muted">(Latest 5 | Today)</small>
-                                        </h5>
-                                        <a href="{{ route('uncst-job-applications.index') }}" class="btn btn-sm btn-outline-primary">View All</a>
-                                    </div>
-                                    <div class="table-responsive">
-                                        <table class="table align-middle table-hover mb-0">
-                                            <thead class="table-light">
-                                                <tr>
-                                                    <th scope="col">#</th>
-                                                    <th scope="col"><i class="bi bi-person"></i> Full Name</th>
-                                                    <th scope="col"><i class="bi bi-briefcase"></i> Position</th>
-                                                    <th scope="col"><i class="bi bi-calendar-event"></i> Applied On</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @forelse ($entries as $entry)
+                            <!-- Applications -->
+                            <div class="col-12">
+                                <div class="card shadow-sm border-0 recent-sales">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <h5 class="card-title mb-0">
+                                                <i class="bi bi-person-lines-fill text-primary"></i>
+                                                Latest Applications <span
+                                                    class="badge bg-primary">{{ $entries->count() }}</span>
+                                                <small class="text-muted">(Latest 5 | Today)</small>
+                                            </h5>
+                                            <a href="{{ route('uncst-job-applications.index') }}"
+                                                class="btn btn-sm btn-outline-primary">View All</a>
+                                        </div>
+                                        <div class="table-responsive">
+                                            <table class="table align-middle table-hover mb-0">
+                                                <thead class="table-light">
                                                     <tr>
-                                                        <td>
-                                                            <span class="badge bg-secondary">{{ $entry->id }}</span>
-                                                        </td>
-                                                        <td>
-                                                            <div class="d-flex align-items-center gap-2">
-                                                                <span class="avatar rounded-circle bg-primary text-white fw-bold"
-                                                                    style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;">
-                                                                    {{ strtoupper(substr($entry->full_name, 0, 1)) }}
+                                                        <th scope="col">#</th>
+                                                        <th scope="col"><i class="bi bi-person"></i> Full Name</th>
+                                                        <th scope="col"><i class="bi bi-briefcase"></i> Position
+                                                        </th>
+                                                        <th scope="col"><i class="bi bi-calendar-event"></i>
+                                                            Applied On</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @forelse ($entries as $entry)
+                                                        <tr>
+                                                            <td>
+                                                                <span
+                                                                    class="badge bg-secondary">{{ $entry->id }}</span>
+                                                            </td>
+                                                            <td>
+                                                                <div class="d-flex align-items-center gap-2">
+                                                                    <span
+                                                                        class="avatar rounded-circle bg-primary text-white fw-bold"
+                                                                        style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;">
+                                                                        {{ strtoupper(substr($entry->full_name, 0, 1)) }}
+                                                                    </span>
+                                                                    <span>{{ $entry->full_name }}</span>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <span class="badge bg-info text-dark">
+                                                                    {{ \App\Models\CompanyJob::where('job_code', $entry->reference_number)->first()->job_title ?? 'N/A' }}
                                                                 </span>
-                                                                <span>{{ $entry->full_name }}</span>
-                                                            </div>
-                                                        </td>
-                                                        <td>
-                                                            <span class="badge bg-info text-dark">
-                                                                {{ \App\Models\CompanyJob::where('job_code', $entry->reference_number)->first()->job_title ?? 'N/A' }}
-                                                            </span>
-                                                        </td>
-                                                        <td>
-                                                            <span class="text-nowrap">
-                                                                <i class="bi bi-clock text-primary"></i>
-                                                                {{ $entry->created_at->format('d M, Y H:i') }}
-                                                            </span>
-                                                            <br>
-                                                            <small class="text-muted">{{ $entry->created_at->diffForHumans() }}</small>
-                                                        </td>
-                                                    </tr>
-                                                @empty
-                                                    <tr>
-                                                        <td colspan="4" class="text-center text-muted py-4">
-                                                            <i class="bi bi-emoji-frown fs-2"></i>
-                                                            <div>No applications found for today.</div>
-                                                        </td>
-                                                    </tr>
-                                                @endforelse
-                                            </tbody>
-                                        </table>
+                                                            </td>
+                                                            <td>
+                                                                <span class="text-nowrap">
+                                                                    <i class="bi bi-clock text-primary"></i>
+                                                                    {{ $entry->created_at->format('d M, Y H:i') }}
+                                                                </span>
+                                                                <br>
+                                                                <small
+                                                                    class="text-muted">{{ $entry->created_at->diffForHumans() }}</small>
+                                                            </td>
+                                                        </tr>
+                                                    @empty
+                                                        <tr>
+                                                            <td colspan="4" class="text-center text-muted py-4">
+                                                                <i class="bi bi-emoji-frown fs-2"></i>
+                                                                <div>No applications found for today.</div>
+                                                            </td>
+                                                        </tr>
+                                                    @endforelse
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
                         @endif
+                        @if (auth()->user()->hasRole('HR'))
+                            <!-- Ongoing Appraisals -->
+                            <div class="col-12">
+                                <div class="overflow-auto card top-selling">
 
-                        <!-- Ongoing Appraisals -->
-                        <div class="col-12">
-                            <div class="overflow-auto card top-selling">
+                                    <div class="card-body pb-0">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <h5 class="card-title mb-0">
+                                                <i class="bi bi-arrow-repeat text-primary"></i>
+                                                Ongoing Appraisals <span
+                                                    class="badge bg-primary">{{ $appraisals->count() }}</span>
+                                                <small class="text-muted">(Latest 5)</small>
+                                            </h5>
+                                            <a href="{{ route('uncst-appraisals.index') }}"
+                                                class="btn btn-sm btn-outline-primary">View All</a>
+                                        </div>
+                                        <div class="table-responsive">
+                                            <table class="table align-middle table-hover mb-0">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th scope="col"><i class="bi bi-person"></i> Full Name</th>
+                                                        <th scope="col"><i class="bi bi-diagram-3"></i> Department
+                                                        </th>
+                                                        <th scope="col"><i class="bi bi-calendar-event"></i>
+                                                            Applied On
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @forelse ($appraisals as $appraisal)
+                                                        <tr>
+                                                            <td>
+                                                                <div class="d-flex align-items-center gap-2">
+                                                                    <span
+                                                                        class="avatar rounded-circle bg-primary text-white fw-bold"
+                                                                        style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;">
+                                                                        {{ strtoupper(substr($appraisal->employee->first_name, 0, 1)) }}{{ strtoupper(substr($appraisal->employee->last_name ?? $appraisal->employee->first_name, 0, 1)) }}
+                                                                    </span>
+                                                                    <span>
+                                                                        {{ $appraisal->employee->first_name . ' ' . ($appraisal->employee->last_name ?? $appraisal->employee->first_name) }}
+                                                                        <br>
+                                                                        <small
+                                                                            class="text-muted">{{ $appraisal->employee->job_title ?? '' }}</small>
+                                                                    </span>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <span class="badge bg-info text-dark">
+                                                                    {{ $appraisal->employee->department->department_name ?? '-' }}
+                                                                </span>
+                                                            </td>
+                                                            <td>
+                                                                <span class="text-nowrap">
+                                                                    <i class="bi bi-clock text-primary"></i>
+                                                                    {{ \Carbon\Carbon::parse($appraisal->created_at)->format('d M, Y') }}
+                                                                </span>
+                                                                <br>
+                                                                <small
+                                                                    class="text-muted">{{ \Carbon\Carbon::parse($appraisal->created_at)->diffForHumans() }}</small>
+                                                            </td>
+                                                        </tr>
+                                                    @empty
+                                                        <tr>
+                                                            <td colspan="3" class="text-center text-muted py-4">
+                                                                <i class="bi bi-emoji-frown fs-2"></i>
+                                                                <div>No ongoing appraisals found.</div>
+                                                            </td>
+                                                        </tr>
+                                                    @endforelse
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
 
-                                <div class="card-body pb-0">
-                                    <div class="d-flex justify-content-between align-items-center mb-3">
-                                        <h5 class="card-title mb-0">
-                                            <i class="bi bi-arrow-repeat text-primary"></i>
-                                            Ongoing Appraisals <span
-                                                class="badge bg-primary">{{ $appraisals->count() }}</span>
-                                            <small class="text-muted">(Latest 5)</small>
-                                        </h5>
-                                        <a href="{{ route('uncst-appraisals.index') }}"
-                                            class="btn btn-sm btn-outline-primary">View All</a>
-                                    </div>
-                                    <div class="table-responsive">
-                                        <table class="table align-middle table-hover mb-0">
-                                            <thead class="table-light">
-                                                <tr>
-                                                    <th scope="col"><i class="bi bi-person"></i> Full Name</th>
-                                                    <th scope="col"><i class="bi bi-diagram-3"></i> Department</th>
-                                                    <th scope="col"><i class="bi bi-calendar-event"></i> Applied On
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @forelse ($appraisals as $appraisal)
-                                                    <tr>
-                                                        <td>
-                                                            <div class="d-flex align-items-center gap-2">
-                                                                <span
-                                                                    class="avatar rounded-circle bg-primary text-white fw-bold"
-                                                                    style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;">
-                                                                    {{ strtoupper(substr($appraisal->employee->first_name, 0, 1)) }}{{ strtoupper(substr($appraisal->employee->last_name ?? $appraisal->employee->first_name, 0, 1)) }}
-                                                                </span>
-                                                                <span>
-                                                                    {{ $appraisal->employee->first_name . ' ' . ($appraisal->employee->last_name ?? $appraisal->employee->first_name) }}
-                                                                    <br>
-                                                                    <small
-                                                                        class="text-muted">{{ $appraisal->employee->job_title ?? '' }}</small>
-                                                                </span>
-                                                            </div>
-                                                        </td>
-                                                        <td>
-                                                            <span class="badge bg-info text-dark">
-                                                                {{ $appraisal->employee->department->department_name ?? '-' }}
-                                                            </span>
-                                                        </td>
-                                                        <td>
-                                                            <span class="text-nowrap">
-                                                                <i class="bi bi-clock text-primary"></i>
-                                                                {{ \Carbon\Carbon::parse($appraisal->created_at)->format('d M, Y') }}
-                                                            </span>
-                                                            <br>
-                                                            <small
-                                                                class="text-muted">{{ \Carbon\Carbon::parse($appraisal->created_at)->diffForHumans() }}</small>
-                                                        </td>
-                                                    </tr>
-                                                @empty
-                                                    <tr>
-                                                        <td colspan="3" class="text-center text-muted py-4">
-                                                            <i class="bi bi-emoji-frown fs-2"></i>
-                                                            <div>No ongoing appraisals found.</div>
-                                                        </td>
-                                                    </tr>
-                                                @endforelse
-                                            </tbody>
-                                        </table>
-                                    </div>
                                 </div>
-
                             </div>
-                        </div>
-                        <!-- End Ongoing Appraisals -->
-
+                            <!-- End Ongoing Appraisals -->
+                        @endif
                         {{-- <div class="col-12">
                             <div class="card">
 
@@ -851,7 +858,7 @@
                                     </div>
                                 </div>
                             </div>
-                        @else 
+                        @else
                             <div class="col-xxl-12 col-md-12">
                                 <div class="card info-card border-0 shadow-sm">
                                     <div class="card-body text-center">
@@ -859,8 +866,9 @@
                                             <i class="bi bi-calendar-check"></i> No Recent Leave Requests
                                         </h5>
                                         <p class="text-muted">
-                                            You have not submitted any leave requests recently. Please submit a leave request
-                                            if you need to take time off.   
+                                            You have not submitted any leave requests recently. Please submit a leave
+                                            request
+                                            if you need to take time off.
                                         </p>
                                     </div>
                                 </div>
