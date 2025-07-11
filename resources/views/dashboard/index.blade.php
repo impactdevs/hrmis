@@ -288,8 +288,8 @@
                                         <div class="d-flex justify-content-between align-items-center mb-3">
                                             <h5 class="card-title mb-0">
                                                 <i class="bi bi-arrow-repeat text-primary"></i>
-                                                Ongoing Appraisals <span
-                                                    class="badge bg-primary">{{ $appraisals->count() }}</span>
+                                                Submitted Appraisals <span
+                                                    class="badge bg-primary">{{ $ongoingAppraisals->count() }}</span>
                                                 <small class="text-muted">(Latest 5)</small>
                                             </h5>
                                             <a href="{{ route('uncst-appraisals.index') }}"
@@ -639,7 +639,7 @@
                         <div class="col-xxl-4 col-md-6">
                             <div class="card info-card customers-card">
                                 <div class="card-body">
-                                    <h5 class="card-title">Ongoing Appraisals</h5>
+                                    <h5 class="card-title">Submitted Appraisals</h5>
                                     <div class="d-flex align-items-center">
                                         <div
                                             class="card-icon rounded-circle d-flex align-items-center justify-content-center">

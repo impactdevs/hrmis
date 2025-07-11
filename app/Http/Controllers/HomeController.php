@@ -39,6 +39,8 @@ class HomeController extends Controller
         $pendingAppraisals = Appraisal::whereNull('appraisal_request_status->HR')
             ->count();
 
+            //appraisals waiting for ES' approval
+
         $ongoingAppraisals = Appraisal::whereJsonContains('appraisal_request_status', ['HR' => 'approved'])
             ->whereNull('appraisal_request_status->Executive Secretary')
             ->count();
