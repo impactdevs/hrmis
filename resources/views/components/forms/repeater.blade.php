@@ -48,6 +48,9 @@
                         </div>
                     </div>
 
+                    <div class="form-text">
+                        All files must be in either of the formats PDF, JPG,PNG(Max 5MB each)
+                    </div>
                     <input type="file" name="{{ $name }}[{{ $index }}][proof]"
                         id="proof-{{ $name }}-{{ $index }}" class="d-none"
                         accept=".pdf,.jpg,.jpeg,.png,.gif">
