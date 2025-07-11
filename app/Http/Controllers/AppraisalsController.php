@@ -2,14 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\Summit;
 use App\Models\Appraisal;
 use App\Models\Contract;
 use App\Models\User;
 use App\Notifications\AppraisalApproval;
 use App\Notifications\AppraisalApplication;
 use Illuminate\Http\Request;
-use App\Models\Form;
 use App\Models\Scopes\EmployeeScope;
 use Illuminate\Support\Facades\Notification;
 

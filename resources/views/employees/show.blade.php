@@ -231,7 +231,7 @@
                     </div>
                     <div class="mb-3 row">
                         <div class="col-md-4"><strong>Next of Kin:</strong></div>
-                        <div class="col-md-8">{{ $employee->next_of_kin ?? 'No Email' }}</div>
+                        <div class="col-md-8">{{ $employee->next_of_kin ?? 'No Next of Kin' }}</div>
                     </div>
                 </section>
 
