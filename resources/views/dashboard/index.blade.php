@@ -108,6 +108,8 @@
                             </div>
                         </div>
 
+                        
+
                         <div class="col-xxl-4 col-md-6">
                             <div class="card info-card customers-card">
                                 <div class="card-body">
@@ -712,6 +714,24 @@
                                         <div class="ps-3">
                                             <h6>{{ $submittedAppraisalsByHR->count() }}</h6>
                                             <span class="pt-2 text-muted small ps-1">Approved By E.S</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                                                <div class="col-xxl-4 col-md-6">
+                            <div class="card info-card customers-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Pending Appraisals</h5>
+                                    <div class="d-flex align-items-center">
+                                        <div
+                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                            <i class="bi bi-check-circle text-success"></i>
+                                        </div>
+                                        <div class="ps-3">
+                                            <h6>{{ $pendingAppraisals }}</h6>
+                                            <span class="pt-2 text-muted small ps-1">Your Draft Appraisals</span>
                                         </div>
                                     </div>
                                 </div>
