@@ -58,21 +58,33 @@
                                             <i class="bi bi-hourglass-split text-warning"></i>
                                         </div>
                                         <div class="ps-3">
-                                            <h6>{{ $submittedAppraisalsBystaff->count() }}</h6>
-                                            <span class="pt-2 text-muted small ps-1">Appraisals submitted to the
-                                                H.o.D</span>
+
+                                            @if (auth()->user()->hasRole('Head of Division'))
+                                                <h6>{{ $submittedAppraisalsBystaff->count() }}</h6>
+                                                <span class="pt-2 text-muted small ps-1">
+                                                    Appraisals submitted to the
+                                                    H.o.D
+                                                </span>
+                                            @elseif(auth()->user()->hasRole('HR'))
+                                             <h6>{{ $submittedAppraisalsByHoD->count() }}</h6>
+                                                <span class="pt-2 text-muted small ps-1">
+                                                    Appraisals Reviewed By HoD
+                                                </span>
+                                            @endif
+
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        @if (!auth()->user()->hasRole('Staff'))
+                       
                             <!-- Ongoing Appraisals Card -->
                             <div class="col-xxl-4 col-md-6">
                                 <div class="card info-card customers-card">
                                     <div class="card-body">
-                                        <h5 class="card-title">Appraisals Submitted To The H.R</h5>
+                                          @if (auth()->user()->hasRole('Head of Division'))
+                                                  <h5 class="card-title">Appraisals Submitted To The H.R</h5>
                                         <div class="d-flex align-items-center">
                                             <div
                                                 class="card-icon rounded-circle d-flex align-items-center justify-content-center">
@@ -84,10 +96,23 @@
                                                 H.R</span>
                                             </div>
                                         </div>
+                                            @elseif(auth()->user()->hasRole('HR'))
+                                               <h5 class="card-title">Appraisals Submitted To The Executive Secretary</h5>
+                                        <div class="d-flex align-items-center">
+                                            <div
+                                                class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                                <i class="bi bi-arrow-repeat text-primary"></i>
+                                            </div>
+                                            <div class="ps-3">
+                                                <h6>{{ $submittedAppraisalsByHR->count() }}</h6>Appraisals submitted to
+                                                the
+                                                E.S</span>
+                                            </div>
+                                        </div>
+                                            @endif
                                     </div>
                                 </div>
                             </div>
-                        @endif
 
                         <!-- Complete Appraisals Card -->
                         <div class="col-xxl-4 col-md-6">
@@ -108,25 +133,25 @@
                             </div>
                         </div>
 
-                        
-
-                        <div class="col-xxl-4 col-md-6">
-                            <div class="card info-card customers-card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Pending Appraisals</h5>
-                                    <div class="d-flex align-items-center">
-                                        <div
-                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                            <i class="bi bi-check-circle text-success"></i>
-                                        </div>
-                                        <div class="ps-3">
-                                            <h6>{{ $pendingAppraisals }}</h6>
-                                            <span class="pt-2 text-muted small ps-1">Your Draft Appraisals</span>
+                        @if (!auth()->user()->hasRole('HR'))
+                            <div class="col-xxl-4 col-md-6">
+                                <div class="card info-card customers-card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Pending Appraisals</h5>
+                                        <div class="d-flex align-items-center">
+                                            <div
+                                                class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                                <i class="bi bi-check-circle text-success"></i>
+                                            </div>
+                                            <div class="ps-3">
+                                                <h6>{{ $pendingAppraisals }}</h6>
+                                                <span class="pt-2 text-muted small ps-1">Your Draft Appraisals</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        @endif
 
                         <!-- Complete Appraisals Card -->
                         <div class="col-xxl-4 col-md-6">
@@ -720,7 +745,7 @@
                             </div>
                         </div>
 
-                                                <div class="col-xxl-4 col-md-6">
+                        <div class="col-xxl-4 col-md-6">
                             <div class="card info-card customers-card">
                                 <div class="card-body">
                                     <h5 class="card-title">Pending Appraisals</h5>
