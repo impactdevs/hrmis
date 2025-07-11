@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\DB;
 
 class AppraisalsController extends Controller
 {
-    /**
+    /** 
      * Display a listing of the resource.
      */
     public function index()

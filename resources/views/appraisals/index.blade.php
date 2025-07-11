@@ -199,7 +199,7 @@
                             @if (filled($appraisals))
                                 @foreach ($appraisals as $appraisal)
                                     <div
-                                        class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
+                                        class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 hover:shadow-lg transition-shadow @if ($appraisal->draft_was_submitted)border border-success border-4 @endif">
                                         <div class="flex justify-between items-start mb-4">
                                             <div>
                                                 <h3
