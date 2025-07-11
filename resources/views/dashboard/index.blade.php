@@ -66,25 +66,29 @@
                                                     H.o.D
                                                 </span>
                                             @elseif(auth()->user()->hasRole('HR'))
-                                             <h6>{{ $submittedAppraisalsByHoD->count() }}</h6>
+                                                <h6>{{ $submittedAppraisalsByHoD->count() }}</h6>
+                                                <span class="pt-2 text-muted small ps-1">
+                                                    Appraisals Reviewed By HoD
+                                                </span>
+                                            @elseif(auth()->user()->hasRole('Executive Secretary'))
+                                                <h6>{{ $submittedAppraisalsByHR->count() }}</h6>
                                                 <span class="pt-2 text-muted small ps-1">
                                                     Appraisals Reviewed By HoD
                                                 </span>
                                             @endif
-
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                       
-                            <!-- Ongoing Appraisals Card -->
-                            <div class="col-xxl-4 col-md-6">
-                                <div class="card info-card customers-card">
-                                    <div class="card-body">
-                                          @if (auth()->user()->hasRole('Head of Division'))
-                                                  <h5 class="card-title">Appraisals Submitted To The H.R</h5>
+
+                        <!-- Ongoing Appraisals Card -->
+                        <div class="col-xxl-4 col-md-6">
+                            <div class="card info-card customers-card">
+                                <div class="card-body">
+                                    @if (auth()->user()->hasRole('Head of Division'))
+                                        <h5 class="card-title">Appraisals Submitted To The H.R</h5>
                                         <div class="d-flex align-items-center">
                                             <div
                                                 class="card-icon rounded-circle d-flex align-items-center justify-content-center">
@@ -96,8 +100,8 @@
                                                 H.R</span>
                                             </div>
                                         </div>
-                                            @elseif(auth()->user()->hasRole('HR'))
-                                               <h5 class="card-title">Appraisals Submitted To The Executive Secretary</h5>
+                                    @elseif(auth()->user()->hasRole('HR'))
+                                        <h5 class="card-title">Appraisals Submitted To The Executive Secretary</h5>
                                         <div class="d-flex align-items-center">
                                             <div
                                                 class="card-icon rounded-circle d-flex align-items-center justify-content-center">
@@ -109,10 +113,21 @@
                                                 E.S</span>
                                             </div>
                                         </div>
-                                            @endif
-                                    </div>
+                                     @elseif(auth()->user()->hasRole('HR'))
+                                        <h5 class="card-title">Appraisals Submitted From HR</h5>
+                                        <div class="d-flex align-items-center">
+                                            <div
+                                                class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                                <i class="bi bi-arrow-repeat text-primary"></i>
+                                            </div>
+                                            <div class="ps-3">
+                                                <h6>{{ $submittedAppraisalsByHR->count() }}</h6>Appraisals Reviewed By The HR</span>
+                                            </div>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
+                        </div>
 
                         <!-- Complete Appraisals Card -->
                         <div class="col-xxl-4 col-md-6">
