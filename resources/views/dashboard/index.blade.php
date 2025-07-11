@@ -733,7 +733,7 @@
                                             <i class="bi bi-hourglass-split text-warning"></i>
                                         </div>
                                         <div class="ps-3">
-                                            <h6>{{ $appraisals->count() }}</h6>
+                                            <h6>{{ $submittedAppraisalsBystaff->count() }}</h6>
                                             <span class="pt-2 text-muted small ps-1">Appraisals submitted to the
                                                 H.o.D</span>
                                         </div>
