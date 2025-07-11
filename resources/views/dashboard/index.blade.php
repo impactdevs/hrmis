@@ -8,163 +8,179 @@
 
                         <!-- Employees Card -->
                         <div class="col-xxl-3 col-md-6">
-                            <div class="card info-card sales-card">
+                            <a href="{{ route('employees.index') }}">
+                                <div class="card info-card sales-card">
 
-                                <div class="card-body">
-                                    <h5 class="card-title">Employees</h5>
+                                    <div class="card-body">
+                                        <h5 class="card-title">Employees</h5>
 
-                                    <div class="d-flex align-items-center">
-                                        <div
-                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                            <i class="bi bi-person"></i>
-                                        </div>
-                                        <div class="ps-3">
-                                            <h6>{{ $number_of_employees }}</h6>
+                                        <div class="d-flex align-items-center">
+                                            <div
+                                                class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                                <i class="bi bi-person"></i>
+                                            </div>
+                                            <div class="ps-3">
+                                                <h6>{{ $number_of_employees }}</h6>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                            </div>
+                                </div>
+                            </a>
                         </div><!-- End Employees Card -->
                         <!-- Attendees Card -->
                         <div class="col-xxl-3 col-md-6">
-                            <div class="card info-card revenue-card">
+                            <a href="{{ route('attendances.index') }}">
+                                <div class="card info-card revenue-card">
 
-                                <div class="card-body">
-                                    <h5 class="card-title">Attendees</h5>
+                                    <div class="card-body">
+                                        <h5 class="card-title">Attendees</h5>
 
-                                    <div class="d-flex align-items-center">
-                                        <div
-                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                            <i class="bi bi-person"></i>
-                                        </div>
-                                        <div class="ps-3">
-                                            <h6>{{ $attendances }}</h6>
+                                        <div class="d-flex align-items-center">
+                                            <div
+                                                class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                                <i class="bi bi-person"></i>
+                                            </div>
+                                            <div class="ps-3">
+                                                <h6>{{ $attendances }}</h6>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                            </div>
+                                </div>
+                            </a>
                         </div><!-- End Attendees Card -->
 
                         <!-- Pending Appraisals Card -->
                         <div class="col-xxl-4 col-md-6">
-                            <div class="card info-card customers-card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Submitted Appraisals</h5>
-                                    <div class="d-flex align-items-center">
-                                        <div
-                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                            <i class="bi bi-hourglass-split text-warning"></i>
-                                        </div>
-                                        <div class="ps-3">
+                            <a href="{{ route('uncst-appraisals.index') }}">
+                                <div class="card info-card customers-card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Submitted Appraisals</h5>
+                                        <div class="d-flex align-items-center">
+                                            <div
+                                                class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                                <i class="bi bi-hourglass-split text-warning"></i>
+                                            </div>
+                                            <div class="ps-3">
 
-                                            @if (auth()->user()->hasRole('Head of Division'))
-                                                <h6>{{ $submittedAppraisalsBystaff->count() }}</h6>
-                                                <span class="pt-2 text-muted small ps-1">
-                                                    Appraisals submitted to the
-                                                    H.o.D
-                                                </span>
-                                            @elseif(auth()->user()->hasRole('HR'))
-                                                <h6>{{ $submittedAppraisalsByHoD->count() }}</h6>
-                                                <span class="pt-2 text-muted small ps-1">
-                                                    Appraisals Reviewed By HoD
-                                                </span>
-                                            @elseif(auth()->user()->hasRole('Executive Secretary'))
-                                                <h6>{{ $submittedAppraisalsByHR->count() }}</h6>
-                                                <span class="pt-2 text-muted small ps-1">
-                                                    Appraisals Reviewed By HoD
-                                                </span>
-                                            @endif
+                                                @if (auth()->user()->hasRole('Head of Division'))
+                                                    <h6>{{ $submittedAppraisalsBystaff->count() }}</h6>
+                                                    <span class="pt-2 text-muted small ps-1">
+                                                        Appraisals submitted to the
+                                                        H.o.D
+                                                    </span>
+                                                @elseif(auth()->user()->hasRole('HR'))
+                                                    <h6>{{ $submittedAppraisalsByHoD->count() }}</h6>
+                                                    <span class="pt-2 text-muted small ps-1">
+                                                        Appraisals Received from HoDs
+                                                    </span>
+                                                @elseif(auth()->user()->hasRole('Executive Secretary'))
+                                                    <h6>{{ $submittedAppraisalsByHR->count() }}</h6>
+                                                    <span class="pt-2 text-muted small ps-1">
+                                                        Appraisals Reviewed By HoD
+                                                    </span>
+                                                @endif
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </a>
                         </div>
 
 
                         <!-- Ongoing Appraisals Card -->
                         <div class="col-xxl-4 col-md-6">
-                            <div class="card info-card customers-card">
-                                <div class="card-body">
-                                    @if (auth()->user()->hasRole('Head of Division'))
-                                        <h5 class="card-title">Appraisals Submitted To The H.R</h5>
-                                        <div class="d-flex align-items-center">
-                                            <div
-                                                class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                                <i class="bi bi-arrow-repeat text-primary"></i>
+                            <a href="{{ route('uncst-appraisals.index') }}">
+                                <div class="card info-card customers-card">
+                                    <div class="card-body">
+                                        @if (auth()->user()->hasRole('Head of Division'))
+                                            <h5 class="card-title">Appraisals Submitted To The H.R</h5>
+                                            <div class="d-flex align-items-center">
+                                                <div
+                                                    class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                                    <i class="bi bi-arrow-repeat text-primary"></i>
+                                                </div>
+                                                <div class="ps-3">
+                                                    <h6>{{ $submittedAppraisalsByHoD->count() }}</h6>Appraisals
+                                                    submitted to
+                                                    the
+                                                    H.R</span>
+                                                </div>
                                             </div>
-                                            <div class="ps-3">
-                                                <h6>{{ $submittedAppraisalsByHoD->count() }}</h6>Appraisals submitted to
-                                                the
-                                                H.R</span>
+                                        @elseif(auth()->user()->hasRole('HR'))
+                                            <h5 class="card-title">Appraisals Submitted To The Executive Secretary</h5>
+                                            <div class="d-flex align-items-center">
+                                                <div
+                                                    class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                                    <i class="bi bi-arrow-repeat text-primary"></i>
+                                                </div>
+                                                <div class="ps-3">
+                                                    <h6>{{ $submittedAppraisalsByHR->count() }}</h6>Appraisals
+                                                    submitted to
+                                                    the
+                                                    E.S</span>
+                                                </div>
                                             </div>
-                                        </div>
-                                    @elseif(auth()->user()->hasRole('HR'))
-                                        <h5 class="card-title">Appraisals Submitted To The Executive Secretary</h5>
-                                        <div class="d-flex align-items-center">
-                                            <div
-                                                class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                                <i class="bi bi-arrow-repeat text-primary"></i>
+                                        @elseif(auth()->user()->hasRole('HR'))
+                                            <h5 class="card-title">Appraisals Submitted From HR</h5>
+                                            <div class="d-flex align-items-center">
+                                                <div
+                                                    class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                                    <i class="bi bi-arrow-repeat text-primary"></i>
+                                                </div>
+                                                <div class="ps-3">
+                                                    <h6>{{ $submittedAppraisalsByHR->count() }}</h6>Appraisals Reviewed
+                                                    By The HR</span>
+                                                </div>
                                             </div>
-                                            <div class="ps-3">
-                                                <h6>{{ $submittedAppraisalsByHR->count() }}</h6>Appraisals submitted to
-                                                the
-                                                E.S</span>
-                                            </div>
-                                        </div>
-                                     @elseif(auth()->user()->hasRole('HR'))
-                                        <h5 class="card-title">Appraisals Submitted From HR</h5>
-                                        <div class="d-flex align-items-center">
-                                            <div
-                                                class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                                <i class="bi bi-arrow-repeat text-primary"></i>
-                                            </div>
-                                            <div class="ps-3">
-                                                <h6>{{ $submittedAppraisalsByHR->count() }}</h6>Appraisals Reviewed By The HR</span>
-                                            </div>
-                                        </div>
-                                    @endif
+                                        @endif
+                                    </div>
                                 </div>
-                            </div>
+                            </a>
                         </div>
 
                         <!-- Complete Appraisals Card -->
                         <div class="col-xxl-4 col-md-6">
-                            <div class="card info-card customers-card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Complete Appraisals</h5>
-                                    <div class="d-flex align-items-center">
-                                        <div
-                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                            <i class="bi bi-check-circle text-success"></i>
-                                        </div>
-                                        <div class="ps-3">
-                                            <h6>{{ $submittedAppraisalsByHR->count() }}</h6>
-                                            <span class="pt-2 text-muted small ps-1">Approved By E.S</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        @if (!auth()->user()->hasRole('HR'))
-                            <div class="col-xxl-4 col-md-6">
+                            <a href="{{ route('uncst-appraisals.index') }}">
                                 <div class="card info-card customers-card">
                                     <div class="card-body">
-                                        <h5 class="card-title">Pending Appraisals</h5>
+                                        <h5 class="card-title">Complete Appraisals</h5>
                                         <div class="d-flex align-items-center">
                                             <div
                                                 class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                                                 <i class="bi bi-check-circle text-success"></i>
                                             </div>
                                             <div class="ps-3">
-                                                <h6>{{ $pendingAppraisals }}</h6>
-                                                <span class="pt-2 text-muted small ps-1">Your Draft Appraisals</span>
+                                                <h6>{{ $submittedAppraisalsByHR->count() }}</h6>
+                                                <span class="pt-2 text-muted small ps-1">Approved By E.S</span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+                            </a>
+                        </div>
+
+                        @if (!auth()->user()->hasRole('HR'))
+                            <div class="col-xxl-4 col-md-6">
+                                <a href="{{ route('uncst-appraisals.index') }}">
+                                    <div class="card info-card customers-card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Pending Appraisals</h5>
+                                            <div class="d-flex align-items-center">
+                                                <div
+                                                    class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                                    <i class="bi bi-check-circle text-success"></i>
+                                                </div>
+                                                <div class="ps-3">
+                                                    <h6>{{ $pendingAppraisals }}</h6>
+                                                    <span class="pt-2 text-muted small ps-1">Your Draft
+                                                        Appraisals</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
                             </div>
                         @endif
 
@@ -209,24 +225,26 @@
 
                         <!-- Leaves Card -->
                         <div class="col-xxl-3 col-xl-12">
+                            <a href="{{ route('leaves.index') }}">
+                                <div class="card info-card customers-card">
 
-                            <div class="card info-card customers-card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Number of Employees on Leave <span>| Currently</span>
+                                        </h5>
 
-                                <div class="card-body">
-                                    <h5 class="card-title">Number of Employees on Leave <span>| Currently</span></h5>
-
-                                    <div class="d-flex align-items-center">
-                                        <div
-                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                            <i class="bi bi-people"></i>
+                                        <div class="d-flex align-items-center">
+                                            <div
+                                                class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                                <i class="bi bi-people"></i>
+                                            </div>
+                                            <div class="ps-3">
+                                                <h6>{{ $available_leave }}</h6>
+                                            </div>
                                         </div>
-                                        <div class="ps-3">
-                                            <h6>{{ $available_leave }}</h6>
-                                        </div>
+
                                     </div>
-
                                 </div>
-                            </div>
+                            </a>
 
                         </div><!-- End Leaves Card -->
 
@@ -705,6 +723,7 @@
 
                         <!-- Pending Appraisals Card -->
                         <div class="col-xxl-4 col-md-6">
+                            <a href="{{ route("uncst-appraisals.index") }}">
                             <div class="card info-card customers-card">
                                 <div class="card-body">
                                     <h5 class="card-title">Submitted Appraisals</h5>
@@ -721,10 +740,12 @@
                                     </div>
                                 </div>
                             </div>
+                            </a>
                         </div>
 
                         <!-- Ongoing Appraisals Card -->
                         <div class="col-xxl-4 col-md-6">
+                            <a href="{{ route("uncst-appraisals.index") }}">
                             <div class="card info-card customers-card">
                                 <div class="card-body">
                                     <h5 class="card-title">On Going Appraisals</h5>
@@ -739,10 +760,12 @@
                                     </div>
                                 </div>
                             </div>
+                        </a>
                         </div>
 
                         <!-- Complete Appraisals Card -->
                         <div class="col-xxl-4 col-md-6">
+                            <a href="{{ route("uncst-appraisals.index") }}">
                             <div class="card info-card customers-card">
                                 <div class="card-body">
                                     <h5 class="card-title">Complete Appraisals</h5>
@@ -758,9 +781,11 @@
                                     </div>
                                 </div>
                             </div>
+                        </a>
                         </div>
 
                         <div class="col-xxl-4 col-md-6">
+                            <a href="{{ route("uncst-appraisals.index") }}">
                             <div class="card info-card customers-card">
                                 <div class="card-body">
                                     <h5 class="card-title">Pending Appraisals</h5>
@@ -776,6 +801,7 @@
                                     </div>
                                 </div>
                             </div>
+                            </a>
                         </div>
 
                         <!-- Complete Appraisals Card -->
