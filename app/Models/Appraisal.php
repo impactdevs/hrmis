@@ -179,6 +179,7 @@ class Appraisal extends Model
     }
 
 
+
     public function getHasSomeDraftAttribute()
     {
 

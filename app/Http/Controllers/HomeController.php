@@ -34,21 +34,46 @@ class HomeController extends Controller
 
         $employee = auth()->user()->employee; // Assuming you have a relationship set up
 
-        $appraisals = Appraisal::count();
-
-        $pendingAppraisals = Appraisal::whereNull('appraisal_request_status->HR')
+        $appraisals = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
+            ->where('appraisal_drafts.is_submitted', true)
             ->count();
 
-            //appraisals waiting for ES' approval
-
-        $ongoingAppraisals = Appraisal::whereJsonContains('appraisal_request_status', ['HR' => 'approved'])
-            ->whereNull('appraisal_request_status->Executive Secretary')
+        $pendingAppraisals = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
+            ->where('appraisal_drafts.is_submitted', false)
+            ->where(function ($query) {
+                $query->where('appraisal_drafts.employee_id', auth()->user()->employee->employee_id);
+            })
             ->count();
 
 
-        $completeAppraisals = Appraisal::whereJsonContains('appraisal_request_status', ['HR' => 'approved'])
-            ->whereJsonContains('appraisal_request_status', ['Executive Secretary' => 'approved'])
-            ->count();
+
+        //submitted appraisals to H.O.D
+        $submittedAppraisalsBystaff = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
+            ->whereNull('appraisals.appraisal_request_status')
+            ->where('appraisal_drafts.is_submitted', true)
+            ->get();
+
+
+        //appraisals submitted to the H.R
+        $submittedAppraisalsByHoD = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
+            ->whereJsonContains('appraisal_request_status', ['Head of Division' => 'approved'])
+            ->whereNull("appraisal_request_status->HR")
+            ->where('appraisal_drafts.is_submitted', true)
+            ->get();
+
+        //to the E.S
+        $submittedAppraisalsByHR = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
+            ->whereJsonContains('appraisal_request_status', ['Head of Division' => 'approved', 'HR' => 'approved', 'Executive Secretary' => 'approved'])
+            ->where('appraisal_drafts.is_submitted', true)
+            ->get();
+
+        $ongoingAppraisals = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
+            ->where('appraisal_drafts.is_submitted', true)
+            ->where(function ($query) {
+                $query->where('appraisal_drafts.employee_id', auth()->user()->employee->employee_id);
+            })
+            ->get();
+
         // contracts
         $contracts = Contract::whereTodayOrAfter('end_date')->get();
 
@@ -58,8 +83,6 @@ class HomeController extends Controller
 
         $leaveTypes = LeaveType::all()->keyBy('leave_type_id');
 
-        // //ongoing appraisals
-        // $ongoingAppraisals = Appraisal::where('employee_id', optional(auth()->user()->employee)->employee_id)->count();
 
 
         $isAdmin = auth()->user()->isAdminOrSecretary;
@@ -255,7 +278,7 @@ class HomeController extends Controller
         $user = User::find(auth()->id());
         $notifications = $user->unreadNotifications()->latest()->take(10)->get();
 
-        return view('dashboard.index', compact('number_of_employees', 'notifications', 'contracts', 'runningContracts', 'expiredContracts', 'attendances', 'available_leave', 'hours', 'todayCounts', 'yesterdayCounts', 'lateCounts', 'chartDataJson', 'leaveTypesJson', 'chartEmployeeDataJson', 'events', 'trainings', 'entries', 'appraisals', 'leaveApprovalData', 'totalLeaves', 'totalDays', 'todayBirthdays', 'isAdmin', 'completeAppraisals', 'ongoingAppraisals', 'pendingAppraisals'));
+        return view('dashboard.index', compact('number_of_employees', 'ongoingAppraisals','submittedAppraisalsBystaff', 'pendingAppraisals', 'submittedAppraisalsByHR', 'submittedAppraisalsByHoD', 'notifications', 'contracts', 'runningContracts', 'expiredContracts', 'attendances', 'available_leave', 'hours', 'todayCounts', 'yesterdayCounts', 'lateCounts', 'chartDataJson', 'leaveTypesJson', 'chartEmployeeDataJson', 'events', 'trainings', 'entries', 'appraisals', 'leaveApprovalData', 'totalLeaves', 'totalDays', 'todayBirthdays', 'isAdmin'));
     }
 
     public function agree()

@@ -2,7 +2,6 @@
     <section class="m-2 section dashboard">
         @if (auth()->user()->isAdminOrSecretary)
             <div class="row">
-
                 <!-- Left side columns -->
                 <div class="col-lg-8">
                     <div class="row">
@@ -52,39 +51,43 @@
                         <div class="col-xxl-4 col-md-6">
                             <div class="card info-card customers-card">
                                 <div class="card-body">
-                                    <h5 class="card-title">Pending Appraisals</h5>
+                                    <h5 class="card-title">Submitted Appraisals</h5>
                                     <div class="d-flex align-items-center">
                                         <div
                                             class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                                             <i class="bi bi-hourglass-split text-warning"></i>
                                         </div>
                                         <div class="ps-3">
-                                            <h6>{{ $pendingAppraisals }}</h6>
-                                            <span class="pt-2 text-muted small ps-1">Pending evaluations</span>
+                                            <h6>{{ $submittedAppraisalsBystaff->count() }}</h6>
+                                            <span class="pt-2 text-muted small ps-1">Appraisals submitted to the
+                                                H.o.D</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Ongoing Appraisals Card -->
-                        <div class="col-xxl-4 col-md-6">
-                            <div class="card info-card customers-card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Ongoing Appraisals</h5>
-                                    <div class="d-flex align-items-center">
-                                        <div
-                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                            <i class="bi bi-arrow-repeat text-primary"></i>
-                                        </div>
-                                        <div class="ps-3">
-                                            <h6>{{ $ongoingAppraisals }}</h6>
-                                            <span class="pt-2 text-muted small ps-1">Awaiting final approval</span>
+                        @if (!auth()->user()->hasRole('Staff'))
+                            <!-- Ongoing Appraisals Card -->
+                            <div class="col-xxl-4 col-md-6">
+                                <div class="card info-card customers-card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">To The H.R</h5>
+                                        <div class="d-flex align-items-center">
+                                            <div
+                                                class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                                <i class="bi bi-arrow-repeat text-primary"></i>
+                                            </div>
+                                            <div class="ps-3">
+                                                <h6>{{ $submittedAppraisalsByHoD->count() }}</h6>Appraisals submitted to
+                                                the
+                                                H.R</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        @endif
 
                         <!-- Complete Appraisals Card -->
                         <div class="col-xxl-4 col-md-6">
@@ -97,8 +100,26 @@
                                             <i class="bi bi-check-circle text-success"></i>
                                         </div>
                                         <div class="ps-3">
-                                            <h6>{{ $completeAppraisals }}</h6>
-                                            <span class="pt-2 text-muted small ps-1">Complete evaluations</span>
+                                            <h6>{{ $submittedAppraisalsByHR->count() }}</h6>
+                                            <span class="pt-2 text-muted small ps-1">Approved By E.S</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xxl-4 col-md-6">
+                            <div class="card info-card customers-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Pending Appraisals</h5>
+                                    <div class="d-flex align-items-center">
+                                        <div
+                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                            <i class="bi bi-check-circle text-success"></i>
+                                        </div>
+                                        <div class="ps-3">
+                                            <h6>{{ $pendingAppraisals }}</h6>
+                                            <span class="pt-2 text-muted small ps-1">Your Draft Appraisals</span>
                                         </div>
                                     </div>
                                 </div>
@@ -279,87 +300,111 @@
                             </div>
 
                         @endif
-                        @if (auth()->user()->hasRole('HR'))
-                            <!-- Ongoing Appraisals -->
-                            <div class="col-12">
-                                <div class="overflow-auto card top-selling">
+                        <!-- Ongoing Appraisals -->
+                        <div class="col-12">
+                            <div class="overflow-auto card top-selling">
 
-                                    <div class="card-body pb-0">
-                                        <div class="d-flex justify-content-between align-items-center mb-3">
-                                            <h5 class="card-title mb-0">
-                                                <i class="bi bi-arrow-repeat text-primary"></i>
-                                                Submitted Appraisals <span
-                                                    class="badge bg-primary">{{ $ongoingAppraisals->count() }}</span>
-                                                <small class="text-muted">(Latest 5)</small>
-                                            </h5>
-                                            <a href="{{ route('uncst-appraisals.index') }}"
-                                                class="btn btn-sm btn-outline-primary">View All</a>
-                                        </div>
-                                        <div class="table-responsive">
-                                            <table class="table align-middle table-hover mb-0">
-                                                <thead class="table-light">
-                                                    <tr>
-                                                        <th scope="col"><i class="bi bi-person"></i> Full Name</th>
-                                                        <th scope="col"><i class="bi bi-diagram-3"></i> Department
-                                                        </th>
-                                                        <th scope="col"><i class="bi bi-calendar-event"></i>
-                                                            Applied On
-                                                        </th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @forelse ($appraisals as $appraisal)
-                                                        @if ($appraisal->has_some_draft && !$appraisal->has_draft)
-                                                            @continue
-                                                        @endif
-                                                        <tr>
-                                                            <td>
-                                                                <div class="d-flex align-items-center gap-2">
-                                                                    <span
-                                                                        class="avatar rounded-circle bg-primary text-white fw-bold"
-                                                                        style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;">
-                                                                        {{ strtoupper(substr($appraisal->employee->first_name, 0, 1)) }}{{ strtoupper(substr($appraisal->employee->last_name ?? $appraisal->employee->first_name, 0, 1)) }}
-                                                                    </span>
-                                                                    <span>
-                                                                        {{ $appraisal->employee->first_name . ' ' . ($appraisal->employee->last_name ?? $appraisal->employee->first_name) }}
-                                                                        <br>
-                                                                        <small
-                                                                            class="text-muted">{{ $appraisal->employee->job_title ?? '' }}</small>
-                                                                    </span>
-                                                                </div>
-                                                            </td>
-                                                            <td>
-                                                                <span class="badge bg-info text-dark">
-                                                                    {{ $appraisal->employee->department->department_name ?? '-' }}
-                                                                </span>
-                                                            </td>
-                                                            <td>
-                                                                <span class="text-nowrap">
-                                                                    <i class="bi bi-clock text-primary"></i>
-                                                                    {{ \Carbon\Carbon::parse($appraisal->created_at)->format('d M, Y') }}
-                                                                </span>
-                                                                <br>
-                                                                <small
-                                                                    class="text-muted">{{ \Carbon\Carbon::parse($appraisal->created_at)->diffForHumans() }}</small>
-                                                            </td>
-                                                        </tr>
-                                                    @empty
-                                                        <tr>
-                                                            <td colspan="3" class="text-center text-muted py-4">
-                                                                <i class="bi bi-emoji-frown fs-2"></i>
-                                                                <div>No ongoing appraisals found.</div>
-                                                            </td>
-                                                        </tr>
-                                                    @endforelse
-                                                </tbody>
-                                            </table>
-                                        </div>
+                                <div class="card-body pb-0">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h5 class="card-title mb-0">
+                                            <i class="bi bi-arrow-repeat text-primary"></i>
+                                            Submitted Appraisals <span class="badge bg-primary"><span
+                                                    class="badge bg-primary">
+
+                                                    @if (auth()->user()->hasRole('Head of Division'))
+                                                        {{ $submittedAppraisalsBystaff->count() }}
+                                                    @elseif(auth()->user()->hasRole('HR'))
+                                                        {{ $submittedAppraisalsByHoD->count() }}
+                                                    @elseif(auth()->user()->hasRole('Executive Secretary'))
+                                                        {{ $submittedAppraisalsByHR->count() }}
+                                                    @endif
+                                                </span></span>
+                                            <small class="text-muted">(Latest 5)</small>
+                                        </h5>
+                                        <a href="{{ route('uncst-appraisals.index') }}"
+                                            class="btn btn-sm btn-outline-primary">View All</a>
                                     </div>
-
+                                    <div class="table-responsive">
+                                        <table class="table align-middle table-hover mb-0">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th scope="col"><i class="bi bi-person"></i> Full Name</th>
+                                                    <th scope="col"><i class="bi bi-diagram-3"></i> Department
+                                                    </th>
+                                                    <th scope="col"><i class="bi bi-calendar-event"></i>
+                                                        Applied On
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @php
+                                                    if (auth()->user()->hasRole('Head of Division')) {
+                                                        $latestAppraisals = $submittedAppraisalsBystaff
+                                                            ->sortByDesc('created_at')
+                                                            ->take(5);
+                                                    } elseif (auth()->user()->hasRole('HR')) {
+                                                        $latestAppraisals = $submittedAppraisalsByHoD
+                                                            ->sortByDesc('created_at')
+                                                            ->take(5);
+                                                    } elseif (auth()->user()->hasRole('Executive Secretary')) {
+                                                        $latestAppraisals = $submittedAppraisalsByHR
+                                                            ->sortByDesc('created_at')
+                                                            ->take(5);
+                                                    } else {
+                                                        $latestAppraisals = collect(); // empty collection
+                                                    }
+                                                @endphp
+                                                @forelse ($latestAppraisals as $appraisal)
+                                                    @if ($appraisal->has_some_draft && !$appraisal->has_draft)
+                                                        @continue
+                                                    @endif
+                                                    <tr>
+                                                        <td>
+                                                            <div class="d-flex align-items-center gap-2">
+                                                                <span
+                                                                    class="avatar rounded-circle bg-primary text-white fw-bold"
+                                                                    style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;">
+                                                                    {{ strtoupper(substr($appraisal->employee->first_name, 0, 1)) }}{{ strtoupper(substr($appraisal->employee->last_name ?? $appraisal->employee->first_name, 0, 1)) }}
+                                                                </span>
+                                                                <span>
+                                                                    {{ $appraisal->employee->first_name . ' ' . ($appraisal->employee->last_name ?? $appraisal->employee->first_name) }}
+                                                                    <br>
+                                                                    <small
+                                                                        class="text-muted">{{ $appraisal->employee->job_title ?? '' }}</small>
+                                                                </span>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <span class="badge bg-info text-dark">
+                                                                {{ $appraisal->employee->department->department_name ?? '-' }}
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <span class="text-nowrap">
+                                                                <i class="bi bi-clock text-primary"></i>
+                                                                {{ \Carbon\Carbon::parse($appraisal->created_at)->format('d M, Y') }}
+                                                            </span>
+                                                            <br>
+                                                            <small
+                                                                class="text-muted">{{ \Carbon\Carbon::parse($appraisal->created_at)->diffForHumans() }}</small>
+                                                        </td>
+                                                    </tr>
+                                                @empty
+                                                    <tr>
+                                                        <td colspan="3" class="text-center text-muted py-4">
+                                                            <i class="bi bi-emoji-frown fs-2"></i>
+                                                            <div>No ongoing appraisals found.</div>
+                                                        </td>
+                                                    </tr>
+                                                @endforelse
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
+
                             </div>
-                            <!-- End Ongoing Appraisals -->
-                        @endif
+                        </div>
+                        <!-- End Ongoing Appraisals -->
                         {{-- <div class="col-12">
                             <div class="card">
 
@@ -620,15 +665,16 @@
                         <div class="col-xxl-4 col-md-6">
                             <div class="card info-card customers-card">
                                 <div class="card-body">
-                                    <h5 class="card-title">Pending Appraisals</h5>
+                                    <h5 class="card-title">Submitted Appraisals</h5>
                                     <div class="d-flex align-items-center">
                                         <div
                                             class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                                             <i class="bi bi-hourglass-split text-warning"></i>
                                         </div>
                                         <div class="ps-3">
-                                            <h6>{{ $pendingAppraisals }}</h6>
-                                            <span class="pt-2 text-muted small ps-1">Pending evaluations</span>
+                                            <h6>{{ $appraisals->count() }}</h6>
+                                            <span class="pt-2 text-muted small ps-1">Appraisals submitted to the
+                                                H.o.D</span>
                                         </div>
                                     </div>
                                 </div>
@@ -639,15 +685,14 @@
                         <div class="col-xxl-4 col-md-6">
                             <div class="card info-card customers-card">
                                 <div class="card-body">
-                                    <h5 class="card-title">Submitted Appraisals</h5>
+                                    <h5 class="card-title">On Going Appraisals</h5>
                                     <div class="d-flex align-items-center">
                                         <div
                                             class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                                             <i class="bi bi-arrow-repeat text-primary"></i>
                                         </div>
                                         <div class="ps-3">
-                                            <h6>{{ $ongoingAppraisals }}</h6>
-                                            <span class="pt-2 text-muted small ps-1">Awaiting final approval</span>
+                                            <h6>{{ $ongoingAppraisals->count() }}</h6>Appraisals in Approval</span>
                                         </div>
                                     </div>
                                 </div>
@@ -665,8 +710,8 @@
                                             <i class="bi bi-check-circle text-success"></i>
                                         </div>
                                         <div class="ps-3">
-                                            <h6>{{ $completeAppraisals }}</h6>
-                                            <span class="pt-2 text-muted small ps-1">Complete evaluations</span>
+                                            <h6>{{ $submittedAppraisalsByHR->count() }}</h6>
+                                            <span class="pt-2 text-muted small ps-1">Approved By E.S</span>
                                         </div>
                                     </div>
                                 </div>
