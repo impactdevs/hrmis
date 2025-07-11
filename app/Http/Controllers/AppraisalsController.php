@@ -240,7 +240,7 @@ class AppraisalsController extends Controller
             $expiredContract = Contract::where('employee_id', $appraisal->employee_id)
                 // ->wherePast('end_date')
                 ->whereNotIn('id', $contractAppraisals)
-                ->orderBy('end_date', 'desc')
+                ->orderBy('created_at', 'desc')
                 ->first();
         }
         return view('appraisals.edit', compact('appraisal', 'users', 'expiredContract', 'draft'));

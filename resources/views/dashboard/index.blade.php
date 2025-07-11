@@ -309,6 +309,9 @@
                                                 </thead>
                                                 <tbody>
                                                     @forelse ($appraisals as $appraisal)
+                                                        @if ($appraisal->has_some_draft && !$appraisal->has_draft)
+                                                            @continue
+                                                        @endif
                                                         <tr>
                                                             <td>
                                                                 <div class="d-flex align-items-center gap-2">
