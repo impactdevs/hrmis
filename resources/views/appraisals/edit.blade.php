@@ -59,7 +59,7 @@
     </div>
 
     <div class="top-0 p-3 toast-container position-fixed start-50 translate-middle-x text-bg-success approval"
-        role="alert" aria-live="assertive" aria-atomic="true">
+        style="margin-left:30%" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="toast-header">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                 class="bi bi-x-octagon-fill text-danger" viewBox="0 0 16 16">
@@ -160,6 +160,11 @@
                                             ];
                                             $selected = old('review_type', $appraisal->review_type ?? '');
                                             $otherValue = old('review_type_other', $appraisal->review_type_other ?? '');
+                                            $showContractDetails = in_array($selected, [
+                                                'confirmation',
+                                                'end_of_contract',
+                                                'mid_financial_year',
+                                            ]);
                                         @endphp
 
                                         @foreach ($options as $value => $text)
@@ -167,12 +172,7 @@
                                                 <input type="radio" name="review_type"
                                                     id="review_type_{{ $value }}" value="{{ $value }}"
                                                     class="form-check-input @error('review_type') is-invalid @enderror"
-                                                    {{ $selected === $value ? 'checked' : '' }}
-                                                    @if ($value === 'end_of_contract') onclick="document.getElementById('expireContractDetails').classList.remove('d-none');document.getElementById('review_type_other_input').classList.add('d-none');"
-                                                    @elseif ($value === 'other')
-                                                        onclick="document.getElementById('expireContractDetails').classList.add('d-none');document.getElementById('review_type_other_input').classList.remove('d-none');"
-                                                    @else 
-                                                        onclick="document.getElementById('expireContractDetails').classList.add('d-none');document.getElementById('review_type_other_input').classList.add('d-none');" @endif>
+                                                    {{ $selected === $value ? 'checked' : '' }}>
                                                 <label class="form-check-label" for="review_type_{{ $value }}">
                                                     {{ $text }}
                                                 </label>
@@ -193,101 +193,35 @@
                                         @enderror
                                     </div>
                                 </div>
-                                <script>
-                                    // Ensure correct visibility on page load
-                                    document.addEventListener('DOMContentLoaded', function() {
-                                        var selected = document.querySelector('input[name="review_type"]:checked');
-                                        var otherInput = document.getElementById('review_type_other_input');
-                                        if (selected && selected.value === 'other') {
-                                            otherInput.classList.remove('d-none');
-                                        } else {
-                                            otherInput.classList.add('d-none');
-                                        }
-                                    });
-                                </script>
                             </div>
 
-                            <div id="expireContractDetails"
-                                class="{{ $selected === 'end_of_contract' ? '' : 'd-none' }}">
-                                {{-- contract --}}
+                            <!-- Contract Details - Visible for confirmation, end_of_contract, and mid_financial_year -->
+                            <div id="contractDetails" class="{{ $showContractDetails ? '' : 'd-none' }}">
                                 @if (isset($expiredContract))
                                     <div class="alert alert-info mt-3">
-                                        <strong>Contract being Appraised Details</strong>
+                                        <strong>Contract Details</strong>
                                         <ul class="mb-0">
                                             <li>
                                                 <strong>Contract Start Date:</strong>
-                                                {{ isset($expiredContract) && $expiredContract->start_date ? $expiredContract->start_date->toDateString() : 'N/A' }}
+                                                {{ $expiredContract->start_date ? $expiredContract->start_date->toDateString() : 'N/A' }}
                                             </li>
                                             <li>
                                                 <strong>Contract End Date:</strong>
-                                                {{ isset($expiredContract) && $expiredContract->end_date ? $expiredContract->end_date->toDateString() : 'N/A' }}
+                                                {{ $expiredContract->end_date ? $expiredContract->end_date->toDateString() : 'N/A' }}
                                             </li>
                                             <li>
                                                 <strong>Contract Description:</strong>
                                                 {{ $expiredContract->description ?? 'N/A' }}
                                             </li>
-                                            <li>
-                                                <strong>Contract Documents:</strong>
-                                                @if (!empty($expiredContract->contract_documents))
-                                                    <div class="flex-wrap gap-2 d-flex">
-                                                        @foreach ($expiredContract->contract_documents as $attachment)
-                                                            <a href="{{ asset('storage/' . $attachment['proof']) }}"
-                                                                target="_blank"
-                                                                class="btn btn-sm btn-outline-secondary d-flex align-items-center">
-                                                                @if (Str::endsWith($attachment['proof'], ['.pdf']))
-                                                                    <i class="fas fa-file-pdf text-danger me-2"></i>
-                                                                @else
-                                                                    <i class="fas fa-file-image text-primary me-2"></i>
-                                                                @endif
-                                                                {{ Str::limit($attachment['title'], 15) }}
-                                                            </a>
-                                                        @endforeach
-                                                    </div>
-                                                @else
-                                                    <span class="text-muted">No attachments</span>
-                                                @endif
-                                            </li>
                                         </ul>
-                                        {{-- Add hidden contract_id input if end_of_contract --}}
-                                        @if ($selected === 'end_of_contract' && isset($expiredContract))
-                                            <input type="hidden" name="contract_id" id="contract_id_input"
-                                                value="{{ $expiredContract->id }}">
-                                        @endif
                                     </div>
                                 @else
                                     <div class="alert alert-warning mt-3">
-                                        No contract expiry details available.
+                                        No contract details available.
                                     </div>
                                 @endif
                             </div>
                         </div>
-
-                        @push('scripts')
-                            <script>
-                                document.addEventListener('DOMContentLoaded', function() {
-                                    // Show/hide contract details on page load if needed
-                                    var selected = document.querySelector('input[name="review_type"]:checked');
-                                    var expireDiv = document.getElementById('expireContractDetails');
-                                    if (selected && selected.value === 'end_of_contract') {
-                                        expireDiv.classList.remove('d-none');
-                                    } else {
-                                        expireDiv.classList.add('d-none');
-                                    }
-
-                                    // Listen for changes
-                                    document.querySelectorAll('input[name="review_type"]').forEach(function(radio) {
-                                        radio.addEventListener('change', function() {
-                                            if (this.value === 'end_of_contract') {
-                                                expireDiv.classList.remove('d-none');
-                                            } else {
-                                                expireDiv.classList.add('d-none');
-
-                                            }
-                                        });
-                                    });
-                                });
-                            </script>
-                        @endpush
 
                         <div class="col-lg-6">
                             <div class="p-3 rounded form-section bg-light">
@@ -309,6 +243,138 @@
                     </div>
                 </div>
             </div>
+
+            @push('scripts')
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        // Get elements
+                        const startDateInput = document.getElementById('appraisal_start_date');
+                        const endDateInput = document.getElementById('appraisal_end_date');
+                        const reviewTypeRadios = document.querySelectorAll('input[name="review_type"]');
+                        const contractDetails = document.getElementById('contractDetails');
+                        const otherInput = document.getElementById('review_type_other_input');
+
+                        // Get contract data if available
+                        const contractData = @json(isset($expiredContract)
+                                ? [
+                                    'start_date' => $expiredContract->start_date->toDateString(),
+                                    'end_date' => $expiredContract->end_date->toDateString(),
+                                ]
+                                : null);
+
+                        // Function to set date inputs readonly state
+                        function setDateInputsReadonly(isReadonly) {
+                            startDateInput.readOnly = isReadonly;
+                            endDateInput.readOnly = isReadonly;
+
+                            // Toggle styling to indicate readonly state
+                            if (isReadonly) {
+                                startDateInput.classList.add('bg-light', 'readonly-input');
+                                endDateInput.classList.add('bg-light', 'readonly-input');
+                            } else {
+                                startDateInput.classList.remove('bg-light', 'readonly-input');
+                                endDateInput.classList.remove('bg-light', 'readonly-input');
+                            }
+                        }
+
+                        // Function to show/hide contract details
+                        function toggleContractDetails(show) {
+                            if (show) {
+                                contractDetails.classList.remove('d-none');
+                            } else {
+                                contractDetails.classList.add('d-none');
+                            }
+                        }
+
+                        // Function to show/hide other input
+                        function toggleOtherInput(show) {
+                            if (show) {
+                                otherInput.classList.remove('d-none');
+                            } else {
+                                otherInput.classList.add('d-none');
+                            }
+                        }
+
+                        // Function to calculate financial year dates
+                        function getFinancialYearDates() {
+                            const now = new Date();
+                            const currentYear = now.getFullYear();
+                            const previousYear = currentYear - 1;
+
+                            return {
+                                start: `${previousYear}-07-01`,
+                                end: `${currentYear}-06-30`
+                            };
+                        }
+
+                        // Function to set dates based on review type
+                        function setDatesForReviewType(reviewType) {
+                            if (!reviewType) return;
+
+                            switch (reviewType) {
+                                case 'confirmation':
+                                    if (contractData) {
+                                        startDateInput.value = contractData.start_date;
+                                        // Add 6 months to start date
+                                        const startDate = new Date(contractData.start_date);
+                                        const endDate = new Date(startDate.setMonth(startDate.getMonth() + 6));
+                                        endDateInput.value = endDate.toISOString().split('T')[0];
+                                    }
+                                    setDateInputsReadonly(true);
+                                    toggleContractDetails(true);
+                                    toggleOtherInput(false);
+                                    break;
+
+                                case 'end_of_contract':
+                                    if (contractData) {
+                                        startDateInput.value = contractData.start_date;
+                                        endDateInput.value = contractData.end_date;
+                                    }
+                                    setDateInputsReadonly(true);
+                                    toggleContractDetails(true);
+                                    toggleOtherInput(false);
+                                    break;
+
+                                case 'mid_financial_year':
+                                    const fyDates = getFinancialYearDates();
+                                    startDateInput.value = fyDates.start;
+                                    endDateInput.value = fyDates.end;
+                                    setDateInputsReadonly(true);
+                                    toggleContractDetails(true);
+                                    toggleOtherInput(false);
+                                    break;
+
+                                case 'other':
+                                    // Clear dates and make editable
+                                    startDateInput.value = '';
+                                    endDateInput.value = '';
+                                    setDateInputsReadonly(false);
+                                    toggleContractDetails(false);
+                                    toggleOtherInput(true);
+                                    break;
+                            }
+                        }
+
+                        // Set initial state on page load
+                        const initialReviewType = document.querySelector('input[name="review_type"]:checked')?.value;
+                        setDatesForReviewType(initialReviewType);
+
+                        // Update dates when review type changes
+                        reviewTypeRadios.forEach(radio => {
+                            radio.addEventListener('change', function() {
+                                setDatesForReviewType(this.value);
+                            });
+                        });
+                    });
+                </script>
+            @endpush
+
+            <style>
+                .readonly-input {
+                    cursor: not-allowed;
+                    background-color: #e9ecef !important;
+                }
+            </style>
 
 
             <!-- APPRAISAL INFORMATION -->
