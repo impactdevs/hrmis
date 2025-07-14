@@ -120,28 +120,28 @@ class HomeController extends Controller
         $leaveRequests = Leave::where('end_date', '>', $today)->get();
         //number of employees
         $number_of_employees = Employee::count();
-        $attendances = Attendance::whereDate('attendance_date', $today)->count();
+        $attendances = Attendance::whereDate('access_date_and_time', $today)->count();
         $available_leave = Leave::count();
         //count the number of clockins per hour
         $clockInCounts = DB::table('attendances')
-            ->select(DB::raw('HOUR(clock_in) as hour'), DB::raw('count(*) as count'))
-            ->whereDate('attendance_date', $today)
+            ->select(DB::raw('HOUR(access_time) as hour'), DB::raw('count(*) as count'))
+            ->whereDate('access_date_and_time', $today)
             ->groupBy('hour')
             ->orderBy('hour')
             ->get();
         // Query to count clock-ins per hour for yesterday
         $yesterdayClockInCounts = DB::table('attendances')
-            ->select(DB::raw('HOUR(clock_in) as hour'), DB::raw('count(*) as count'))
-            ->whereDate('attendance_date', $yesterday)
+            ->select(DB::raw('HOUR(access_time) as hour'), DB::raw('count(*) as count'))
+            ->whereDate('access_date_and_time', $yesterday)
             ->groupBy('hour')
             ->orderBy('hour')
             ->get();
 
         // Query for late arrivals (e.g., after 9 AM)
         $lateArrivalCounts = DB::table('attendances')
-            ->select(DB::raw('HOUR(clock_in) as hour'), DB::raw('count(*) as count'))
-            ->whereDate('attendance_date', $today)
-            ->where('clock_in', '>', Carbon::today()->setHour(9))
+            ->select(DB::raw('HOUR(access_time) as hour'), DB::raw('count(*) as count'))
+            ->whereDate('access_date_and_time', $today)
+            ->where('access_time', '>', Carbon::today()->setHour(9))
             ->groupBy('hour')
             ->orderBy('hour')
             ->get();
