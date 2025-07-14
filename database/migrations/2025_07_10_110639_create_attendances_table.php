@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string("staff_id");
             $table->datetime('access_date_and_time');
             $table->date('access_date');
-            $table->date('access_time');
+            $table->time('access_time');
         });
     }
 
