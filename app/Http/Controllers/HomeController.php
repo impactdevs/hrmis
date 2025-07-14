@@ -14,9 +14,7 @@ use App\Models\Training;
 use Carbon\Carbon;
 use App\Models\Event;
 use App\Models\User;
-use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Request;
 
 class HomeController extends Controller
 {
@@ -54,10 +52,21 @@ class HomeController extends Controller
             ->get();
 
 
-        //appraisals submitted to the H.R
         $submittedAppraisalsByHoD = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
-            ->whereJsonContains('appraisal_request_status', ['Head of Division' => 'approved'])
-            ->whereNull("appraisal_request_status->HR")
+            ->where(function ($query) {
+                $query->whereJsonContains('appraisals.appraisal_request_status', ['Head of Division' => 'approved'])
+                    ->orWhereExists(function ($subQuery) {
+                        $subQuery->select(DB::raw(1))
+                            ->from('employees')
+                            ->join('users', 'users.id', '=', 'employees.user_id')
+                            ->join('model_has_roles', 'model_has_roles.model_id', '=', 'users.id')
+                            ->whereColumn('employees.employee_id', 'appraisals.appraiser_id')
+                            ->where('model_has_roles.model_type', User::class)
+                            ->where('roles.name', 'HR')
+                            ->join('roles', 'roles.id', '=', 'model_has_roles.role_id');
+                    });
+            })
+            ->whereNull("appraisals.appraisal_request_status->HR")
             ->where('appraisal_drafts.is_submitted', true)
             ->get();
 
@@ -278,7 +287,7 @@ class HomeController extends Controller
         $user = User::find(auth()->id());
         $notifications = $user->unreadNotifications()->latest()->take(10)->get();
 
-        return view('dashboard.index', compact('number_of_employees', 'ongoingAppraisals','submittedAppraisalsBystaff', 'pendingAppraisals', 'submittedAppraisalsByHR', 'submittedAppraisalsByHoD', 'notifications', 'contracts', 'runningContracts', 'expiredContracts', 'attendances', 'available_leave', 'hours', 'todayCounts', 'yesterdayCounts', 'lateCounts', 'chartDataJson', 'leaveTypesJson', 'chartEmployeeDataJson', 'events', 'trainings', 'entries', 'appraisals', 'leaveApprovalData', 'totalLeaves', 'totalDays', 'todayBirthdays', 'isAdmin'));
+        return view('dashboard.index', compact('number_of_employees', 'ongoingAppraisals', 'submittedAppraisalsBystaff', 'pendingAppraisals', 'submittedAppraisalsByHR', 'submittedAppraisalsByHoD', 'notifications', 'contracts', 'runningContracts', 'expiredContracts', 'attendances', 'available_leave', 'hours', 'todayCounts', 'yesterdayCounts', 'lateCounts', 'chartDataJson', 'leaveTypesJson', 'chartEmployeeDataJson', 'events', 'trainings', 'entries', 'appraisals', 'leaveApprovalData', 'totalLeaves', 'totalDays', 'todayBirthdays', 'isAdmin'));
     }
 
     public function agree()
