@@ -24,18 +24,21 @@ class Attendance extends Model
     // Specify the type of the primary key
     protected $keyType = 'string';
 
-    // The attributes that are mass assignable
     protected $fillable = [
         'attendance_id',
-        'employee_id',
-        'attendance_date', // Corrected this line
-        'clock_in'
+        'staff_id',
+        'access_date_and_time',
+        'access_date',
+        'access_time',
     ];
 
-    // Cast attributes to specific types
     protected $casts = [
-        'attendance_date' => 'date',
+        'access_date_and_time' => 'datetime',
+        'access_date' => 'date',
+        'access_time' => 'datetime:H:i:s',
     ];
+
+        public $timestamps = false;
 
     // Model boot method
     protected static function boot()

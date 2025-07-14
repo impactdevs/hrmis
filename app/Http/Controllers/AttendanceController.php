@@ -6,6 +6,8 @@ use App\Models\Attendance;
 use App\Models\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+
 
 class AttendanceController extends Controller
 {
@@ -65,27 +67,26 @@ class AttendanceController extends Controller
         return view('attendances.show', compact('attendance'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function store_api(Request $request)
     {
-        //
-    }
+        $validated = $request->validate([
+            'staff_id' => 'required|string',
+            'access_date_and_time' => 'required|date',
+        ]);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+        $datetime = date('Y-m-d H:i:s', strtotime($validated['access_date_and_time']));
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $attendance = Attendance::create([
+            'attendance_id' => Str::uuid(),
+            'staff_id' => $validated['staff_id'],
+            'access_date_and_time' => $datetime,
+            'access_date' => date('Y-m-d', strtotime($datetime)),
+            'access_time' => date('H:i:s', strtotime($datetime)),
+        ]);
+
+        return response()->json([
+            'message' => 'Attendance recorded successfully',
+            'data' => $attendance
+        ], 201);
     }
 }
