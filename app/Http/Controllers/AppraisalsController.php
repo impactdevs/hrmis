@@ -299,8 +299,7 @@ class AppraisalsController extends Controller
                     }
                 }
             }
-        }
-    }
+
 
 
         // Handle draft logic
