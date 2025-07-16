@@ -1,14 +1,6 @@
 <x-app-layout>
     <div class="mt-3">
-        <div class="flex-row flex-1 d-flex justify-content-between">
-            @can('can add a whistleblower')
-                <div>
-                    <a href="{{ route('whistleblower.create') }}" class="btn border-t-neutral-50 btn-primary">
-                        <i class="bi bi-database-add me-2"></i>Add whistleblower
-                    </a>
-                </div>
-            @endcan
-        </div>
+        
             <div class="table-wrapper">
                 <table class="table table-striped">
                     <thread>

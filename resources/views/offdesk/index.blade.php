@@ -1,5 +1,6 @@
 <x-app-layout>
     <div class="mt-3">
+        @if (auth()->user()->hasRole('Staff'))
         <div class="d-flex justify-content-between">
             @can('create offdesk')
                 <a href="{{ route('offdesk.create') }}" class="btn btn-primary">
@@ -7,6 +8,7 @@
                 </a>
             @endcan
         </div>
+        @endif
 
         <div class="table-wrapper mt-3">
             <table class="table table-striped">
@@ -18,6 +20,7 @@
                         <th>End</th>
                         <th>Destination</th>
                         <th>Duty Allocated</th>
+                        <th>Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -30,6 +33,16 @@
                             <td>{{ $entry->end_datetime }}</td>
                             <td>{{ $entry->destination }}</td>
                             <td>{{ $entry->duty_allocated }}</td>
+                            <td>
+                                @if ($entry->status === 'approved')
+                                    <span class="badge bg-success">Approved</span>
+                                @elseif ($entry->status === 'declined')
+                                    <span class="badge bg-danger">Declined</span>
+                                @else
+                                    <span class="badge bg-secondary">Pending</span>
+                                @endif
+                            </td>
+
                             <td class="d-flex gap-2">
                                 <a href="{{ route('offdesk.show', $entry->off_desk_id) }}" class="btn btn-sm btn-info">View</a>
                                 <a href="{{ route('offdesk.edit', $entry->off_desk_id) }}" class="btn btn-sm btn-warning">Edit</a>

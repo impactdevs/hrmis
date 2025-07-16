@@ -154,7 +154,13 @@ Route::get('/whistleblowers/{id}', [WhistleblowerController::class, 'show']); //
 
 
 Route::resource('workfromhome', WorkFromHomeController::class);
+Route::patch('/workfromhome/{id}/approve', [WorkFromHomeController::class, 'approve'])->name('workfromhome.approve');
+Route::patch('/workfromhome/{id}/decline', [WorkFromHomeController::class, 'decline'])->name('workfromhome.decline');
+
 Route::resource('offdesk', OffDeskController::class);
+Route::patch('/offdesk/{id}/approve', [OffDeskController::class, 'approve'])->name('offdesk.approve');
+Route::patch('/offdesk/{id}/decline', [OffDeskController::class, 'decline'])->name('offdesk.decline');
+
 
 
 

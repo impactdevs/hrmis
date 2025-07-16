@@ -83,4 +83,38 @@ class OffDeskController extends Controller
 
         return redirect()->route('offdesk.index')->with('success', 'Off desk record deleted.');
     }
+
+    public function approve($id)
+{
+    $entry = OffDesk::findOrFail($id);
+
+    if (!auth()->user()->hasRole('HR')) {
+        abort(403);
+    }
+
+    $entry->update(['status' => 'approved']);
+
+    return redirect()->route('offdesk.show', $id)->with('success', 'Request approved.');
+}
+
+public function decline(Request $request, $id)
+{
+    $entry = OffDesk::findOrFail($id);
+
+    if (!auth()->user()->hasRole('HR')) {
+        abort(403);
+    }
+
+    $request->validate([
+        'decline_reason' => 'required|string|max:1000',
+    ]);
+
+    $entry->update([
+        'status' => 'declined',
+        'decline_reason' => $request->decline_reason,
+    ]);
+
+    return redirect()->route('offdesk.show', $id)->with('success', 'Request declined.');
+}
+
 }

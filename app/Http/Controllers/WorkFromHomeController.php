@@ -56,20 +56,15 @@ class WorkFromHomeController extends Controller
                 'employee_id' => $employeeId,
             ]);
 
-            // Save each task
-            $startDates = $request->input('task_start_date', []);
-            $endDates = $request->input('task_end_date', []);
-            $descriptions = $request->input('description', []);
-
-            foreach ($descriptions as $index => $desc) {
-                Task::create([
-                    'task_id' => \Str::uuid(),
-                    'work_from_home_id' => $workFromHome->work_from_home_id,
-                    'start_date'        => $startDates[$index],
-                    'end_date'          => $endDates[$index] ?? $desc,
-                    'description'       => $desc,
-                ]);
-            }
+            if ($request->has('task_start_date')) {
+    foreach ($request->task_start_date as $index => $start) {
+        $workFromHome->task()->create([
+            'task_start_date' => $start,
+            'task_end_date'   => $request->task_end_date[$index],
+            'description'     => $request->description[$index],
+        ]);
+    }
+}
 
             DB::commit();
 
@@ -123,4 +118,38 @@ class WorkFromHomeController extends Controller
 
         return redirect()->route('workfromhome.index')->with('success', 'Work from home request deleted.');
     }
+
+    public function approve($id)
+    {
+        $entry = WorkFromHome::findOrFail($id);
+
+        if (!auth()->user()->hasRole('HR')) {
+            abort(403);
+        }
+
+        $entry->update(['status' => 'approved']);
+
+        return redirect()->route('workfromhome.show', $id)->with('success', 'Request approved.');
+    }
+
+    public function decline(Request $request, $id)
+    {
+        $entry = WorkFromHome::findOrFail($id);
+
+        if (!auth()->user()->hasRole('HR')) {
+            abort(403);
+        }
+
+        $request->validate([
+            'decline_reason' => 'required|string|max:1000',
+        ]);
+
+        $entry->update([
+            'status' => 'declined',
+            'decline_reason' => $request->decline_reason,
+        ]);
+
+        return redirect()->route('workfromhome.show', $id)->with('success', 'Request declined.');
+    }
+
 }

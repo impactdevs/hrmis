@@ -25,6 +25,8 @@ class OffDesk extends Model
         'destination',
         'duty_allocated',
         'reason',
+        'status',
+        'decline_reason',
     ];
 
 

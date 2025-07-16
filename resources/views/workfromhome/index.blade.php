@@ -1,5 +1,6 @@
 <x-app-layout>
     <div class="mt-3">
+         @if (auth()->user()->hasRole('Staff'))
         <div class="flex-row flex-1 d-flex justify-content-between">
             @can('can add work from home request')
                 <div>
@@ -9,6 +10,7 @@
                 </div>
             @endcan
         </div>
+        @endif
 
         <div class="table-wrapper mt-3">
             <table class="table table-striped">
@@ -18,11 +20,13 @@
                         <th scope="col">Employee</th>
                         <th scope="col">Start Date</th>
                         <th scope="col">End Date</th>
+                        <th scope="col">Status</th>
                         <!-- <th scope="col">Reason</th>
                         <th scope="col">Location</th>
                         <th scope="col">Attachment</th>
                         <th scope="col">Task</th> -->
                         <th scope="col">Actions</th>
+
                     </tr>
                 </thead>
                 <tbody>
@@ -32,6 +36,16 @@
                             <td>{{ $entry->employee->full_name ?? 'N/A' }}</td>
                             <td>{{ $entry->work_from_home_start_date }}</td>
                             <td>{{ $entry->work_from_home_end_date }}</td>
+                            <td>
+                                @if ($entry->status === 'approved')
+                                    <span class="badge bg-success">Approved</span>
+                                @elseif ($entry->status === 'declined')
+                                    <span class="badge bg-danger">Declined</span>
+                                @else
+                                    <span class="badge bg-secondary">Pending</span>
+                                @endif
+                            </td>
+
                             <!-- <td>{{ $entry->work_from_home_reason }}</td>
                             <td>{{ $entry->work_location }}</td>
 
@@ -56,6 +70,11 @@
                                 @endif
                             </td> -->
                             <td class="d-flex gap-2">
+
+                                <a href="{{ route('workfromhome.show', $entry->work_from_home_id) }}" class="btn btn-sm btn-info">
+                                    View
+                                </a>
+                                
                                 @can('edit work from home request')
                                     <a href="{{ route('workfromhome.edit', $entry->work_from_home_id) }}" class="btn btn-sm btn-warning">
                                         Edit
@@ -70,9 +89,7 @@
                                     </form>
                                 @endcan
 
-                                <a href="{{ route('workfromhome.show', $entry->work_from_home_id) }}" class="btn btn-sm btn-info">
-                                    View
-                                </a>
+
                             </td>
                         </tr>
                     @empty

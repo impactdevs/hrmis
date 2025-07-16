@@ -26,6 +26,8 @@ class WorkFromHome extends Model
         'work_from_home_attachments',
         'work_location',
         'task_id',
+        'status',
+        'decline_reason',
     ];
 
 

@@ -125,6 +125,17 @@
                 </li>
             @endif
 
+            @if (auth()->user()->hasRole('Staff'))
+                <li class="nav-item">
+                <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('whistleblower.create')) bg-secondary @endif"
+                    href="{{ route('whistleblower.create') }}">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Make Complaint
+                </a>
+            </li>
+            @endif
+
+            @if (auth()->user()->hasRole('HR'))
                 <li class="nav-item">
                     <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('whistleblower.index') || request()->routeIs('whistleblower.show')) bg-secondary @endif"
                         href="{{ route('whistleblower.index') }}">
@@ -132,6 +143,7 @@
                         WhistleBlower
                     </a>
                 </li>
+            @endif
 
                 <li class="nav-item">
                     <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('workfromhome.index') || request()->routeIs('workfromhome.show')) bg-secondary @endif"
