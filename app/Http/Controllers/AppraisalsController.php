@@ -275,27 +275,27 @@ class AppraisalsController extends Controller
 
         // Default message
         $message = "Appraisal has been submitted successfully.";
+       if (isset($requestedData['relevant_documents']) && filled($requestedData['relevant_documents']) && is_array($requestedData['relevant_documents'])) {
+                foreach ($requestedData['relevant_documents'] as $key => $value) {
+                    // Ensure $value is an array to avoid undefined index
+                    if (!is_array($value)) {
+                        continue;
+                    }
 
-        if (filled($requestedData['relevant_documents']) && is_array($requestedData['relevant_documents'])) {
-            foreach ($requestedData['relevant_documents'] as $key => $value) {
-                // Ensure $value is an array to avoid undefined index
-                if (!is_array($value)) {
-                    continue;
-                }
+                    // Handle when proof is not set or null, fallback to existing
+                    if (!array_key_exists('proof', $value) || $value['proof'] === null) {
+                        $requestedData['relevant_documents'][$key]['proof'] = $uncst_appraisal['relevant_documents'][$key]['proof'] ?? null;
+                    }
 
-                // Handle when proof is not set or null, fallback to existing
-                if (!array_key_exists('proof', $value) || $value['proof'] === null) {
-                    $requestedData['relevant_documents'][$key]['proof'] = $uncst_appraisal['relevant_documents'][$key]['proof'] ?? null;
-                }
+                    // Check if a new file is uploaded for this document
+                    if ($request->hasFile("relevant_documents.$key.proof")) {
+                        $file = $request->file("relevant_documents.$key.proof");
 
-                // Check if a new file is uploaded for this document
-                if ($request->hasFile("relevant_documents.$key.proof")) {
-                    $file = $request->file("relevant_documents.$key.proof");
-
-                    // Double-check it's a valid upload
-                    if ($file && $file->isValid()) {
-                        $filePath = $file->store('proof_documents', 'public');
-                        $requestedData['relevant_documents'][$key]['proof'] = $filePath;
+                        // Double-check it's a valid upload
+                        if ($file && $file->isValid()) {
+                            $filePath = $file->store('proof_documents', 'public');
+                            $requestedData['relevant_documents'][$key]['proof'] = $filePath;
+                        }
                     }
                 }
             }
