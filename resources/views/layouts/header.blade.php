@@ -132,7 +132,7 @@
                     $title = 'Applying for leave';
                 }
 
-                
+
 
                 if (request()->routeIs('salary-advances.index')) {
                     $title = 'Salary Advances';
@@ -161,6 +161,46 @@
                 if (request()->routeIs('departments.index')) {
                     $title = 'Departments';
                 }
+
+                if (request()->routeIs('whistleblower.index')){
+                    $title = 'Whistleblowers';
+                }
+
+                    if (request()->routeIs('whistleblower.show')) {
+                    $title = 'Whistleblowers';
+                }
+
+                if (request()->routeIs('whistleblower.create')) {
+                    $title = 'Add whistleblower';
+                }
+
+                 if (request()->routeIs('workfromhome.index')){
+                    $title = 'Work From Home';
+                }
+
+                 if (request()->routeIs('workfromhome.create')){
+                    $title = ' Add Work From Home Record';
+                }
+
+
+                    if (request()->routeIs('workfromhome.show')) {
+                    $title = 'Work From Home Records';
+                }
+
+                if (request()->routeIs('offdesk.index')){
+                    $title = 'Off Desk';
+                }
+
+                    if (request()->routeIs('offdesk.create')){
+                    $title = ' Add Off Desk Record';
+                }
+
+                if (request()->routeIs('offdesk.show')){
+                    $title = 'Off Desk Records';
+                }
+
+
+
             @endphp
 
             {{ $title }}

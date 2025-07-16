@@ -8,15 +8,17 @@ use Illuminate\View\ComponentAttributeBag;
 
 class TextArea extends Component
 {
+    public string $id;
     public function __construct(
         public string $name,
         public string $label,
-        public string $id,
+        string $id = null,
         public ?string $value = null, // Optional value for pre-filling
         public bool $isDisabled = false,
         public bool $isDraft = false
     ) {
-    }
+        $this->id = $id ?? $name;
+       }
 
     public function render(): View|Closure|string
     {
