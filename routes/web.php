@@ -32,6 +32,10 @@ use App\Http\Controllers\TrainingController;
 use App\Http\Controllers\UploadEmployees;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\WhistleblowingController;
+use App\Http\Controllers\WhistleblowerController;
+use App\Http\Controllers\WorkFromHomeController;
+use App\Http\Controllers\OffDeskController;
+
 use App\Models\Employee;
 use App\Models\StaffRecruitment;
 use Illuminate\Support\Facades\Route;
@@ -149,6 +153,19 @@ Route::post('uncst-whistleblowing-form', [WhistleblowingController::class, 'stor
 Route::get('whistleblowing', [WhistleblowingController::class, 'index'])->middleware(['auth'])->name('whistleblowing.index');
 Route::get('whistleblowing/{id}', [WhistleblowingController::class, 'show'])->name('whistleblowing.show');
 Route::get("uncst-thank-you-for-the-report", [WhistleblowingController::class, 'thankyou'])->name('whistle.thankyou');
+
+
+
+Route::post('/whistleblowers', [WhistleblowerController::class, 'store'])->name('whistleblower.store');// Public
+Route::get('/whistleblowers', [WhistleblowerController::class, 'index'])->name('whistleblower.index');
+Route::get('/whistleblowers/create', [WhistleblowerController::class, 'create'])->name('whistleblower.create');
+Route::get('/whistleblowers/{id}', [WhistleblowerController::class, 'show']); // Admin
+
+
+Route::resource('workfromhome', WorkFromHomeController::class);
+Route::resource('offdesk', OffDeskController::class);
+
+
 
 
 

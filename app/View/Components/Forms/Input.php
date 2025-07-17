@@ -8,6 +8,7 @@ use Illuminate\View\Component;
 class Input extends Component
 {
 
+    public string $id;
     /**
      * Create a new component instance.
      */
@@ -15,7 +16,7 @@ class Input extends Component
         public string $name,
         public string $type,
         public string $label,
-        public string $id,
+         string $id = null,
         public string $placeholder = '', // Default value provided here
         public string $value = '', // Default value provided here
         public bool $isDisabled = false,
@@ -23,9 +24,11 @@ class Input extends Component
         public ?int $max = null   // Optional max
 
     )
-    {
-        //
+
+        {
+        $this->id = $id ?? $name;
     }
+
 
     /**
      * Get the view / contents that represent the component.

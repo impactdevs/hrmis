@@ -93,7 +93,6 @@
                 </a>
             </li>
 
-
             <li class="nav-item">
                 @php
                     $currentUrl = auth()->user()->isAdminOrSecretary ? 'employees.index' : 'employees.show';
@@ -140,6 +139,30 @@
                     </a>
                 </li>
             @endif
+
+                <li class="nav-item">
+                    <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('whistleblower.index') || request()->routeIs('whistleblower.show')) bg-secondary @endif"
+                        href="{{ route('whistleblower.index') }}">
+                        <i class="fas fa-user-secret text-white-600"></i>
+                        WhistleBlower
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('workfromhome.index') || request()->routeIs('workfromhome.show')) bg-secondary @endif"
+                        href="{{ route('workfromhome.index') }}">
+                        <i class="bi bi-house-check"></i>
+                        Work From Home
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('offdesk.index') || request()->routeIs('offdesk.show')) bg-secondary @endif"
+                        href="{{ route('offdesk.index') }}">
+                        <i class="bi bi-briefcase"></i>
+                        Off Desk
+                    </a>
+                </li>
         </ul>
         @if (auth()->user()->hasRole('HR'))
             <h6

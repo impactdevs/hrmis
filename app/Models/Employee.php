@@ -275,4 +275,10 @@ class Employee extends Model
     {
         return $this->hasMany(Contract::class, 'employee_id', 'employee_id')->withoutGlobalScopes();
     }
+
+    public function getFullNameAttribute()
+{
+    return "{$this->first_name} {$this->last_name}";
+}
+
 }
