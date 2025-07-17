@@ -130,7 +130,7 @@
                         </li>
                         <li class="mb-0">
                             In cases where information to be filled in form does not fit in the space provided, the back
-                            face of the same sheet may be used with an indication of a “PTO” where applicable.
+                            face of the same sheet may be used with an indication of a "PTO" where applicable.
                         </li>
                     </ol>
                 </div>
@@ -576,7 +576,7 @@
                     <h4 class="mb-0">SECTION 2</h4>
                     <small class="fw-light">(To be completed by Staff Under Review (Appraisee) and Supervisor
                         (Appraiser))</small>
-                    <p>The Appraiser should take into consideration the Appraisee’s job description and the actual
+                    <p>The Appraiser should take into consideration the Appraisee's job description and the actual
                         activities
                         performed and outputs produced, constraints encountered as described by the Appraisee in Section
                         1, as
@@ -728,7 +728,7 @@
                                                         min="0" max="6" step="0.5"
                                                         value="{{ $agreedScore }}"
                                                         @if ($appraisal->is_appraisee) readonly @endif
-                                                        oninput="updateOverallAverage()">
+                                                        oninput="updateKeyDutiesOverall()">
                                                 @endif
                                             </td>
 
@@ -801,6 +801,15 @@
                                         </td>
                                     </tr>
                                 </tbody>
+                                <tfoot>
+                                    <tr class="bg-blue-100 font-semibold">
+                                        <td class="px-6 py-3 border border-gray-200 text-end" colspan="3">Total</td>
+                                        <td class="px-6 py-3 border border-gray-200 text-center" id="supervisee-total"></td>
+                                        <td class="px-6 py-3 border border-gray-200 text-center" id="supervisor-total"></td>
+                                        <td class="px-6 py-3 border border-gray-200 text-center" id="agreed-total"></td>
+                                        <td class="px-6 py-3 border border-gray-200"></td>
+                                    </tr>
+                                </tfoot>
                             </table>
 
                             @push('scripts')
@@ -872,7 +881,7 @@
                                                 min="0" max="6" step="0.5"
                                                 value="0"
                                                 ${canAppraisee ? 'readonly' : ''}
-                                                oninput="updateOverallAverage()">
+                                                oninput="updateKeyDutiesOverall()">
                                         </td>
                                         <td class="px-2 py-2 border border-gray-200 align-middle text-center no-print">
                                             <button type="button" class="btn btn-sm btn-danger remove-duty-row" title="Remove row">
@@ -899,6 +908,7 @@
                                             $tbody.find('tr').last().before(newRow);
                                             updateDutyRowNumbers();
                                             showDutyRemoveButtons();
+                                            updateKeyDutiesOverall();
                                         });
 
                                         // Remove row button for Key Duties table
@@ -913,6 +923,7 @@
                                             updateDutyRowNumbers();
                                             updateDutyInputNames();
                                             showDutyRemoveButtons();
+                                            updateKeyDutiesOverall();
                                         });
 
                                         function updateDutyRowNumbers() {
@@ -972,8 +983,8 @@
                                 <tr>
                                     <th>Measurable Indicators/Personal Attributes</th>
                                     <th>Maximum Score</th>
-                                    <th>Appraisee’s Score</th>
-                                    <th>Appraiser’s Score</th>
+                                    <th>Appraisee's Score</th>
+                                    <th>Appraiser's Score</th>
                                     <th>Agreed Score</th>
                                 </tr>
                             </thead>
@@ -1003,6 +1014,9 @@
                                             value="{{ $appraisal->personal_attributes_assessment['technical_knowledge']['agreed_score'] ?? '' }}"
                                             @if ($headOfDivisionDraftValue) style="color: transparent;" @endif
                                             @if ($appraisal->is_appraisee) readonly @endif
+                                            oninput="updatePersonalAttributesTotal()"
+                                            onfocus="if(this.value=='0') this.value=''"
+                                            onblur="if(this.value=='') this.value=0; updatePersonalAttributesTotal()"
                                             class="form-control form-control-sm score-input" min="0"
                                             max="4"></td>
                                 </tr>
@@ -1037,6 +1051,9 @@
                                             name="personal_attributes_assessment[commitment][agreed_score]"
                                             value="{{ $appraisal->personal_attributes_assessment['commitment']['agreed_score'] ?? '' }}"
                                             @if ($headOfDivisionDraftValue) style="color: transparent;" @endif
+                                            oninput="updatePersonalAttributesTotal()"
+                                            onfocus="if(this.value=='0') this.value=''"
+                                            onblur="if(this.value=='') this.value=0; updatePersonalAttributesTotal()"
                                             @if ($appraisal->is_appraisee) readonly @endif
                                             class="form-control form-control-sm score-input" min="0"
                                             max="4">
@@ -1075,6 +1092,9 @@
                                             name="personal_attributes_assessment[team_work][agreed_score]"
                                             value="{{ $appraisal->personal_attributes_assessment['team_work']['agreed_score'] ?? '' }}"
                                             @if ($headOfDivisionDraftValue) style="color: transparent;" @endif
+                                            oninput="updatePersonalAttributesTotal()"
+                                            onfocus="if(this.value=='0') this.value=''"
+                                            onblur="if(this.value=='') this.value=0; updatePersonalAttributesTotal()"
                                             @if ($appraisal->is_appraisee) readonly @endif
                                             class="form-control form-control-sm score-input" min="0"
                                             max="4">
@@ -1112,6 +1132,9 @@
                                             name="personal_attributes_assessment[productivity][agreed_score]"
                                             value="{{ $appraisal->personal_attributes_assessment['productivity']['agreed_score'] ?? '' }}"
                                             @if ($headOfDivisionDraftValue) style="color: transparent;" @endif
+                                            oninput="updatePersonalAttributesTotal()"
+                                            onfocus="if(this.value=='0') this.value=''"
+                                            onblur="if(this.value=='') this.value=0; updatePersonalAttributesTotal()"
                                             @if ($appraisal->is_appraisee) readonly @endif
                                             class="form-control form-control-sm score-input" min="0"
                                             max="4">
@@ -1149,6 +1172,9 @@
                                             name="personal_attributes_assessment[integrity][agreed_score]"
                                             value="{{ $appraisal->personal_attributes_assessment['integrity']['agreed_score'] ?? '' }}"
                                             @if ($headOfDivisionDraftValue) style="color: transparent;" @endif
+                                            oninput="updatePersonalAttributesTotal()"
+                                            onfocus="if(this.value=='0') this.value=''"
+                                            onblur="if(this.value=='') this.value=0; updatePersonalAttributesTotal()"
                                             @if ($appraisal->is_appraisee) readonly @endif
                                             class="form-control form-control-sm score-input" min="0"
                                             max="4">
@@ -1186,6 +1212,9 @@
                                             name="personal_attributes_assessment[flexibility][agreed_score]"
                                             value="{{ $appraisal->personal_attributes_assessment['flexibility']['agreed_score'] ?? '' }}"
                                             @if ($headOfDivisionDraftValue) style="color: transparent;" @endif
+                                            oninput="updatePersonalAttributesTotal()"
+                                            onfocus="if(this.value=='0') this.value=''"
+                                            onblur="if(this.value=='') this.value=0; updatePersonalAttributesTotal()"
                                             @if ($appraisal->is_appraisee) readonly @endif
                                             class="form-control form-control-sm score-input" min="0"
                                             max="4">
@@ -1225,6 +1254,9 @@
                                             name="personal_attributes_assessment[attendance][agreed_score]"
                                             value="{{ $appraisal->personal_attributes_assessment['attendance']['agreed_score'] ?? '' }}"
                                             @if ($headOfDivisionDraftValue) style="color: transparent;" @endif
+                                            oninput="updatePersonalAttributesTotal()"
+                                            onfocus="if(this.value=='0') this.value=''"
+                                            onblur="if(this.value=='') this.value=0; updatePersonalAttributesTotal()"
                                             @if ($appraisal->is_appraisee) readonly @endif
                                             class="form-control form-control-sm score-input" min="0"
                                             max="4">
@@ -1262,6 +1294,9 @@
                                             name="personal_attributes_assessment[appearance][agreed_score]"
                                             value="{{ $appraisal->personal_attributes_assessment['appearance']['agreed_score'] ?? '' }}"
                                             @if ($headOfDivisionDraftValue) style="color: transparent;" @endif
+                                            oninput="updatePersonalAttributesTotal()"
+                                            onfocus="if(this.value=='0') this.value=''"
+                                            onblur="if(this.value=='') this.value=0; updatePersonalAttributesTotal()"
                                             @if ($appraisal->is_appraisee) readonly @endif
                                             class="form-control form-control-sm score-input" min="0"
                                             max="4">
@@ -1301,6 +1336,9 @@
                                             name="personal_attributes_assessment[interpersonal][agreed_score]"
                                             value="{{ $appraisal->personal_attributes_assessment['interpersonal']['agreed_score'] ?? '' }}"
                                             @if ($headOfDivisionDraftValue) style="color: transparent;" @endif
+                                            oninput="updatePersonalAttributesTotal()"
+                                            onfocus="if(this.value=='0') this.value=''"
+                                            onblur="if(this.value=='') this.value=0; updatePersonalAttributesTotal()"
                                             @if ($appraisal->is_appraisee) readonly @endif
                                             class="form-control form-control-sm score-input" min="0"
                                             max="4">
@@ -1341,6 +1379,9 @@
                                             name="personal_attributes_assessment[initiative][agreed_score]"
                                             value="{{ $appraisal->personal_attributes_assessment['initiative']['agreed_score'] ?? '' }}"
                                             @if ($headOfDivisionDraftValue) style="color: transparent;" @endif
+                                            oninput="updatePersonalAttributesTotal()"
+                                            onfocus="if(this.value=='0') this.value=''"
+                                            onblur="if(this.value=='') this.value=0; updatePersonalAttributesTotal()"
                                             @if ($appraisal->is_appraisee) readonly @endif
                                             class="form-control form-control-sm score-input" min="0"
                                             max="4">
@@ -1353,9 +1394,9 @@
                                 <tr>
                                     <th>Total Score</th>
                                     <th>40%</th>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
+                                    <td id="personal-appraisee-total"></td>
+                                    <td id="personal-appraiser-total"></td>
+                                    <td id="personal-agreed-total"></td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -1503,6 +1544,7 @@
                                         $tbody.append(newRow);
                                         updateRowNumbers();
                                         showRemoveButtons();
+                                        updateKeyDutiesOverall();
                                     });
 
                                     // Remove row button
@@ -1512,6 +1554,7 @@
                                         updateRowNumbers();
                                         updateInputNames();
                                         showRemoveButtons();
+                                        updateKeyDutiesOverall();
                                     });
 
                                     // Show remove buttons only if more than 1 row
@@ -1568,14 +1611,14 @@
 
                     <div class="col-md-12">
                         <x-forms.text-area name="employee_improvement" :isDraft="$headOfDivisionDraftValue"
-                            label="ii.	Areas for Improvement - Summarize employee’s areas for improvement"
+                            label="ii.	Areas for Improvement - Summarize employee's areas for improvement"
                             id="employee_improvement" :value="old('employee_improvement', $appraisal->employee_improvement ?? '')" :isDisabled="!$appraisal->is_appraisor" />
                     </div>
 
 
                     <div class="col-md-12">
                         <x-forms.text-area name="superviser_overall_assessment" :isDraft="$headOfDivisionDraftValue"
-                            label="iii.	Supervisor’s overall assessment - Describe overall performance in accomplishing goals, fulfilling other results and responsibilities; eg Excellent, Very good, Satisfactory, Average, Unsatisfactory. "
+                            label="iii.	Supervisor's overall assessment - Describe overall performance in accomplishing goals, fulfilling other results and responsibilities; eg Excellent, Very good, Satisfactory, Average, Unsatisfactory. "
                             id="superviser_overall_assessment" :value="old(
                                 'superviser_overall_assessment',
                                 $appraisal->superviser_overall_assessment ?? '',
@@ -1610,7 +1653,7 @@
 
                     <div class="col-md-12">
                         <x-forms.text-area name="overall_assessment" :isDraft="$executiveSecretaryDraftValue"
-                            label="iii.	Supervisor’s overall assessment - Describe overall performance in accomplishing goals, fulfilling other results and responsibilities; eg Excellent, Very good, Satisfactory, Average, Unsatisfactory. "
+                            label="iii.	Supervisor's overall assessment - Describe overall performance in accomplishing goals, fulfilling other results and responsibilities; eg Excellent, Very good, Satisfactory, Average, Unsatisfactory. "
                             id="overall_assessment" :value="old('overall_assessment', $appraisal->overall_assessment ?? '')" :isDisabled="!$appraisal->is_es" />
                     </div>
 
@@ -2019,7 +2062,164 @@
     </style>
     @push('scripts')
         <script>
+            // Global function for key duties overall average
+            function updateKeyDutiesOverall() {
+            console.log("here")
+                const agreedInputs = document.querySelectorAll('#key-duties-table .agreed-score-input');
+                const superviseeInputs = document.querySelectorAll('input[name^="appraisal_period_rate"][name$="[supervisee_score]"]');
+                const supervisorInputs = document.querySelectorAll('input[name^="appraisal_period_rate"][name$="[supervisor_score]"]');
+                let totalAgreed = 0, totalSupervisee = 0, totalSupervisor = 0;
+                let rowCount = 0;
+
+                agreedInputs.forEach(input => {
+                    let val = parseFloat(input.value);
+                    if (isNaN(val)) {
+                        val = 0;
+                    } else {
+                        if (val > 6) val = 6;
+                        else if (val < 0) val = 0;
+                        input.value = val;
+                    }
+                    totalAgreed += val;
+                    rowCount++;
+                });
+                superviseeInputs.forEach(input => {
+                    let val = parseFloat(input.value);
+                    if (isNaN(val)) val = 0;
+                    if (val > 6) val = 6;
+                    else if (val < 0) val = 0;
+                    input.value = val;
+                    totalSupervisee += val;
+                });
+                supervisorInputs.forEach(input => {
+                    let val = parseFloat(input.value);
+                    if (isNaN(val)) val = 0;
+                    if (val > 6) val = 6;
+                    else if (val < 0) val = 0;
+                    input.value = val;
+                    totalSupervisor += val;
+                });
+
+                const maxScore = rowCount * 6;
+                const agreedPct = maxScore > 0 ? (totalAgreed / maxScore) * 100 : 0;
+                const superviseePct = maxScore > 0 ? (totalSupervisee / maxScore) * 100 : 0;
+                const supervisorPct = maxScore > 0 ? (totalSupervisor / maxScore) * 100 : 0;
+
+                // Update tfoot
+                document.getElementById('supervisee-total').textContent = `${totalSupervisee}/${maxScore} (${superviseePct.toFixed(1)}%)`;
+                document.getElementById('supervisor-total').textContent = `${totalSupervisor}/${maxScore} (${supervisorPct.toFixed(1)}%)`;
+                document.getElementById('agreed-total').textContent = `${totalAgreed}/${maxScore} (${agreedPct.toFixed(1)}%)`;
+
+                const scaledAvg = agreedPct * 60 / 100; // Convert agreed percentage to a 60% scale
+
+                document.getElementById('overallAverage').textContent = scaledAvg.toFixed(1);
+                document.getElementById('averageProgress').style.width = `${agreedPct}%`;
+
+                const statusMessages = [{
+                        threshold: 90,
+                        message: 'Exceptional Performance',
+                        color: 'from-green-400 to-emerald-600'
+                    },
+                    {
+                        threshold: 75,
+                        message: 'Exceeds Expectations',
+                        color: 'from-blue-400 to-indigo-600'
+                    },
+                    {
+                        threshold: 50,
+                        message: 'Meets Expectations',
+                        color: 'from-yellow-400 to-amber-600'
+                    },
+                    {
+                        threshold: 25,
+                        message: 'Needs Improvement',
+                        color: 'from-orange-400 to-red-600'
+                    },
+                    {
+                        threshold: 0,
+                        message: 'Requires Immediate Attention',
+                        color: 'from-red-400 to-rose-600'
+                    }
+                ];
+                const performanceStatus = document.getElementById('performanceStatus');
+                const status = statusMessages.find(s => agreedPct >= s.threshold);
+                if (status) {
+                    performanceStatus.textContent = status.message;
+                    document.getElementById('averageProgress').className =
+                        `absolute left-0 top-0 h-full bg-gradient-to-r ${status.color} transition-all duration-500`;
+                }
+
+                window.keyDutiesContribution = scaledAvg;
+                updateTotalScore();
+            }
+
+            // Global function for personal attributes total
+            function updatePersonalAttributesTotal() {
+                let totalAgreed = 0, totalAppraisee = 0, totalAppraiser = 0;
+                const agreedInputs = document.querySelectorAll('#personal-attributes input[name$="[agreed_score]"]');
+                const appraiseeInputs = document.querySelectorAll('#personal-attributes input[name$="[appraisee_score]"]');
+                const appraiserInputs = document.querySelectorAll('#personal-attributes input[name$="[appraiser_score]"]');
+                let rowCount = 0;
+
+                agreedInputs.forEach(input => {
+                    let val = parseFloat(input.value);
+                    if (isNaN(val)) val = 0;
+                    if (val > 4) val = 4;
+                    else if (val < 0) val = 0;
+                    input.value = val;
+                    totalAgreed += val;
+                    console.log(totalAgreed)
+                    rowCount++;
+                });
+                appraiseeInputs.forEach(input => {
+                    let val = parseFloat(input.value);
+                    if (isNaN(val)) val = 0;
+                    if (val > 4) val = 4;
+                    else if (val < 0) val = 0;
+                    input.value = val;
+                    totalAppraisee += val;
+                });
+                appraiserInputs.forEach(input => {
+                    let val = parseFloat(input.value);
+                    if (isNaN(val)) val = 0;
+                    if (val > 4) val = 4;
+                    else if (val < 0) val = 0;
+                    input.value = val;
+                    totalAppraiser += val;
+                });
+                const maxScore = rowCount * 4;
+                const agreedPct = maxScore > 0 ? (totalAgreed / maxScore) * 100 : 0;
+                const appraiseePct = maxScore > 0 ? (totalAppraisee / maxScore) * 100 : 0;
+                const appraiserPct = maxScore > 0 ? (totalAppraiser / maxScore) * 100 : 0;
+                document.getElementById('personal-appraisee-total').textContent = `${totalAppraisee}/${maxScore} (${appraiseePct.toFixed(1)}%)`;
+                document.getElementById('personal-appraiser-total').textContent = `${totalAppraiser}/${maxScore} (${appraiserPct.toFixed(1)}%)`;
+                document.getElementById('personal-agreed-total').textContent = `${totalAgreed}/${maxScore} (${agreedPct.toFixed(1)}%)`;
+                const percentage = (totalAgreed / 40) * 100;
+                const scaledPercentage = percentage * 0.4;
+                window.personalAttributesContribution = scaledPercentage;
+                document.getElementById('overall-40pct').textContent = `${scaledPercentage.toFixed(1)}% (${totalAgreed}/40)`;
+                updateTotalScore();
+            }
+
+            // Update combined total score
+            function updateTotalScore() {
+                const total = (window.keyDutiesContribution || 0) +
+                    (window.personalAttributesContribution || 0);
+                document.getElementById('totalScore').textContent = `${total.toFixed(1)}%`;
+            }
+
+            // Initialize calculations on page load
+            document.addEventListener('DOMContentLoaded', function() {
+                updateKeyDutiesOverall();
+                updatePersonalAttributesTotal();
+            });
+        </script>
+    @endpush
+    @push('scripts')
+        <script>
             $(document).ready(function() {
+
+
                 // Initialize all components
                 initScoreValidation();
                 initSelect2();
@@ -2962,14 +3162,12 @@
                             }
                         });
 
-                        const averagePerRow = rowCount > 0 ? totalAgreed / rowCount : 0;
-                        const averagePercentage = (averagePerRow / 6) * 100;
-                        const scaledAvg = averagePercentage * 0.6; // 60% weight
+                        const scaledAvg = (totalAgreed / (rowCount * 6)) * 100 * 0.6; // 60% weight
 
                         overallAverageElement.textContent = scaledAvg.toFixed(1);
-                        averageProgress.style.width = `${averagePercentage}%`;
+                        averageProgress.style.width = `${scaledAvg}%`;
 
-                        const status = statusMessages.find(s => averagePercentage >= s.threshold);
+                        const status = statusMessages.find(s => scaledAvg >= s.threshold);
                         if (status) {
                             performanceStatus.textContent = status.message;
                             averageProgress.className =
