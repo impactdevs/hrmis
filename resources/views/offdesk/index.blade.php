@@ -3,7 +3,7 @@
         <div class="d-flex justify-content-between">
             @can('create offdesk')
                 <a href="{{ route('offdesk.create') }}" class="btn btn-primary">
-                    <i class="bi bi-plus-circle me-1"></i> Add Off Desk Record
+                    <i class="bi bi-plus-circle me-1"></i> Request for Off Desk Time
                 </a>
             @endcan
         </div>
@@ -16,8 +16,6 @@
                         <th>Employee</th>
                         <th>Start</th>
                         <th>End</th>
-                        <th>Destination</th>
-                        <th>Duty Allocated</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -28,16 +26,19 @@
                             <td>{{ $entry->employee->full_name ?? 'N/A' }}</td>
                             <td>{{ $entry->start_datetime }}</td>
                             <td>{{ $entry->end_datetime }}</td>
-                            <td>{{ $entry->destination }}</td>
-                            <td>{{ $entry->duty_allocated }}</td>
                             <td class="d-flex gap-2">
-                                <a href="{{ route('offdesk.show', $entry->off_desk_id) }}" class="btn btn-sm btn-info">View</a>
-                                <a href="{{ route('offdesk.edit', $entry->off_desk_id) }}" class="btn btn-sm btn-warning">Edit</a>
-                                <form action="{{ route('offdesk.destroy', $entry->off_desk_id) }}" method="POST">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
-                                </form>
+                                <a href="{{ route('offdesk.show', $entry->off_desk_id) }}"
+                                    class="btn btn-sm btn-info">View</a>
+                                    @if (auth()->user()->employee->employee_id == $entry->employee_id)
+                                <a href="{{ route('offdesk.edit', $entry->off_desk_id) }}"
+                                    class="btn btn-sm btn-warning">Edit</a>
+                                    <form action="{{ route('offdesk.destroy', $entry->off_desk_id) }}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button class="btn btn-sm btn-danger"
+                                            onclick="return confirm('Are you sure?')">Delete</button>
+                                    </form>
+                                @endif
                             </td>
                         </tr>
                     @empty

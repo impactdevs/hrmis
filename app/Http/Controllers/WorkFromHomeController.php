@@ -7,12 +7,14 @@ use App\Models\Employee;
 use Illuminate\Http\Request;
 use App\Models\Task;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+
 
 class WorkFromHomeController extends Controller
 {
     public function index()
     {
-        $entries = WorkFromHome::with('employee')->paginate(10);
+        $entries = WorkFromHome::with('employee', 'tasks')->paginate(10);
         return view('workfromhome.index', compact('entries'));
     }
 
@@ -28,7 +30,7 @@ class WorkFromHomeController extends Controller
             'work_from_home_start_date' => 'required|date',
             'work_from_home_end_date'   => 'required|date|after_or_equal:work_from_home_start_date',
             'work_from_home_reason'     => 'required|string|max:1000',
-            'work_from_home_attachments'=> 'nullable|mimes:pdf,jpg,jpeg,png,doc,docx,xlsx|max:10240',
+            'work_from_home_attachments' => 'nullable|mimes:pdf,jpg,jpeg,png,doc,docx,xlsx|max:10240',
             'work_location'             => 'required|string|max:100',
 
             // task fields
@@ -63,13 +65,14 @@ class WorkFromHomeController extends Controller
 
             foreach ($descriptions as $index => $desc) {
                 Task::create([
-                    'task_id' => \Str::uuid(),
-                    'work_from_home_id' => $workFromHome->work_from_home_id,
-                    'start_date'        => $startDates[$index],
-                    'end_date'          => $endDates[$index] ?? $desc,
-                    'description'       => $desc,
+                    'task_id'            => Str::uuid(),
+                    'work_from_home_id'  => $workFromHome->work_from_home_id,
+                    'task_start_date'    => $startDates[$index],
+                    'task_end_date'      => $endDates[$index] ?? null,
+                    'description'        => $desc,
                 ]);
             }
+
 
             DB::commit();
 
@@ -82,13 +85,13 @@ class WorkFromHomeController extends Controller
 
     public function show($id)
     {
-        $entry = WorkFromHome::with('employee')->findOrFail($id);
+        $entry = WorkFromHome::with('employee', 'tasks')->findOrFail($id);
         return view('workfromhome.show', compact('entry'));
     }
 
     public function edit($id)
     {
-       $entry = WorkFromHome::with('task')->findOrFail($id);
+        $entry = WorkFromHome::with('task')->findOrFail($id);
         $employees = Employee::all();
         return view('workfromhome.edit', compact('entry', 'employees'));
     }

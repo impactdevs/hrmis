@@ -42,7 +42,7 @@ class WorkFromHome extends Model
         return $this->belongsTo(Employee::class, 'employee_id', 'employee_id');
     }
 
-    public function task()
+    public function tasks()
     {
         return $this->hasMany(Task::class, 'work_from_home_id', 'work_from_home_id');
     }

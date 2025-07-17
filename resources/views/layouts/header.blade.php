@@ -88,6 +88,10 @@
                     $title = 'Events';
                 }
 
+                if (request()->routeIs('offdesk.create')) {
+                    $title = 'Apply For Off Desk Time';
+                }
+
                 if (request()->routeIs('events.create')) {
                     $title = 'Create an Event';
                 }
@@ -137,8 +141,6 @@
                     $title = 'Applying for leave';
                 }
 
-
-
                 if (request()->routeIs('salary-advances.index')) {
                     $title = 'Salary Advances';
                 }
@@ -174,13 +176,13 @@
                 if (request()->routeIs('whistleblowing.show')) {
                     $whistle = request()->route('id');
                     $report = \app\Models\WhistleblowingReport::find($whistle);
-                    $title = 'Whistleblowing Report Details for '. $report->tracking_id;
+                    $title = 'Whistleblowing Report Details for ' . $report->tracking_id;
                 }
-                if (request()->routeIs('whistleblower.index')){
+                if (request()->routeIs('whistleblower.index')) {
                     $title = 'Whistleblowers';
                 }
 
-                    if (request()->routeIs('whistleblower.show')) {
+                if (request()->routeIs('whistleblower.show')) {
                     $title = 'Whistleblowers';
                 }
 
@@ -188,32 +190,29 @@
                     $title = 'Add whistleblower';
                 }
 
-                 if (request()->routeIs('workfromhome.index')){
+                if (request()->routeIs('workfromhome.index')) {
                     $title = 'Work From Home';
                 }
 
-                 if (request()->routeIs('workfromhome.create')){
+                if (request()->routeIs('workfromhome.create')) {
                     $title = ' Add Work From Home Record';
                 }
 
-
-                    if (request()->routeIs('workfromhome.show')) {
+                if (request()->routeIs('workfromhome.show')) {
                     $title = 'Work From Home Records';
                 }
 
-                if (request()->routeIs('offdesk.index')){
-                    $title = 'Off Desk';
+                if (request()->routeIs('offdesk.index')) {
+                    $title = 'Off Desk Management';
                 }
 
-                    if (request()->routeIs('offdesk.create')){
-                    $title = ' Add Off Desk Record';
+                if (request()->routeIs('offdesk.create')) {
+                    $title = 'Apply For Off Desk Time';
                 }
 
-                if (request()->routeIs('offdesk.show')){
-                    $title = 'Off Desk Records';
+                if (request()->routeIs('offdesk.show')) {
+                    $title = 'Off Desk Details';
                 }
-
-
 
             @endphp
 
