@@ -36,15 +36,19 @@ class AttendanceScope implements Scope
                 $departmentId = DB::table('employees')->where('user_id', $user->id)->value('department_id');
 
                 if ($departmentId) {
-                    //only show attendances from the user's department
-                    $users = DB::table('employees')->where('department_id', $departmentId)->pluck('employee_id');
+                    // Get staff IDs of employees in the specified department
+                    $staffIds = DB::table('employees')
+                        ->where('department_id', $departmentId)
+                        ->pluck('staff_id'); // Assuming staff_id is stored in employees table
 
-                    $builder->whereIn('attendances.employee_id', $users);
+                    // Filter attendances by staff_id
+                    $builder->whereIn('attendances.staff_id', $staffIds);
                 }
+
                 break;
 
             case 'Executive Secretary':
-            // Add logic if needed
+                // Add logic if needed
             case 'Assistant Executive Secretary':
                 break;
 
