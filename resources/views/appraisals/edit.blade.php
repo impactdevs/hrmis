@@ -803,10 +803,14 @@
                                 </tbody>
                                 <tfoot>
                                     <tr class="bg-blue-100 font-semibold">
-                                        <td class="px-6 py-3 border border-gray-200 text-end" colspan="3">Total</td>
-                                        <td class="px-6 py-3 border border-gray-200 text-center" id="supervisee-total"></td>
-                                        <td class="px-6 py-3 border border-gray-200 text-center" id="supervisor-total"></td>
-                                        <td class="px-6 py-3 border border-gray-200 text-center" id="agreed-total"></td>
+                                        <td class="px-6 py-3 border border-gray-200 text-end" colspan="3">Total
+                                        </td>
+                                        <td class="px-6 py-3 border border-gray-200 text-center"
+                                            id="supervisee-total"></td>
+                                        <td class="px-6 py-3 border border-gray-200 text-center"
+                                            id="supervisor-total"></td>
+                                        <td class="px-6 py-3 border border-gray-200 text-center" id="agreed-total">
+                                        </td>
                                         <td class="px-6 py-3 border border-gray-200"></td>
                                     </tr>
                                 </tfoot>
@@ -2065,9 +2069,13 @@
             // Global function for key duties overall average
             function updateKeyDutiesOverall() {
                 const agreedInputs = document.querySelectorAll('#key-duties-table .agreed-score-input');
-                const superviseeInputs = document.querySelectorAll('input[name^="appraisal_period_rate"][name$="[supervisee_score]"]');
-                const supervisorInputs = document.querySelectorAll('input[name^="appraisal_period_rate"][name$="[supervisor_score]"]');
-                let totalAgreed = 0, totalSupervisee = 0, totalSupervisor = 0;
+                const superviseeInputs = document.querySelectorAll(
+                    'input[name^="appraisal_period_rate"][name$="[supervisee_score]"]');
+                const supervisorInputs = document.querySelectorAll(
+                    'input[name^="appraisal_period_rate"][name$="[supervisor_score]"]');
+                let totalAgreed = 0,
+                    totalSupervisee = 0,
+                    totalSupervisor = 0;
                 let rowCount = 0;
 
                 agreedInputs.forEach(input => {
@@ -2106,8 +2114,10 @@
                 const supervisorPct = maxScore > 0 ? (totalSupervisor / maxScore) * 100 : 0;
 
                 // Update tfoot
-                document.getElementById('supervisee-total').textContent = `${totalSupervisee}/${maxScore} (${superviseePct.toFixed(1)}%)`;
-                document.getElementById('supervisor-total').textContent = `${totalSupervisor}/${maxScore} (${supervisorPct.toFixed(1)}%)`;
+                document.getElementById('supervisee-total').textContent =
+                    `${totalSupervisee}/${maxScore} (${superviseePct.toFixed(1)}%)`;
+                document.getElementById('supervisor-total').textContent =
+                    `${totalSupervisor}/${maxScore} (${supervisorPct.toFixed(1)}%)`;
                 document.getElementById('agreed-total').textContent = `${totalAgreed}/${maxScore} (${agreedPct.toFixed(1)}%)`;
 
                 const scaledAvg = agreedPct * 60 / 100; // Convert agreed percentage to a 60% scale
@@ -2155,7 +2165,9 @@
 
             // Global function for personal attributes total
             function updatePersonalAttributesTotal() {
-                let totalAgreed = 0, totalAppraisee = 0, totalAppraiser = 0;
+                let totalAgreed = 0,
+                    totalAppraisee = 0,
+                    totalAppraiser = 0;
                 const agreedInputs = document.querySelectorAll('#personal-attributes input[name$="[agreed_score]"]');
                 const appraiseeInputs = document.querySelectorAll('#personal-attributes input[name$="[appraisee_score]"]');
                 const appraiserInputs = document.querySelectorAll('#personal-attributes input[name$="[appraiser_score]"]');
@@ -2191,9 +2203,12 @@
                 const agreedPct = maxScore > 0 ? (totalAgreed / maxScore) * 100 : 0;
                 const appraiseePct = maxScore > 0 ? (totalAppraisee / maxScore) * 100 : 0;
                 const appraiserPct = maxScore > 0 ? (totalAppraiser / maxScore) * 100 : 0;
-                document.getElementById('personal-appraisee-total').textContent = `${totalAppraisee}/${maxScore} (${appraiseePct.toFixed(1)}%)`;
-                document.getElementById('personal-appraiser-total').textContent = `${totalAppraiser}/${maxScore} (${appraiserPct.toFixed(1)}%)`;
-                document.getElementById('personal-agreed-total').textContent = `${totalAgreed}/${maxScore} (${agreedPct.toFixed(1)}%)`;
+                document.getElementById('personal-appraisee-total').textContent =
+                    `${totalAppraisee}/${maxScore} (${appraiseePct.toFixed(1)}%)`;
+                document.getElementById('personal-appraiser-total').textContent =
+                    `${totalAppraiser}/${maxScore} (${appraiserPct.toFixed(1)}%)`;
+                document.getElementById('personal-agreed-total').textContent =
+                    `${totalAgreed}/${maxScore} (${agreedPct.toFixed(1)}%)`;
                 const percentage = (totalAgreed / 40) * 100;
                 const scaledPercentage = percentage * 0.4;
                 window.personalAttributesContribution = scaledPercentage;
@@ -2901,16 +2916,42 @@
                     $('#appraisalForm').submit();
                 });
 
-                // 1. Score Input Validation
                 function initScoreValidation() {
                     function clampScore($input, max = 4, min = 0) {
                         let val = parseFloat($input.val());
-                        if (val > max) $input.val(max);
-                        else if (val < min) $input.val(min);
+                        if (isNaN(val)) val = min;
+                        else val = Math.min(Math.max(val, min), max);
+                        $input.val(val);
                     }
 
-                    $('.score-input, .score-input-component').on('input', function() {
+                    // For personal attributes scores
+                    $('.score-input').on('input', function() {
                         clampScore($(this));
+                        updatePersonalAttributesTotal();
+                    }).on('focus', function() {
+                        if (this.value === '0') {
+                            this.value = '';
+                        }
+                    }).on('blur', function() {
+                        if (this.value === '') {
+                            this.value = '0';
+                            $(this).trigger('input');
+                        }
+                    });
+
+                    // For key duties agreed scores
+                    $('.agreed-score-input').on('input', function() {
+                        clampScore($(this), 6);
+                        updateKeyDutiesOverall();
+                    }).on('focus', function() {
+                        if (this.value === '0') {
+                            this.value = '';
+                        }
+                    }).on('blur', function() {
+                        if (this.value === '') {
+                            this.value = '0';
+                            $(this).trigger('input');
+                        }
                     });
                 }
 
@@ -3007,7 +3048,7 @@
 
                             updateKeyDutiesOverall();
                         });
-                        
+
                     }
                 });
 
@@ -3155,7 +3196,7 @@
                     }
 
                     function updateOverallAverage() {
-                    console.log("here2")
+                        console.log("here2")
                         let totalAgreed = 0;
                         let rowCount = 0;
 
@@ -3214,30 +3255,32 @@
         </script>
     @endpush
     @push('scripts')
-    <script>
-        function updatePrintSummaryScores() {
-            // Get the scores from the on-screen elements
-            const keyDuties = document.getElementById('overallAverage')?.textContent || '';
-            const personalAttributes = document.getElementById('overall-40pct')?.textContent || '';
-            const totalScore = document.getElementById('totalScore')?.textContent || '';
+        <script>
+            function updatePrintSummaryScores() {
+                // Get the scores from the on-screen elements
+                const keyDuties = document.getElementById('overallAverage')?.textContent || '';
+                const personalAttributes = document.getElementById('overall-40pct')?.textContent || '';
+                const totalScore = document.getElementById('totalScore')?.textContent || '';
 
-            document.getElementById('print-key-duties-score').textContent = keyDuties + '%';
-            document.getElementById('print-personal-attributes-score').textContent = personalAttributes;
-            document.getElementById('print-total-score').textContent = totalScore;
-        }
+                document.getElementById('print-key-duties-score').textContent = keyDuties + '%';
+                document.getElementById('print-personal-attributes-score').textContent = personalAttributes;
+                document.getElementById('print-total-score').textContent = totalScore;
+            }
 
-        // Update before print
-        window.addEventListener('beforeprint', updatePrintSummaryScores);
-    </script>
+            // Update before print
+            window.addEventListener('beforeprint', updatePrintSummaryScores);
+        </script>
     @endpush
 
     <div class="print-summary-cover d-none d-print-block" style="page-break-after: always;">
         <h1 class="text-center">Appraisal Summary</h1>
         <hr>
-        <p><strong>Employee Name:</strong> {{ auth()->user()->employee->first_name . ' ' . auth()->user()->employee->last_name }}</p>
+        <p><strong>Employee Name:</strong>
+            {{ auth()->user()->employee->first_name . ' ' . auth()->user()->employee->last_name }}</p>
         <p><strong>Position:</strong> {{ optional(auth()->user()->employee->position)->position_name }}</p>
         <p><strong>Division:</strong> {{ optional(auth()->user()->employee->department)->department_name }}</p>
-        <p><strong>Appraisal Period:</strong> {{ $appraisal->appraisal_start_date?->toDateString() }} - {{ $appraisal->appraisal_end_date?->toDateString() }}</p>
+        <p><strong>Appraisal Period:</strong> {{ $appraisal->appraisal_start_date?->toDateString() }} -
+            {{ $appraisal->appraisal_end_date?->toDateString() }}</p>
         <hr>
         <h3>Scores Summary</h3>
         <ul>
