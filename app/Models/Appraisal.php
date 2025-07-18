@@ -93,12 +93,21 @@ class Appraisal extends Model
 
     public function getIsAppraiseeAttribute()
     {
+        // Check if the logged-in user is the appraisee
         if (auth()->user()->employee->employee_id == $this->employee_id) {
+
+            // Optional: check if the appraisee is also a Head of Division
+            if ($this->getTheAppraiseeIsHod()) {
+                // You can return something special here if needed
+                return true; // or return 'HOD' or some other indicator
+            }
+
             return true;
         }
 
         return false;
     }
+
 
     public function getIsAppraisorAttribute()
     {
