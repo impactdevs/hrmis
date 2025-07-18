@@ -1893,6 +1893,11 @@
 
         @media print {
 
+            @page {
+                size: landscape;
+                margin: 0;
+            }
+
             /* Remove Bootstrap container padding if needed */
             .container,
             .container-fluid {
@@ -2062,6 +2067,29 @@
         #performance-table-wrapper .date-input:focus {
             outline: none;
             background-color: #f8f9fa;
+        }
+
+              .editable-cell {
+            border: 1px solid #ddd; /* Make sure there's a border for print */
+            padding: 8px; /* Make text easily readable */
+            font-size: 12pt; /* Suitable font size for printing */
+            background-color: #fff; /* Ensure white background for printed content */
+            color: #333; /* Dark text for contrast */
+        }
+
+        /* Make sure the tooltip does not show up in print */
+        .tooltip {
+            display: none !important;
+        }
+
+        /* Ensure hidden input values are properly handled */
+        input[type="hidden"] {
+            display: none !important;
+        }
+
+        /* Handle the contenteditable div for appraisee */
+        .editable-cell[contenteditable="true"] {
+            font-style: italic; /* Mark editable cells for clarity */
         }
     </style>
     @push('scripts')
