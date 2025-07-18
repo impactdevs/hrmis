@@ -47,7 +47,7 @@
             $headOfDivisionDraftValue = $appraisal->draft_users['Head of Division'] ?? false;
         }
     @endphp
-    <div class="gap-2 p-2 bg-white border rounded shadow position-fixed top-50 end-0 translate-middle-y d-flex align-items-center border-primary no-print"
+    <div class="gap-2 p-2 no-print bg-white border rounded shadow position-fixed top-50 end-0 translate-middle-y d-flex align-items-center border-primary no-print"
         style="z-index: 9999; cursor: pointer;" role="button" onclick="window.print();" title="Print this page">
 
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="blue" stroke-width="2"
@@ -58,7 +58,7 @@
 
     </div>
 
-    <div class="top-0 p-3 toast-container position-fixed start-50 translate-middle-x text-bg-success approval"
+    <div class="top-0 p-3 toast-container position-fixed start-50 translate-middle-x text-bg-success approval no-print"
         style="margin-left:30%" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="toast-header">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
@@ -2064,7 +2064,6 @@
         <script>
             // Global function for key duties overall average
             function updateKeyDutiesOverall() {
-            console.log("here")
                 const agreedInputs = document.querySelectorAll('#key-duties-table .agreed-score-input');
                 const superviseeInputs = document.querySelectorAll('input[name^="appraisal_period_rate"][name$="[supervisee_score]"]');
                 const supervisorInputs = document.querySelectorAll('input[name^="appraisal_period_rate"][name$="[supervisor_score]"]');
@@ -2081,6 +2080,7 @@
                         input.value = val;
                     }
                     totalAgreed += val;
+                    console.log(totalAgreed)
                     rowCount++;
                 });
                 superviseeInputs.forEach(input => {
@@ -2980,6 +2980,8 @@
                     if (hiddenInput && hiddenInput.tagName === 'INPUT') {
                         hiddenInput.value = value;
                     }
+
+                    updateKeyDutiesOverall();
                 }
 
                 document.querySelectorAll('.score-cell').forEach(cell => {
@@ -3002,7 +3004,10 @@
                                     hiddenInput.value = 0;
                                 }
                             }
+
+                            updateKeyDutiesOverall();
                         });
+                        
                     }
                 });
 
@@ -3150,6 +3155,7 @@
                     }
 
                     function updateOverallAverage() {
+                    console.log("here2")
                         let totalAgreed = 0;
                         let rowCount = 0;
 
@@ -3207,4 +3213,39 @@
             });
         </script>
     @endpush
+    @push('scripts')
+    <script>
+        function updatePrintSummaryScores() {
+            // Get the scores from the on-screen elements
+            const keyDuties = document.getElementById('overallAverage')?.textContent || '';
+            const personalAttributes = document.getElementById('overall-40pct')?.textContent || '';
+            const totalScore = document.getElementById('totalScore')?.textContent || '';
+
+            document.getElementById('print-key-duties-score').textContent = keyDuties + '%';
+            document.getElementById('print-personal-attributes-score').textContent = personalAttributes;
+            document.getElementById('print-total-score').textContent = totalScore;
+        }
+
+        // Update before print
+        window.addEventListener('beforeprint', updatePrintSummaryScores);
+    </script>
+    @endpush
+
+    <div class="print-summary-cover d-none d-print-block" style="page-break-after: always;">
+        <h1 class="text-center">Appraisal Summary</h1>
+        <hr>
+        <p><strong>Employee Name:</strong> {{ auth()->user()->employee->first_name . ' ' . auth()->user()->employee->last_name }}</p>
+        <p><strong>Position:</strong> {{ optional(auth()->user()->employee->position)->position_name }}</p>
+        <p><strong>Division:</strong> {{ optional(auth()->user()->employee->department)->department_name }}</p>
+        <p><strong>Appraisal Period:</strong> {{ $appraisal->appraisal_start_date?->toDateString() }} - {{ $appraisal->appraisal_end_date?->toDateString() }}</p>
+        <hr>
+        <h3>Scores Summary</h3>
+        <ul>
+            <li><strong>Key Duties (60%):</strong> <span id="print-key-duties-score"></span></li>
+            <li><strong>Personal Attributes (40%):</strong> <span id="print-personal-attributes-score"></span></li>
+            <li><strong>Total Score:</strong> <span id="print-total-score"></span></li>
+        </ul>
+        <hr>
+        <p><em>This is a summary page for printing. The detailed appraisal follows on subsequent pages.</em></p>
+    </div>
 </x-app-layout>

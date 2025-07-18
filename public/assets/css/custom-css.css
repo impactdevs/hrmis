@@ -15,6 +15,21 @@ body {
   /* Center vertically */
 }
 
+@media print {
+
+  .no-print,
+  .d-none,
+  .d-print-none {
+    display: none !important;
+  }
+
+  #main {
+    max-width: 100% !important;
+    overflow-x: auto;
+  }
+
+}
+
 .sidebar {
   width: 20%;
   /* Set a fixed width for the sidebar */

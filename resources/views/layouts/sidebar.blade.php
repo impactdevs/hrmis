@@ -1,4 +1,4 @@
-<div class="sidebar bg-primary border-start border-start-5 shadow rounded-start-5 border-dashed mobile-menu col-12 col-md-3 col-lg-2 col-xl-2"
+<div class="sidebar bg-primary no-print border-start border-start-5 shadow rounded-start-5 border-dashed mobile-menu col-12 col-md-3 col-lg-2 col-xl-2"
     style="position: sticky; top: 0; height: 100vh; overflow-y: auto;">
     <div class="border-bottom border-bottom-5 h-25 d-flex align-items-center justify-content-center">
         <img src="{{ asset('assets/img/logo.png') }}" alt="company logo"
@@ -140,7 +140,7 @@
                 </li>
             @endif
 
-                <li class="nav-item">
+                {{-- <li class="nav-item">
                     <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('whistleblower.index') || request()->routeIs('whistleblower.show')) bg-secondary @endif"
                         href="{{ route('whistleblower.index') }}">
                         <i class="fas fa-user-secret text-white-600"></i>
@@ -154,7 +154,7 @@
                         <i class="bi bi-house-check"></i>
                         Work From Home
                     </a>
-                </li>
+                </li> --}}
 
                 <li class="nav-item">
                     <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('offdesk.index') || request()->routeIs('offdesk.show')) bg-secondary @endif"
