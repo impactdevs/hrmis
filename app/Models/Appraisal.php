@@ -118,6 +118,20 @@ class Appraisal extends Model
         return false;
     }
 
+    public function getTheAppraiseeIsHod()
+    {
+        // Fetch the employee without global scopes
+        $employee = Employee::withoutGlobalScopes()->find($this->employee_id);
+
+        if (!$employee || !$employee->user) {
+            return false;
+        }
+
+        // Check if the appraisee's user has the 'Head of Division' role
+        return $employee->user->hasRole('Head of Division');
+    }
+
+
     /* enforce appraisal approval hierarchy
     *Staff creates appraisal
     *the next to approve is the supervisor(Head of Division)
