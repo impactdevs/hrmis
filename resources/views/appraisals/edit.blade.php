@@ -3304,12 +3304,15 @@
     @endpush
 
     <div class="print-summary-cover d-none d-print-block" style="page-break-after: always;">
+           @php
+                                        $employee = app\Models\Employee::find($appraisal->employee_id);
+                                    @endphp
         <h1 class="text-center">Appraisal Summary</h1>
         <hr>
         <p><strong>Employee Name:</strong>
-            {{ auth()->user()->employee->first_name . ' ' . auth()->user()->employee->last_name }}</p>
-        <p><strong>Position:</strong> {{ optional(auth()->user()->employee->position)->position_name }}</p>
-        <p><strong>Division:</strong> {{ optional(auth()->user()->employee->department)->department_name }}</p>
+            {{ $employee->first_name . ' ' . $employee->last_name }}</p>
+        <p><strong>Position:</strong> {{ optional($employee ->position)->position_name }}</p>
+        <p><strong>Division:</strong> {{ optional($employee->department)->department_name }}</p>
         <p><strong>Appraisal Period:</strong> {{ $appraisal->appraisal_start_date?->toDateString() }} -
             {{ $appraisal->appraisal_end_date?->toDateString() }}</p>
         <hr>
