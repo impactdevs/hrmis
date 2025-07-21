@@ -407,25 +407,28 @@
                             <div class="p-3 rounded form-section bg-light">
                                 <h5 class="mb-3 text-muted">Your Personal Details</h5>
                                 <div class="row g-3">
+                                    @php
+                                        $employee = app\Models\Employee::find($appraisal->employee_id);
+                                    @endphp
                                     <div class="col-md-12">
                                         <p> FULL NAME:
-                                            {{ auth()->user()->employee->first_name . ' ' . auth()->user()->employee->last_name }}
+                                            {{ $employee->first_name . ' ' . $employee->last_name }}
                                         </p>
                                     </div>
                                     <div class="col-md-12">
                                         <p> POSITION:
-                                            {{ optional(auth()->user()->employee->position)->position_name }}
+                                            {{ optional($employee->position)->position_name }}
                                         </p>
                                     </div>
 
                                     <div class="col-md-12">
                                         <p> DIVISION:
-                                            {{ optional(auth()->user()->employee->department)->department_name }}
+                                            {{ optional($employee->department)->department_name }}
                                         </p>
                                     </div>
                                     <div class="col-md-12">
                                         <p> DATE OF 1ST APPOINTMENT:
-                                            {{ \Carbon\Carbon::parse(auth()->user()->employee->date_of_entry)->toFormattedDateString() }}
+                                            {{ \Carbon\Carbon::parse($employee->date_of_entry)->toFormattedDateString() }}
                                         </p>
                                     </div>
 
