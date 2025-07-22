@@ -140,7 +140,7 @@
                 </li>
             @endif
 
-                {{-- <li class="nav-item">
+                <li class="nav-item">
                     <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('whistleblower.index') || request()->routeIs('whistleblower.show')) bg-secondary @endif"
                         href="{{ route('whistleblower.index') }}">
                         <i class="fas fa-user-secret text-white-600"></i>
@@ -154,10 +154,10 @@
                         <i class="bi bi-house-check"></i>
                         Work From Home
                     </a>
-                </li> --}}
+                </li>
 
                 <li class="nav-item">
-                    <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('offdesk.index') || request()->routeIs('offdesk.show')) bg-secondary @endif"
+                    <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('offdesk.index') || request()->routeIs('offdesk.show') || request()->routeIs('offdesk.edit')) bg-secondary @endif"
                         href="{{ route('offdesk.index') }}">
                         <i class="bi bi-briefcase"></i>
                         Off Desk

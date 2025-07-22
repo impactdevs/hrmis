@@ -195,11 +195,11 @@
                 }
 
                 if (request()->routeIs('workfromhome.create')) {
-                    $title = ' Add Work From Home Record';
+                    $title = 'Apply To Work From Home';
                 }
 
                 if (request()->routeIs('workfromhome.show')) {
-                    $title = 'Work From Home Records';
+                    $title = 'Work From Home Details';
                 }
 
                 if (request()->routeIs('offdesk.index')) {
@@ -212,6 +212,10 @@
 
                 if (request()->routeIs('offdesk.show')) {
                     $title = 'Off Desk Details';
+                }
+
+                if (request()->routeIs('offdesk.edit')) {
+                    $title = 'Editing Off Desk Record';
                 }
 
             @endphp

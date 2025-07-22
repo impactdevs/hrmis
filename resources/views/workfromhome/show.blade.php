@@ -13,7 +13,6 @@
                     </div>
                     <div class="col-md-6">
                         <p><strong>Reason:</strong> {{ $entry->work_from_home_reason }}</p>
-                        <p><strong>Location:</strong> {{ $entry->work_location }}</p>
                         @if ($entry->work_from_home_attachments)
                             <p><strong>Attachment:</strong>
                                 <a href="{{ asset('storage/' . $entry->work_from_home_attachments) }}" target="_blank"

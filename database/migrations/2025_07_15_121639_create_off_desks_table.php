@@ -16,9 +16,9 @@ return new class extends Migration
             $table->uuid('employee_id')->references('employee_id')->on('employees');
             $table->dateTime('start_datetime');
             $table->dateTime('end_datetime');
-            $table->text('reason');
-            $table->text('destination');
-            $table->text('duty_allocated');
+            $table->text('reason')->nullable();
+            $table->text('destination')->nullable();
+            $table->text('duty_allocated')->nullable();
             $table->timestamps();
         });
     }

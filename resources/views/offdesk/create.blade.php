@@ -1,40 +1,24 @@
 <x-app-layout>
-    <div class="container mt-4">
+    <div class="m-3">
+        {{-- Display Validation Errors --}}
+        @if ($errors->any())
+            <div class="mb-4">
+                <div class="alert alert-danger p-4 rounded">
+                    <strong>Whoops! Something went wrong.</strong>
+                    <ul class="mt-2 mb-0 list-disc list-inside text-sm text-red-600">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
+        @endif
 
-        <form action="{{ route('offdesk.store') }}" method="POST">
+        <form method="POST" action="{{ route('offdesk.store') }}" accept-charset="UTF-8" class="form-horizontal"
+            enctype="multipart/form-data">
             @csrf
-
-            <div class="mb-3 row">
-                <div class="col-md-6">
-                    <label for="start_datetime" class="form-label">Start Date & Time</label>
-                    <input type="datetime-local" name="start_datetime" class="form-control" value="{{ old('start_datetime') }}" required>
-                </div>
-
-                <div class="col-md-6">
-                    <label for="end_datetime" class="form-label">End Date & Time</label>
-                    <input type="datetime-local" name="end_datetime" class="form-control" value="{{ old('end_datetime') }}" required>
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Destination</label>
-                <textarea name="destination" class="form-control" rows="1" required>{{ old('destination') }}</textarea>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Duty Allocated</label>
-                <textarea name="duty_allocated" class="form-control" rows="1" required>{{ old('duty_allocated') }}</textarea>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Reason</label>
-                <textarea name="reason" class="form-control" rows="3" required>{{ old('reason') }}</textarea>
-            </div>
-
-            <div class="d-flex justify-content-between mt-3">
-                <a href="{{ route('offdesk.index') }}" class="btn btn-secondary">Cancel</a>
-                <button type="submit" class="btn btn-primary">Save</button>
-            </div>
+            @include ('offdesk.form', ['formMode' => 'create'])
         </form>
     </div>
 </x-app-layout>
+

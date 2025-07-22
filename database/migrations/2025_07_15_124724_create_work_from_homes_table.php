@@ -16,9 +16,7 @@ return new class extends Migration
             $table->uuid('employee_id')->references('employee_id')->on('employees');
             $table->date('work_from_home_start_date')->nullable();
             $table->date('work_from_home_end_date')->nullable();
-            $table->string('work_location')->nullable();
-            $table->string('tasks_planned')->nullable();
-            $table->string('work_from_home_reason')->nullable();
+            $table->longtext('work_from_home_reason')->nullable();
             $table->string('work_from_home_attachments')->nullable();
             $table->timestamps();
         });

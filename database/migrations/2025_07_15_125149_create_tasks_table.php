@@ -16,7 +16,7 @@ return new class extends Migration
             $table->uuid('work_from_home_id');
             $table->date('task_start_date')->nullable();
             $table->date('task_end_date')->nullable();
-            $table->string('description')->nullable();
+            $table->longtext('description')->nullable();
             $table->timestamps();
 
              $table->foreign('work_from_home_id')->references('work_from_home_id')->on('work_from_homes')->onDelete('cascade');

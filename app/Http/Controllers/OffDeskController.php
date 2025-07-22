@@ -16,34 +16,33 @@ class OffDeskController extends Controller
 
     public function create()
     {
-        $employees = Employee::all();
-        return view('offdesk.create', compact('employees'));
+        return view('offdesk.create');
     }
 
     public function store(Request $request)
-{
-    $validated = $request->validate([
-        'start_datetime' => 'required|date',
-        'end_datetime'   => 'required|date|after_or_equal:start_datetime',
-        'destination'         => 'required|string|max:100',
-        'duty_allocated'         => 'required|string|max:100',
-        'reason'         => 'required|string|max:1000',
-    ]);
+    {
+        $validated = $request->validate([
+            'start_datetime' => 'required|date',
+            'end_datetime'   => 'required|date|after_or_equal:start_datetime',
+            'destination'         => 'nullable|string|max:100',
+            'duty_allocated'         => 'nullable|string|max:100',
+            'reason'         => 'nullable|string|max:1000',
+        ]);
 
-    // Fetch employee ID from logged-in user
-    $employeeId = auth()->user()->employee->employee_id ?? null;
+        // Fetch employee ID from logged-in user
+        $employeeId = auth()->user()->employee->employee_id ?? null;
 
-    if (!$employeeId) {
-        return back()->with('error', 'Employee record not found for the current user.');
+        if (!$employeeId) {
+            return back()->with('error', 'Employee record not found for the current user.');
+        }
+
+        // Merge employee ID into data
+        $validated['employee_id'] = $employeeId;
+
+        OffDesk::create($validated);
+
+        return redirect()->route('offdesk.index')->with('success', 'Off desk record created successfully.');
     }
-
-    // Merge employee ID into data
-    $validated['employee_id'] = $employeeId;
-
-    OffDesk::create($validated);
-
-    return redirect()->route('offdesk.index')->with('success', 'Off desk record created successfully.');
-}
 
     public function show($id)
     {
@@ -53,9 +52,9 @@ class OffDeskController extends Controller
 
     public function edit($id)
     {
-        $entry = OffDesk::findOrFail($id);
-        $employees = Employee::all();
-        return view('offdesk.edit', compact('entry', 'employees'));
+        $offdesk = OffDesk::findOrFail($id);
+        // $employees = Employee::all();
+        return view('offdesk.edit', compact('offdesk'));
     }
 
     public function update(Request $request, $id)

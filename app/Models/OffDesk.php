@@ -27,6 +27,11 @@ class OffDesk extends Model
         'reason',
     ];
 
+    protected $casts = [
+        'start_datetime' => 'datetime',
+        'end_datetime' => 'datetime',
+    ];
+
 
     protected static function boot()
     {

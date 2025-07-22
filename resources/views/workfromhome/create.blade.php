@@ -34,26 +34,13 @@
             </div>
 
             <div class="mb-3">
-                <label for="work_location" class="form-label">Work Location</label>
-                <select name="work_location" class="form-select" required>
-                    <option value="" disabled {{ old('work_location') ? '' : 'selected' }}>Select location</option>
-                    @php
-                        $locations = ['Home', 'Office', 'Field', 'Workshop', 'Training', 'Other'];
-                    @endphp
-                    @foreach($locations as $location)
-                        <option value="{{ $location }}" {{ old('work_location') === $location ? 'selected' : '' }}>{{ $location }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div class="mb-3">
                 <label for="work_from_home_attachments" class="form-label">Attachment (Optional)</label>
                 <input type="file" name="work_from_home_attachments" class="form-control">
             </div>
 
             {{-- Task Entries --}}
             <div class="mb-3">
-                <label class="form-label">Tasks</label>
+                <label class="form-label">Tasks(A Break down Of what you will be doing from home)</label>
                 <table class="table table-bordered" id="task-table">
                     <thead>
                         <tr>
@@ -65,9 +52,9 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td><input type="date" name="task_start_date[]" class="form-control" required></td>
-                            <td><input type="date" name="task_end_date[]" class="form-control" required></td>
-                            <td><input type="text" name="description[]" class="form-control" required></td>
+                            <td><input type="date" name="task_start_date[]" class="form-control"></td>
+                            <td><input type="date" name="task_end_date[]" class="form-control"></td>
+                            <td><input type="text" name="description[]" class="form-control"></td>
                             <td><button type="button" class="btn btn-danger btn-sm remove-row">Remove</button></td>
                         </tr>
                     </tbody>
@@ -88,23 +75,23 @@
 
     {{-- Dynamic row addition script --}}
     @push('scripts')
-    <script>
-        document.getElementById('add-task').addEventListener('click', function () {
-            const row = `
+        <script>
+            document.getElementById('add-task').addEventListener('click', function() {
+                const row = `
                 <tr>
                     <td><input type="date" name="task_start_date[]" class="form-control" required></td>
                     <td><input type="date" name="task_end_date[]" class="form-control" required></td>
                     <td><input type="text" name="description[]" class="form-control" required></td>
                     <td><button type="button" class="btn btn-danger btn-sm remove-row">Remove</button></td>
                 </tr>`;
-            document.querySelector('#task-table tbody').insertAdjacentHTML('beforeend', row);
-        });
+                document.querySelector('#task-table tbody').insertAdjacentHTML('beforeend', row);
+            });
 
-        document.addEventListener('click', function (e) {
-            if (e.target && e.target.classList.contains('remove-row')) {
-                e.target.closest('tr').remove();
-            }
-        });
-    </script>
+            document.addEventListener('click', function(e) {
+                if (e.target && e.target.classList.contains('remove-row')) {
+                    e.target.closest('tr').remove();
+                }
+            });
+        </script>
     @endpush
 </x-app-layout>

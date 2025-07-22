@@ -31,7 +31,6 @@ class WorkFromHomeController extends Controller
             'work_from_home_end_date'   => 'required|date|after_or_equal:work_from_home_start_date',
             'work_from_home_reason'     => 'required|string|max:1000',
             'work_from_home_attachments' => 'nullable|mimes:pdf,jpg,jpeg,png,doc,docx,xlsx|max:10240',
-            'work_location'             => 'required|string|max:100',
 
             // task fields
             'task_start_date.*' => 'required|date',
