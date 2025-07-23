@@ -340,7 +340,7 @@ class AppraisalsController extends Controller
             $requestedData['contract_id'] = null;
         }
 
-        if (!empty($requestedData['review_type_other']) && $requestedData['review_type_other'] !== 'other') {
+        if (!empty($requestedData['review_type_other']) && ($requestedData['review_type'] != 'other')) {
             $requestedData['review_type_other'] = null;
         }
 

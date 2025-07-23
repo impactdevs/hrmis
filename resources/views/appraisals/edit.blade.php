@@ -244,6 +244,7 @@
                 </div>
             </div>
 
+
             @push('scripts')
                 <script>
                     document.addEventListener('DOMContentLoaded', function() {
@@ -290,6 +291,10 @@
                         function toggleOtherInput(show) {
                             if (show) {
                                 otherInput.classList.remove('d-none');
+                                //check if in edit mode and refill with the value in case it exists
+                                if (otherInput.querySelector('input')) {
+                                    otherInput.querySelector('input').value = '{{ old('review_type_other', $otherValue) }}';
+                                }
                             } else {
                                 otherInput.classList.add('d-none');
                             }
@@ -346,8 +351,8 @@
 
                                 case 'other':
                                     // Clear dates and make editable
-                                    startDateInput.value = '';
-                                    endDateInput.value = '';
+                                    startDateInput.value = '{{ isset($appraisal->appraisal_start_date) ? $appraisal->appraisal_end_date->toDateString() : '' }}';
+                                    endDateInput.value = '{{ isset($appraisal->appraisal_end_date) ? $appraisal->appraisal_end_date->toDateString() : '' }}';
                                     setDateInputsReadonly(false);
                                     toggleContractDetails(false);
                                     toggleOtherInput(true);
