@@ -597,7 +597,7 @@
                             <table class="min-w-full text-base border border-gray-200" id="key-duties-table">
                                 <thead class="text-sm text-gray-700 uppercase bg-blue-100 border-b border-gray-200">
                                     <tr>
-                                        <th class="px-6 py-3 border border-gray-200 w-12">No.</th>
+                                        <th class="px-6 py-3 border border-gray-200 w-24" style="">No.</th>
                                         <th class="px-6 py-3 border border-gray-200">Planned Tasks (Target)</th>
                                         <th class="px-6 py-3 border border-gray-200">Output / Results</th>
                                         <th class="px-6 py-3 border border-gray-200 w-32">Supervisee (/6)</th>
@@ -767,15 +767,26 @@
                                         </tr>
                                     @endfor
 
+                                </tbody>
+                                <tfoot>
+                                    <tr class="bg-blue-100 font-semibold">
+                                        <td class="px-6 py-3 border border-gray-200 text-end" colspan="3">Total
+                                        </td>
+                                        <td class="px-6 py-3 border border-gray-200 text-center"
+                                            id="supervisee-total"></td>
+                                        <td class="px-6 py-3 border border-gray-200 text-center"
+                                            id="supervisor-total"></td>
+                                        <td class="px-6 py-3 border border-gray-200 text-center" id="agreed-total">
+                                        </td>
+                                        <td class="px-6 py-3 border border-gray-200"></td>
+                                    </tr>
 
-
-                                    <!-- Total Row -->
                                     <tr class="bg-gradient-to-r from-blue-50 to-indigo-50 font-semibold">
                                         <td class="px-6 py-4 border border-gray-200" colspan="7">
                                             <div class="flex items-center justify-between">
                                                 <div class="flex items-center space-x-4">
                                                     <div class="text-lg font-bold text-blue-700">
-                                                        Overall Average:
+                                                        Total Score from this Section out of 60:
                                                         <span id="overallAverage" class="text-2xl ml-2">0</span>%
                                                     </div>
 
@@ -803,19 +814,6 @@
 
                                         </td>
                                     </tr>
-                                </tbody>
-                                <tfoot>
-                                    <tr class="bg-blue-100 font-semibold">
-                                        <td class="px-6 py-3 border border-gray-200 text-end" colspan="3">Total
-                                        </td>
-                                        <td class="px-6 py-3 border border-gray-200 text-center"
-                                            id="supervisee-total"></td>
-                                        <td class="px-6 py-3 border border-gray-200 text-center"
-                                            id="supervisor-total"></td>
-                                        <td class="px-6 py-3 border border-gray-200 text-center" id="agreed-total">
-                                        </td>
-                                        <td class="px-6 py-3 border border-gray-200"></td>
-                                    </tr>
                                 </tfoot>
                             </table>
 
@@ -833,86 +831,88 @@
                                             let canAppraisor = @json($appraisal->is_appraisor);
 
                                             let newRow = `
-                                    <tr class="hover:bg-blue-50 transition-colors" data-row="${i}">
-                                        <td class="px-6 py-4 border border-gray-200 font-bold text-gray-900 align-top" rowspan="2">
-                                            <span class="row-number">${i}.</span>
-                                        </td>
-                                        <td class="px-6 py-2 border border-gray-200">
-                                            <div class="editable-cell p-2 rounded text-muted"
-                                                contenteditable="${canAppraisee ? 'true' : 'false'}"
-                                                data-placeholder="Enter task"
-                                                oninput="updateHiddenInput(this)"
-                                                onfocus="if(this.classList.contains('text-muted')){this.textContent='';this.classList.remove('text-muted');}">
-                                                Enter task
-                                            </div>
-                                            <input type="hidden"
-                                                name="appraisal_period_rate[${i - 1}][planned_activity]"
-                                                value="">
-                                        </td>
-                                        <td class="px-6 py-2 border border-gray-200">
-                                            <div class="editable-cell p-2 rounded text-muted"
-                                                contenteditable="${canAppraisee ? 'true' : 'false'}"
-                                                data-placeholder="Enter result"
-                                                oninput="updateHiddenInput(this)"
-                                                onfocus="if(this.classList.contains('text-muted')){this.textContent='';this.classList.remove('text-muted');}">
-                                                Enter result
-                                            </div>
-                                            <input type="hidden"
-                                                name="appraisal_period_rate[${i - 1}][output_results]"
-                                                value="">
-                                        </td>
-                                        <td class="px-6 py-2 border border-gray-200">
-                                            <div class="score-cell"
-                                                contenteditable="${canAppraisee ? 'true' : 'false'}"
-                                                data-type="score" oninput="updateScoreInput(this)">
-                                                0
-                                            </div>
-                                            <input type="hidden"
-                                                name="appraisal_period_rate[${i - 1}][supervisee_score]"
-                                                value="0">
-                                        </td>
-                                        <td class="px-6 py-2 border border-gray-200">
-                                            <div class="score-cell"
-                                                contenteditable="${canAppraisor ? 'true' : 'false'}"
-                                                data-type="score" oninput="updateScoreInput(this)">
-                                                0
-                                            </div>
-                                            <input type="hidden"
-                                                name="appraisal_period_rate[${i - 1}][supervisor_score]"
-                                                value="0">
-                                        </td>
-                                        <td class="px-6 py-2 border border-gray-200">
-                                            <input type="number"
-                                                name="appraisal_period_rate[${i - 1}][agreed_score]"
-                                                class="form-control form-control-sm agreed-score-input"
-                                                min="0" max="6" step="0.5"
-                                                value="0"
-                                                ${canAppraisee ? 'readonly' : ''}
-                                                oninput="updateKeyDutiesOverall()">
-                                        </td>
-                                        <td class="px-2 py-2 border border-gray-200 align-middle text-center no-print">
-                                            <button type="button" class="btn btn-sm btn-danger remove-duty-row" title="Remove row">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    <tr class="hover:bg-blue-50 transition-colors">
-                                        <td class="px-6 py-2 border border-gray-200 bg-gray-50 italic text-gray-600" colspan="6">
-                                            <div class="editable-cell p-2 rounded text-muted"
-                                                contenteditable="${canAppraisor ? 'true' : 'false'}"
-                                                data-placeholder="Supervisor's comment..."
-                                                oninput="updateHiddenInput(this)"
-                                                onfocus="if(this.classList.contains('text-muted')){this.textContent='';this.classList.remove('text-muted');}">
-                                                Supervisor's comment...
-                                            </div>
-                                            <input type="hidden"
-                                                name="appraisal_period_rate[${i - 1}][supervisor_comment]"
-                                                value="">
-                                        </td>
-                                    </tr>
-                                    `;
+                                            <tr class="hover:bg-blue-50 transition-colors" data-row="${i}">
+                                                <td class="px-6 py-4 border border-gray-200 font-bold text-gray-900 align-top" rowspan="2">
+                                                    <span class="row-number">${i}.</span>
+                                                </td>
+                                                <td class="px-6 py-2 border border-gray-200">
+                                                    <div class="editable-cell p-2 rounded text-muted"
+                                                        contenteditable="${canAppraisee ? 'true' : 'false'}"
+                                                        data-placeholder="Enter task"
+                                                        oninput="updateHiddenInput(this)"
+                                                        onfocus="if(this.classList.contains('text-muted')){this.textContent='';this.classList.remove('text-muted');}">
+                                                        Enter task
+                                                    </div>
+                                                    <input type="hidden"
+                                                        name="appraisal_period_rate[${i - 1}][planned_activity]"
+                                                        value="">
+                                                </td>
+                                                <td class="px-6 py-2 border border-gray-200">
+                                                    <div class="editable-cell p-2 rounded text-muted"
+                                                        contenteditable="${canAppraisee ? 'true' : 'false'}"
+                                                        data-placeholder="Enter result"
+                                                        oninput="updateHiddenInput(this)"
+                                                        onfocus="if(this.classList.contains('text-muted')){this.textContent='';this.classList.remove('text-muted');}">
+                                                        Enter result
+                                                    </div>
+                                                    <input type="hidden"
+                                                        name="appraisal_period_rate[${i - 1}][output_results]"
+                                                        value="">
+                                                </td>
+                                                <td class="px-6 py-2 border border-gray-200">
+                                                    <div class="score-cell text-muted"
+                                                        contenteditable="${canAppraisee ? 'true' : 'false'}"
+                                                        data-type="score" oninput="updateScoreInput(this)"
+                                                        onclick="if(this.classList.contains('text-muted')){this.textContent='';this.classList.remove('text-muted');}">
+                                                        0
+                                                    </div>
+                                                    <input type="hidden"
+                                                        name="appraisal_period_rate[${i - 1}][supervisee_score]"
+                                                        value="0">
+                                                </td>
+                                                <td class="px-6 py-2 border border-gray-200">
+                                                    <div class="score-cell text-muted"
+                                                        contenteditable="${canAppraisor ? 'true' : 'false'}"
+                                                        data-type="score" oninput="updateScoreInput(this)"
+                                                        onclick="if(this.classList.contains('text-muted')){this.textContent='';this.classList.remove('text-muted');}">
+                                                        0
+                                                    </div>
+                                                    <input type="hidden"
+                                                        name="appraisal_period_rate[${i - 1}][supervisor_score]"
+                                                        value="0">
+                                                </td>
+                                                <td class="px-6 py-2 border border-gray-200">
+                                                    <input type="number"
+                                                        name="appraisal_period_rate[${i - 1}][agreed_score]"
+                                                        class="form-control form-control-sm agreed-score-input"
+                                                        min="0" max="6" step="0.5"
+                                                        value="0"
+                                                        ${canAppraisee ? 'readonly' : ''}
+                                                        oninput="updateKeyDutiesOverall()">
+                                                </td>
+                                                <td class="px-2 py-2 border border-gray-200 align-middle text-center no-print">
+                                                    <button type="button" class="btn btn-sm btn-danger remove-duty-row" title="Remove row">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <tr class="hover:bg-blue-50 transition-colors">
+                                                <td class="px-6 py-2 border border-gray-200 bg-gray-50 italic text-gray-600" colspan="6">
+                                                    <div class="editable-cell p-2 rounded text-muted"
+                                                        contenteditable="${canAppraisor ? 'true' : 'false'}"
+                                                        data-placeholder="Supervisor's comment..."
+                                                        oninput="updateHiddenInput(this)"
+                                                        onfocus="if(this.classList.contains('text-muted')){this.textContent='';this.classList.remove('text-muted');}">
+                                                        Supervisor's comment...
+                                                    </div>
+                                                    <input type="hidden"
+                                                        name="appraisal_period_rate[${i - 1}][supervisor_comment]"
+                                                        value="">
+                                                </td>
+                                            </tr>
+                                                                                `;
                                             // Insert before the total row (last tr)
-                                            $tbody.find('tr').last().before(newRow);
+                                            $table.find('tfoot').before(newRow);
                                             updateDutyRowNumbers();
                                             showDutyRemoveButtons();
                                             updateKeyDutiesOverall();
@@ -981,18 +981,18 @@
                         <h6 class="h1">ASSESSMENT OF PERSONAL ATTRIBUTES</h6>
                         <p>The Appraisee should score her/his attributes in relation to performance.
                         </p>
-                        <table class="table align-middle table-striped table-hover table-borderless table-primary"
+<table class="table align-middle table-striped table-hover table-borderless table-primary text-center">
                             id="personal-attributes">
                             <caption>Rating: 80-100 – Excellent 70-79 – Very Good 60-69 - Satisfactory 50-59 – Average
                                 0-49
                                 - Unsatisfactory </caption>
                             <thead class="table-light">
                                 <tr>
-                                    <th>Measurable Indicators/Personal Attributes</th>
-                                    <th>Maximum Score</th>
-                                    <th>Appraisee's Score</th>
-                                    <th>Appraiser's Score</th>
-                                    <th>Agreed Score</th>
+                                    <th style="width: 30%">Measurable Indicators/Personal Attributes</th>
+                                    <th style="width: 17.5%">Maximum Score</th>
+                                    <th style="width: 17.5%">Appraisee's Score</th>
+                                    <th style="width: 17.5%">Appraiser's Score</th>
+                                    <th style="width: 17.5%">Agreed Score</th>
                                 </tr>
                             </thead>
                             <tbody class="table-group-divider">
@@ -1416,11 +1416,11 @@
                             <table class="table table-hover table-striped mb-0" id="performance-planning-table">
                                 <thead class="bg-light">
                                     <tr>
-                                        <th class="py-3 text-center">No.</th>
-                                        <th class="py-3">Key Output Description</th>
-                                        <th class="py-3">Agreed Performance Targets</th>
-                                        <th class="py-3">Target Dates</th>
-                                        <th class="py-3 no-print"></th>
+                                        <th class="py-3 text-center" style="width:10%">No.</th>
+                                        <th class="py-3 text-center" style="width:30%">Key Output Description</th>
+                                        <th class="py-3 text-center" style="width:30%">Agreed Performance Targets</th>
+                                        <th class="py-3 text-center" style="width:20%">Target Dates</th>
+                                        <th class="py-3 no-print text-center" style="width:10%"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -1895,6 +1895,12 @@
             /* Show caret for editable fields */
         }
 
+        table {
+            table-layout: fixed;
+            /* Crucial for column control */
+            width: 100%;
+        }
+
         @media print {
 
             @page {
@@ -2022,24 +2028,9 @@
 
         .editable-cell {
             min-height: 10vh;
+
             line-height: 1.5;
             font-family: Verdana, Geneva, Tahoma, sans-serif
-        }
-
-        table {
-            table-layout: fixed;
-            /* Crucial for column control */
-            width: 100%;
-        }
-
-        td {
-            max-width: 0;
-            /* Contain cell expansion */
-        }
-
-        .editable-cell {
-            /* ... existing styles ... */
-            word-break: break-word;
         }
 
         .editable-cell[data-placeholder]:empty::before {
@@ -2090,16 +2081,16 @@
         }
 
         .editable-cell {
-            /* border: 1px solid #ddd; */
+            border: 1px solid #ddd;
             /* Make sure there's a border for print */
-            /* padding: 8px; */
+            padding: 8px;
             /* Make text easily readable */
             font-size: 12pt;
             /* Suitable font size for printing */
             background-color: #fff;
             /* Ensure white background for printed content */
             color: #333;
-            /* Dark text for contrast */ */
+            /* Dark text for contrast */
         }
 
         /* Make sure the tooltip does not show up in print */
@@ -2163,9 +2154,9 @@
                 });
 
                 const maxScore = rowCount * 6;
-                const agreedPct = maxScore > 0 ? (totalAgreed / maxScore) * 100 : 0;
-                const superviseePct = maxScore > 0 ? (totalSupervisee / maxScore) * 100 : 0;
-                const supervisorPct = maxScore > 0 ? (totalSupervisor / maxScore) * 100 : 0;
+                const agreedPct = maxScore > 0 ? (totalAgreed / maxScore) * 60 : 0;
+                const superviseePct = maxScore > 0 ? (totalSupervisee / maxScore) * 60 : 0;
+                const supervisorPct = maxScore > 0 ? (totalSupervisor / maxScore) * 60 : 0;
 
                 // Update tfoot
                 document.getElementById('supervisee-total').textContent =
