@@ -1805,9 +1805,15 @@
                                 {{-- {{ dd($userRole == $currentApprover, $isHR,  $isHoD) }} --}}
                                 {{-- Approval / Rejection Controls --}}
                                 @if ($userRole == $currentApprover || $isHR || $isHoD)
+                                    @php
+                                        $statusArray = $appraisal->appraisal_request_status ?? [];
+                                    @endphp
+
                                     @if (
-                                        (!$isHoD && $appraisal->appraisal_request_status == null) ||
-                                            ($previousApprover != 'None' && $appraisal->appraisal_request_status[$previousApprover] == 'approved'))
+                                        (!$isHoD && empty($statusArray)) ||
+                                            ($previousApprover != 'None' &&
+                                                isset($statusArray[$previousApprover]) &&
+                                                $statusArray[$previousApprover] == 'approved'))
                                         <div class="form-group no-print mt-3 d-flex gap-2">
                                             <input class="btn btn-outline-primary btn-large approve-btn" type="button"
                                                 value="Approve" data-appraisal-id="{{ $appraisal->appraisal_id }}">
@@ -1815,7 +1821,13 @@
                                                 value="Reject" data-appraisal-id="{{ $appraisal->appraisal_id }}"
                                                 data-bs-toggle="modal" data-bs-target="#rejectModal">
                                         </div>
-                                    @elseif ($previousApprover != 'None' && $appraisal->appraisal_request_status[$previousApprover] == 'rejected')
+                                        @php
+                                            $statusArray = $appraisal->appraisal_request_status ?? [];
+                                        @endphp
+                                    @elseif (
+                                        $previousApprover != 'None' &&
+                                            isset($statusArray[$previousApprover]) &&
+                                            $statusArray[$previousApprover] == 'rejected')
                                         <p>Rejected by the {{ $previousApprover }}</p>
                                     @endif
                                 @else
@@ -2072,12 +2084,17 @@
             background-color: #f8f9fa;
         }
 
-              .editable-cell {
-            border: 1px solid #ddd; /* Make sure there's a border for print */
-            padding: 8px; /* Make text easily readable */
-            font-size: 12pt; /* Suitable font size for printing */
-            background-color: #fff; /* Ensure white background for printed content */
-            color: #333; /* Dark text for contrast */
+        .editable-cell {
+            border: 1px solid #ddd;
+            /* Make sure there's a border for print */
+            padding: 8px;
+            /* Make text easily readable */
+            font-size: 12pt;
+            /* Suitable font size for printing */
+            background-color: #fff;
+            /* Ensure white background for printed content */
+            color: #333;
+            /* Dark text for contrast */
         }
 
         /* Make sure the tooltip does not show up in print */
@@ -2092,7 +2109,8 @@
 
         /* Handle the contenteditable div for appraisee */
         .editable-cell[contenteditable="true"] {
-            font-style: italic; /* Mark editable cells for clarity */
+            font-style: italic;
+            /* Mark editable cells for clarity */
         }
     </style>
     @push('scripts')
@@ -3304,14 +3322,14 @@
     @endpush
 
     <div class="print-summary-cover d-none d-print-block" style="page-break-after: always;">
-           @php
-                                        $employee = app\Models\Employee::find($appraisal->employee_id);
-                                    @endphp
+        @php
+            $employee = app\Models\Employee::find($appraisal->employee_id);
+        @endphp
         <h1 class="text-center">Appraisal Summary</h1>
         <hr>
         <p><strong>Employee Name:</strong>
             {{ $employee->first_name . ' ' . $employee->last_name }}</p>
-        <p><strong>Position:</strong> {{ optional($employee ->position)->position_name }}</p>
+        <p><strong>Position:</strong> {{ optional($employee->position)->position_name }}</p>
         <p><strong>Division:</strong> {{ optional($employee->department)->department_name }}</p>
         <p><strong>Appraisal Period:</strong> {{ $appraisal->appraisal_start_date?->toDateString() }} -
             {{ $appraisal->appraisal_end_date?->toDateString() }}</p>

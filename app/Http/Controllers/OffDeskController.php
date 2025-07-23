@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\OffDesk;
 use App\Models\Employee;
+use App\Models\User;
+use App\Notifications\OffDeskNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 
 class OffDeskController extends Controller
 {
@@ -39,7 +42,12 @@ class OffDeskController extends Controller
         // Merge employee ID into data
         $validated['employee_id'] = $employeeId;
 
-        OffDesk::create($validated);
+        $offdesk = OffDesk::create($validated);
+
+        $hrUser = User::role('HR')->first();
+        if ($hrUser) {
+            Notification::send($hrUser, new OffDeskNotification($offdesk, auth()->user()->employee->first_name, auth()->user()->employee->last_name));
+        }
 
         return redirect()->route('offdesk.index')->with('success', 'Off desk record created successfully.');
     }

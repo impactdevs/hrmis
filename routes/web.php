@@ -155,13 +155,6 @@ Route::get('whistleblowing/{id}', [WhistleblowingController::class, 'show'])->na
 Route::get("uncst-thank-you-for-the-report", [WhistleblowingController::class, 'thankyou'])->name('whistle.thankyou');
 
 
-
-Route::post('/whistleblowers', [WhistleblowerController::class, 'store'])->name('whistleblower.store');// Public
-Route::get('/whistleblowers', [WhistleblowerController::class, 'index'])->name('whistleblower.index');
-Route::get('/whistleblowers/create', [WhistleblowerController::class, 'create'])->name('whistleblower.create');
-Route::get('/whistleblowers/{id}', [WhistleblowerController::class, 'show']); // Admin
-
-
 Route::resource('workfromhome', WorkFromHomeController::class);
 Route::resource('offdesk', OffDeskController::class);
 

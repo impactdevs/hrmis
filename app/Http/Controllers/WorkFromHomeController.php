@@ -6,7 +6,10 @@ use App\Models\WorkFromHome;
 use App\Models\Employee;
 use Illuminate\Http\Request;
 use App\Models\Task;
+use App\Models\User;
+use App\Notifications\WorkFromHomeNotification;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 
 
@@ -48,8 +51,6 @@ class WorkFromHomeController extends Controller
             return back()->with('error', 'Employee record not found for the current user.');
         }
 
-        DB::beginTransaction();
-
         try {
             // Create work from home record
             $workFromHome = WorkFromHome::create([
@@ -72,12 +73,15 @@ class WorkFromHomeController extends Controller
                 ]);
             }
 
+            $hrUser = User::role('HR')->first();
+            if ($hrUser) {
+                Notification::send($hrUser, new WorkFromHomeNotification($workFromHome, auth()->user()->employee->first_name, auth()->user()->employee->last_name));
+            }
 
-            DB::commit();
+
 
             return redirect()->route('workfromhome.index')->with('success', 'Work from home request created successfully.');
         } catch (\Throwable $e) {
-            DB::rollBack();
             return back()->with('error', 'Failed to save request: ' . $e->getMessage());
         }
     }

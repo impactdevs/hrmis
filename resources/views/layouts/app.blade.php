@@ -118,7 +118,7 @@
         <script type="module">
             Toastify({
                 text: "{{ session('error') }}",
-                duration: 3000,
+                duration: 8000,
                 destination: "",
                 newWindow: true,
                 close: true,
@@ -184,6 +184,42 @@
                         notificationItem = `
                                 <li>
                                 <a class="dropdown-item" href="/events/${notification.event_id}">
+                                ${notification.message}
+                                </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                `;
+                    }
+
+                    if (notification.report_id) {
+                        // Create a new notification item
+                        notificationItem = `
+                                <li>
+                                <a class="dropdown-item" href="/events/${notification.report_id}">
+                                ${notification.message}
+                                </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                `;
+                    }
+
+                    if (notification.off_desk_id) {
+                        // Create a new notification item
+                        notificationItem = `
+                                <li>
+                                <a class="dropdown-item" href="/offdesk/${notification.off_desk_id}">
+                                ${notification.message}
+                                </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                `;
+                    }
+
+                    if (notification.work_from_home_id) {
+                        // Create a new notification item
+                        notificationItem = `
+                                <li>
+                                <a class="dropdown-item" href="/workfromhome/${notification.work_from_home_id}">
                                 ${notification.message}
                                 </a>
                                 </li>

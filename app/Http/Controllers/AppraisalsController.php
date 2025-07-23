@@ -21,7 +21,48 @@ class AppraisalsController extends Controller
      */
     public function index()
     {
-        $appraisals = Appraisal::with('employee')->latest()->paginate();
+        if (auth()->user()->hasRole('HR')) {
+            // If the user is a Staff, only show their own appraisals
+            $appraisals = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
+                ->where(function ($query) {
+                    $query->whereJsonContains('appraisals.appraisal_request_status', ['Head of Division' => 'approved'])
+                        ->orWhereJsonContains('appraisals.appraisal_request_status', ['Executive Secretary' => 'approved'])
+                        //or rejected by Head of Division or Executive Secretary
+                        ->orWhereJsonContains('appraisals.appraisal_request_status', ['Head of Division' => 'rejected'])
+                        ->orWhereJsonContains('appraisals.appraisal_request_status', ['Executive Secretary' => 'rejected'])
+                        ->orWhereExists(function ($subQuery) {
+                            $subQuery->select(DB::raw(1))
+                                ->from('employees')
+                                ->join('users', 'users.id', '=', 'employees.user_id')
+                                ->join('model_has_roles', 'model_has_roles.model_id', '=', 'users.id')
+                                ->whereColumn('employees.employee_id', 'appraisals.appraiser_id')
+                                ->where('model_has_roles.model_type', User::class)
+                                ->where('roles.name', 'HR')
+                                ->join('roles', 'roles.id', '=', 'model_has_roles.role_id');
+                        });
+                })
+                ->whereNull("appraisals.appraisal_request_status->HR")
+                ->where('appraisal_drafts.is_submitted', true)
+                ->paginate();
+        } else if (auth()->user()->hasRole('Executive Secretary')) {
+            //to the E.S
+            $appraisals = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
+                ->whereJsonContains('appraisal_request_status', ['Head of Division' => 'approved', 'HR' => 'approved'])
+                ->orWhereExists(function ($subQuery) {
+                    $subQuery->select(DB::raw(1))
+                        ->from('employees')
+                        ->join('users', 'users.id', '=', 'employees.user_id')
+                        ->join('model_has_roles', 'model_has_roles.model_id', '=', 'users.id')
+                        ->whereColumn('employees.employee_id', 'appraisals.employee_id')
+                        ->where('model_has_roles.model_type', User::class)
+                        ->where('roles.name', 'Head of Division')
+                        ->join('roles', 'roles.id', '=', 'model_has_roles.role_id');
+                })
+                ->where('appraisal_drafts.is_submitted', true)
+                ->paginate();
+        } else {
+            $appraisals = Appraisal::with('employee')->latest()->paginate();
+        }
         return view('appraisals.index', compact('appraisals'));
     }
 
@@ -275,30 +316,30 @@ class AppraisalsController extends Controller
 
         // Default message
         $message = "Appraisal has been submitted successfully.";
-       if (isset($requestedData['relevant_documents']) && filled($requestedData['relevant_documents']) && is_array($requestedData['relevant_documents'])) {
-                foreach ($requestedData['relevant_documents'] as $key => $value) {
-                    // Ensure $value is an array to avoid undefined index
-                    if (!is_array($value)) {
-                        continue;
-                    }
+        if (isset($requestedData['relevant_documents']) && filled($requestedData['relevant_documents']) && is_array($requestedData['relevant_documents'])) {
+            foreach ($requestedData['relevant_documents'] as $key => $value) {
+                // Ensure $value is an array to avoid undefined index
+                if (!is_array($value)) {
+                    continue;
+                }
 
-                    // Handle when proof is not set or null, fallback to existing
-                    if (!array_key_exists('proof', $value) || $value['proof'] === null) {
-                        $requestedData['relevant_documents'][$key]['proof'] = $uncst_appraisal['relevant_documents'][$key]['proof'] ?? null;
-                    }
+                // Handle when proof is not set or null, fallback to existing
+                if (!array_key_exists('proof', $value) || $value['proof'] === null) {
+                    $requestedData['relevant_documents'][$key]['proof'] = $uncst_appraisal['relevant_documents'][$key]['proof'] ?? null;
+                }
 
-                    // Check if a new file is uploaded for this document
-                    if ($request->hasFile("relevant_documents.$key.proof")) {
-                        $file = $request->file("relevant_documents.$key.proof");
+                // Check if a new file is uploaded for this document
+                if ($request->hasFile("relevant_documents.$key.proof")) {
+                    $file = $request->file("relevant_documents.$key.proof");
 
-                        // Double-check it's a valid upload
-                        if ($file && $file->isValid()) {
-                            $filePath = $file->store('proof_documents', 'public');
-                            $requestedData['relevant_documents'][$key]['proof'] = $filePath;
-                        }
+                    // Double-check it's a valid upload
+                    if ($file && $file->isValid()) {
+                        $filePath = $file->store('proof_documents', 'public');
+                        $requestedData['relevant_documents'][$key]['proof'] = $filePath;
                     }
                 }
             }
+        }
 
 
 

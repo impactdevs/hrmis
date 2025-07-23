@@ -142,7 +142,7 @@
 
                 <li class="nav-item">
                     <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('whistleblower.index') || request()->routeIs('whistleblower.show')) bg-secondary @endif"
-                        href="{{ route('whistleblower.index') }}">
+                        href="{{ route('whistleblowing.index') }}">
                         <i class="fas fa-user-secret text-white-600"></i>
                         WhistleBlower
                     </a>

@@ -72,7 +72,7 @@ class HomeController extends Controller
 
         //to the E.S
         $submittedAppraisalsByHR = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
-            ->whereJsonContains('appraisal_request_status', ['Head of Division' => 'approved', 'HR' => 'approved', 'Executive Secretary' => 'approved'])
+            ->whereJsonContains('appraisal_request_status', ['Head of Division' => 'approved', 'HR' => 'approved'])
             ->where('appraisal_drafts.is_submitted', true)
             ->get();
 

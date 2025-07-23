@@ -37,10 +37,19 @@
                                         }
                                     }
                                     if (isset($notification->data['leave_roster_id'])) {
-                                        $url = url(
-                                            'apply-for-leave',
-                                            $notification->data['leave_roster_id'],
-                                        );
+                                        $url = url('apply-for-leave', $notification->data['leave_roster_id']);
+                                    }
+
+                                    if (isset($notification->data['off_desk_id'])) {
+                                        $url = url('offdesk', $notification->data['off_desk_id']);
+                                    }
+
+                                    if (isset($notification->data['work_from_home_id'])) {
+                                        $url = url('offdesk', $notification->data['work_from_home_id']);
+                                    }
+
+                                    if (isset($notification->data['report_id'])) {
+                                        $url = url('whistleblowing', $notification->data['report_id']);
                                     }
                                 @endphp
                                 <li class="list-group-item notification-item m-2 d-flex justify-content-between"
