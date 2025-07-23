@@ -1475,23 +1475,12 @@
                                                         $appraisal->performance_planning[$j]['target_date'] ?? '';
                                                 @endphp
 
-                                                @if ($staffDraftValue)
-                                                    {{-- Empty visible date input --}}
-                                                    <input type="date"
-                                                        class="form-control form-control-sm date-input" value=""
-                                                        disabled>
 
-                                                    {{-- Hidden input to submit the actual value --}}
-                                                    <input type="hidden"
-                                                        name="performance_planning[{{ $j }}][target_date]"
-                                                        value="{{ $targetDate }}">
-                                                @else
-                                                    {{-- Normal visible input with value --}}
-                                                    <input type="date"
-                                                        class="form-control form-control-sm date-input"
-                                                        name="performance_planning[{{ $j }}][target_date]"
-                                                        value="{{ $targetDate }}">
-                                                @endif
+                                                {{-- Empty visible date input --}}
+                                                <input type="text" class="form-control form-control-sm"
+                                                    name="performance_planning[{{ $j }}][target_date]"
+                                                    value="{{ $targetDate }}">
+
                                             </td>
                                             <td class="no-print align-middle text-center">
                                                 <button type="button" class="btn btn-sm btn-danger remove-row-btn"
@@ -1538,7 +1527,7 @@
                                             <input type="hidden" name="performance_planning[${rowCount}][performance_target]" value="">
                                         </td>
                                         <td>
-                                            <input type="date" class="form-control form-control-sm date-input"
+                                            <input type="text" class="form-control form-control-sm"
                                                 name="performance_planning[${rowCount}][target_date]" value="">
                                         </td>
                                         <td class="no-print align-middle text-center">
@@ -2037,6 +2026,22 @@
             font-family: Verdana, Geneva, Tahoma, sans-serif
         }
 
+        table {
+            table-layout: fixed;
+            /* Crucial for column control */
+            width: 100%;
+        }
+
+        td {
+            max-width: 0;
+            /* Contain cell expansion */
+        }
+
+        .editable-cell {
+            /* ... existing styles ... */
+            word-break: break-word;
+        }
+
         .editable-cell[data-placeholder]:empty::before {
             content: attr(data-placeholder);
             color: #9ca3af;
@@ -2085,16 +2090,16 @@
         }
 
         .editable-cell {
-            border: 1px solid #ddd;
+            /* border: 1px solid #ddd; */
             /* Make sure there's a border for print */
-            padding: 8px;
+            /* padding: 8px; */
             /* Make text easily readable */
             font-size: 12pt;
             /* Suitable font size for printing */
             background-color: #fff;
             /* Ensure white background for printed content */
             color: #333;
-            /* Dark text for contrast */
+            /* Dark text for contrast */ */
         }
 
         /* Make sure the tooltip does not show up in print */
