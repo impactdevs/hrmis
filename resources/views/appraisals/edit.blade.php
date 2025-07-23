@@ -981,8 +981,8 @@
                         <h6 class="h1">ASSESSMENT OF PERSONAL ATTRIBUTES</h6>
                         <p>The Appraisee should score her/his attributes in relation to performance.
                         </p>
-<table class="table align-middle table-striped table-hover table-borderless table-primary text-center">
-                            id="personal-attributes">
+<table class="table align-middle table-striped table-hover table-borderless table-primary text-center" id="personal-attributes">
+                          
                             <caption>Rating: 80-100 – Excellent 70-79 – Very Good 60-69 - Satisfactory 50-59 – Average
                                 0-49
                                 - Unsatisfactory </caption>
