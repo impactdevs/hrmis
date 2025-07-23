@@ -19,15 +19,15 @@ class AppraisalsController extends Controller
     /** 
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $search = $request->get('search');
+
         if (auth()->user()->hasRole('HR')) {
-            // If the user is a Staff, only show their own appraisals
-            $appraisals = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
+            $query = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
                 ->where(function ($query) {
                     $query->whereJsonContains('appraisals.appraisal_request_status', ['Head of Division' => 'approved'])
                         ->orWhereJsonContains('appraisals.appraisal_request_status', ['Executive Secretary' => 'approved'])
-                        //or rejected by Head of Division or Executive Secretary
                         ->orWhereJsonContains('appraisals.appraisal_request_status', ['Head of Division' => 'rejected'])
                         ->orWhereJsonContains('appraisals.appraisal_request_status', ['Executive Secretary' => 'rejected'])
                         ->orWhereExists(function ($subQuery) {
@@ -42,11 +42,19 @@ class AppraisalsController extends Controller
                         });
                 })
                 ->whereNull("appraisals.appraisal_request_status->HR")
-                ->where('appraisal_drafts.is_submitted', true)
-                ->paginate();
+                ->where('appraisal_drafts.is_submitted', true);
+
+            if ($search) {
+                $query->whereHas('employee', function ($q) use ($search) {
+                    $q->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhere('staff_id', 'like', "%{$search}%");
+                });
+            }
+
+            $appraisals = $query->paginate();
         } else if (auth()->user()->hasRole('Executive Secretary')) {
-            //to the E.S
-            $appraisals = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
+            $query = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
                 ->whereJsonContains('appraisal_request_status', ['Head of Division' => 'approved', 'HR' => 'approved'])
                 ->orWhereExists(function ($subQuery) {
                     $subQuery->select(DB::raw(1))
@@ -58,11 +66,33 @@ class AppraisalsController extends Controller
                         ->where('roles.name', 'Head of Division')
                         ->join('roles', 'roles.id', '=', 'model_has_roles.role_id');
                 })
-                ->where('appraisal_drafts.is_submitted', true)
-                ->paginate();
+                ->where('appraisal_drafts.is_submitted', true);
+
+            if ($search) {
+                $query->whereHas('employee', function ($q) use ($search) {
+                    $q->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhere('staff_id', 'like', "%{$search}%");
+                });
+            }
+
+            $appraisals = $query->paginate();
         } else {
-            $appraisals = Appraisal::with('employee')->latest()->paginate();
+            $query = Appraisal::with('employee')->latest();
+
+            if ($search) {
+                $query->whereHas('employee', function ($q) use ($search) {
+                    $q->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhere('staff_id', 'like', "%{$search}%");
+                });
+            }
+
+            $appraisals = $query->paginate();
         }
+
+        $appraisals->appends(['search' => $search]);
+
         return view('appraisals.index', compact('appraisals'));
     }
 

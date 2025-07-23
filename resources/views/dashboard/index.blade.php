@@ -122,7 +122,7 @@
                                                     E.S</span>
                                                 </div>
                                             </div>
-                                        @elseif(auth()->user()->hasRole('HR'))
+                                        @elseif(auth()->user()->hasRole('Executive Secretary'))
                                             <h5 class="card-title">Appraisals Submitted From HR</h5>
                                             <div class="d-flex align-items-center">
                                                 <div
