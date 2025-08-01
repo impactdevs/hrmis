@@ -24,7 +24,7 @@ jobs:
           username: ${{ secrets.DO_USERNAME }}
           key: ${{ secrets.DO_SSH_KEY }}
           source: "."
-          target: "/var/www/uncst.impact-outsourcing.com"
+          target: "/var/www/hrm.uncst.go.ug"
 
       - name: Run migrations, optimize, and restart Supervisor
         uses: appleboy/ssh-action@master
@@ -33,7 +33,7 @@ jobs:
           username: ${{ secrets.DO_USERNAME }}
           key: ${{ secrets.DO_SSH_KEY }}
           script: |
-            cd /var/www/uncst.impact-outsourcing.com
+            cd /var/www/hrm.uncst.go.ug
             npm run build
             php artisan migrate --force
             php artisan optimize:clear
@@ -50,8 +50,8 @@ jobs:
           username: ${{ secrets.DO_USERNAME }}
           key: ${{ secrets.DO_SSH_KEY }}
           script: |
-            sudo chgrp -R www-data /var/www/uncst.impact-outsourcing.com/storage /var/www/uncst.impact-outsourcing.com/bootstrap/cache
-            sudo chmod -R ug+rwx /var/www/uncst.impact-outsourcing.com/storage /var/www/uncst.impact-outsourcing.com/bootstrap/cache
+            sudo chgrp -R www-data /var/www/hrm.uncst.go.ug/storage /var/www/hrm.uncst.go.ug/bootstrap/cache
+            sudo chmod -R ug+rwx /var/www/hrm.uncst.go.ug/storage /var/www/hrm.uncst.go.ug/bootstrap/cache
             # set right permissions for images directory in public, make sure its readable and writable
 
       - name: Set proper permissions for images directory
@@ -61,5 +61,5 @@ jobs:
           username: ${{ secrets.DO_USERNAME }}
           key: ${{ secrets.DO_SSH_KEY }}
           script: |
-            sudo chgrp -R www-data /var/www/uncst.impact-outsourcing.com/public
-            sudo chmod -R ug+rwx /var/www/uncst.impact-outsourcing.com/public
+            sudo chgrp -R www-data /var/www/hrm.uncst.go.ug/public
+            sudo chmod -R ug+rwx /var/www/hrm.uncst.go.ug/public
