@@ -108,11 +108,13 @@
                                                     </td>
                                                     @php
                                                         $statusHistory = collect($appraisal->appraisal_request_status);
+                                                        $appraiser = \App\Models\Employee::find($appraisal->appraiser_id);
+                                                        $appraisarIsEs = $appraiser && $appraiser->user->hasRole('Executive Secretary');
                                                         $user = \App\Models\User::find(
                                                             \App\Models\Employee::find($appraisal->employee_id)
                                                                 ->user_id,
                                                         );
-                                                        if ($user && $user->hasRole('Head of Division')) {
+                                                        if ($user && $user->hasRole('Head of Division') || $appraisarIsEs) {
                                                             $approvalFlow = ['Executive Secretary'];
                                                         } else {
                                                             $approvalFlow = [
