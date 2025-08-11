@@ -66,6 +66,8 @@ class AppraisalsController extends Controller
                         ->where('roles.name', 'Head of Division')
                         ->join('roles', 'roles.id', '=', 'model_has_roles.role_id');
                 })
+                //or where the ES is the appraiser
+                ->orWhere('appraiser_id', auth()->user()->employee->employee_id)
                 ->where('appraisal_drafts.is_submitted', true);
 
             if ($search) {
