@@ -351,8 +351,10 @@
 
                                 case 'other':
                                     // Clear dates and make editable
-                                    startDateInput.value = '{{ isset($appraisal->appraisal_start_date) ? $appraisal->appraisal_end_date->toDateString() : '' }}';
-                                    endDateInput.value = '{{ isset($appraisal->appraisal_end_date) ? $appraisal->appraisal_end_date->toDateString() : '' }}';
+                                    startDateInput.value =
+                                        '{{ isset($appraisal->appraisal_start_date) ? $appraisal->appraisal_end_date->toDateString() : '' }}';
+                                    endDateInput.value =
+                                        '{{ isset($appraisal->appraisal_end_date) ? $appraisal->appraisal_end_date->toDateString() : '' }}';
                                     setDateInputsReadonly(false);
                                     toggleContractDetails(false);
                                     toggleOtherInput(true);
@@ -825,100 +827,99 @@
                             @push('scripts')
                                 <script>
                                     $(function() {
-                                        // Add row button for Key Duties table
                                         $('#add-duty-row').on('click', function() {
                                             let $table = $('#key-duties-table');
                                             let $tbody = $table.find('tbody');
-                                            // Find last data-row index
-                                            let rowCount = $tbody.find('tr[data-row]').length;
-                                            let i = rowCount + 1;
                                             let canAppraisee = @json($appraisal->is_appraisee);
                                             let canAppraisor = @json($appraisal->is_appraisor);
 
+                                            // Create new row number
+                                            const newRowNumber = $tbody.find('tr[data-row]').length + 1;
+
                                             let newRow = `
-                                            <tr class="hover:bg-blue-50 transition-colors" data-row="${i}">
-                                                <td class="px-6 py-4 border border-gray-200 font-bold text-gray-900 align-top" rowspan="2">
-                                                    <span class="row-number">${i}.</span>
-                                                </td>
-                                                <td class="px-6 py-2 border border-gray-200">
-                                                    <div class="editable-cell p-2 rounded text-muted"
-                                                        contenteditable="${canAppraisee ? 'true' : 'false'}"
-                                                        data-placeholder="Enter task"
-                                                        oninput="updateHiddenInput(this)"
-                                                        onfocus="if(this.classList.contains('text-muted')){this.textContent='';this.classList.remove('text-muted');}">
-                                                        Enter task
-                                                    </div>
-                                                    <input type="hidden"
-                                                        name="appraisal_period_rate[${i - 1}][planned_activity]"
-                                                        value="">
-                                                </td>
-                                                <td class="px-6 py-2 border border-gray-200">
-                                                    <div class="editable-cell p-2 rounded text-muted"
-                                                        contenteditable="${canAppraisee ? 'true' : 'false'}"
-                                                        data-placeholder="Enter result"
-                                                        oninput="updateHiddenInput(this)"
-                                                        onfocus="if(this.classList.contains('text-muted')){this.textContent='';this.classList.remove('text-muted');}">
-                                                        Enter result
-                                                    </div>
-                                                    <input type="hidden"
-                                                        name="appraisal_period_rate[${i - 1}][output_results]"
-                                                        value="">
-                                                </td>
-                                                <td class="px-6 py-2 border border-gray-200">
-                                                    <div class="score-cell text-muted"
-                                                        contenteditable="${canAppraisee ? 'true' : 'false'}"
-                                                        data-type="score" oninput="updateScoreInput(this)"
-                                                        onclick="if(this.classList.contains('text-muted')){this.textContent='';this.classList.remove('text-muted');}">
-                                                        0
-                                                    </div>
-                                                    <input type="hidden"
-                                                        name="appraisal_period_rate[${i - 1}][supervisee_score]"
-                                                        value="0">
-                                                </td>
-                                                <td class="px-6 py-2 border border-gray-200">
-                                                    <div class="score-cell text-muted"
-                                                        contenteditable="${canAppraisor ? 'true' : 'false'}"
-                                                        data-type="score" oninput="updateScoreInput(this)"
-                                                        onclick="if(this.classList.contains('text-muted')){this.textContent='';this.classList.remove('text-muted');}">
-                                                        0
-                                                    </div>
-                                                    <input type="hidden"
-                                                        name="appraisal_period_rate[${i - 1}][supervisor_score]"
-                                                        value="0">
-                                                </td>
-                                                <td class="px-6 py-2 border border-gray-200">
-                                                    <input type="number"
-                                                        name="appraisal_period_rate[${i - 1}][agreed_score]"
-                                                        class="form-control form-control-sm agreed-score-input"
-                                                        min="0" max="6" step="0.5"
-                                                        value="0"
-                                                        ${canAppraisee ? 'readonly' : ''}
-                                                        oninput="updateKeyDutiesOverall()">
-                                                </td>
-                                                <td class="px-2 py-2 border border-gray-200 align-middle text-center no-print">
-                                                    <button type="button" class="btn btn-sm btn-danger remove-duty-row" title="Remove row">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                            <tr class="hover:bg-blue-50 transition-colors">
-                                                <td class="px-6 py-2 border border-gray-200 bg-gray-50 italic text-gray-600" colspan="6">
-                                                    <div class="editable-cell p-2 rounded text-muted"
-                                                        contenteditable="${canAppraisor ? 'true' : 'false'}"
-                                                        data-placeholder="Supervisor's comment..."
-                                                        oninput="updateHiddenInput(this)"
-                                                        onfocus="if(this.classList.contains('text-muted')){this.textContent='';this.classList.remove('text-muted');}">
-                                                        Supervisor's comment...
-                                                    </div>
-                                                    <input type="hidden"
-                                                        name="appraisal_period_rate[${i - 1}][supervisor_comment]"
-                                                        value="">
-                                                </td>
-                                            </tr>
-                                                                                `;
-                                            // Insert before the total row (last tr)
-                                            $table.find('tfoot').before(newRow);
+    <tr class="hover:bg-blue-50 transition-colors" data-row="new">
+        <td class="px-6 py-4 border border-gray-200 font-bold text-gray-900 align-top" rowspan="2">
+            <span class="row-number">new.</span>
+        </td>
+        <td class="px-6 py-2 border border-gray-200">
+            <div class="editable-cell p-2 rounded text-muted"
+                contenteditable="${canAppraisee ? 'true' : 'false'}"
+                data-placeholder="Enter task"
+                oninput="updateHiddenInput(this)"
+                onfocus="if(this.classList.contains('text-muted')){this.textContent='';this.classList.remove('text-muted');}">
+                Enter task
+            </div>
+            <input type="hidden"
+                name="appraisal_period_rate[new][planned_activity]"
+                value="">
+        </td>
+        <td class="px-6 py-2 border border-gray-200">
+            <div class="editable-cell p-2 rounded text-muted"
+                contenteditable="${canAppraisee ? 'true' : 'false'}"
+                data-placeholder="Enter result"
+                oninput="updateHiddenInput(this)"
+                onfocus="if(this.classList.contains('text-muted')){this.textContent='';this.classList.remove('text-muted');}">
+                Enter result
+            </div>
+            <input type="hidden"
+                name="appraisal_period_rate[new][output_results]"
+                value="">
+        </td>
+        <td class="px-6 py-2 border border-gray-200">
+            <div class="score-cell text-muted"
+                contenteditable="${canAppraisee ? 'true' : 'false'}"
+                data-type="score" oninput="updateScoreInput(this)"
+                onclick="if(this.classList.contains('text-muted')){this.textContent='';this.classList.remove('text-muted');}">
+                0
+            </div>
+            <input type="hidden"
+                name="appraisal_period_rate[new][supervisee_score]"
+                value="0">
+        </td>
+        <td class="px-6 py-2 border border-gray-200">
+            <div class="score-cell text-muted"
+                contenteditable="${canAppraisor ? 'true' : 'false'}"
+                data-type="score" oninput="updateScoreInput(this)"
+                onclick="if(this.classList.contains('text-muted')){this.textContent='';this.classList.remove('text-muted');}">
+                0
+            </div>
+            <input type="hidden"
+                name="appraisal_period_rate[new][supervisee_score]"
+                value="0">
+        </td>
+        <td class="px-6 py-2 border border-gray-200">
+            <input type="number"
+                name="appraisal_period_rate[new][agreed_score]"
+                class="form-control form-control-sm agreed-score-input"
+                min="0" max="6" step="0.5"
+                value="0"
+                ${canAppraisee ? 'readonly' : ''}
+                oninput="updateKeyDutiesOverall()">
+        </td>
+        <td class="px-2 py-2 border border-gray-200 align-middle text-center no-print">
+            <button type="button" class="btn btn-sm btn-danger remove-duty-row" title="Remove row">
+                <i class="fas fa-trash"></i>
+            </button>
+        </td>
+    </tr>
+    <tr class="hover:bg-blue-50 transition-colors">
+        <td class="px-6 py-2 border border-gray-200 bg-gray-50 italic text-gray-600" colspan="6">
+            <div class="editable-cell p-2 rounded text-muted"
+                contenteditable="${canAppraisor ? 'true' : 'false'}"
+                data-placeholder="Supervisor's comment..."
+                oninput="updateHiddenInput(this)"
+                onfocus="if(this.classList.contains('text-muted')){this.textContent='';this.classList.remove('text-muted');}">
+                Supervisor's comment...
+            </div>
+            <input type="hidden"
+                name="appraisal_period_rate[new][supervisor_comment]"
+                value="">
+        </td>
+    </tr>`;
+
+                                            $tbody.append(newRow);
                                             updateDutyRowNumbers();
+                                            updateDutyInputNames();
                                             showDutyRemoveButtons();
                                             updateKeyDutiesOverall();
                                         });
@@ -939,8 +940,12 @@
                                         });
 
                                         function updateDutyRowNumbers() {
-                                            $('#key-duties-table tbody tr[data-row]').each(function(i, tr) {
-                                                $(tr).find('.row-number').text((i + 1) + '.');
+                                            console.log('Updating duty row numbers...');
+                                            let rowNum = 1;
+                                            $('#key-duties-table tbody tr[data-row]').each(function() {
+                                                $(this).attr('data-row', rowNum);
+                                                $(this).find('.row-number').text(rowNum + '.');
+                                                rowNum++;
                                             });
                                         }
 
@@ -986,8 +991,10 @@
                         <h6 class="h1">ASSESSMENT OF PERSONAL ATTRIBUTES</h6>
                         <p>The Appraisee should score her/his attributes in relation to performance.
                         </p>
-<table class="table align-middle table-striped table-hover table-borderless table-primary text-center" id="personal-attributes">
-                          
+                        <table
+                            class="table align-middle table-striped table-hover table-borderless table-primary text-center"
+                            id="personal-attributes">
+
                             <caption>Rating: 80-100 – Excellent 70-79 – Very Good 60-69 - Satisfactory 50-59 – Average
                                 0-49
                                 - Unsatisfactory </caption>
