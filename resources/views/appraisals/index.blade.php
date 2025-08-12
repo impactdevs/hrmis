@@ -17,8 +17,7 @@
                     </a>
                 @endif
             </div>
-
-
+            
             <div class="mb-6">
                 {{-- search by name or staff id --}}
                 @if (auth()->user()->hasRole('HR') ||
