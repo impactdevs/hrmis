@@ -70,11 +70,56 @@ class HomeController extends Controller
             ->where('appraisal_drafts.is_submitted', true)
             ->get();
 
-        //to the E.S
+        //submitte by all supervisors
+        $submittedAppraisalsByallSupervisors = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
+            ->where(function ($q) {
+                $q->where(function ($q2) {
+                    $q2->whereJsonContains('appraisal_request_status', [
+                        'Head of Division' => 'approved',
+                        'HR' => 'approved'
+                    ])
+                        ->whereNull("appraisals.appraisal_request_status->Executive Secretary");
+                })
+                    ->orWhereExists(function ($subQuery) {
+                        $subQuery->select(DB::raw(1))
+                            ->from('employees')
+                            ->join('users', 'users.id', '=', 'employees.user_id')
+                            ->join('model_has_roles', 'model_has_roles.model_id', '=', 'users.id')
+                            ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
+                            ->whereColumn('employees.employee_id', 'appraisals.employee_id')
+                            ->where('model_has_roles.model_type', User::class)
+                            ->where('roles.name', 'Head of Division');
+                    })
+                    ->orWhere('appraiser_id', auth()->user()->employee->employee_id);
+            })
+            ->where(function ($q) {
+                $q->whereNull("appraisals.appraisal_request_status->Executive Secretary")
+                    ->orWhereJsonDoesntContain('appraisal_request_status', [
+                        'Executive Secretary' => 'approved',
+                    ]);
+            })
+            ->where('appraisal_drafts.is_submitted', true)->get();
+
+
         $submittedAppraisalsByHR = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
             ->whereJsonContains('appraisal_request_status', ['Head of Division' => 'approved', 'HR' => 'approved'])
             ->where('appraisal_drafts.is_submitted', true)
             ->get();
+
+        //get the Executive Secretary's account
+        $executiveSecretary = User::role('Executive Secretary')->first();
+
+        $employeeId = Employee::withoutGlobalScope(EmployeeScope::class)
+            ->where('user_id', $executiveSecretary->id)
+            ->value('employee_id');
+
+        //complete appraisals
+        $completeAppraisals = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
+            ->whereJsonContains('appraisal_request_status', ['Head of Division' => 'approved', 'HR' => 'approved', 'Executive Secretary' => 'approved'])
+            //or where the appraser is the Executive Secretary and has approved
+            ->orWhere('appraiser_id', $employeeId)->whereJsonContains('appraisal_request_status', ['Executive Secretary' => 'approved'])
+
+            ->where('appraisal_drafts.is_submitted', true);
 
         $ongoingAppraisals = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
             ->where('appraisal_drafts.is_submitted', true)
@@ -287,7 +332,7 @@ class HomeController extends Controller
         $user = User::find(auth()->id());
         $notifications = $user->unreadNotifications()->latest()->take(10)->get();
 
-        return view('dashboard.index', compact('number_of_employees', 'ongoingAppraisals', 'submittedAppraisalsBystaff', 'pendingAppraisals', 'submittedAppraisalsByHR', 'submittedAppraisalsByHoD', 'notifications', 'contracts', 'runningContracts', 'expiredContracts', 'attendances', 'available_leave', 'hours', 'todayCounts', 'yesterdayCounts', 'lateCounts', 'chartDataJson', 'leaveTypesJson', 'chartEmployeeDataJson', 'events', 'trainings', 'entries', 'appraisals', 'leaveApprovalData', 'totalLeaves', 'totalDays', 'todayBirthdays', 'isAdmin'));
+        return view('dashboard.index', compact('number_of_employees', 'submittedAppraisalsByallSupervisors','completeAppraisals', 'ongoingAppraisals', 'submittedAppraisalsBystaff', 'pendingAppraisals', 'submittedAppraisalsByHR', 'submittedAppraisalsByHoD', 'notifications', 'contracts', 'runningContracts', 'expiredContracts', 'attendances', 'available_leave', 'hours', 'todayCounts', 'yesterdayCounts', 'lateCounts', 'chartDataJson', 'leaveTypesJson', 'chartEmployeeDataJson', 'events', 'trainings', 'entries', 'appraisals', 'leaveApprovalData', 'totalLeaves', 'totalDays', 'todayBirthdays', 'isAdmin'));
     }
 
     public function agree()

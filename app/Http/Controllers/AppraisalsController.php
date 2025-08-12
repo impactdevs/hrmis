@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Appraisal;
 use App\Models\Contract;
+use App\Models\Employee;
 use App\Models\User;
 use App\Notifications\AppraisalApproval;
 use App\Notifications\AppraisalApplication;
@@ -16,84 +17,215 @@ use Illuminate\Support\Facades\DB;
 
 class AppraisalsController extends Controller
 {
-  /** 
+    /** 
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $search = $request->get('search');
+        // $search = $request->get('search');
 
-        if (auth()->user()->hasRole('HR')) {
-            $query = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
-                ->where(function ($query) {
-                    $query->whereJsonContains('appraisals.appraisal_request_status', ['Head of Division' => 'approved'])
-                        ->orWhereJsonContains('appraisals.appraisal_request_status', ['Executive Secretary' => 'approved'])
-                        ->orWhereJsonContains('appraisals.appraisal_request_status', ['Head of Division' => 'rejected'])
-                        ->orWhereJsonContains('appraisals.appraisal_request_status', ['Executive Secretary' => 'rejected'])
-                        ->orWhereExists(function ($subQuery) {
-                            $subQuery->select(DB::raw(1))
-                                ->from('employees')
-                                ->join('users', 'users.id', '=', 'employees.user_id')
-                                ->join('model_has_roles', 'model_has_roles.model_id', '=', 'users.id')
-                                ->whereColumn('employees.employee_id', 'appraisals.appraiser_id')
-                                ->where('model_has_roles.model_type', User::class)
-                                ->where('roles.name', 'HR')
-                                ->join('roles', 'roles.id', '=', 'model_has_roles.role_id');
-                        });
-                })
-                ->whereNull("appraisals.appraisal_request_status->HR")
-                ->where('appraisal_drafts.is_submitted', true);
+        // if (auth()->user()->hasRole('HR')) {
 
-            if ($search) {
-                $query->whereHas('employee', function ($q) use ($search) {
-                    $q->where('first_name', 'like', "%{$search}%")
-                        ->orWhere('last_name', 'like', "%{$search}%")
-                        ->orWhere('staff_id', 'like', "%{$search}%");
-                });
-            }
+        //     $dashboard_filter = $request->get('dashboard_filter');
 
-            $appraisals = $query->paginate();
-        } else if (auth()->user()->hasRole('Executive Secretary')) {
-            $query = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
-                ->whereJsonContains('appraisal_request_status', ['Head of Division' => 'approved', 'HR' => 'approved'])
-                ->orWhereExists(function ($subQuery) {
-                    $subQuery->select(DB::raw(1))
-                        ->from('employees')
-                        ->join('users', 'users.id', '=', 'employees.user_id')
-                        ->join('model_has_roles', 'model_has_roles.model_id', '=', 'users.id')
-                        ->whereColumn('employees.employee_id', 'appraisals.employee_id')
-                        ->where('model_has_roles.model_type', User::class)
-                        ->where('roles.name', 'Head of Division')
-                        ->join('roles', 'roles.id', '=', 'model_has_roles.role_id');
-                })
-                //or where the ES is the appraiser
-                ->orWhere('appraiser_id', auth()->user()->employee->employee_id)
-                ->where('appraisal_drafts.is_submitted', true);
+        //     //if the filter is submitted_to_es
 
-            if ($search) {
-                $query->whereHas('employee', function ($q) use ($search) {
-                    $q->where('first_name', 'like', "%{$search}%")
-                        ->orWhere('last_name', 'like', "%{$search}%")
-                        ->orWhere('staff_id', 'like', "%{$search}%");
-                });
-            }
+        //     //to the E.S
+        //     $submittedAppraisalsByHR = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
+        //         ->whereJsonContains('appraisal_request_status', ['Head of Division' => 'approved', 'HR' => 'approved'])
+        //         ->where('appraisal_drafts.is_submitted', true)
+        //         ->get();
 
-            $appraisals = $query->paginate();
-        } else {
-            $query = Appraisal::with('employee')->latest();
+        //     if (!is_null($dashboard_filter) && $dashboard_filter == 'submitted_to_es') {
+        //         //these are the appraisals that the H.R submitted to the E.S.
+        //         $query = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
+        //             ->whereJsonContains('appraisal_request_status', ['Head of Division' => 'approved', 'HR' => 'approved'])
+        //             ->where('appraisal_drafts.is_submitted', true);
+        //     } else if (!is_null($dashboard_filter) && $dashboard_filter == 'completed_appraisals') {
+        //         //get the Executive Secretary's account
+        //         $executiveSecretary = User::role('Executive Secretary')->first();
 
-            if ($search) {
-                $query->whereHas('employee', function ($q) use ($search) {
-                    $q->where('first_name', 'like', "%{$search}%")
-                        ->orWhere('last_name', 'like', "%{$search}%")
-                        ->orWhere('staff_id', 'like', "%{$search}%");
-                });
-            }
+        //         $employeeId = Employee::withoutGlobalScope(EmployeeScope::class)
+        //             ->where('user_id', $executiveSecretary->id)
+        //             ->value('employee_id');
+        //         $query = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
+        //             ->whereJsonContains('appraisal_request_status', ['Head of Division' => 'approved', 'HR' => 'approved', 'Executive Secretary' => 'approved'])
+        //             //or where the appraser is the Executive Secretary and has approved
+        //             ->orWhere('appraiser_id', $employeeId)->whereJsonContains('appraisal_request_status', ['Executive Secretary' => 'approved'])
 
-            $appraisals = $query->paginate();
-        }
+        //             ->where('appraisal_drafts.is_submitted', true);
+        //     } else if (!is_null($dashboard_filter) && $dashboard_filter == 'received_from_HoDs') {
+        //         $query = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
+        //             ->where(function ($query) {
+        //                 $query->whereJsonContains('appraisals.appraisal_request_status', ['Head of Division' => 'approved'])
+        //                     ->orWhereExists(function ($subQuery) {
+        //                         $subQuery->select(DB::raw(1))
+        //                             ->from('employees')
+        //                             ->join('users', 'users.id', '=', 'employees.user_id')
+        //                             ->join('model_has_roles', 'model_has_roles.model_id', '=', 'users.id')
+        //                             ->whereColumn('employees.employee_id', 'appraisals.appraiser_id')
+        //                             ->where('model_has_roles.model_type', User::class)
+        //                             ->where('roles.name', 'HR')
+        //                             ->join('roles', 'roles.id', '=', 'model_has_roles.role_id');
+        //                     });
+        //             })
+        //             ->whereNull("appraisals.appraisal_request_status->HR")
+        //             ->where('appraisal_drafts.is_submitted', true);
+        //     } else if (!is_null($dashboard_filter) && $dashboard_filter == 'awaiting_for_me') {
 
-        $appraisals->appends(['search' => $search]);
+        //         $query = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
+        //             ->where(function ($query) {
+        //                 $query->whereJsonContains('appraisals.appraisal_request_status', ['Head of Division' => 'approved'])
+        //                     ->orWhereJsonContains('appraisals.appraisal_request_status', ['Executive Secretary' => 'approved'])
+        //                     ->orWhereJsonContains('appraisals.appraisal_request_status', ['Head of Division' => 'rejected'])
+        //                     ->orWhereJsonContains('appraisals.appraisal_request_status', ['Executive Secretary' => 'rejected'])
+        //                     ->orWhereExists(function ($subQuery) {
+        //                         $subQuery->select(DB::raw(1))
+        //                             ->from('employees')
+        //                             ->join('users', 'users.id', '=', 'employees.user_id')
+        //                             ->join('model_has_roles', 'model_has_roles.model_id', '=', 'users.id')
+        //                             ->whereColumn('employees.employee_id', 'appraisals.appraiser_id')
+        //                             ->where('model_has_roles.model_type', User::class)
+        //                             ->where('roles.name', 'HR')
+        //                             ->join('roles', 'roles.id', '=', 'model_has_roles.role_id');
+        //                     });
+        //             })
+        //             ->whereNull("appraisals.appraisal_request_status->HR")
+        //             ->where('appraisal_drafts.is_submitted', true);
+        //     } else {
+        //         $query = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
+        //             ->where(function ($query) {
+        //                 $query->whereJsonContains('appraisals.appraisal_request_status', ['Head of Division' => 'approved'])
+        //                     ->orWhereJsonContains('appraisals.appraisal_request_status', ['Executive Secretary' => 'approved'])
+        //                     ->orWhereJsonContains('appraisals.appraisal_request_status', ['Head of Division' => 'rejected'])
+        //                     ->orWhereJsonContains('appraisals.appraisal_request_status', ['Executive Secretary' => 'rejected'])
+        //                     ->orWhereExists(function ($subQuery) {
+        //                         $subQuery->select(DB::raw(1))
+        //                             ->from('employees')
+        //                             ->join('users', 'users.id', '=', 'employees.user_id')
+        //                             ->join('model_has_roles', 'model_has_roles.model_id', '=', 'users.id')
+        //                             ->whereColumn('employees.employee_id', 'appraisals.appraiser_id')
+        //                             ->where('model_has_roles.model_type', User::class)
+        //                             ->where('roles.name', 'HR')
+        //                             ->join('roles', 'roles.id', '=', 'model_has_roles.role_id');
+        //                     });
+        //             })
+        //             ->whereNull("appraisals.appraisal_request_status->HR")
+        //             ->where('appraisal_drafts.is_submitted', true);
+        //     }
+
+        //     if ($search) {
+        //         $query->whereHas('employee', function ($q) use ($search) {
+        //             $q->where('first_name', 'like', "%{$search}%")
+        //                 ->orWhere('last_name', 'like', "%{$search}%")
+        //                 ->orWhere('staff_id', 'like', "%{$search}%");
+        //         });
+        //     }
+
+        //     $appraisals = $query->paginate();
+        // } else if (auth()->user()->hasRole('Executive Secretary')) {
+
+        //     $dashboard_filter = $request->get('dashboard_filter');
+
+        //     if (!is_null($dashboard_filter) && $dashboard_filter == 'submitted_to_es') {
+        //         //these are the appraisals that the H.R submitted to the E.S.
+        //         $query = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
+        //             ->whereJsonContains('appraisal_request_status', ['Head of Division' => 'approved', 'HR' => 'approved'])
+
+        //             ->where('appraisal_drafts.is_submitted', true);
+        //     } else if (!is_null($dashboard_filter) && $dashboard_filter == 'completed_appraisals') {
+
+        //         //get the Executive Secretary's account
+        //         $executiveSecretary = User::role('Executive Secretary')->first();
+
+        //         $employeeId = Employee::withoutGlobalScope(EmployeeScope::class)
+        //             ->where('user_id', $executiveSecretary->id)
+        //             ->value('employee_id');
+        //         $query = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
+        //             ->whereJsonContains('appraisal_request_status', ['Head of Division' => 'approved', 'HR' => 'approved', 'Executive Secretary' => 'approved'])
+        //             ->orWhere('appraiser_id', $employeeId)->whereJsonContains('appraisal_request_status', ['Executive Secretary' => 'approved'])
+
+        //             ->where('appraisal_drafts.is_submitted', true);
+        //     } else if (!is_null($dashboard_filter) && $dashboard_filter == 'from_all_supervisors') {
+        //         $query = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
+        //             ->where(function ($q) {
+        //                 $q->where(function ($q2) {
+        //                     $q2->whereJsonContains('appraisal_request_status', [
+        //                         'Head of Division' => 'approved',
+        //                         'HR' => 'approved'
+        //                     ])
+        //                         ->whereNull("appraisals.appraisal_request_status->Executive Secretary");
+        //                 })
+        //                     ->orWhereExists(function ($subQuery) {
+        //                         $subQuery->select(DB::raw(1))
+        //                             ->from('employees')
+        //                             ->join('users', 'users.id', '=', 'employees.user_id')
+        //                             ->join('model_has_roles', 'model_has_roles.model_id', '=', 'users.id')
+        //                             ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
+        //                             ->whereColumn('employees.employee_id', 'appraisals.employee_id')
+        //                             ->where('model_has_roles.model_type', User::class)
+        //                             ->where('roles.name', 'Head of Division');
+        //                     })
+        //                     ->orWhere('appraiser_id', auth()->user()->employee->employee_id);
+        //             })
+        //             ->where(function ($q) {
+        //                 $q->whereNull("appraisals.appraisal_request_status->Executive Secretary")
+        //                     ->orWhereJsonDoesntContain('appraisal_request_status', [
+        //                         'Executive Secretary' => 'approved',
+        //                     ]);
+        //             })
+        //             ->where('appraisal_drafts.is_submitted', true);
+        //     } else if (!is_null($dashboard_filter) && $dashboard_filter == 'pending_appraisals') {
+        //         //get the logged in person's drafts
+        //         $query = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
+        //             ->where('appraisal_drafts.is_submitted', false)
+        //             ->where(function ($query) {
+        //                 $query->where('appraisal_drafts.employee_id', auth()->user()->employee->employee_id);
+        //             });
+        //     } else {
+        //         $query = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
+        //             ->whereJsonContains('appraisal_request_status', ['Head of Division' => 'approved', 'HR' => 'approved'])
+        //             ->orWhereExists(function ($subQuery) {
+        //                 $subQuery->select(DB::raw(1))
+        //                     ->from('employees')
+        //                     ->join('users', 'users.id', '=', 'employees.user_id')
+        //                     ->join('model_has_roles', 'model_has_roles.model_id', '=', 'users.id')
+        //                     ->whereColumn('employees.employee_id', 'appraisals.employee_id')
+        //                     ->where('model_has_roles.model_type', User::class)
+        //                     ->where('roles.name', 'Head of Division')
+        //                     ->join('roles', 'roles.id', '=', 'model_has_roles.role_id');
+        //             })
+        //             //or where the ES is the appraiser
+        //             ->orWhere('appraiser_id', auth()->user()->employee->employee_id)
+        //             ->where('appraisal_drafts.is_submitted', true);
+        //     }
+
+        //     if ($search) {
+        //         $query->whereHas('employee', function ($q) use ($search) {
+        //             $q->where('first_name', 'like', "%{$search}%")
+        //                 ->orWhere('last_name', 'like', "%{$search}%")
+        //                 ->orWhere('staff_id', 'like', "%{$search}%");
+        //         });
+        //     }
+
+        //     $appraisals = $query->paginate();
+        // } else {
+        //     $query = Appraisal::with('employee')->latest();
+
+        //     if ($search) {
+        //         $query->whereHas('employee', function ($q) use ($search) {
+        //             $q->where('first_name', 'like', "%{$search}%")
+        //                 ->orWhere('last_name', 'like', "%{$search}%")
+        //                 ->orWhere('staff_id', 'like', "%{$search}%");
+        //         });
+        //     }
+
+        //     $appraisals = $query->paginate();
+        // }
+
+        // $appraisals->appends(['search' => $search]);
+
+        $appraisals = Appraisal::with('employee', 'appraiser')->paginate();
 
         return view('appraisals.index', compact('appraisals'));
     }
