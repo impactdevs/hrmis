@@ -108,14 +108,30 @@
                                                     </td>
                                                     @php
                                                         $statusHistory = collect($appraisal->appraisal_request_status);
-                                                        $appraiser = \App\Models\Employee::find($appraisal->appraiser_id);
-                                                        $appraiser_user = \App\Models\User::find($appraiser->user_id);
-                                                        $appraisarIsEs = $appraiser && $appraiser_user->hasRole('Executive Secretary');
-                                                        $user = \App\Models\User::find(
-                                                            \App\Models\Employee::find($appraisal->employee_id)
-                                                                ->user_id,
+                                                        $appraiser = \App\Models\Employee::withoutGlobalScopes()->find(
+                                                            $appraisal->appraiser_id,
                                                         );
-                                                        if ($user && $user->hasRole('Head of Division') || $appraisarIsEs) {
+
+                                                        $appraiser_user = $appraiser
+                                                            ? \App\Models\User::find($appraiser->user_id)
+                                                            : null;
+
+                                                        $appraisarIsEs =
+                                                            $appraiser_user &&
+                                                            $appraiser_user->hasRole('Executive Secretary');
+
+                                                        $employee = \App\Models\Employee::withoutGlobalScopes()->find(
+                                                            $appraisal->employee_id,
+                                                        );
+
+                                                        $user = $employee
+                                                            ? \App\Models\User::find($employee->user_id)
+                                                            : null;
+
+                                                        if (
+                                                            ($user && $user->hasRole('Head of Division')) ||
+                                                            $appraisarIsEs
+                                                        ) {
                                                             $approvalFlow = ['Executive Secretary'];
                                                         } else {
                                                             $approvalFlow = [
