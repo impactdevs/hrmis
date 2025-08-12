@@ -225,7 +225,7 @@ class AppraisalsController extends Controller
 
         // $appraisals->appends(['search' => $search]);
 
-        $appraisals = Appraisal::with('employee', 'appraiser')->paginate();
+        $appraisals = Appraisal::with('employee', 'appraiser')->get();
 
         return view('appraisals.index', compact('appraisals'));
     }
