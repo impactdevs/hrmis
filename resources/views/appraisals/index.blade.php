@@ -413,10 +413,10 @@
                             </div>
 
                         @endif
-                        {{-- <!-- Pagination (for both layouts) -->
+                        <!-- Pagination (for both layouts) -->
                         <div class="mt-4 px-4 py-3 border-t border-gray-200 dark:border-gray-700 sm:px-6">
                             {!! $appraisals->appends(['search' => request()->get('search')])->render() !!}
-                        </div> --}}
+                        </div>
                     </div>
                 </div>
             </div>
