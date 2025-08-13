@@ -343,4 +343,6 @@ class HomeController extends Controller
         $user->save();
         return redirect()->back()->with('success', 'Thank you for agreeing to data usage.');
     }
+
+    
 }

@@ -1713,9 +1713,12 @@
 
                         @php
                             $is_es = auth()->user()->hasRole('Executive Secretary');
+                             $userRole = Auth::user()->roles->pluck('name')[0];
                         @endphp
                         @if (!isset($draft) || !$draft->is_submitted)
                             @if ($appraisal->is_appraisee || $appraisal->is_appraisor || $is_es)
+                            @if (!(isset($appraisal->appraisal_request_status[$userRole]) &&
+                                                $appraisal->appraisal_request_status[$userRole] === 'approved'))
                                 <div class="gap-3 d-flex no-print">
                                     <button type="reset" class="btn btn-lg btn-outline-secondary">
                                         <i class="fas fa-undo me-2"></i>Reset
@@ -1729,6 +1732,7 @@
                                         <i class="fas fa-paper-plane me-2"></i>Review & Submit
                                     </button>
                                 </div>
+                                @endif
                             @endif
                         @endif
                         @can('approve appraisal')
@@ -1739,7 +1743,7 @@
                             @endphp
                             @if (!is_null($appraisal->employee->user_id))
                                 @php
-                                    $userRole = Auth::user()->roles->pluck('name')[0];
+                                   
                                     $roleNames = [
                                         'Head of Division' => 'Head of Division',
                                         'HR' => 'HR',
