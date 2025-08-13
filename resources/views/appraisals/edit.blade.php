@@ -352,9 +352,9 @@
                                 case 'other':
                                     // Clear dates and make editable
                                     startDateInput.value =
-                                        '{{ isset($appraisal->appraisal_start_date) ? $appraisal->appraisal_end_date->toDateString() : '' }}';
+                                        '{{ isset($appraisal->appraisal_start_date) ? optional($appraisal->appraisal_end_date)->toDateString() : '' }}';
                                     endDateInput.value =
-                                        '{{ isset($appraisal->appraisal_end_date) ? $appraisal->appraisal_end_date->toDateString() : '' }}';
+                                        '{{ isset($appraisal->appraisal_end_date) ? optional($appraisal->appraisal_end_date)->toDateString() : '' }}';
                                     setDateInputsReadonly(false);
                                     toggleContractDetails(false);
                                     toggleOtherInput(true);
