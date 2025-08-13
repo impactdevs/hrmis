@@ -12,9 +12,19 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('appraisals', function (Blueprint $table) {
-            // add panel_recommendations column and supervisor_recommendations column
-            $table->text('panel_recommendations')->nullable()->after('superviser_overall_assessment');
-            $table->text('supervisor_recommendations')->nullable()->after('panel_recommendationst');
+            // Drop columns if they already exist
+            if (Schema::hasColumn('appraisals', 'panel_recommendations')) {
+                $table->dropColumn('panel_recommendations');
+            }
+            if (Schema::hasColumn('appraisals', 'supervisor_recommendations')) {
+                $table->dropColumn('supervisor_recommendations');
+            }
+        });
+
+        Schema::table('appraisals', function (Blueprint $table) {
+            // Add the new columns
+            $table->text('panel_recommendations')->nullable()->after('recommendations');
+            $table->text('supervisor_recommendations')->nullable()->after('recommendations');
         });
     }
 
@@ -24,7 +34,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('appraisals', function (Blueprint $table) {
-            //
+            $table->dropColumn(['panel_recommendations', 'supervisor_recommendations']);
         });
     }
 };
