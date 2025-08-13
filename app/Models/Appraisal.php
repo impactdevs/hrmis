@@ -49,6 +49,7 @@ class Appraisal extends Model
         'panel_recommendations',
         'supervisor_recommendations',
         'panel_comment',
+        'overall_assessment_and_comments',
         'panel_recommendation',
         'overall_assessment',
         'executive_secretary_comments',

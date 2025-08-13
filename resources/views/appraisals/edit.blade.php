@@ -1658,7 +1658,6 @@
                             :isDraft="$executiveSecretaryDraftValue" id="panel_recommendation" :value="old('panel_recommendation', $appraisal->panel_recommendation ?? '')" :isDisabled="!$appraisal->is_es" />
                     </div>
 
-
                     <div class="col-md-12">
                         <x-forms.text-area name="overall_assessment" :isDraft="$executiveSecretaryDraftValue"
                             label="iii.	Supervisor's overall assessment - Describe overall performance in accomplishing goals, fulfilling other results and responsibilities; eg Excellent, Very good, Satisfactory, Average, Unsatisfactory. "
@@ -1711,8 +1710,12 @@
                             <i class="fas fa-info-circle text-primary me-2"></i>
                             Thank you for filling the appraisal
                         </div>
+
+                        @php
+                            $is_es = auth()->user()->hasRole('Executive Secretary');
+                        @endphp
                         @if (!isset($draft) || !$draft->is_submitted)
-                            @if ($appraisal->is_appraisee || $appraisal->is_appraisor)
+                            @if ($appraisal->is_appraisee || $appraisal->is_appraisor || $is_es)
                                 <div class="gap-3 d-flex no-print">
                                     <button type="reset" class="btn btn-lg btn-outline-secondary">
                                         <i class="fas fa-undo me-2"></i>Reset
