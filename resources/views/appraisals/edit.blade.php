@@ -1634,9 +1634,9 @@
                     </div>
 
                     <div class="col-md-12">
-                        <x-forms.text-area name="recommendations" :isDraft="$headOfDivisionDraftValue"
-                            label="iv. Recommendations: Recommendations with reasons on whether the employee under review should be promoted, confirmed, remain on probation, redeployed, terminated from Council Service, contract renewed, go for further training, needs counseling, status quo should be maintained, etc.)."
-                            id="recommendations" :value="old('recommendations', $appraisal->recommendations ?? '')" :isDisabled="!$appraisal->is_appraisor" />
+                        <x-forms.text-area name="supervisor_recommendations" :isDraft="$headOfDivisionDraftValue"
+                            label="iv. Supervisor Recommendations: Recommendations with reasons on whether the employee under review should be promoted, confirmed, remain on probation, redeployed, terminated from Council Service, contract renewed, go for further training, needs counseling, status quo should be maintained, etc.)."
+                            id="supervisor_recommendations" :value="old('supervisor_recommendations', $appraisal->supervisor_recommendations ?? '')" :isDisabled="!$appraisal->is_appraisor" />
                     </div>
                 </div>
             </fieldset>
@@ -1666,9 +1666,9 @@
                     </div>
 
                     <div class="col-md-12">
-                        <x-forms.text-area name="recommendations" :isDraft="$executiveSecretaryDraftValue"
+                        <x-forms.text-area name="panel_recommendations" :isDraft="$executiveSecretaryDraftValue"
                             label="iv. Recommendations: Recommendations with reasons on whether the employee under review should be promoted, confirmed, remain on probation, redeployed, terminated from Council Service, contract renewed, go for further training, needs counseling, status quo should be maintained, etc.)."
-                            id="recommendations" :value="old('recommendations', $appraisal->recommendations ?? '')" :isDisabled="!$appraisal->is_es" />
+                            id="panel_recommendations" :value="old('panel_recommendations', $appraisal->panel_recommendations ?? '')" :isDisabled="!$appraisal->is_es" />
                     </div>
                 </div>
             </fieldset>
