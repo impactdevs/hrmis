@@ -44,6 +44,8 @@ Route::get('/', function () {
     return redirect('dashboard');
 });
 
+route::get('/aggregations', [HomeController::class, 'getAppraisalStatusCounts'])->name('home');
+
 Route::get('/dashboard', [HomeController::class, 'index'])->middleware(['auth', 'verified', 'check.employee.record'])->name('dashboard');
 Route::post('/agree', [HomeController::class, 'agree'])->middleware(['auth', 'verified'])->name('agree');
 Route::get('/upload-employee', [UploadEmployees::class, 'process_csv_for_arrears']);
