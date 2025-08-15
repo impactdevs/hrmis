@@ -1,0 +1,35 @@
+@echo off
+setlocal enabledelayedexpansion
+
+:: --- Configuration ---
+set DB_HOST=127.0.0.1
+set DB_USER=
+set DB_PASS=
+set DB_NAME=
+set TABLE_NAME=attendances
+set ID_COLUMN=attendance_id
+set API_URL=
+
+echo 🔄 %DATE% %TIME% Checking for new records...
+
+:: Get records from MySQL (skip header row)
+for /f "skip=1 tokens=1,2,3" %%a in ('mysql -h %DB_HOST% -u %DB_USER% -p%DB_PASS% -D %DB_NAME% -B -e "SELECT %ID_COLUMN%, staff_id, access_date_and_time FROM %TABLE_NAME%;"') do (
+    set "id=%%a"
+    set "staff_id=%%b"
+    set "access_date_and_time=%%c"
+
+    :: Prepare JSON
+    set "json={\"staff_id\":\"!staff_id!\",\"access_date_and_time\":\"!access_date_and_time!\"}"
+
+    :: Send to API
+    for /f %%r in ('curl -s -o NUL -w "%%{http_code}" -X POST "%API_URL%" -H "Content-Type: application/json" -d "!json!"') do set response=%%r
+
+    if "!response!"=="201" (
+        echo ✅ Sent record ID !id!. Deleting from DB...
+        mysql -h %DB_HOST% -u %DB_USER% -p%DB_PASS% -D %DB_NAME% -e "DELETE FROM %TABLE_NAME% WHERE %ID_COLUMN% = '!id!';"
+    ) else (
+        echo ❌ Failed to send record ID !id!. HTTP status: !response!
+    )
+)
+
+echo ✅ Script finished.

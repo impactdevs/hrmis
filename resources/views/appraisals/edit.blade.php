@@ -1725,7 +1725,7 @@
                             $is_es = auth()->user()->hasRole('Executive Secretary');
                             $userRole = Auth::user()->roles->pluck('name')[0];
                         @endphp
-                        {{-- @if (!isset($draft) || !$draft->is_submitted) --}}
+                        @if (!isset($draft) || !$draft->is_submitted)
                             @if ($appraisal->is_appraisee || $appraisal->is_appraisor || $is_es)
                                 @if (
                                     !(
@@ -1749,7 +1749,7 @@
                                     </div>
                                 @endif
                             @endif
-                        {{-- @endif --}}
+                        @endif
                         @can('approve appraisal')
                             @php
                                 $userBeingapproved = \App\Models\User::find(
