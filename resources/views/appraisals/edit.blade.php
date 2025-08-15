@@ -1,9 +1,15 @@
 <x-app-layout>
+    {{-- 
+   PAGE NOTES
+   1. I have added .no-break class to some elements to prevent it from breaking into a new line.
+
+   --}}
     @php
+        //check if appraisal was rejected.
         $rejectedEntry = collect($appraisal->appraisal_request_status)
             ->filter(fn($status) => $status === 'rejected')
             ->keys()
-            ->first(); // Get the first person/role who rejected
+            ->first();
 
         $rejectionReason = $appraisal->rejection_reason ?? 'No reason provided.';
     @endphp
@@ -144,7 +150,9 @@
                 </div>
                 <div class="card-body">
                     <div class="row g-4">
-                        <div class="col-lg-6">
+
+                        {{-- review type div --}}
+                        <div class="col-lg-6 no-break">
                             <div class="p-3 rounded form-section bg-light">
                                 <h5 class="mb-3 text-muted">Review Type</h5>
                                 <div class="flex-wrap gap-4 d-flex">
@@ -223,7 +231,8 @@
                             </div>
                         </div>
 
-                        <div class="col-lg-6">
+                        {{-- review duration --}}
+                        <div class="col-lg-6 no-break">
                             <div class="p-3 rounded form-section bg-light">
                                 <h5 class="mb-3 text-muted">Review Period</h5>
                                 <div class="row g-3">
@@ -240,6 +249,7 @@
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -463,7 +473,7 @@
                     </p>
                     <div class="table-responsive">
                         <table class="table mb-0 align-middle table-hover">
-                            <thead class="table-light">
+                            <thead class="table-light no-break">
                                 <tr>
                                     <th style="width: 15%">Rating</th>
                                     <th style="width: 60%">Description</th>
@@ -837,85 +847,85 @@
                                             const newRowNumber = $tbody.find('tr[data-row]').length + 1;
 
                                             let newRow = `
-    <tr class="hover:bg-blue-50 transition-colors" data-row="new">
-        <td class="px-6 py-4 border border-gray-200 font-bold text-gray-900 align-top" rowspan="2">
-            <span class="row-number">new.</span>
-        </td>
-        <td class="px-6 py-2 border border-gray-200">
-            <div class="editable-cell p-2 rounded text-muted"
-                contenteditable="${canAppraisee ? 'true' : 'false'}"
-                data-placeholder="Enter task"
-                oninput="updateHiddenInput(this)"
-                onfocus="if(this.classList.contains('text-muted')){this.textContent='';this.classList.remove('text-muted');}">
-                Enter task
-            </div>
-            <input type="hidden"
-                name="appraisal_period_rate[new][planned_activity]"
-                value="">
-        </td>
-        <td class="px-6 py-2 border border-gray-200">
-            <div class="editable-cell p-2 rounded text-muted"
-                contenteditable="${canAppraisee ? 'true' : 'false'}"
-                data-placeholder="Enter result"
-                oninput="updateHiddenInput(this)"
-                onfocus="if(this.classList.contains('text-muted')){this.textContent='';this.classList.remove('text-muted');}">
-                Enter result
-            </div>
-            <input type="hidden"
-                name="appraisal_period_rate[new][output_results]"
-                value="">
-        </td>
-        <td class="px-6 py-2 border border-gray-200">
-            <div class="score-cell text-muted"
-                contenteditable="${canAppraisee ? 'true' : 'false'}"
-                data-type="score" oninput="updateScoreInput(this)"
-                onclick="if(this.classList.contains('text-muted')){this.textContent='';this.classList.remove('text-muted');}">
-                0
-            </div>
-            <input type="hidden"
-                name="appraisal_period_rate[new][supervisee_score]"
-                value="0">
-        </td>
-        <td class="px-6 py-2 border border-gray-200">
-            <div class="score-cell text-muted"
-                contenteditable="${canAppraisor ? 'true' : 'false'}"
-                data-type="score" oninput="updateScoreInput(this)"
-                onclick="if(this.classList.contains('text-muted')){this.textContent='';this.classList.remove('text-muted');}">
-                0
-            </div>
-            <input type="hidden"
-                name="appraisal_period_rate[new][supervisee_score]"
-                value="0">
-        </td>
-        <td class="px-6 py-2 border border-gray-200">
-            <input type="number"
-                name="appraisal_period_rate[new][agreed_score]"
-                class="form-control form-control-sm agreed-score-input"
-                min="0" max="6" step="0.5"
-                value="0"
-                ${canAppraisee ? 'readonly' : ''}
-                oninput="updateKeyDutiesOverall()">
-        </td>
-        <td class="px-2 py-2 border border-gray-200 align-middle text-center no-print">
-            <button type="button" class="btn btn-sm btn-danger remove-duty-row" title="Remove row">
-                <i class="fas fa-trash"></i>
-            </button>
-        </td>
-    </tr>
-    <tr class="hover:bg-blue-50 transition-colors">
-        <td class="px-6 py-2 border border-gray-200 bg-gray-50 italic text-gray-600" colspan="6">
-            <div class="editable-cell p-2 rounded text-muted"
-                contenteditable="${canAppraisor ? 'true' : 'false'}"
-                data-placeholder="Supervisor's comment..."
-                oninput="updateHiddenInput(this)"
-                onfocus="if(this.classList.contains('text-muted')){this.textContent='';this.classList.remove('text-muted');}">
-                Supervisor's comment...
-            </div>
-            <input type="hidden"
-                name="appraisal_period_rate[new][supervisor_comment]"
-                value="">
-        </td>
-    </tr>`;
+                                                    <tr class="hover:bg-blue-50 transition-colors" data-row="new">
+                                                        <td class="px-6 py-4 border border-gray-200 font-bold text-gray-900 align-top" rowspan="2">
+                                                            <span class="row-number">new.</span>
+                                                        </td>
+                                                        <td class="px-6 py-2 border border-gray-200">
+                                                            <div class="editable-cell p-2 rounded text-muted"
+                                                                contenteditable="${canAppraisee ? 'true' : 'false'}"
+                                                                data-placeholder="Enter task"
+                                                                oninput="updateHiddenInput(this)"
+                                                                onfocus="if(this.classList.contains('text-muted')){this.textContent='';this.classList.remove('text-muted');}">
+                                                                Enter task
+                                                            </div>
+                                                            <input type="hidden"
+                                                                name="appraisal_period_rate[new][planned_activity]"
+                                                                value="">
+                                                        </td>
+                                                        <td class="px-6 py-2 border border-gray-200">
+                                                            <div class="editable-cell p-2 rounded text-muted"
+                                                                contenteditable="${canAppraisee ? 'true' : 'false'}"
+                                                                data-placeholder="Enter result"
+                                                                oninput="updateHiddenInput(this)"
+                                                                onfocus="if(this.classList.contains('text-muted')){this.textContent='';this.classList.remove('text-muted');}">
+                                                                Enter result
+                                                            </div>
+                                                            <input type="hidden"
+                                                                name="appraisal_period_rate[new][output_results]"
+                                                                value="">
+                                                        </td>
+                                                        <td class="px-6 py-2 border border-gray-200">
+                                                            <div class="score-cell text-muted"
+                                                                contenteditable="${canAppraisee ? 'true' : 'false'}"
+                                                                data-type="score" oninput="updateScoreInput(this)"
+                                                                onclick="if(this.classList.contains('text-muted')){this.textContent='';this.classList.remove('text-muted');}">
+                                                                0
+                                                            </div>
+                                                            <input type="hidden"
+                                                                name="appraisal_period_rate[new][supervisee_score]"
+                                                                value="0">
+                                                        </td>
+                                                        <td class="px-6 py-2 border border-gray-200">
+                                                            <div class="score-cell text-muted"
+                                                                contenteditable="${canAppraisor ? 'true' : 'false'}"
+                                                                data-type="score" oninput="updateScoreInput(this)"
+                                                                onclick="if(this.classList.contains('text-muted')){this.textContent='';this.classList.remove('text-muted');}">
+                                                                0
+                                                            </div>
+                                                            <input type="hidden"
+                                                                name="appraisal_period_rate[new][supervisee_score]"
+                                                                value="0">
+                                                        </td>
+                                                        <td class="px-6 py-2 border border-gray-200">
+                                                            <input type="number"
+                                                                name="appraisal_period_rate[new][agreed_score]"
+                                                                class="form-control form-control-sm agreed-score-input"
+                                                                min="0" max="6" step="0.5"
+                                                                value="0"
+                                                                ${canAppraisee ? 'readonly' : ''}
+                                                                oninput="updateKeyDutiesOverall()">
+                                                        </td>
+                                                        <td class="px-2 py-2 border border-gray-200 align-middle text-center no-print">
+                                                            <button type="button" class="btn btn-sm btn-danger remove-duty-row" title="Remove row">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="hover:bg-blue-50 transition-colors">
+                                                        <td class="px-6 py-2 border border-gray-200 bg-gray-50 italic text-gray-600" colspan="6">
+                                                            <div class="editable-cell p-2 rounded text-muted"
+                                                                contenteditable="${canAppraisor ? 'true' : 'false'}"
+                                                                data-placeholder="Supervisor's comment..."
+                                                                oninput="updateHiddenInput(this)"
+                                                                onfocus="if(this.classList.contains('text-muted')){this.textContent='';this.classList.remove('text-muted');}">
+                                                                Supervisor's comment...
+                                                            </div>
+                                                            <input type="hidden"
+                                                                name="appraisal_period_rate[new][supervisor_comment]"
+                                                                value="">
+                                                        </td>
+                                                    </tr>`;
 
                                             $tbody.append(newRow);
                                             updateDutyRowNumbers();
@@ -1713,24 +1723,33 @@
 
                         @php
                             $is_es = auth()->user()->hasRole('Executive Secretary');
+                            $userRole = Auth::user()->roles->pluck('name')[0];
                         @endphp
-                        @if (!isset($draft) || !$draft->is_submitted)
+                        {{-- @if (!isset($draft) || !$draft->is_submitted) --}}
                             @if ($appraisal->is_appraisee || $appraisal->is_appraisor || $is_es)
-                                <div class="gap-3 d-flex no-print">
-                                    <button type="reset" class="btn btn-lg btn-outline-secondary">
-                                        <i class="fas fa-undo me-2"></i>Reset
-                                    </button>
-                                    <button id="save-draft-btn" class="btn btn-lg btn-outline-secondary"
-                                        value="draft" name="is_draft">
-                                        <i class="fas fa-save me-2"></i>Save as Draft
-                                    </button>
-                                    <button type="submit" class="btn btn-lg btn-primary" name="is_draft"
-                                        value="not_draft">
-                                        <i class="fas fa-paper-plane me-2"></i>Review & Submit
-                                    </button>
-                                </div>
+                                @if (
+                                    !(
+                                        (isset($appraisal->appraisal_request_status[$userRole]) &&
+                                            $appraisal->appraisal_request_status[$userRole] === 'rejected') ||
+                                        (isset($appraisal->appraisal_request_status[$userRole]) &&
+                                            $appraisal->appraisal_request_status[$userRole] === 'approved')
+                                    ))
+                                    <div class="gap-3 d-flex no-print">
+                                        <button type="reset" class="btn btn-lg btn-outline-secondary">
+                                            <i class="fas fa-undo me-2"></i>Reset
+                                        </button>
+                                        <button id="save-draft-btn" class="btn btn-lg btn-outline-secondary"
+                                            value="draft" name="is_draft">
+                                            <i class="fas fa-save me-2"></i>Save as Draft
+                                        </button>
+                                        <button type="submit" class="btn btn-lg btn-primary" name="is_draft"
+                                            value="not_draft">
+                                            <i class="fas fa-paper-plane me-2"></i>Review & Submit
+                                        </button>
+                                    </div>
+                                @endif
                             @endif
-                        @endif
+                        {{-- @endif --}}
                         @can('approve appraisal')
                             @php
                                 $userBeingapproved = \App\Models\User::find(
@@ -1739,7 +1758,6 @@
                             @endphp
                             @if (!is_null($appraisal->employee->user_id))
                                 @php
-                                    $userRole = Auth::user()->roles->pluck('name')[0];
                                     $roleNames = [
                                         'Head of Division' => 'Head of Division',
                                         'HR' => 'HR',
@@ -1920,7 +1938,19 @@
 
             @page {
                 size: landscape;
-                margin: 0;
+                margin: 2;
+            }
+
+            /* only split a page after */
+            .no-break {
+                page-break-inside: avoid;
+                /* Modern browsers */
+                break-inside: avoid;
+                /* CSS3 standard */
+                -webkit-column-break-inside: avoid;
+                /* For WebKit browsers */
+                -moz-column-break-inside: avoid;
+                /* For Firefox */
             }
 
             /* Remove Bootstrap container padding if needed */
