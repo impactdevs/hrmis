@@ -80,21 +80,40 @@
 
 
     @if ($rejectedEntry)
-        <!-- Toast for rejection -->
-        <div class="top-0 p-3 toast-container position-fixed start-50 translate-middle-x text-bg-danger approval"
-            role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="toast-header">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                    class="bi bi-x-octagon-fill text-danger" viewBox="0 0 16 16">
-                    <path
-                        d="M11.46.146A.5.5 0 0 1 12 .5v3.793a.5.5 0 0 1-.146.354l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 0 1 0-.708l7-7A.5.5 0 0 1 8.207.146L11.46.146z" />
-                </svg>
-                <strong class="me-auto">Rejected by {{ $rejectedEntry }}</strong>
-                <button type="button" class="btn-close no-print" data-bs-dismiss="toast" aria-label="Close"></button>
+        <!-- Alert for rejection -->
+        <div class="alert alert-warning alert-dismissible fade show mx-3 mt-3" role="alert">
+            <div class="d-flex align-items-start">
+                <div class="me-3">
+                    <i class="fas fa-exclamation-triangle fa-2x text-warning"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <h5 class="alert-heading mb-2">
+                        <i class="fas fa-times-circle me-2"></i>
+                        Appraisal Rejected by {{ $rejectedEntry }}
+                    </h5>
+                    <p class="mb-2">
+                        <strong>Rejection Reason:</strong> {{ $rejectionReason }}
+                    </p>
+                    @if(auth()->user()->hasRole('Staff') || auth()->user()->hasRole('Head of Division'))
+                        <hr>
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-info-circle me-2 text-info"></i>
+                            <small class="mb-0">
+                                <strong>Action Required:</strong> This appraisal has been rejected. Please review the feedback
+                                above, make necessary changes, and resubmit your appraisal.
+                            </small>
+                        </div>
+                        <div class="mt-2">
+                            <small class="text-muted">
+                                <i class="fas fa-lightbulb me-1"></i>
+                                <strong>Tip:</strong> Once you address the feedback, use the "Review & Submit" button to
+                                resubmit for approval.
+                            </small>
+                        </div>
+                    @endif
+                </div>
             </div>
-            <div class="toast-body">
-                <strong>Reason:</strong> {{ $rejectionReason }}
-            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
 
@@ -560,7 +579,18 @@
                             </div>
 
                             <div class="mt-4 col-12">
-                                <p class="fw-bold">b. Challenges</p>
+                                <p class="fw-bold">b. Other Qualifications</p>
+                                <x-forms.text-area name="qualifications" :isDisabled="!$appraisal->is_appraisee" :isDraft="$staffDraftValue"
+                                    label=" Outline any other qualifications achieved."
+                                    id="qualifications" :value="old(
+                                        'qualifications',
+                                        $appraisal->qualifications ?? '',
+                                    )" />
+                            </div>
+                            
+
+                            <div class="mt-4 col-12">
+                                <p class="fw-bold">c. Challenges</p>
                                 <x-forms.text-area name="unanticipated_constraints" :isDisabled="!$appraisal->is_appraisee" :isDraft="$staffDraftValue"
                                     label="Briefly state unanticipated constraints/problems that you encountered and how they affected the achievements of the objectives."
                                     id="unanticipated_constraints" :value="old(
@@ -570,17 +600,24 @@
                             </div>
 
                             <div class="mt-4 col-12">
-                                <p class="fw-bold">c. Personal Initiatives</p>
+                                <p class="fw-bold">d. Personal Initiatives</p>
                                 <x-forms.text-area name="personal_initiatives" :isDisabled="!$appraisal->is_appraisee" :isDraft="$staffDraftValue"
                                     label="Outline personal initiatives and any other factors that you think contributed to your achievements and successes."
                                     id="personal_initiatives" :value="old('personal_initiatives', $appraisal->personal_initiatives ?? '')" />
                             </div>
 
                             <div class="mt-4 col-12">
-                                <p class="fw-bold">d. Training Support Needs</p>
+                                <p class="fw-bold">e. Training Support Needs</p>
                                 <x-forms.text-area name="training_support_needs" :isDisabled="!$appraisal->is_appraisee" :isDraft="$staffDraftValue"
                                     label="Indicate the nature of training support you may need to effectively perform your duties. Training support should be consistent with the job requirements and applicable to UNCST policies and regulations."
                                     id="training_support_needs" :value="old('training_support_needs', $appraisal->training_support_needs ?? '')" />
+                            </div>
+
+                            <div class="mt-4 col-12">
+                                <p class="fw-bold">f. Suggestions on what management should change or attend to</p>
+                                <x-forms.text-area name="suggestons" :isDisabled="!$appraisal->is_appraisee" :isDraft="$staffDraftValue"
+                                    label="Indicate the suggestions you think need to be addressed or attended to."
+                                    id="suggestions" :value="old('suggestions', $appraisal->suggestions ?? '')" />
                             </div>
 
 
@@ -626,7 +663,7 @@
                                 <tbody>
                                     @php
                                         $rowCount = max(
-                                            4,
+                                            2,
                                             isset($appraisal->appraisal_period_rate)
                                                 ? count($appraisal->appraisal_period_rate)
                                                 : 0,
@@ -1431,6 +1468,21 @@
                         </table>
                         <p><strong>Overall Score (max 40%):</strong> <span id="overall-40pct"></span></p>
 
+
+                        <div class="print-summary-cover d-none d-print-block" style="page-break-after: always;">
+                            @php
+                                $employee = app\Models\Employee::find($appraisal->employee_id);
+                            @endphp
+                            <h3>Scores Summary</h3>
+                            <ul>
+                                <li><strong>Key Duties (60%):</strong> <span id="print-key-duties-score"></span></li>
+                                <li><strong>Personal Attributes (40%):</strong> <span
+                                        id="print-personal-attributes-score"></span></li>
+                                <li><strong>Total Score:</strong> <span id="print-total-score"></span></li>
+                            </ul>
+                        </div>
+
+
                         <div id="performance-table-wrapper" class="table-responsive">
                             <h6 class="h1">PERFORMANCE PLANNING</h6>
                             <p>The Appraiser and Appraisee discuss and agree on the key outputs for the next performance
@@ -1448,7 +1500,7 @@
                                 <tbody>
                                     @php
                                         $planningRows = max(
-                                            8,
+                                            4,
                                             isset($appraisal->performance_planning)
                                                 ? count($appraisal->performance_planning)
                                                 : 0,
@@ -1698,13 +1750,129 @@
             </fieldset>
 
             <fieldset class="p-2 mb-4 border">
-                <legend>SECTION 5</legend>
+                <legend>SECTION 6</legend>
                 <div class="mb-3 row">
                     <div class="col-md-12">
                         <div class="col-md-12">
+                            {{-- Repeater for uploading documents --}}
                             <x-forms.repeater name="relevant_documents"
-                                label="Attach Any Relevant Documents(contract renewal letter and other attachments such as Job descriptions, certificates )"
+                                label="Attach Any Relevant Documents (contract renewal letter, job descriptions, certificates, etc.)"
                                 :values="$appraisal->relevant_documents ?? []" />
+
+                            @if(!empty($appraisal?->relevant_documents))
+                                @foreach($appraisal->relevant_documents as $index => $doc)
+                                    @php
+                                        $hasProof = !empty($doc['proof']);
+                                        $canAccess = $appraisal->can_access_attachments ?? false;
+
+                                        // Get file extension and set appropriate icon
+                                        $fileExtension = $hasProof ? strtolower(pathinfo($doc['proof'], PATHINFO_EXTENSION)) : 'unknown';
+                                        $fileIcon = match ($fileExtension) {
+                                            'pdf' => 'fas fa-file-pdf text-danger',
+                                            'doc', 'docx' => 'fas fa-file-word text-primary',
+                                            'xls', 'xlsx' => 'fas fa-file-excel text-success',
+                                            'ppt', 'pptx' => 'fas fa-file-powerpoint text-warning',
+                                            'jpg', 'jpeg', 'png', 'gif' => 'fas fa-file-image text-info',
+                                            'zip', 'rar' => 'fas fa-file-archive text-secondary',
+                                            'txt' => 'fas fa-file-alt text-dark',
+                                            default => 'fas fa-file text-muted'
+                                        };
+
+                                        $fileSize = '';
+                                        if ($hasProof) {
+                                            $fullPath = storage_path('app/public/' . $doc['proof']);
+                                            if (file_exists($fullPath)) {
+                                                $bytes = filesize($fullPath);
+                                                $fileSize = $bytes > 1024 * 1024 ? round($bytes / (1024 * 1024), 1) . ' MB' : round($bytes / 1024, 1) . ' KB';
+                                            }
+                                        }
+                                    @endphp
+
+                                    <div
+                                        class="mb-3 p-3 border rounded {{ $canAccess ? 'border-primary bg-light' : 'border-secondary bg-light text-muted' }} shadow-sm">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <i class="{{ $fileIcon }} me-2 fs-5"></i>
+                                                    <div>
+                                                        <strong
+                                                            class="d-block">{{ $doc['title'] ?? $doc['name'] ?? 'Document ' . ($index + 1) }}</strong>
+                                                        @if($fileSize)
+                                                            <small class="text-muted">{{ $fileSize }}</small>
+                                                        @endif
+                                                    </div>
+                                                </div>
+
+                                                @if(!empty($doc['description']))
+                                                    <small class="text-muted d-block mb-2">{{ $doc['description'] }}</small>
+                                                @endif
+
+                                                @if($hasProof && !$canAccess)
+                                                    <div class="mt-2">
+                                                        <span class="badge bg-warning text-dark">
+                                                            <i class="fas fa-lock me-1"></i>Access Restricted
+                                                        </span>
+                                                        <small class="text-muted d-block mt-1">
+                                                            Available after appraisal submission
+                                                        </small>
+                                                    </div>
+                                                @endif
+                                            </div>
+
+                                            @if($hasProof && $canAccess)
+                                                <div class="btn-group" role="group">
+                                                    <a href="{{ route('appraisals.attachment.view', [$appraisal->appraisal_id, $index]) }}"
+                                                        target="_blank" class="btn btn-sm btn-outline-primary"
+                                                        title="View {{ strtoupper($fileExtension) }} file" data-bs-toggle="tooltip">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a href="{{ route('appraisals.attachment.download', [$appraisal->appraisal_id, $index]) }}"
+                                                        class="btn btn-sm btn-outline-success"
+                                                        title="Download {{ strtoupper($fileExtension) }} file"
+                                                        data-bs-toggle="tooltip">
+                                                        <i class="fas fa-download"></i>
+                                                    </a>
+                                                </div>
+                                            @elseif($hasProof && !$canAccess)
+                                                <div class="text-muted">
+                                                    <i class="fas fa-eye-slash me-1"></i>
+                                                    <i class="fas fa-download text-muted"></i>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endforeach
+
+                                @if($canAccess && count($appraisal->relevant_documents) > 1)
+                                    <div class="mt-3 d-flex gap-2 flex-wrap">
+                                        <a href="{{ route('appraisals.attachments.download-all', $appraisal->appraisal_id) }}"
+                                            class="btn btn-primary" data-bs-toggle="tooltip" data-bs-placement="top"
+                                            title="Download all {{ count($appraisal->relevant_documents) }} attachments as ZIP file">
+                                            <i class="fas fa-download me-2"></i> Download All Attachments
+                                            ({{ count($appraisal->relevant_documents) }})
+                                        </a>
+                                        <small class="text-muted align-self-center">
+                                            <i class="fas fa-info-circle"></i> Total size:
+                                            @php
+                                                $totalSize = 0;
+                                                foreach ($appraisal->relevant_documents as $doc) {
+                                                    if (!empty($doc['proof'])) {
+                                                        $fullPath = storage_path('app/public/' . $doc['proof']);
+                                                        if (file_exists($fullPath)) {
+                                                            $totalSize += filesize($fullPath);
+                                                        }
+                                                    }
+                                                }
+                                                $totalSizeFormatted = $totalSize > 1024 * 1024
+                                                    ? round($totalSize / (1024 * 1024), 1) . ' MB'
+                                                    : round($totalSize / 1024, 1) . ' KB';
+                                            @endphp
+                                            {{ $totalSizeFormatted }}
+                                        </small>
+                                    </div>
+                                @endif
+                            @endif
+
                         </div>
                     </div>
                 </div>
@@ -1868,6 +2036,8 @@
                 </div>
             </div>
 
+            
+
         </div>
 
         <div class="d-none preview-section">
@@ -1876,7 +2046,9 @@
             <div class="container-lg">
                 @include('appraisals.appraisal_preview', ['appraisal' => $appraisal])
             </div>
-        </div>
+            </div>
+
+        
 
         {{-- back button to the form --}}
         <div class="d-flex justify-content-center align-items-center gap-3 my-4 no-print">
@@ -2156,6 +2328,21 @@
     </style>
     @push('scripts')
         <script>
+
+
+            document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll("textarea.auto-resize").forEach(el => {
+        function resize() {
+            el.style.height = "auto";
+            el.style.height = (el.scrollHeight) + "px";
+        }
+
+        el.addEventListener("input", resize);
+
+        // resize immediately on load if prefilled
+        resize();
+    });
+});
             // Global function for key duties overall average
             function updateKeyDutiesOverall() {
                 const agreedInputs = document.querySelectorAll('#key-duties-table .agreed-score-input');
@@ -2330,6 +2517,8 @@
                 initSelect2();
                 initAppraisalApproval();
                 initActivityRatingTable();
+                initTooltips();
+                initAttachmentHandlers();
 
                 // on submitting the form, update the hidden inputs
                 $('#appraisalForm').on('submit', function(e) {
@@ -3341,6 +3530,55 @@
 
                     setTimeout(() => status.remove(), 2000);
                 }
+
+                // Initialize tooltips for better UX
+                function initTooltips() {
+                    // Initialize Bootstrap tooltips
+                    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                    const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                        return new bootstrap.Tooltip(tooltipTriggerEl);
+                    });
+                }
+
+                // Handle attachment-related interactions
+                function initAttachmentHandlers() {
+                    // Handle attachment preview errors
+                    document.querySelectorAll('a[href*="attachment.view"]').forEach(link => {
+                        link.addEventListener('click', function (e) {
+                            // Add loading indicator or feedback
+                            const icon = this.querySelector('i');
+                            if (icon) {
+                                const originalClass = icon.className;
+                                icon.className = 'fas fa-spinner fa-spin';
+                                setTimeout(() => {
+                                    icon.className = originalClass;
+                                }, 2000);
+                            }
+                        });
+                    });
+
+                    // Handle download errors gracefully
+                    document.querySelectorAll('a[href*="attachment.download"]').forEach(link => {
+                        link.addEventListener('click', function (e) {
+                            const icon = this.querySelector('i');
+                            if (icon) {
+                                const originalClass = icon.className;
+                                icon.className = 'fas fa-spinner fa-spin';
+                                setTimeout(() => {
+                                    icon.className = originalClass;
+                                }, 1000);
+                            }
+                        });
+                    });
+
+                    // Show file size in tooltip for bulk download
+                    document.querySelectorAll('a[href*="download-all"]').forEach(link => {
+                        if (!link.hasAttribute('title') && link.dataset.bsOriginalTitle) {
+                            // Tooltip already configured via Blade template
+                            return;
+                        }
+                    });
+                }
             });
         </script>
     @endpush
@@ -3374,14 +3612,7 @@
         <p><strong>Division:</strong> {{ optional($employee->department)->department_name }}</p>
         <p><strong>Appraisal Period:</strong> {{ $appraisal->appraisal_start_date?->toDateString() }} -
             {{ $appraisal->appraisal_end_date?->toDateString() }}</p>
-        <hr>
-        <h3>Scores Summary</h3>
-        <ul>
-            <li><strong>Key Duties (60%):</strong> <span id="print-key-duties-score"></span></li>
-            <li><strong>Personal Attributes (40%):</strong> <span id="print-personal-attributes-score"></span></li>
-            <li><strong>Total Score:</strong> <span id="print-total-score"></span></li>
-        </ul>
-        <hr>
+        
         <p><em>This is a summary page for printing. The detailed appraisal follows on subsequent pages.</em></p>
     </div>
 </x-app-layout>

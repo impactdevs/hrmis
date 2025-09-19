@@ -17,7 +17,19 @@ class PermissionsDemoSeeder extends Seeder
         // Reset cached roles and permissions
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        //create a role
+        // Create permissions first
+        $permissions = [
+            'approve appraisal',
+            'view appraisal',
+            'edit appraisal',
+            'create appraisal',
+        ];
+
+        foreach ($permissions as $permission) {
+            Permission::create(['name' => $permission]);
+        }
+
+        //create roles
         $role1 = 'Staff';
         $role2 = 'Executive Secretary';
         $role3 = 'HR';
@@ -28,6 +40,18 @@ class PermissionsDemoSeeder extends Seeder
         $role3 = Role::create(['name' => $role3]);
         $role4 = Role::create(['name' => $role4]);
         $role5 = Role::create(['name' => $role5]);
+
+        // Assign permissions to roles
+        // Staff can create, view, and edit their own appraisals
+        $role1->givePermissionTo(['create appraisal', 'view appraisal', 'edit appraisal']);
+        
+        // Executive Secretary, HR, and Head of Division can approve appraisals
+        $role2->givePermissionTo(['approve appraisal', 'view appraisal', 'edit appraisal']);
+        $role3->givePermissionTo(['approve appraisal', 'view appraisal', 'edit appraisal']);
+        $role4->givePermissionTo(['approve appraisal', 'view appraisal', 'edit appraisal']);
+        
+        // Assistant Executive Secretary has similar permissions to ES
+        $role5->givePermissionTo(['approve appraisal', 'view appraisal', 'edit appraisal']);
         // gets all permissions via Gate::before rule; see AuthServiceProvider
         $user1 = \App\Models\User::factory()->create([
             'name' => 'STAFF USER',

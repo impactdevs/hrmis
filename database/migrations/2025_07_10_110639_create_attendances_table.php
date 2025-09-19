@@ -14,9 +14,11 @@ return new class extends Migration
         Schema::create('attendances', function (Blueprint $table) {
             $table->uuid('attendance_id')->primary();
             $table->string("staff_id");
+            $table->foreign('staff_id')->references('staff_id')->on('employees');
             $table->datetime('access_date_and_time');
             $table->date('access_date');
             $table->time('access_time');
+            $table->timestamps();
         });
     }
 

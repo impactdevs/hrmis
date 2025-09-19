@@ -35,25 +35,63 @@
                                         <span class="d-block text-muted small mt-2">
                                             {{ basename($qualification['proof']) }}
                                         </span>
+                                        @if (request()->routeIs('uncst-appraisals.edit'))
+                                            <div class="mt-2">
+                                                <a href="{{ route('appraisals.attachment.download', ['appraisal' => request()->route('uncst_appraisal'), 'index' => $index]) }}"
+                                                   class="btn btn-sm btn-outline-primary me-1" target="_blank">
+                                                    <i class="fas fa-download"></i> Download
+                                                </a>
+                                                <a href="{{ asset('storage/' . $qualification['proof']) }}"
+                                                   class="btn btn-sm btn-outline-secondary" target="_blank">
+                                                    <i class="fas fa-eye"></i> View
+                                                </a>
+                                            </div>
+                                        @endif
+                                        <!-- Print-friendly attachment info -->
+                                        <div class="attachment-info">
+                                            <strong>Attachment Type:</strong> PDF Document<br>
+                                            <strong>Filename:</strong> {{ basename($qualification['proof']) }}<br>
+                                            <strong>Title:</strong> {{ $qualification['title'] ?? 'N/A' }}
+                                        </div>
                                     </div>
                                 @else
-                                    <img src="{{ asset('storage/' . $qualification['proof']) }}" alt="Current document"
-                                        class="img-thumbnail">
+                                    <div class="image-preview-wrapper">
+                                        <img src="{{ asset('storage/' . $qualification['proof']) }}" alt="Current document"
+                                            class="img-thumbnail">
+                                        @if (request()->routeIs('uncst-appraisals.edit'))
+                                            <div class="mt-2">
+                                                <a href="{{ route('appraisals.attachment.download', ['appraisal' => request()->route('uncst_appraisal'), 'index' => $index]) }}"
+                                                   class="btn btn-sm btn-outline-primary me-1" target="_blank">
+                                                    <i class="fas fa-download"></i> Download
+                                                </a>
+                                                <a href="{{ asset('storage/' . $qualification['proof']) }}"
+                                                   class="btn btn-sm btn-outline-secondary" target="_blank">
+                                                    <i class="fas fa-eye"></i> View
+                                                </a>
+                                            </div>
+                                        @endif
+                                        <!-- Print-friendly attachment info -->
+                                        <div class="attachment-info">
+                                            <strong>Attachment Type:</strong> Image File<br>
+                                            <strong>Filename:</strong> {{ basename($qualification['proof']) }}<br>
+                                            <strong>Title:</strong> {{ $qualification['title'] ?? 'N/A' }}
+                                        </div>
+                                    </div>
                                 @endif
                             @else
                                 <i class="fas fa-cloud-upload-alt fa-3x text-primary"></i>
                                 <div class="mt-2">Drag & drop or click to upload</div>
-                                <div class="text-muted small">Supports: PDF, JPG, PNG, GIF</div>
+                                <div class="text-muted small">Supports: PDF, DOC, DOCX, JPG, PNG, GIF</div>
                             @endif
                         </div>
                     </div>
 
                     <div class="form-text">
-                        All files must be in either of the formats PDF, JPG,PNG(Max 5MB each)
+                        All files must be in either of the formats PDF, DOC, DOCX, JPG, PNG, GIF (Max 10MB each)
                     </div>
                     <input type="file" name="{{ $name }}[{{ $index }}][proof]"
                         id="proof-{{ $name }}-{{ $index }}" class="d-none"
-                        accept=".pdf,.jpg,.jpeg,.png,.gif">
+                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif">
 
                     <div class="file-error text-danger small mt-2"></div>
                 </div>
@@ -135,6 +173,37 @@
             height: 20px;
             font-size: 0.85rem;
         }
+
+        /* Print-friendly attachment display */
+        @media print {
+            .preview-content .btn {
+                display: none !important;
+            }
+
+            .attachment-info {
+                display: block !important;
+                color: black !important;
+                background: white !important;
+                border: 1px solid #333 !important;
+                padding: 10px !important;
+                margin-top: 10px !important;
+                border-radius: 4px;
+            }
+
+            .pdf-preview, .image-preview-wrapper {
+                border: 1px solid #333 !important;
+                padding: 15px !important;
+                background: white !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        .attachment-info {
+            display: none;
+        }
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -197,9 +266,24 @@
             if (!file) return;
 
             // Validate file type
-            const validTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/gif'];
+            const validTypes = [
+                'application/pdf',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'image/jpeg',
+                'image/png',
+                'image/gif'
+            ];
             if (!validTypes.includes(file.type)) {
-                errorDiv.textContent = 'Invalid file type. Please upload a PDF, JPG, PNG, or GIF.';
+                errorDiv.textContent = 'Invalid file type. Please upload a PDF, DOC, DOCX, JPG, PNG, or GIF.';
+                input.value = '';
+                return;
+            }
+            
+            // Validate file size (10MB = 10 * 1024 * 1024 bytes)
+            const maxSize = 10 * 1024 * 1024;
+            if (file.size > maxSize) {
+                errorDiv.textContent = 'File size too large. Maximum allowed size is 10MB.';
                 input.value = '';
                 return;
             }
@@ -248,14 +332,14 @@
                         <div class="preview-content">
                             <i class="fas fa-cloud-upload-alt fa-3x text-primary"></i>
                             <div class="mt-2">Drag & drop or click to upload</div>
-                            <div class="text-muted small">Supports: PDF, JPG, PNG, GIF</div>
+                            <div class="text-muted small">Supports: PDF, DOC, DOCX, JPG, PNG, GIF</div>
                         </div>
                     </div>
                     <input type="file" 
                            name="{{ $name }}[${index}][proof]" 
                            id="proof-{{ $name }}-${index}" 
                            class="d-none"
-                           accept=".pdf,.jpg,.jpeg,.png,.gif">
+                           accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif">
                     <div class="file-error text-danger small mt-2"></div>
                 </div>
             </div>

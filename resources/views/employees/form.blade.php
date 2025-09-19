@@ -72,13 +72,90 @@
         <div class="col-md-6">
             <x-forms.text-area name="job_description" label="Job Description" id="job_description" :value="old('job_description', $employee->job_description ?? '')" />
         </div>
-        
+
         <div class="col-md-6">
             <x-forms.dropdown name="department_id" label="Department" id="department_id" :options="$departments"
                 :selected="$employee->department_id ?? ''" />
         </div>
     </div>
 </fieldset>
+
+
+<!-- Qualification Details Group -->
+<fieldset class="border p-2 mb-4">
+    <legend class="w-auto">Professional Qualifications</legend>
+
+    <div id="qualifications-container">
+        @php
+            // Determine which qualifications to show
+            $qualifications = old('qualifications_details');
+            if (!$qualifications && isset($employee) && $employee->qualifications_details) {
+                $qualifications = $employee->qualifications_details;
+            }
+            if (!$qualifications) {
+                $qualifications = [['qualification' => '', 'institution' => '', 'year_obtained' => '', 'proof' => '']];
+            }
+        @endphp
+
+        @foreach($qualifications as $index => $qual)
+            <div class="row mb-3 qualification-row" data-index="{{ $index }}">
+                <div class="col-md-3">
+                    <x-forms.input
+                        name="qualifications_details[{{ $index }}][qualification]"
+                        label="Qualification"
+                        type="text"
+                        value="{{ $qual['qualification'] ?? $qual['title'] ?? '' }}"
+                        placeholder="e.g., Bachelor's Degree, CPA, etc." />
+                </div>
+                <div class="col-md-3">
+                    <x-forms.input
+                        name="qualifications_details[{{ $index }}][institution]"
+                        label="Institution"
+                        type="text"
+                        value="{{ $qual['institution'] ?? '' }}"
+                        placeholder="e.g., Makerere University" />
+                </div>
+                <div class="col-md-2">
+                    <x-forms.input
+                        name="qualifications_details[{{ $index }}][year_obtained]"
+                        label="Year Obtained"
+                        type="number"
+                        value="{{ $qual['year_obtained'] ?? '' }}"
+                        placeholder="YYYY"
+                        min="1950"
+                        max="{{ date('Y') }}" />
+                </div>
+                <div class="col-md-3">
+                    <x-forms.upload
+                        name="qualifications_details[{{ $index }}][proof]"
+                        label="Proof Document"
+                        id="qualifications_details_{{ $index }}_proof"
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        value="{{ $qual['proof'] ?? '' }}"
+                        description="Upload PDF, JPG, JPEG, or PNG files"
+                        filetype="document" />
+                    @if(isset($qual['proof']) && $qual['proof'])
+                        <small class="text-muted">
+                            Current: <a href="{{ asset('storage/' . $qual['proof']) }}" target="_blank">View Document</a>
+                        </small>
+                    @endif
+                </div>
+                <div class="col-md-1 d-flex align-items-end">
+                    <button type="button" class="btn btn-danger btn-sm remove-qualification" {{ $index === 0 && count($qualifications) === 1 ? 'disabled' : '' }}>
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        @endforeach
+    </div>
+
+    <div class="text-end mt-3">
+        <button type="button" class="btn btn-primary" id="add-qualification">
+            <i class="fas fa-plus"></i> Add Another Qualification
+        </button>
+    </div>
+</fieldset>
+
 
 <!-- Additional Information Group -->
 <fieldset class="border p-2 mb-4">
@@ -100,15 +177,9 @@
                 value="{{ old('home_district', $employee->home_district ?? '') }}" />
         </div>
 
-    </div>
-
-    <div class="row mb-3">
         <div class="col-md-6">
             <x-forms.input name="next_of_kin" label="Next Of Kin" type="text" id="next_of_kin"
                 placeholder="Employee Next Of Kin" value="{{ old('next_of_kin', $employee->next_of_kin ?? '') }}" />
-        </div>
-        <div class="col-md-6">
-            <x-forms.repeater name="qualifications_details" label="Qualifications" :values="$employee->qualifications_details ?? []" />
         </div>
     </div>
 </fieldset>
@@ -209,6 +280,81 @@
                     }
                 }
             });
+
+            // Qualification management
+            let qualificationIndex = {{ count($qualifications ?? []) }};
+
+            // Add new qualification row
+            $('#add-qualification').on('click', function() {
+                const newRow = `
+                    <div class="row mb-3 qualification-row" data-index="${qualificationIndex}">
+                        <div class="col-md-3">
+                            <label for="qualifications_details_${qualificationIndex}_qualification" class="form-label">Qualification</label>
+                            <input type="text" 
+                                   name="qualifications_details[${qualificationIndex}][qualification]" 
+                                   id="qualifications_details_${qualificationIndex}_qualification"
+                                   class="form-control" 
+                                   placeholder="e.g., Bachelor's Degree, CPA, etc.">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="qualifications_details_${qualificationIndex}_institution" class="form-label">Institution</label>
+                            <input type="text" 
+                                   name="qualifications_details[${qualificationIndex}][institution]" 
+                                   id="qualifications_details_${qualificationIndex}_institution"
+                                   class="form-control" 
+                                   placeholder="e.g., Makerere University">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="qualifications_details_${qualificationIndex}_year_obtained" class="form-label">Year Obtained</label>
+                            <input type="number" 
+                                   name="qualifications_details[${qualificationIndex}][year_obtained]" 
+                                   id="qualifications_details_${qualificationIndex}_year_obtained"
+                                   class="form-control" 
+                                   placeholder="YYYY" 
+                                   min="1950" 
+                                   max="{{ date('Y') }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="qualifications_details_${qualificationIndex}_proof" class="form-label">Proof Document</label>
+                            <input type="file" 
+                                   name="qualifications_details[${qualificationIndex}][proof]" 
+                                   id="qualifications_details_${qualificationIndex}_proof"
+                                   class="form-control" 
+                                   accept=".pdf,.jpg,.jpeg,.png">
+                        </div>
+                        <div class="col-md-1 d-flex align-items-end">
+                            <button type="button" class="btn btn-danger btn-sm remove-qualification">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                $('#qualifications-container').append(newRow);
+                qualificationIndex++;
+                updateRemoveButtons();
+            });
+
+            // Remove qualification row
+            $(document).on('click', '.remove-qualification', function() {
+                if (!$(this).is(':disabled')) {
+                    $(this).closest('.qualification-row').remove();
+                    updateRemoveButtons();
+                }
+            });
+
+            // Update remove button states
+            function updateRemoveButtons() {
+                const rows = $('.qualification-row');
+                if (rows.length === 1) {
+                    rows.find('.remove-qualification').prop('disabled', true);
+                } else {
+                    rows.find('.remove-qualification').prop('disabled', false);
+                }
+            }
+
+            // Initialize remove button states
+            updateRemoveButtons();
         });
     </script>
 @endpush

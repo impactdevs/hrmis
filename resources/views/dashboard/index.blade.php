@@ -53,7 +53,7 @@
 
                         <!-- Pending Appraisals Card -->
                         <div class="col-xxl-4 col-md-6">
-                            
+
                                 <div class="card info-card customers-card">
                                     <div class="card-body">
                                         <h5 class="card-title">Submitted Appraisals</h5>
@@ -238,7 +238,7 @@
                                 <div class="card info-card customers-card">
 
                                     <div class="card-body">
-                                        <h5 class="card-title">Number of Employees on Leave <span>| Currently</span>
+                                        <h5 class="card-title">Employees on Leave <span>| Currently</span>
                                         </h5>
 
                                         <div class="d-flex align-items-center">
@@ -247,7 +247,9 @@
                                                 <i class="bi bi-people"></i>
                                             </div>
                                             <div class="ps-3">
-                                                <h6>{{ $available_leave }}</h6>
+                                                <h4 class="card-title">Number of Employees on Leave <span>| Currently</span></h4>
+
+                                                <h4>{{ $available_leave }}</h4>
                                             </div>
                                         </div>
 
@@ -613,24 +615,29 @@
                                                 @foreach ($notifications as $notification)
                                                     @php
                                                         $url = '';
-                                                        if (isset($notification->data['leave_id'])) {
-                                                            $url = url('leaves', $notification->data['leave_id']);
+                                                        if (isset($notification->data['leave_id']) && !empty($notification->data['leave_id'])) {
+                                                            try {
+                                                                $url = route('leaves.show', ['leave' => $notification->data['leave_id']]);
+                                                            } catch (Exception $e) {
+                                                                // If route generation fails, default to leaves index
+                                                                $url = route('leaves.index');
+                                                            }
                                                         }
                                                         if (isset($notification->data['training_id'])) {
-                                                            $url = url('trainings', $notification->data['training_id']);
+                                                            $url = route('trainings.show', $notification->data['training_id']);
                                                         }
                                                         if (isset($notification->data['event_id'])) {
-                                                            $url = url('events', $notification->data['event_id']);
+                                                            $url = route('events.show', $notification->data['event_id']);
                                                         }
                                                         if (isset($notification->data['appraisal_id'])) {
-                                                            $url = url(
-                                                                'uncst-appraisals',
+                                                            $url = route(
+                                                                'uncst-appraisals.show',
                                                                 $notification->data['appraisal_id'],
                                                             );
                                                         }
                                                         if (isset($notification->data['travel_training_id'])) {
-                                                            $url = url(
-                                                                'out-of-station-trainings',
+                                                            $url = route(
+                                                                'out-of-station-trainings.show',
                                                                 $notification->data['travel_training_id'],
                                                             );
                                                         }
@@ -638,7 +645,7 @@
                                                             if (
                                                                 $notification->data['reminder_category'] == 'appraisal'
                                                             ) {
-                                                                $url = url('uncst-appraisals');
+                                                                $url = route('uncst-appraisals.index');
                                                             }
                                                         }
                                                         $isUnread = is_null($notification->read_at);
@@ -855,149 +862,284 @@
                             <!-- Leave Requests Timeline -->
                             <div class="col-xxl-12 col-md-12">
                                 <div class="card info-card border-0 shadow-sm leave-approval-card">
-                                    <div class="card-body">
-                                        <h5 class="mb-4 fw-bold text-primary">
-                                            <i class="bi bi-calendar-check"></i> My Recent Leave Requests
+                                    <div class="card-header bg-primary text-white border-0">
+                                        <h5 class="mb-0 fw-bold d-flex align-items-center">
+                                            <i class="bi bi-calendar-check me-2"></i>
+                                            My Recent Leave Requests
+                                            <span class="badge bg-light text-primary ms-auto">{{ count($leaveApprovalData) }}</span>
                                         </h5>
-                                        <ul class="timeline list-unstyled">
-                                            @foreach ($leaveApprovalData as $leaveData)
-                                                <li class="timeline-item mb-5 position-relative ps-4">
-                                                    <div class="d-flex align-items-center mb-2">
-                                                        <span
-                                                            class="badge bg-primary me-2">{{ $leaveData['leave_type_name'] ?? 'Leave' }}</span>
-                                                        <span
-                                                            class="fw-semibold">{{ \Carbon\Carbon::parse($leaveData['start_date'])->format('d M') }}
-                                                            -
-                                                            {{ \Carbon\Carbon::parse($leaveData['end_date'])->format('d M, Y') }}</span>
-                                                        @if ($leaveData['esStatus'] === 'Approved')
-                                                            <span class="badge bg-success ms-2">Approved</span>
-                                                        @elseif ($leaveData['status'] === 'Rejected')
-                                                            <span class="badge bg-danger ms-2">Rejected</span>
-                                                        @else
-                                                            <span
-                                                                class="badge bg-warning text-dark ms-2">Pending</span>
-                                                        @endif
-                                                    </div>
-                                                    <div class="ms-1 mb-2">
-                                                        <small>
-                                                            <i class="bi bi-chat-left-text"></i>
-                                                            <strong>Reason:</strong> {{ $leaveData['reason'] ?? '-' }}
-                                                        </small>
-                                                    </div>
-                                                    <div class="ms-1 mb-2">
-                                                        <small>
-                                                            <i class="bi bi-person-check"></i>
-                                                            <strong>Handover:</strong>
-                                                            @if (!empty($leaveData['my_work_will_be_done_by']))
-                                                                {{ is_array($leaveData['my_work_will_be_done_by']) ? implode(', ', $leaveData['my_work_will_be_done_by']) : $leaveData['my_work_will_be_done_by'] }}
-                                                            @else
-                                                                N/A
-                                                            @endif
-                                                        </small>
-                                                    </div>
-                                                    <div class="ms-1 mb-2">
-                                                        <small>
-                                                            <i class="bi bi-telephone"></i>
-                                                            <strong>Contact:</strong>
-                                                            {{ $leaveData['phone_number'] ?? '-' }}
-                                                        </small>
-                                                    </div>
-                                                    <!-- Approval Progress Bar -->
-                                                    <div class="progress my-3" style="height: 8px;">
-                                                        <div class="progress-bar bg-{{ $leaveData['hrStatus'] === 'Approved' ? 'success' : ($leaveData['hrStatus'] === 'Rejected' ? 'danger' : 'warning') }}"
-                                                            role="progressbar" style="width: 33%;" aria-valuenow="33"
-                                                            aria-valuemin="0" aria-valuemax="100"></div>
-                                                        <div class="progress-bar bg-{{ strtolower($leaveData['hodStatus']) === 'approved' ? 'success' : (strtolower($leaveData['hodStatus']) === 'rejected' ? 'danger' : 'warning') }}"
-                                                            role="progressbar" style="width: 33%;" aria-valuenow="33"
-                                                            aria-valuemin="0" aria-valuemax="100"></div>
-                                                        <div class="progress-bar bg-{{ $leaveData['esStatus'] === 'Approved' ? 'success' : ($leaveData['esStatus'] === 'Rejected' ? 'danger' : 'warning') }}"
-                                                            role="progressbar" style="width: 34%;" aria-valuenow="34"
-                                                            aria-valuemin="0" aria-valuemax="100"></div>
-                                                    </div>
-                                                    <div class="d-flex justify-content-between text-center small mb-2">
-                                                        <span>
-                                                            <i class="bi bi-person-badge"></i>
-                                                            HR<br>
-                                                            @if ($leaveData['hrStatus'] === 'Approved')
-                                                                <i class="bi bi-check-circle-fill text-success"></i>
-                                                            @elseif ($leaveData['hrStatus'] === 'Rejected')
-                                                                <i class="bi bi-x-circle-fill text-danger"></i>
-                                                            @else
-                                                                <i class="bi bi-hourglass-split text-warning"></i>
-                                                            @endif
-                                                        </span>
-                                                        <span>
-                                                            <i class="bi bi-person-workspace"></i>
-                                                            HOD<br>
-                                                            @if (strtolower($leaveData['hodStatus']) === 'approved' || strtolower($leaveData['hodStatus']) === 'apprroved')
-                                                                <i class="bi bi-check-circle-fill text-success"></i>
-                                                            @elseif (strtolower($leaveData['hodStatus']) === 'rejected')
-                                                                <i class="bi bi-x-circle-fill text-danger"></i>
-                                                            @else
-                                                                <i class="bi bi-hourglass-split text-warning"></i>
-                                                            @endif
-                                                        </span>
-                                                        <span>
-                                                            <i class="bi bi-person-lines-fill"></i>
-                                                            Executive<br>
-                                                            @if ($leaveData['esStatus'] === 'Approved')
-                                                                <i class="bi bi-check-circle-fill text-success"></i>
-                                                            @elseif ($leaveData['esStatus'] === 'Rejected')
-                                                                <i class="bi bi-x-circle-fill text-danger"></i>
-                                                            @else
-                                                                <i class="bi bi-hourglass-split text-warning"></i>
-                                                            @endif
-                                                        </span>
-                                                    </div>
-                                                    <!-- Status & Actions -->
-                                                    @if ($leaveData['esStatus'] === 'Approved')
-                                                        <div
-                                                            class="alert alert-success py-2 px-3 mt-2 mb-0 d-flex align-items-center gap-2">
-                                                            <i class="bi bi-emoji-laughing fs-4"></i>
-                                                            <div>
-                                                                <strong>Congratulations!</strong> Your leave is fully
-                                                                approved.
-                                                                @if ($leaveData['daysRemaining'] == 'Leave has not started')
-                                                                    <span class="d-block">Leave has not started
-                                                                        yet.</span>
-                                                                @else
-                                                                    <span class="d-block">Days remaining:
-                                                                        <strong>{{ $leaveData['daysRemaining'] }}</strong></span>
+                                    </div>
+                                    <div class="card-body" id="leaveTrackingContainer">
+                                        <div class="row" id="leaveRequestsContainer">
+                                            @foreach ($leaveApprovalData as $index => $leaveData)
+                                                <div class="col-12 mb-4 leave-request-item" data-leave-id="{{ $leaveData['leave']->leave_id ?? '' }}">
+                                                    <div class="card border-0 shadow-sm h-100 position-relative overflow-hidden">
+                                                        <!-- Animated border indicator -->
+                                                        <div class="position-absolute top-0 start-0 w-100 h-2
+                                                            @if($leaveData['esStatus'] === 'Approved') bg-success
+                                                            @elseif($leaveData['status'] === 'Rejected') bg-danger
+                                                            @else bg-warning @endif
+                                                            progress-indicator" style="height: 4px;"></div>
+
+                                                        <div class="card-body">
+                                                            <!-- Header Section -->
+                                                            <div class="d-flex flex-wrap align-items-center justify-content-between mb-3">
+                                                                <div class="d-flex align-items-center flex-wrap gap-2">
+                                                                    <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill">
+                                                                        <i class="bi bi-calendar-event me-1"></i>
+                                                                        {{ $leaveData['leave_type_name'] ?? 'Leave' }}
+                                                                    </span>
+                                                                    <span class="text-muted">
+                                                                        <i class="bi bi-clock me-1"></i>
+                                                                        {{ \Carbon\Carbon::parse($leaveData['start_date'])->format('d M') }} -
+                                                                        {{ \Carbon\Carbon::parse($leaveData['end_date'])->format('d M, Y') }}
+                                                                    </span>
+                                                                </div>
+                                                                <div class="status-badge-container">
+                                                                    @if($leaveData['esStatus'] === 'Approved')
+                                                                        <span class="badge bg-success px-3 py-2 rounded-pill animate-pulse">
+                                                                            <i class="bi bi-check-circle me-1"></i>Fully Approved
+                                                                        </span>
+                                                                    @elseif($leaveData['status'] === 'Rejected')
+                                                                        <span class="badge bg-danger px-3 py-2 rounded-pill">
+                                                                            <i class="bi bi-x-circle me-1"></i>Rejected
+                                                                        </span>
+                                                                    @else
+                                                                        <span class="badge bg-warning text-dark px-3 py-2 rounded-pill">
+                                                                            <i class="bi bi-hourglass-split me-1"></i>
+                                                                            @php
+                                                                                $currentStage = 'Pending HR Approval';
+                                                                                if($leaveData['hrStatus'] === 'Approved') {
+                                                                                    $currentStage = 'Pending HOD Approval';
+                                                                                }
+                                                                                if($leaveData['hodStatus'] === 'Approved') {
+                                                                                    $currentStage = 'Pending Executive Secretary';
+                                                                                }
+                                                                            @endphp
+                                                                            {{ $currentStage }}
+                                                                        </span>
+                                                                    @endif
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- Details Section - Responsive Grid -->
+                                                            <div class="row g-3 mb-4">
+                                                                @if(!empty($leaveData['rejection_reason']))
+                                                                <div class="col-md-6">
+                                                                    <div class="info-item d-flex align-items-start">
+                                                                        <i class="bi bi-exclamation-triangle text-danger me-2 mt-1"></i>
+                                                                        <div>
+                                                                            <small class="text-muted d-block">Rejection Reason</small>
+                                                                            <span class="fw-medium">{{ $leaveData['rejection_reason'] }}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                @endif
+
+                                                                @if(!empty($leaveData['phone_number']))
+                                                                <div class="col-md-6">
+                                                                    <div class="info-item d-flex align-items-start">
+                                                                        <i class="bi bi-telephone text-success me-2 mt-1"></i>
+                                                                        <div>
+                                                                            <small class="text-muted d-block">Contact</small>
+                                                                            <span class="fw-medium">{{ $leaveData['phone_number'] }}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
                                                                 @endif
                                                             </div>
+
+                                                            <!-- Sequential Approval Progress -->
+                                                            <div class="approval-flow-container mb-4">
+                                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                                    <small class="text-muted fw-semibold">Approval Progress</small>
+                                                                    <small class="text-muted">
+                                                                        @php
+                                                                            $approvedCount = 0;
+                                                                            $rejectedCount = 0;
+                                                                            if($leaveData['hrStatus'] === 'Approved') $approvedCount++;
+                                                                            if($leaveData['hodStatus'] === 'Approved') $approvedCount++;
+                                                                            if($leaveData['esStatus'] === 'Approved') $approvedCount++;
+                                                                            if($leaveData['hrStatus'] === 'Rejected') $rejectedCount++;
+                                                                            if($leaveData['hodStatus'] === 'Rejected') $rejectedCount++;
+                                                                            if($leaveData['esStatus'] === 'Rejected') $rejectedCount++;
+                                                                            $progressPercentage = ($leaveData['progress'] ?? 0);
+                                                                        @endphp
+                                                                        @if($rejectedCount > 0)
+                                                                            Rejected
+                                                                        @else
+                                                                            {{ $approvedCount }}/3 Approved
+                                                                        @endif
+                                                                    </small>
+                                                                </div>
+
+                                                                <!-- Modern Progress Bar -->
+                                                                <div class="progress mb-3" style="height: 8px; border-radius: 10px;">
+                                                                    <div class="progress-bar progress-bar-striped
+                                                                        @if($leaveData['status'] === 'Rejected') bg-danger
+                                                                        @elseif($approvedCount === 3) bg-success progress-bar-animated
+                                                                        @else bg-primary progress-bar-animated @endif"
+                                                                        role="progressbar"
+                                                                        style="width: {{ $progressPercentage }}%;"
+                                                                        aria-valuenow="{{ $progressPercentage }}"
+                                                                        aria-valuemin="0"
+                                                                        aria-valuemax="100">
+                                                                    </div>
+                                                                </div>
+
+                                                                <!-- Approval Stages - Mobile Responsive -->
+                                                                <div class="row text-center g-2">
+                                                                    <div class="col-4">
+                                                                        <div class="approval-stage p-2 rounded
+                                                                            @if($leaveData['hrStatus'] === 'Approved') bg-success-subtle text-success
+                                                                            @elseif($leaveData['hrStatus'] === 'Rejected') bg-danger-subtle text-danger
+                                                                            @else bg-warning-subtle text-warning @endif">
+                                                                            <div class="stage-icon mb-1">
+                                                                                @if($leaveData['hrStatus'] === 'Approved')
+                                                                                    <i class="bi bi-check-circle-fill fs-5"></i>
+                                                                                @elseif($leaveData['hrStatus'] === 'Rejected')
+                                                                                    <i class="bi bi-x-circle-fill fs-5"></i>
+                                                                                @else
+                                                                                    <i class="bi bi-hourglass-split fs-5"></i>
+                                                                                @endif
+                                                                            </div>
+                                                                            <div class="stage-title">
+                                                                                <small class="fw-semibold d-block">HR</small>
+                                                                                <small class="d-block">
+                                                                                    @if($leaveData['hrStatus'] === 'Approved') Approved
+                                                                                    @elseif($leaveData['hrStatus'] === 'Rejected') Rejected
+                                                                                    @else Pending @endif
+                                                                                </small>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="col-4">
+                                                                        <div class="approval-stage p-2 rounded
+                                                                            @if($leaveData['hodStatus'] === 'Approved') bg-success-subtle text-success
+                                                                            @elseif($leaveData['hodStatus'] === 'Rejected') bg-danger-subtle text-danger
+                                                                            @else bg-warning-subtle text-warning @endif">
+                                                                            <div class="stage-icon mb-1">
+                                                                                @if($leaveData['hodStatus'] === 'Approved')
+                                                                                    <i class="bi bi-check-circle-fill fs-5"></i>
+                                                                                @elseif($leaveData['hodStatus'] === 'Rejected')
+                                                                                    <i class="bi bi-x-circle-fill fs-5"></i>
+                                                                                @else
+                                                                                    <i class="bi bi-hourglass-split fs-5 @if($leaveData['hrStatus'] !== 'Approved') text-muted @endif"></i>
+                                                                                @endif
+                                                                            </div>
+                                                                            <div class="stage-title">
+                                                                                <small class="fw-semibold d-block">HOD</small>
+                                                                                <small class="d-block">
+                                                                                    @if($leaveData['hodStatus'] === 'Approved') Approved
+                                                                                    @elseif($leaveData['hodStatus'] === 'Rejected') Rejected
+                                                                                    @elseif($leaveData['hrStatus'] === 'Approved') Pending
+                                                                                    @else Awaiting @endif
+                                                                                </small>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="col-4">
+                                                                        <div class="approval-stage p-2 rounded
+                                                                            @if($leaveData['esStatus'] === 'Approved') bg-success-subtle text-success
+                                                                            @elseif($leaveData['esStatus'] === 'Rejected') bg-danger-subtle text-danger
+                                                                            @else bg-warning-subtle text-warning @endif">
+                                                                            <div class="stage-icon mb-1">
+                                                                                @if($leaveData['esStatus'] === 'Approved')
+                                                                                    <i class="bi bi-check-circle-fill fs-5"></i>
+                                                                                @elseif($leaveData['esStatus'] === 'Rejected')
+                                                                                    <i class="bi bi-x-circle-fill fs-5"></i>
+                                                                                @else
+                                                                                    <i class="bi bi-hourglass-split fs-5 @if(strtolower($leaveData['hodStatus']) !== 'approved') text-muted @endif"></i>
+                                                                                @endif
+                                                                            </div>
+                                                                            <div class="stage-title">
+                                                                                <small class="fw-semibold d-block">ES</small>
+                                                                                <small class="d-block">
+                                                                                    @if($leaveData['esStatus'] === 'Approved') Approved
+                                                                                    @elseif($leaveData['esStatus'] === 'Rejected') Rejected
+                                                                                    @elseif(strtolower($leaveData['hodStatus']) === 'approved') Pending
+                                                                                    @else Awaiting @endif
+                                                                                </small>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- Status Messages -->
+                                                            @if($leaveData['esStatus'] === 'Approved')
+                                                                <div class="alert alert-success border-0 d-flex align-items-center mb-3" role="alert">
+                                                                    <i class="bi bi-check-circle-fill me-2"></i>
+                                                                    <div>
+                                                                        <strong>Congratulations!</strong> Your leave is fully approved.
+                                                                        @if($leaveData['daysRemaining'] == 'Leave has not started')
+                                                                            <small class="d-block mt-1 text-success-emphasis">Leave period has not started yet.</small>
+                                                                        @elseif(is_numeric($leaveData['daysRemaining']))
+                                                                            <small class="d-block mt-1 text-success-emphasis">Days remaining: <strong>{{ $leaveData['daysRemaining'] }}</strong></small>
+                                                                        @endif
+                                                                    </div>
+                                                                </div>
+                                                            @elseif($leaveData['status'] === 'Rejected' && isset($leaveData['rejection_reason']))
+                                                                <div class="alert alert-danger border-0" role="alert">
+                                                                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                                                    <strong>Rejected:</strong> {{ $leaveData['rejection_reason'] }}
+                                                                </div>
+                                                            @else
+                                                                <div class="alert alert-info border-0" role="alert">
+                                                                    <i class="bi bi-info-circle-fill me-2"></i>
+                                                                    <strong>Status:</strong> Currently in {{ $currentStage ?? 'approval process' }}.
+                                                                    @if($leaveData['hrStatus'] !== 'Approved')
+                                                                        <small class="d-block mt-1">Waiting for HR to review your request.</small>
+                                                                    @elseif(strtolower($leaveData['hodStatus']) !== 'approved')
+                                                                        <small class="d-block mt-1">HR approved. Forwarded to Head of Division.</small>
+                                                                    @else
+                                                                        <small class="d-block mt-1">HOD approved. Forwarded to Executive Secretary.</small>
+                                                                    @endif
+                                                                </div>
+                                                            @endif
+
+                                                            <!-- Action Buttons -->
+                                                            <div class="d-flex flex-wrap gap-2 mt-3">
+                                                                @if(!empty($leaveData['handover_note_file']))
+                                                                    <a href="{{ route('leaves.handover.view', ['leave' => $leaveData['leave']->leave_id]) }}"
+                                                                       class="btn btn-sm btn-outline-primary" target="_blank">
+                                                                        <i class="bi bi-file-earmark-arrow-down me-1"></i>
+                                                                        Handover Document
+                                                                    </a>
+                                                                @endif
+
+                                                                @if(isset($leaveData['leave']))
+                                                                    <a href="{{ route('leaves.show', ['leave' => $leaveData['leave']->leave_id]) }}"
+                                                                       class="btn btn-sm btn-outline-info">
+                                                                        <i class="bi bi-eye me-1"></i>
+                                                                        View Details
+                                                                    </a>
+                                                                @endif
+                                                            </div>
+
+                                                            <!-- Handover Note Preview -->
+                                                            @if(!empty($leaveData['handover_note']))
+                                                                <div class="mt-3 p-3 bg-light rounded border-start border-primary border-3">
+                                                                    <small class="text-muted d-block mb-1">
+                                                                        <i class="bi bi-journal-text me-1"></i>Handover Note:
+                                                                    </small>
+                                                                    <div class="handover-note-preview" style="max-height: 60px; overflow: hidden;">
+                                                                        {{ Str::limit($leaveData['handover_note'], 150) }}
+                                                                    </div>
+                                                                    @if(strlen($leaveData['handover_note']) > 150)
+                                                                        <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none toggle-handover-note">
+                                                                            <small>Show more...</small>
+                                                                        </button>
+                                                                    @endif
+                                                                </div>
+                                                            @endif
                                                         </div>
-                                                    @elseif ($leaveData['status'] === 'Rejected' && isset($leaveData['rejection_reason']))
-                                                        <div class="alert alert-danger py-2 px-3 mt-2 mb-0">
-                                                            <strong>Rejected:</strong>
-                                                            {{ $leaveData['rejection_reason'] }}
-                                                        </div>
-                                                    @elseif ($leaveData['status'] === 'Pending')
-                                                        <div class="alert alert-warning py-2 px-3 mt-2 mb-0">
-                                                            <span class="fw-semibold">Pending Approval</span>
-                                                        </div>
-                                                    @endif
-                                                    <!-- Handover Note Download & Text -->
-                                                    <div class="d-flex flex-wrap gap-3 mt-2">
-                                                        @if (!empty($leaveData['handover_note_file']))
-                                                            <a href="{{ asset('storage/' . $leaveData['handover_note_file']) }}"
-                                                                class="btn btn-sm btn-outline-primary"
-                                                                target="_blank">
-                                                                <i class="bi bi-file-earmark-arrow-down"></i> Handover
-                                                                Note
-                                                            </a>
-                                                        @endif
-                                                        @if (!empty($leaveData['handover_note']))
-                                                            <span
-                                                                class="badge bg-light text-dark border border-primary">
-                                                                <i class="bi bi-journal-text"></i>
-                                                                {{ $leaveData['handover_note'] }}
-                                                            </span>
-                                                        @endif
                                                     </div>
-                                                    <hr class="my-4">
-                                                </li>
+                                                </div>
                                             @endforeach
-                                        </ul>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1013,6 +1155,149 @@
                                             request
                                             if you need to take time off.
                                         </p>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+
+                        {{-- Appraisal Progress Timeline --}}
+                        @if (count($appraisalProgressData) > 0)
+                            <div class="col-xxl-12 col-md-12">
+                                <div class="card info-card border-0 shadow-sm appraisal-progress-card">
+                                    <div class="card-body">
+                                        <h5 class="mb-4 fw-bold text-primary">
+                                            <i class="bi bi-clipboard-check"></i> My Appraisal Progress
+                                        </h5>
+                                        <ul class="timeline list-unstyled">
+                                            @foreach ($appraisalProgressData as $appraisalData)
+                                                <li class="timeline-item mb-5 position-relative ps-4">
+                                                    <div class="d-flex align-items-center mb-2">
+                                                        <span class="badge bg-primary me-2">Appraisal</span>
+                                                        <span class="fw-semibold">
+                                                            {{ \Carbon\Carbon::parse($appraisalData['appraisal_period_start'])->format('d M Y') }}
+                                                            -
+                                                            {{ \Carbon\Carbon::parse($appraisalData['appraisal_period_end'])->format('d M Y') }}
+                                                        </span>
+                                                        @if ($appraisalData['status'] === 'Complete')
+                                                            <span class="badge bg-success ms-2">{{ $appraisalData['status'] }}</span>
+                                                        @elseif (str_contains($appraisalData['status'], 'Rejected'))
+                                                            <span class="badge bg-danger ms-2">{{ $appraisalData['status'] }}</span>
+                                                        @else
+                                                            <span class="badge bg-warning text-dark ms-2">{{ $appraisalData['status'] }}</span>
+                                                        @endif
+                                                    </div>
+                                                    <div class="ms-1 mb-2">
+                                                        <small>
+                                                            <i class="bi bi-info-circle"></i>
+                                                            <strong>Current Stage:</strong> {{ $appraisalData['current_stage'] }}
+                                                        </small>
+                                                    </div>
+
+                                                    {{-- Progress Bar --}}
+                                                    <div class="progress my-3" style="height: 12px;">
+                                                        <div class="progress-bar {{ $appraisalData['progress'] == 100 ? 'bg-success' : (str_contains($appraisalData['status'], 'Rejected') ? 'bg-danger' : 'bg-primary') }}"
+                                                            role="progressbar" style="width: {{ $appraisalData['progress'] }}%;"
+                                                            aria-valuenow="{{ $appraisalData['progress'] }}" aria-valuemin="0" aria-valuemax="100">
+                                                            {{ $appraisalData['progress'] }}%
+                                                        </div>
+                                                    </div>
+
+                                                    {{-- Approval Stages --}}
+                                                    <div class="d-flex justify-content-between text-center small mb-2">
+                                                        <span>
+                                                            <i class="bi bi-person-workspace"></i>
+                                                            HoD<br>
+                                                            @if (strtolower($appraisalData['hodStatus']) === 'approved')
+                                                                <i class="bi bi-check-circle-fill text-success"></i>
+                                                            @elseif (strtolower($appraisalData['hodStatus']) === 'rejected')
+                                                                <i class="bi bi-x-circle-fill text-danger"></i>
+                                                            @else
+                                                                <i class="bi bi-hourglass-split text-warning"></i>
+                                                            @endif
+                                                        </span>
+                                                        <span>
+                                                            <i class="bi bi-person-badge"></i>
+                                                            HR<br>
+                                                            @if (strtolower($appraisalData['hrStatus']) === 'approved')
+                                                                <i class="bi bi-check-circle-fill text-success"></i>
+                                                            @elseif (strtolower($appraisalData['hrStatus']) === 'rejected')
+                                                                <i class="bi bi-x-circle-fill text-danger"></i>
+                                                            @else
+                                                                <i class="bi bi-hourglass-split text-warning"></i>
+                                                            @endif
+                                                        </span>
+                                                        <span>
+                                                            <i class="bi bi-person-lines-fill"></i>
+                                                            Executive<br>
+                                                            @if (strtolower($appraisalData['esStatus']) === 'approved')
+                                                                <i class="bi bi-check-circle-fill text-success"></i>
+                                                            @elseif (strtolower($appraisalData['esStatus']) === 'rejected')
+                                                                <i class="bi bi-x-circle-fill text-danger"></i>
+                                                            @else
+                                                                <i class="bi bi-hourglass-split text-warning"></i>
+                                                            @endif
+                                                        </span>
+                                                    </div>
+
+                                                    {{-- Status Alert --}}
+                                                    @if ($appraisalData['status'] === 'Complete')
+                                                        <div class="alert alert-success py-2 px-3 mt-2 mb-0 d-flex align-items-center gap-2">
+                                                            <i class="bi bi-emoji-laughing fs-4"></i>
+                                                            <div>
+                                                                <strong>Congratulations!</strong> Your appraisal is fully completed.
+                                                            </div>
+                                                        </div>
+                                                    @elseif (str_contains($appraisalData['status'], 'Rejected'))
+                                                        <div class="alert alert-danger py-2 px-3 mt-2 mb-0">
+                                                            <strong>{{ $appraisalData['status'] }}:</strong>
+                                                            {{ $appraisalData['current_stage'] }}
+                                                        </div>
+                                                    @else
+                                                        <div class="alert alert-info py-2 px-3 mt-2 mb-0">
+                                                            <span class="fw-semibold">{{ $appraisalData['current_stage'] }}</span>
+                                                        </div>
+                                                    @endif
+
+                                                    {{-- Action Button --}}
+                                                    <div class="d-flex gap-2 mt-2">
+                                                        <a href="{{ route('uncst-appraisals.index', $appraisalData['appraisal']->appraisal_id) }}"
+                                                           class="btn btn-sm btn-outline-primary">
+                                                            <i class="bi bi-eye"></i> View Appraisal
+                                                        </a>
+
+                                                        @if ($appraisalData['can_be_withdrawn'])
+
+                                                            <form action="{{ route('appraisals.withdraw', $appraisalData['appraisal']) }}" method="POST" class="d-inline">
+                                                                @csrf
+                                                                <button type="submit" class="btn btn-sm btn-outline-warning"
+                                                                    onclick="return confirm('Are you sure you want to withdraw this appraisal? This will: Remove it from approval process Reset to draft status Allow further edits Require resubmission. This action cannot be undone.')">
+                                                                    <i class="bi bi-arrow-counterclockwise"></i> Withdraw
+                                                                </button>
+                                                            </form>
+
+                                                        @endif
+                                                    </div>
+                                                    <hr class="my-4">
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        @else
+                            <div class="col-xxl-12 col-md-12">
+                                <div class="card info-card border-0 shadow-sm">
+                                    <div class="card-body text-center">
+                                        <h5 class="mb-4 fw-bold text-primary">
+                                            <i class="bi bi-clipboard-check"></i> No Submitted Appraisals
+                                        </h5>
+                                        <p class="text-muted">
+                                            You have not submitted any appraisals yet. Please submit an appraisal
+                                            when the appraisal period is open.
+                                        </p>
+                                        <a href="{{ route('uncst-appraisals.index') }}" class="btn btn-primary">
+                                            <i class="bi bi-plus-circle"></i> View Appraisals
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -1038,7 +1323,334 @@
                                     border-radius: 50%;
                                     z-index: 1;
                                 }
+
+                                /* Leave Approval Card Enhancements */
+                                .leave-approval-card {
+                                    background: linear-gradient(135deg, #f8f9fc 0%, #ffffff 100%);
+                                    border-radius: 15px;
+                                    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+                                    overflow: hidden;
+                                }
+
+                                .leave-request-item {
+                                    transition: all 0.3s ease;
+                                }
+
+                                .leave-request-item:hover {
+                                    transform: translateY(-2px);
+                                }
+
+                                .leave-request-item .card {
+                                    transition: all 0.3s ease;
+                                    border: 1px solid rgba(0, 0, 0, 0.08);
+                                }
+
+                                .leave-request-item:hover .card {
+                                    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+                                    border-color: rgba(13, 110, 253, 0.25);
+                                }
+
+                                .progress-indicator {
+                                    animation: shimmer 2s infinite linear;
+                                }
+
+                                @keyframes shimmer {
+                                    0% { opacity: 0.6; }
+                                    50% { opacity: 1; }
+                                    100% { opacity: 0.6; }
+                                }
+
+                                .animate-pulse {
+                                    animation: pulse 2s infinite;
+                                }
+
+                                @keyframes pulse {
+                                    0%, 100% { opacity: 1; }
+                                    50% { opacity: 0.7; }
+                                }
+
+                                .approval-stage {
+                                    transition: all 0.3s ease;
+                                    border: 1px solid transparent;
+                                }
+
+                                .approval-stage:hover {
+                                    transform: scale(1.05);
+                                    border-color: rgba(13, 110, 253, 0.25);
+                                }
+
+                                .stage-icon {
+                                    transition: all 0.3s ease;
+                                }
+
+                                .approval-stage:hover .stage-icon {
+                                    transform: scale(1.1);
+                                }
+
+                                .handover-note-preview {
+                                    transition: max-height 0.3s ease;
+                                }
+
+                                .handover-note-expanded {
+                                    max-height: none !important;
+                                }
+
+                                .refresh-leave-status {
+                                    transition: all 0.3s ease;
+                                }
+
+                                .refresh-leave-status:hover {
+                                    transform: rotate(180deg);
+                                }
+
+                                .refresh-leave-status.loading {
+                                    animation: spin 1s linear infinite;
+                                }
+
+                                @keyframes spin {
+                                    from { transform: rotate(0deg); }
+                                    to { transform: rotate(360deg); }
+                                }
+
+                                /* Responsive improvements */
+                                @media (max-width: 768px) {
+                                    .leave-approval-card .card-body {
+                                        padding: 1rem;
+                                    }
+
+                                    .approval-stage {
+                                        padding: 0.5rem;
+                                    }
+
+                                    .stage-icon {
+                                        font-size: 1rem !important;
+                                    }
+
+                                    .status-badge-container {
+                                        margin-top: 0.5rem;
+                                        width: 100%;
+                                    }
+
+                                    .info-item {
+                                        margin-bottom: 1rem;
+                                    }
+                                }
+
+                                /* Appraisal Progress Card Enhancements */
+                                .appraisal-progress-card {
+                                    background: linear-gradient(135deg, #f8f9fc 0%, #ffffff 100%);
+                                    border-radius: 15px;
+                                    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+                                }
+
+                                .appraisal-progress-card .card-body {
+                                    padding: 2rem;
+                                }
+
+                                .appraisal-progress-card .progress {
+                                    border-radius: 10px;
+                                    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+                                    background-color: #e9ecef;
+                                }
+
+                                .appraisal-progress-card .progress-bar {
+                                    border-radius: 10px;
+                                    font-weight: 600;
+                                    font-size: 0.875rem;
+                                    transition: width 0.6s ease;
+                                }
+
+                                .appraisal-progress-card .alert {
+                                    border-radius: 10px;
+                                    border: none;
+                                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                                }
+
+                                .appraisal-progress-card .badge {
+                                    padding: 0.5rem 0.75rem;
+                                    font-size: 0.75rem;
+                                    font-weight: 600;
+                                    border-radius: 20px;
+                                }
+
+                                .appraisal-progress-card .btn {
+                                    border-radius: 8px;
+                                    font-weight: 500;
+                                    padding: 0.5rem 1rem;
+                                    transition: all 0.3s ease;
+                                }
+
+                                .appraisal-progress-card .btn:hover {
+                                    transform: translateY(-2px);
+                                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                                }
+
+                                /* Timeline specific styles for appraisal */
+                                .appraisal-progress-card .timeline {
+                                    border-left-color: #28a745;
+                                }
+
+                                .appraisal-progress-card .timeline-item:before {
+                                    border-color: #28a745;
+                                }
+
+                                /* Hover effects for timeline items */
+                                .appraisal-progress-card .timeline-item {
+                                    transition: all 0.3s ease;
+                                    padding: 1.5rem;
+                                    margin-bottom: 2rem;
+                                    background: rgba(255, 255, 255, 0.8);
+                                    border-radius: 12px;
+                                    border-left: 4px solid transparent;
+                                }
+
+                                .appraisal-progress-card .timeline-item:hover {
+                                    background: rgba(255, 255, 255, 1);
+                                    border-left-color: #0d6efd;
+                                    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.1);
+                                    transform: translateX(5px);
+                                }
                             </style>
+                        @endpush
+
+                        @push('scripts')
+                            <script>
+                                $(document).ready(function() {
+                                    // Handover note toggle functionality
+                                    $('.toggle-handover-note').on('click', function() {
+                                        const preview = $(this).siblings('.handover-note-preview');
+                                        const isExpanded = preview.hasClass('handover-note-expanded');
+
+                                        if (isExpanded) {
+                                            preview.removeClass('handover-note-expanded');
+                                            $(this).html('<small>Show more...</small>');
+                                        } else {
+                                            preview.addClass('handover-note-expanded');
+                                            $(this).html('<small>Show less...</small>');
+                                        }
+                                    });
+
+                                    // Refresh leave status functionality
+                                    $('.refresh-leave-status').on('click', function() {
+                                        const button = $(this);
+                                        const leaveId = button.data('leave-id');
+                                        const leaveCard = button.closest('.leave-request-item');
+
+                                        if (!leaveId) {
+                                            showToast('No leave ID found', 'error');
+                                            return;
+                                        }
+
+                                        // Show loading state
+                                        button.addClass('loading').prop('disabled', true);
+                                        const originalText = button.html();
+                                        button.html('<i class="bi bi-arrow-clockwise me-1"></i>Refreshing...');
+
+                                        // Show loading indicator
+                                        $('#leaveLoadingIndicator').removeClass('d-none');
+
+                                        // AJAX request to refresh leave status
+                                        $.ajax({
+                                            url: `/leaves/${leaveId}/status-refresh`,
+                                            type: 'GET',
+                                            headers: {
+                                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                            },
+                                            success: function(response) {
+                                                if (response.success) {
+                                                    showToast('Leave status refreshed successfully!', 'success');
+                                                    // Optionally update the UI with new status
+                                                    if (response.leave) {
+                                                        updateLeaveCardStatus(leaveCard, response.leave);
+                                                    }
+                                                } else {
+                                                    showToast('Failed to refresh status: ' + (response.message || 'Unknown error'), 'error');
+                                                }
+                                            },
+                                            error: function(xhr) {
+                                                let errorMessage = 'An error occurred while refreshing status.';
+                                                if (xhr.responseJSON && xhr.responseJSON.message) {
+                                                    errorMessage = xhr.responseJSON.message;
+                                                } else if (xhr.status === 404) {
+                                                    errorMessage = 'Leave request not found.';
+                                                } else if (xhr.status === 403) {
+                                                    errorMessage = 'You are not authorized to view this leave request.';
+                                                }
+                                                showToast(errorMessage, 'error');
+                                            },
+                                            complete: function() {
+                                                // Hide loading state
+                                                button.removeClass('loading').prop('disabled', false);
+                                                button.html(originalText);
+                                                $('#leaveLoadingIndicator').addClass('d-none');
+                                            }
+                                        });
+                                    });
+
+                                    // Function to update leave card status (if needed)
+                                    function updateLeaveCardStatus(leaveCard, leaveData) {
+                                        // This function can be enhanced to update specific parts of the card
+                                        // based on the refreshed leave data
+                                        console.log('Updated leave data:', leaveData);
+                                        // Add logic here to update specific status elements
+                                    }
+
+                                    // Toast notification function
+                                    function showToast(message, type = 'info') {
+                                        // If you have a toast library like Toastr, use it here
+                                        // For now, we'll use a simple alert (you can enhance this)
+                                        const colors = {
+                                            success: '#28a745',
+                                            error: '#dc3545',
+                                            info: '#17a2b8',
+                                            warning: '#ffc107'
+                                        };
+
+                                        // Create a simple toast element
+                                        const toast = $(`
+                                            <div class="toast-notification position-fixed" style="
+                                                top: 20px;
+                                                right: 20px;
+                                                background: ${colors[type] || colors.info};
+                                                color: white;
+                                                padding: 1rem 1.5rem;
+                                                border-radius: 8px;
+                                                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                                                z-index: 9999;
+                                                max-width: 300px;
+                                                font-size: 0.9rem;
+                                                animation: slideInRight 0.3s ease;
+                                            ">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="bi bi-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
+                                                    <span>${message}</span>
+                                                </div>
+                                            </div>
+                                        `);
+
+                                        $('body').append(toast);
+
+                                        // Auto remove after 4 seconds
+                                        setTimeout(() => {
+                                            toast.fadeOut(() => toast.remove());
+                                        }, 4000);
+                                    }
+
+                                    // Add CSS animation for toast
+                                    $('<style>').prop('type', 'text/css').html(`
+                                        @keyframes slideInRight {
+                                            from {
+                                                opacity: 0;
+                                                transform: translateX(100%);
+                                            }
+                                            to {
+                                                opacity: 1;
+                                                transform: translateX(0);
+                                            }
+                                        }
+                                    `).appendTo('head');
+                                });
+                            </script>
                         @endpush
                         @foreach ($contracts as $contract)
                             @if ($contract->days_until_end >= 0 && $contract->days_until_end <= 90)
@@ -1192,23 +1804,23 @@
                                                     @php
                                                         $url = '';
                                                         if (isset($notification->data['leave_id'])) {
-                                                            $url = url('leaves', $notification->data['leave_id']);
+                                                            $url = route('leaves.show', ['leave' => $notification->data['leave_id']]);
                                                         }
                                                         if (isset($notification->data['training_id'])) {
-                                                            $url = url('trainings', $notification->data['training_id']);
+                                                            $url = route('trainings.show', $notification->data['training_id']);
                                                         }
                                                         if (isset($notification->data['event_id'])) {
-                                                            $url = url('events', $notification->data['event_id']);
+                                                            $url = route('events.show', $notification->data['event_id']);
                                                         }
                                                         if (isset($notification->data['appraisal_id'])) {
-                                                            $url = url(
-                                                                'uncst-appraisals',
+                                                            $url = route(
+                                                                'uncst-appraisals.show',
                                                                 $notification->data['appraisal_id'],
                                                             );
                                                         }
                                                         if (isset($notification->data['travel_training_id'])) {
-                                                            $url = url(
-                                                                'out-of-station-trainings',
+                                                            $url = route(
+                                                                'out-of-station-trainings.show',
                                                                 $notification->data['travel_training_id'],
                                                             );
                                                         }
@@ -1216,7 +1828,7 @@
                                                             if (
                                                                 $notification->data['reminder_category'] == 'appraisal'
                                                             ) {
-                                                                $url = url('uncst-appraisals');
+                                                                $url = route('uncst-appraisals.index');
                                                             }
                                                         }
                                                         $isUnread = is_null($notification->read_at);
@@ -1416,6 +2028,50 @@
         </div>
     </div>
 
+    <!-- Withdraw Confirmation Modal
+    <div class="modal fade" id="withdrawConfirmModal" tabindex="-1" aria-labelledby="withdrawConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="withdrawConfirmModalLabel">
+                        <i class="bi bi-exclamation-triangle text-warning"></i> Confirm Withdrawal
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning" role="alert">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Warning:</strong> You are about to withdraw your appraisal submission.
+                    </div>
+                    <p>
+                        This action will:
+                    </p>
+                    <ul>
+                        <li>Remove your appraisal from the approval process</li>
+                        <li>Reset the appraisal status to draft</li>
+                        <li>Allow you to make further edits</li>
+                        <li>Require resubmission for approval</li>
+                    </ul>
+                    <p class="text-muted">
+                        <strong>Note:</strong> This action cannot be undone once confirmed.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle"></i> Cancel
+                    </button>
+                    <form id="withdrawForm" method="POST" action="">
+                    @csrf
+                    @method('POST')
+                    <button type="button" class="btn btn-warning" id="confirmWithdrawBtn">
+                        <i class="bi bi-arrow-counterclockwise"></i> Confirm Withdrawal
+                    </button>
+                        </form>
+                </div>
+            </div>
+        </div>
+    </div> -->
+
     @push('scripts')
         @vite(['resources/js/custom-dashboard.js'])
 
@@ -1532,7 +2188,93 @@
                     }).render();
                 }
 
-            });
+                document.addEventListener('DOMContentLoaded', function() {
+    // Set up the withdrawal modal
+    const withdrawModal = document.getElementById('withdrawConfirmModal');
+    const withdrawForm = document.getElementById('withdrawForm');
+    let currentAppraisalId = '';
+
+    // When modal is shown, set the form action
+    withdrawModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        currentAppraisalId = button.getAttribute('data-appraisal-id');
+        withdrawForm.action = `/appraisals/${currentAppraisalId}/withdraw`;
+    });
+
+    // Handle form submission
+    withdrawForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const submitBtn = document.getElementById('confirmWithdrawBtn');
+        const originalText = submitBtn.innerHTML;
+
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="bi bi-arrow-repeat spinner"></i> Withdrawing...';
+
+        // Submit the form via AJAX for better UX
+        fetch(this.action, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show success message
+                showToast('success', data.message || 'Appraisal withdrawn successfully');
+
+                // Close the modal
+                const modal = bootstrap.Modal.getInstance(withdrawModal);
+                modal.hide();
+
+                // Reload the page after a short delay
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            } else {
+                throw new Error(data.message || 'Failed to withdraw appraisal');
+            }
+        })
+        .catch(error => {
+            // Show error message
+            showToast('error', error.message || 'Failed to withdraw appraisal: Unknown error');
+
+            // Reset button state
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+        });
+    });
+
+    // Toast notification function
+    function showToast(type, message) {
+        // You can use your preferred toast library or create a simple one
+        const toast = document.createElement('div');
+        toast.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0`;
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="bi ${type === 'success' ? 'bi-check-circle' : 'bi-exclamation-circle'} me-2"></i>
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        `;
+
+        document.body.appendChild(toast);
+        const bsToast = new bootstrap.Toast(toast);
+        bsToast.show();
+
+        // Remove toast after it hides
+        toast.addEventListener('hidden.bs.toast', function () {
+            document.body.removeChild(toast);
+        });
+    }
+});
             //real notifications
         </script>
     @endpush

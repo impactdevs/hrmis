@@ -17,6 +17,11 @@ class EmployeeScope implements Scope
         // Get the currently authenticated user
         $user = auth()->user();
 
+        // If no user is authenticated, don't apply any constraints
+        if (!$user) {
+            return;
+        }
+
         // Get the user's roles
         $roles = $user->getRoleNames();
         $user_role = $roles->first();

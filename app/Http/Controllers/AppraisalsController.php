@@ -6,18 +6,34 @@ use App\Models\Appraisal;
 use App\Models\Contract;
 use App\Models\Employee;
 use App\Models\User;
+use App\Models\AppraisalHistory;
 use App\Notifications\AppraisalApproval;
 use App\Notifications\AppraisalApplication;
+use App\Notifications\AppraisalWithdrawn;
+use App\Notifications\AppraisalResubmitted;
 use Illuminate\Http\Request;
 use App\Models\Scopes\EmployeeScope;
 use Illuminate\Support\Facades\Notification;
+use App\Services\AppraisalService;
+use Illuminate\Support\Facades\Storage;
+use ZipArchive;
+use setasign\Fpdi\Fpdi;
+
 
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 
 class AppraisalsController extends Controller
 {
-    /** 
+
+    protected $appraisalService;
+
+    public function __construct(AppraisalService $appraisalService)
+    {
+        $this->appraisalService = $appraisalService;
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
@@ -88,9 +104,17 @@ class AppraisalsController extends Controller
                                     ->where('model_has_roles.model_type', User::class)
                                     ->where('roles.name', 'HR')
                                     ->join('roles', 'roles.id', '=', 'model_has_roles.role_id');
+                            })
+                            // Include resubmissions where HR is the appraiser (after resubmission, status is cleared)
+                            ->orWhere(function ($subQuery) {
+                                $subQuery->where('appraiser_id', auth()->user()->employee->employee_id)
+                                    ->where('appraisal_request_status', null); // Status cleared after resubmission
                             });
                     })
-                    ->whereNull("appraisals.appraisal_request_status->HR")
+                    ->where(function ($q) {
+                        $q->whereNull("appraisals.appraisal_request_status->HR")
+                            ->orWhere('appraisal_request_status', null); // Include cleared status after resubmission
+                    })
                     ->where('appraisal_drafts.is_submitted', true);
             } else {
                 $query = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
@@ -209,6 +233,46 @@ class AppraisalsController extends Controller
             }
 
             $appraisals = $query->paginate();
+        } else if (auth()->user()->hasRole('Head of Division')) {
+            // HOD users should see:
+            // 1. Appraisals where they are the appraiser (need to approve)
+            // 2. Appraisals from their department that need their approval
+            $dashboard_filter = $request->get('dashboard_filter');
+
+            $hodEmployeeId = auth()->user()->employee->employee_id;
+
+            if (!is_null($dashboard_filter) && $dashboard_filter == 'pending_approval') {
+                // Appraisals waiting for HOD approval (including resubmissions)
+                $query = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
+                    ->where('appraiser_id', $hodEmployeeId)
+                    ->where('appraisal_drafts.is_submitted', true)
+                    ->where(function ($q) {
+                        $q->whereNull('appraisal_request_status->Head of Division')
+                            ->orWhere('appraisal_request_status', null) // Handle cleared status after resubmission
+                            ->orWhereJsonDoesntContain('appraisal_request_status', ['Head of Division']);
+                    });
+            } else if (!is_null($dashboard_filter) && $dashboard_filter == 'approved_by_me') {
+                // Appraisals already approved by this HOD
+                $query = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
+                    ->where('appraiser_id', $hodEmployeeId)
+                    ->where('appraisal_drafts.is_submitted', true)
+                    ->whereJsonContains('appraisal_request_status', ['Head of Division' => 'approved']);
+            } else {
+                // All appraisals where HOD is the appraiser
+                $query = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
+                    ->where('appraiser_id', $hodEmployeeId)
+                    ->where('appraisal_drafts.is_submitted', true);
+            }
+
+            if ($search) {
+                $query->whereHas('employee', function ($q) use ($search) {
+                    $q->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhere('staff_id', 'like', "%{$search}%");
+                });
+            }
+
+            $appraisals = $query->paginate();
         } else {
             $query = Appraisal::with('employee')->latest();
 
@@ -271,7 +335,7 @@ class AppraisalsController extends Controller
         if (blank($appraser_id)) {
             return back()->with("success", "Un able to assign you a supervisor!");
         }
-        $data =  [
+        $data = [
             "appraisal_start_date" => null,
             "appraisal_end_date" => null,
             'employee_id' => auth()->user()->employee->employee_id,
@@ -280,6 +344,7 @@ class AppraisalsController extends Controller
             "unanticipated_constraints" => null,
             "personal_initiatives" => null,
             "training_support_needs" => null,
+            "suggestions" => null,
             "appraisal_period_rate" => [
                 [
                     "planned_activity" => null,
@@ -289,58 +354,58 @@ class AppraisalsController extends Controller
                 ]
             ],
             "personal_attributes_assessment" => [
-                "technical_knowledge" =>  [
+                "technical_knowledge" => [
                     "appraisee_score" => null,
                     "appraiser_score" => null,
                     "agreed_score" => null,
                 ],
-                "commitment" =>  [
+                "commitment" => [
                     "appraisee_score" => null,
                     "appraiser_score" => null,
                     "agreed_score" => null,
                 ],
-                "team_work" =>  [
+                "team_work" => [
                     "appraisee_score" => null,
                     "appraiser_score" => null,
                     "agreed_score" => null,
                 ],
-                "productivity" =>  [
+                "productivity" => [
                     "appraisee_score" => null,
                     "appraiser_score" => null,
                     "agreed_score" => null,
                 ],
-                "integrity" =>  [
+                "integrity" => [
                     "appraisee_score" => null,
                     "appraiser_score" => null,
                     "agreed_score" => null,
                 ],
-                "flexibility" =>  [
+                "flexibility" => [
                     "appraisee_score" => null,
                     "appraiser_score" => null,
                     "agreed_score" => null,
                 ],
-                "attendance" =>  [
+                "attendance" => [
                     "appraisee_score" => null,
                     "appraiser_score" => null,
                     "agreed_score" => null,
                 ],
-                "appearance" =>  [
+                "appearance" => [
                     "appraisee_score" => null,
                     "appraiser_score" => null,
                     "agreed_score" => null,
                 ],
-                "interpersonal" =>  [
+                "interpersonal" => [
                     "appraisee_score" => null,
                     "appraiser_score" => null,
                     "agreed_score" => null,
                 ],
-                "initiative" =>  [
+                "initiative" => [
                     "appraisee_score" => null,
                     "appraiser_score" => null,
                     "agreed_score" => null,
                 ]
             ],
-            "performance_planning" =>  [
+            "performance_planning" => [
                 [
                     "description" => null,
                     "performance_target" => null,
@@ -356,6 +421,7 @@ class AppraisalsController extends Controller
             "overall_assessment" => null,
             "executive_secretary_comments" => null,
             'is_draft' => true,
+            'current_stage' => 'Staff',
         ];
 
         $appraisal = Appraisal::create($data);
@@ -396,6 +462,7 @@ class AppraisalsController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+
     public function store(Request $request)
     {
         $data = $request->all();
@@ -405,6 +472,8 @@ class AppraisalsController extends Controller
 
         return redirect()->back()->with('success', 'Appraisal submitted successfully!');
     }
+
+
     /**
      * Display the specified resource.
      */
@@ -478,46 +547,149 @@ class AppraisalsController extends Controller
 
         // Default message
         $message = "Appraisal has been submitted successfully.";
-        if (isset($requestedData['relevant_documents']) && filled($requestedData['relevant_documents']) && is_array($requestedData['relevant_documents'])) {
+
+        // Handle relevant documents - FIXED VERSION
+        if (isset($requestedData['relevant_documents']) && is_array($requestedData['relevant_documents'])) {
             foreach ($requestedData['relevant_documents'] as $key => $value) {
-                // Ensure $value is an array to avoid undefined index
+                // Ensure $value is an array
                 if (!is_array($value)) {
                     continue;
                 }
 
-                // Handle when proof is not set or null, fallback to existing
-                if (!array_key_exists('proof', $value) || $value['proof'] === null) {
-                    $requestedData['relevant_documents'][$key]['proof'] = $uncst_appraisal['relevant_documents'][$key]['proof'] ?? null;
-                }
-
-                // Check if a new file is uploaded for this document
+                // Handle file uploads
                 if ($request->hasFile("relevant_documents.$key.proof")) {
                     $file = $request->file("relevant_documents.$key.proof");
 
-                    // Double-check it's a valid upload
                     if ($file && $file->isValid()) {
                         $filePath = $file->store('proof_documents', 'public');
                         $requestedData['relevant_documents'][$key]['proof'] = $filePath;
+
+                        // Also store the original file name
+                        $requestedData['relevant_documents'][$key]['original_name'] = $file->getClientOriginalName();
+                    }
+                } else {
+                    // Keep existing file if no new file uploaded
+                    if (isset($uncst_appraisal['relevant_documents'][$key]['proof'])) {
+                        $requestedData['relevant_documents'][$key]['proof'] = $uncst_appraisal['relevant_documents'][$key]['proof'];
+                    }
+
+                    // Keep existing original name if it exists
+                    if (isset($uncst_appraisal['relevant_documents'][$key]['original_name'])) {
+                        $requestedData['relevant_documents'][$key]['original_name'] = $uncst_appraisal['relevant_documents'][$key]['original_name'];
                     }
                 }
             }
+        } else {
+            // If no relevant_documents in request, keep existing ones
+            $requestedData['relevant_documents'] = $uncst_appraisal['relevant_documents'] ?? [];
         }
 
+        /**
+         * ✅ Handle submission (new or resubmission)
+         */
+        $isSubmission = $request->has('submit') ||
+            ($request->has('is_draft') && $requestedData['is_draft'] === 'not_draft');
 
+        $previousStage = $uncst_appraisal->current_stage;
+
+        // ✅ FIX: Correct stage determination based on your workflow
+        $appraiser = Employee::find($uncst_appraisal->appraiser_id);
+        $appraiserUser = $appraiser ? User::find($appraiser->user_id) : null;
+        $appraiserRole = $appraiserUser ? $this->appraisalService->getUserRoleForApproval($appraiserUser) : null;
+
+        $appraisee = $uncst_appraisal->employee;
+        $appraiseeUser = $appraisee->user ?? null;
+
+        // Determine the correct first stage
+        $firstStage = $this->getSubmissionStage($uncst_appraisal);
+
+        // Check if this is a resubmission after rejection
+        $status = $uncst_appraisal->appraisal_request_status ?? [];
+        $hasRejection = !empty($status) && collect($status)->contains(fn($s) => $s === 'rejected');
 
         // Handle draft logic
         if (isset($requestedData['is_draft'])) {
             if ($requestedData['is_draft'] === 'not_draft') {
-                // Final submission, just update is_submitted to true for this draft
-                DB::table('appraisal_drafts')
-                    ->where('appraisal_id', $uncst_appraisal->appraisal_id)
-                    ->where('employee_id', auth()->user()->employee->employee_id)
-                    ->update(['is_submitted' => true]);
-                $uncst_appraisal->is_draft = false;
-                $uncst_appraisal->save();
-                $message = "Appraisal submitted successfully.";
+                // Final submission - Handle resubmission logic
+                if ($hasRejection || $uncst_appraisal->is_draft) {
+                    // Simple - treat as fresh submission
+                    $uncst_appraisal->rejection_reason = null;
+                    $uncst_appraisal->resubmission_notes = $request->input('resubmission_notes', null);
+                    $uncst_appraisal->resubmitted_at = now();
+
+                    // Restart workflow
+                    $uncst_appraisal->appraisal_request_status = [];
+                    $uncst_appraisal->is_draft = false;
+
+                    // Set the correct initial stage based on appraisee role
+                    $appraisee = $uncst_appraisal->employee;
+                    $appraiseeUser = $appraisee?->user;
+
+                    if ($appraiseeUser && $appraiseeUser->hasRole('Head of Division')) {
+                        $uncst_appraisal->current_stage = 'Head of Division';
+                    } else {
+                        $uncst_appraisal->current_stage = 'Staff';
+                    }
+
+                    $uncst_appraisal->save();
+
+                    // Update draft table
+                    DB::table('appraisal_drafts')
+                        ->where('appraisal_id', $uncst_appraisal->appraisal_id)
+                        ->where('employee_id', auth()->user()->employee->employee_id)
+                        ->update(['is_submitted' => true, 'updated_at' => now()]);
+
+                    // Determine who to notify based on the new current stage
+                    $nextStage = $uncst_appraisal->current_stage;
+
+                    // Log the action
+                    $actionType = $hasRejection ? AppraisalHistory::ACTION_RESUBMITTED : AppraisalHistory::ACTION_SUBMITTED;
+                    $actionMessage = $hasRejection ? 'Appraisal resubmitted after addressing rejection feedback' : 'Appraisal submitted';
+
+                    // Log
+                    AppraisalHistory::logAction(
+                        $uncst_appraisal->appraisal_id,
+                        $actionType,
+                        $previousStage,
+                        $nextStage,
+                        $actionMessage
+                    );
+
+                    // Notifications - only notify the next approver, not everyone
+                    $this->sendSubmissionNotifications($uncst_appraisal, $nextStage);
+
+                    $message = $hasRejection ?
+                        "Appraisal resubmitted successfully and sent for review." :
+                        "Appraisal submitted successfully.";
+
+                } else {
+                    // Normal submission flow - NO auto-approvals
+                    $uncst_appraisal->appraisal_request_status = []; // Clear previous status
+                    // Set the correct initial stage based on appraisee role
+                    $appraisee = $uncst_appraisal->employee;
+                    $appraiseeUser = $appraisee?->user;
+
+                    if ($appraiseeUser && $appraiseeUser->hasRole('Head of Division')) {
+                        $uncst_appraisal->current_stage = 'Head of Division';
+                    } else {
+                        $uncst_appraisal->current_stage = 'Staff';
+                    }
+                    $uncst_appraisal->is_draft = false;
+                    $uncst_appraisal->save();
+
+                    DB::table('appraisal_drafts')
+                        ->where('appraisal_id', $uncst_appraisal->appraisal_id)
+                        ->where('employee_id', auth()->user()->employee->employee_id)
+                        ->update(['is_submitted' => true]);
+
+                    // Notifications - only notify the next approver
+                    $this->sendSubmissionNotifications($uncst_appraisal, $uncst_appraisal->current_stage);
+
+                    $message = "Appraisal submitted successfully.";
+                }
             } elseif ($requestedData['is_draft'] === 'draft') {
                 // Save as draft
+                $uncst_appraisal->appraisal_request_status = $uncst_appraisal->appraisal_request_status ?? [];
                 $uncst_appraisal->is_draft = true;
                 $uncst_appraisal->save();
 
@@ -534,50 +706,77 @@ class AppraisalsController extends Controller
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);
-                    $message = "Appraisal has been saved as a draft successfully.";
                 }
+
+                AppraisalHistory::logAction(
+                    $uncst_appraisal->appraisal_id,
+                    AppraisalHistory::ACTION_EDITED,
+                    $uncst_appraisal->current_stage,
+                    $uncst_appraisal->current_stage,
+                    'Appraisal saved as draft'
+                );
+
+                $message = "Appraisal saved as draft successfully.";
             }
 
             unset($requestedData['is_draft']); // Remove flag before update
         } else {
-            //check the role of the person submitting the appraisal, if its the Staff,
-            if (auth()->user()->hasRole('Staff')) {
-                $employeeAppraisor = \App\Models\Employee::withoutGlobalScope(EmployeeScope::class)
+            // If is_draft is not set, treat it as a normal submission
+            // Handle notifications based on current user role
+            $currentUser = auth()->user();
+
+            if ($currentUser->hasRole('Staff')) {
+                // Staff submission - notify their appraiser (HOD)
+                $employeeAppraiser = Employee::withoutGlobalScope(EmployeeScope::class)
                     ->find($uncst_appraisal->appraiser_id);
 
-                $employeeAppraisee = \App\Models\Employee::withoutGlobalScope(EmployeeScope::class)
-                    ->where('email', auth()->user()->email)->first();
+                $employeeAppraisee = Employee::withoutGlobalScope(EmployeeScope::class)
+                    ->where('email', $currentUser->email)->first();
 
-                $appraisorUser = User::find($employeeAppraisor->user_id);
-                if ($appraisorUser) {
-                    Notification::send($appraisorUser, new AppraisalApplication($uncst_appraisal, $employeeAppraisee->first_name, $employeeAppraisee->last_name));
-                }
-
-                $hrUser = User::role('HR')->first();
-                if ($hrUser) {
-                    Notification::send($hrUser, new AppraisalApplication($uncst_appraisal, $employeeAppraisee->first_name, $employeeAppraisee->last_name));
-                }
-
-                $esUser = User::role('Executive Secretary')->first();
-                if ($esUser) {
-                    Notification::send($esUser, new AppraisalApplication($uncst_appraisal, $employeeAppraisee->first_name, $employeeAppraisee->last_name));
+                if ($employeeAppraiser && $employeeAppraisee && $employeeAppraiser->user) {
+                    Notification::send(
+                        $employeeAppraiser->user,
+                        new AppraisalApplication($uncst_appraisal, $employeeAppraisee->first_name, $employeeAppraisee->last_name)
+                    );
                 }
             }
-            // If is_draft is not set, treat it as a normal submission
+
+            // Normal submission without draft flag
             DB::table('appraisal_drafts')
                 ->where('appraisal_id', $uncst_appraisal->appraisal_id)
                 ->where('employee_id', auth()->user()->employee->employee_id)
                 ->update(['is_submitted' => true]);
+
             $uncst_appraisal->is_draft = false;
             $uncst_appraisal->save();
+
+            $message = "Appraisal submitted successfully.";
         }
 
-        // Update appraisal with remaining request data
-        $uncst_appraisal->update($requestedData);
+        // ✅ Finally update remaining fields (excluding appraisal_request_status and current_stage if they were set above)
+        $fieldsToExclude = ['appraisal_request_status', 'current_stage', 'is_draft', 'rejection_reason', 'resubmission_notes', 'resubmitted_at'];
+        $updateData = array_diff_key($requestedData, array_flip($fieldsToExclude));
+
+        if (!empty($updateData)) {
+            $uncst_appraisal->update($updateData);
+        }
 
         return redirect()->back()->with('success', $message);
     }
 
+
+    protected function getSubmissionStage(Appraisal $appraisal): string
+    {
+        // Simple logic: determine stage based on appraisee role
+        $appraisee = $appraisal->employee;
+        $appraiseeUser = $appraisee?->user;
+
+        if ($appraiseeUser && $appraiseeUser->hasRole('Head of Division')) {
+            return 'Head of Division'; // HOD appraisee starts with HOD stage
+        }
+
+        return 'Staff'; // Regular staff starts with Staff stage
+    }
 
     /**
      * Remove the specified resource from storage.
@@ -588,9 +787,129 @@ class AppraisalsController extends Controller
         return to_route('uncst-appraisals.index');
     }
 
-
-    public function approveOrReject(Request $request, Appraisal $appraisal)
+    // In AppraisalsController.php, add this method:
+    protected function canBeReviewed(Appraisal $appraisal): bool
     {
+        $status = $appraisal->appraisal_request_status ?? [];
+
+        // Check if current user's role has already made a decision
+        $user = auth()->user();
+        $userRole = $this->getUserRoleFromUser($user);
+
+        if (isset($status[$userRole])) {
+            // This role has already made a decision
+            return false;
+        }
+
+        // Check if appraisal is at the correct stage for this user
+        return $appraisal->current_stage === $userRole;
+    }
+
+    /**
+     * Withdraw an appraisal before it's viewed by the appraiser
+     */
+    public function withdraw(Appraisal $appraisal)
+    {
+
+        \Log::debug('Withdrawal debug info:', $appraisal->withdrawal_debug_info);
+
+        $user = auth()->user();
+
+        if ($user->employee->employee_id !== $appraisal->employee_id) {
+            return back()->with('error', 'You can only withdraw your own appraisals.');
+        }
+
+        // Check if appraisal can be withdrawn using the model's attribute
+        if (!$appraisal->can_be_withdrawn) {
+            return back()->with('error', 'Cannot withdraw appraisal. It may have already been viewed by the appraiser.');
+        }
+
+        try {
+            \Log::info('Attempting to withdraw appraisal', [
+                'appraisal_id' => $appraisal->appraisal_id,
+                'user_id' => $user->id,
+                'employee_id' => $user->employee->employee_id
+            ]);
+
+            // Use the model's withdraw method
+            $appraisal->withdraw($user);
+
+            \Log::info('Appraisal withdrawn successfully', [
+                'appraisal_id' => $appraisal->appraisal_id
+            ]);
+
+            // Log the withdrawal action
+            AppraisalHistory::logAction(
+                $appraisal->appraisal_id,
+                AppraisalHistory::ACTION_WITHDRAWN,
+                null,
+                null,
+                'Appraisal withdrawn by appraisee'
+            );
+
+            // Notify relevant users about withdrawal
+            $this->notifyAppraisalWithdrawal($appraisal);
+
+            return back()->with('success', 'Appraisal withdrawn successfully. You can edit and resubmit it later.');
+        } catch (\Exception $e) {
+            \Log::error('Error withdrawing appraisal', [
+                'appraisal_id' => $appraisal->appraisal_id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error withdrawing appraisal: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Send notifications to the appropriate next approver only
+     */
+    protected function sendSubmissionNotifications(Appraisal $appraisal, string $nextStage)
+    {
+        $appraisee = $appraisal->employee;
+
+        if (!$appraisee) {
+            return;
+        }
+
+        // Notify the next approver based on the stage
+        $nextApprovers = User::role($nextStage)->get();
+
+        foreach ($nextApprovers as $nextApprover) {
+            Notification::send(
+                $nextApprover,
+                new AppraisalApplication(
+                    $appraisal,
+                    $appraisee->first_name ?? '',
+                    $appraisee->last_name ?? ''
+                )
+            );
+        }
+
+        // Also notify the appraiser specifically if they're different from the next stage approver
+        $appraiser = Employee::find($appraisal->appraiser_id);
+        if ($appraiser && $appraiser->user) {
+            $appraiserRole = $this->getUserRoleFromUser($appraiser->user);
+            if ($appraiserRole !== $nextStage) {
+                Notification::send(
+                    $appraiser->user,
+                    new AppraisalApplication(
+                        $appraisal,
+                        $appraisee->first_name ?? '',
+                        $appraisee->last_name ?? ''
+                    )
+                );
+            }
+        }
+    }
+
+   public function approveOrReject(Request $request, Appraisal $appraisal)
+    {
+        
         $request->validate([
             'status' => 'required|string|in:approved,rejected',
             'reason' => 'nullable|string',
@@ -603,7 +922,7 @@ class AppraisalsController extends Controller
         // Retrieve current leave_request_status (it will be an array due to casting)
         $appraisalRequestStatus = $appraisal->appraisal_request_status ?: []; // Default to an empty array if null
 
-        // Update leave request based on the user's role and the input status
+        // Update appraisal request based on the user's role and the input status
         if ($user->hasRole('HR')) {
             if ($request->input('status') === 'approved') {
                 // Set HR status to approved
@@ -620,7 +939,11 @@ class AppraisalsController extends Controller
                     $appraisalRequestStatus['Head of Division'] = 'rejected';
                 }
                 $appraisal->rejection_reason = $request->input('reason');
+
+                // Reset to draft for fresh resubmission
+                $this->resetToDraftForResubmission($appraisal);
             }
+
         } elseif ($user->hasRole('Head of Division')) {
             if ($request->input('status') === 'approved') {
                 // Set Head of Division status to approved
@@ -630,7 +953,11 @@ class AppraisalsController extends Controller
                 // Set Head of Division status to rejected
                 $appraisalRequestStatus['Head of Division'] = 'rejected';
                 $appraisal->rejection_reason = $request->input('reason'); // Store rejection reason
+
+                // Reset to draft for fresh resubmission
+                $this->resetToDraftForResubmission($appraisal);
             }
+
         } elseif ($user->hasRole('Executive Secretary')) {
             if ($request->input('status') === 'approved') {
                 // Set leave status as approved for Executive Secretary
@@ -640,10 +967,13 @@ class AppraisalsController extends Controller
                 // Set rejection status
                 $appraisalRequestStatus['Executive Secretary'] = 'rejected';
                 $appraisal->rejection_reason = $request->input('reason'); // Store rejection reason
+
+                // Reset to draft for fresh resubmission
+                $this->resetToDraftForResubmission($appraisal);
             }
 
             // Get the user who requested the appraisal
-            $employee = \App\Models\Employee::withoutGlobalScope(EmployeeScope::class)
+            $employee = Employee::withoutGlobalScope(EmployeeScope::class)
                 ->find($appraisal->employee_id);
 
             $appraisalRequester = User::find($employee->user_id); // Removed ->first()
@@ -657,13 +987,574 @@ class AppraisalsController extends Controller
         $appraisal->appraisal_request_status = $appraisalRequestStatus;
         $appraisal->save();
 
-        return response()->json(['message' => 'Appraisal application approved successfully.', 'status' => $appraisal->leave_request_status]);
+        return response()->json(['message' => 'Appraisal application approved successfully.', 'status' => $appraisal->approval_status]);
+    }
+
+
+    /**
+     * Reset appraisal to draft status for fresh resubmission (for both withdrawal and rejection)
+     */
+    protected function resetToDraftForResubmission(Appraisal $appraisal): void
+    {
+        // Clear approval status but keep rejection reason for reference
+        $appraisal->appraisal_request_status = [];
+
+
+        // Mark as draft
+        $appraisal->is_draft = true;
+
+        // Reset to appropriate initial stage based on appraisee role
+        $appraisee = $appraisal->employee;
+        $appraiseeUser = $appraisee?->user;
+
+        if ($appraiseeUser && $appraiseeUser->hasRole('Head of Division')) {
+            $appraisal->current_stage = 'Head of Division';
+        } else {
+            $appraisal->current_stage = 'Staff';
+        }
+
+        // Mark draft as not submitted
+        DB::table('appraisal_drafts')
+            ->where('appraisal_id', $appraisal->appraisal_id)
+            ->where('employee_id', $appraisal->employee_id)
+            ->update(['is_submitted' => false, 'updated_at' => now()]);
+
+        $appraisal->save();
+
+        // Log the reset action
+        AppraisalHistory::logAction(
+            $appraisal->appraisal_id,
+            AppraisalHistory::ACTION_RESET_TO_DRAFT,
+            null,
+            $appraisal->current_stage,
+            'Appraisal reset to draft for fresh resubmission'
+        );
+    }
+
+
+    /**
+     * Advance appraisal to next stage based on current approval
+     */
+    protected function advanceAppraisalStage(Appraisal $appraisal, string $approvedByRole)
+    {
+        $appraisee = $appraisal->employee;
+        $appraiseeUser = $appraisee->user ?? null;
+        $isAppraiseeHod = $appraiseeUser && $appraiseeUser->hasRole('Head of Division');
+
+        $nextStage = null;
+
+        if ($isAppraiseeHod) {
+            // HOD appraisee: Staff → Executive Secretary (skip HR)
+            if ($approvedByRole === 'Staff') {
+                $nextStage = 'Executive Secretary';
+            }
+        } else {
+            // Regular staff: Staff → Head of Division → HR → Executive Secretary
+            switch ($approvedByRole) {
+                case 'Staff':
+                    $nextStage = 'Head of Division';
+                    break;
+                case 'Head of Division':
+                    $nextStage = 'HR';
+                    break;
+                case 'HR':
+                    $nextStage = 'Executive Secretary';
+                    break;
+                case 'Executive Secretary':
+                    $nextStage = 'Completed';
+                    $appraisal->approval_status = 'approved';
+                    break;
+            }
+        }
+
+        if ($nextStage) {
+            $appraisal->current_stage = $nextStage;
+            $appraisal->save();
+        }
+    }
+
+    /**
+     * Get next approver role
+     */
+    protected function getNextApproverRole(Appraisal $appraisal): ?string
+    {
+        if ($appraisal->current_stage === 'Completed') {
+            return null;
+        }
+
+        return $appraisal->current_stage;
+    }
+
+
+    /**
+     * Resubmit a rejected appraisal
+     */
+    public function resubmit(Request $request, Appraisal $appraisal)
+    {
+        $user = auth()->user();
+
+
+        // Determine the appropriate stage to resubmit to
+        $resubmitStage = $this->getResubmissionStage($appraisal);
+
+        // Update appraisal for resubmission
+        $appraisal->update([
+            'is_draft' => false,
+            'appraisal_request_status' => [], // Clear previous status for fresh review
+            'resubmission_notes' => $request->input('resubmission_notes'),
+            'resubmitted_at' => now(),
+            'rejection_reason' => null, // Clear rejection reason
+        ]);
+
+        // Update draft status
+        DB::table('appraisal_drafts')
+            ->where('appraisal_id', $appraisal->appraisal_id)
+            ->where('employee_id', $user->employee->employee_id)
+            ->update(['is_submitted' => true]);
+
+        // Log the resubmission action
+        AppraisalHistory::logAction(
+            $appraisal->appraisal_id,
+            AppraisalHistory::ACTION_RESUBMITTED,
+            'Staff', // From appraisee status
+            $resubmitStage,
+            'Appraisal resubmitted after rejection: ' . $request->input('resubmission_notes', 'No notes provided')
+        );
+
+        // Notify relevant users about resubmission
+        $this->notifyAppraisalResubmission($appraisal);
+
+        return back()->with('success', 'Appraisal resubmitted successfully.');
+    }
+
+    /**
+     * Determine the appropriate stage to resubmit to
+     */
+    protected function getResubmissionStage(Appraisal $appraisal): string
+    {
+        $status = $appraisal->appraisal_request_status ?? [];
+
+        // Find which stage rejected the appraisal
+        $rejectingStage = collect($status)->search(fn($s) => $s === 'rejected');
+
+        if ($rejectingStage) {
+            return $rejectingStage;
+        }
+
+
+        // Get appraiser details
+        $appraiser = Employee::find($appraisal->appraiser_id);
+        $appraiserUser = $appraiser ? User::find($appraiser->user_id) : null;
+        $appraiserRole = $appraiserUser ? $this->getUserRoleFromUser($appraiserUser) : null;
+
+        // Get appraisee details
+        $appraisee = $appraisal->employee;
+        $appraiseeUser = $appraisee->user ?? null;
+        $isAppraiseeHod = $appraiseeUser && $appraiseeUser->hasRole('Head of Division');
+
+        if ($isAppraiseeHod) {
+            return 'Executive Secretary';
+        }
+        // For regular staff, determine stage based on appraiser's role
+        if ($appraiserRole === 'HR') {
+            return 'HR';
+        } elseif ($appraiserRole === 'Head of Division') {
+            return 'Head of Division';
+        } elseif ($appraiserRole === 'Executive Secretary') {
+            return 'Executive Secretary';
+        }
+
+        // Default fallback - should not normally happen
+        return 'Head of Division';
+    }
+
+    protected function determineResubmissionStage(Appraisal $appraisal): string
+    {
+        // Get appraiser details
+        $appraiser = Employee::find($appraisal->appraiser_id);
+        $appraiserUser = $appraiser ? User::find($appraiser->user_id) : null;
+        $appraiserRole = $appraiserUser ? $this->getUserRoleFromUser($appraiserUser) : null;
+
+        // Get appraisee details
+        $appraisee = $appraisal->employee;
+        $appraiseeUser = $appraisee->user ?? null;
+        $isAppraiseeHod = $appraiseeUser && $appraiseeUser->hasRole('Head of Division');
+
+        if ($isAppraiseeHod) {
+            // HOD appraisee goes directly to Executive Secretary
+            return 'Executive Secretary';
+        }
+
+        // Regular staff: determine stage based on appraiser role
+        return match ($appraiserRole) {
+            'HR' => 'HR',
+            'Executive Secretary' => 'Executive Secretary',
+            default => 'Head of Division', // Default for HOD and others
+        };
+    }
+
+    /**
+     * Get user role from User model (helper method)
+     */
+    protected function getUserRoleFromUser(User $user): string
+    {
+        $roles = $user->getRoleNames();
+        return $roles->first() ?? 'Unknown';
+    }
+    /**
+     * Notify users about appraisal withdrawal
+     */
+    protected function notifyAppraisalWithdrawal(Appraisal $appraisal): void
+    {
+        $appraisee = $appraisal->employee;
+
+        // Notify the appraiser
+        $appraiser = Employee::withoutGlobalScope(EmployeeScope::class)
+            ->find($appraisal->appraiser_id);
+
+        if ($appraiser && $appraiser->user) {
+            Notification::send(
+                $appraiser->user,
+                new AppraisalWithdrawn($appraisal, $appraisee->first_name, $appraisee->last_name)
+            );
+        }
+
+        // Notify HR if applicable
+        $hrUsers = User::role('HR')->get();
+        foreach ($hrUsers as $hrUser) {
+            Notification::send(
+                $hrUser,
+                new AppraisalWithdrawn($appraisal, $appraisee->first_name, $appraisee->last_name)
+            );
+        }
+    }
+
+    /**
+     * Notify users about appraisal resubmission
+     */
+    protected function notifyAppraisalResubmission(Appraisal $appraisal): void
+    {
+        $appraisee = $appraisal->employee;
+
+        // Notify the next approver based on the resubmission stage
+        $nextApprovers = User::role($appraisal->current_stage)->get();
+
+        foreach ($nextApprovers as $approver) {
+            Notification::send(
+                $approver,
+                new AppraisalResubmitted($appraisal, $appraisee->first_name, $appraisee->last_name)
+            );
+        }
+
+        // Also notify HR for visibility
+        $hrUsers = User::role('HR')->get();
+        foreach ($hrUsers as $hrUser) {
+            Notification::send(
+                $hrUser,
+                new AppraisalResubmitted($appraisal, $appraisee->first_name, $appraisee->last_name)
+            );
+        }
+    }
+
+
+    /**
+     * Send appropriate notifications
+     */
+    protected function sendAppraisalNotifications(Appraisal $appraisal, string $status, User $approver)
+    {
+        $appraisee = $appraisal->employee;
+
+        if (!$appraisee || !$appraisee->user) {
+            return;
+        }
+
+        // Notify appraisee of decision
+        Notification::send(
+            $appraisee->user,
+            new AppraisalApproval(
+                $appraisal,
+                $status,
+                $approver->name,
+                $this->appraisalService->getUserRoleForApproval($approver)
+            )
+        );
+
+        // If approved and not completed, notify next approver
+        if ($status === 'approved' && $appraisal->current_stage !== 'Completed') {
+            $nextApproverRole = $this->getNextApproverRole($appraisal);
+
+            if ($nextApproverRole) {
+                $nextApprovers = User::role($nextApproverRole)->get();
+
+                foreach ($nextApprovers as $nextApprover) {
+                    Notification::send(
+                        $nextApprover,
+                        new AppraisalApplication(
+                            $appraisal,
+                            $appraisee->first_name,
+                            $appraisee->last_name
+                        )
+                    );
+                }
+            }
+        }
+    }
+
+
+    private function getAttachmentData(Appraisal $appraisal, $index): array
+    {
+        $documents = $appraisal->relevant_documents ?? [];
+        if (!isset($documents[$index])) {
+            throw new \Exception("Attachment not found for index: {$index}");
+        }
+
+        $filePath = ltrim($documents[$index]['proof'], '/'); // normalize path
+        $fileName = $documents[$index]['name'] ?? $documents[$index]['title'] ?? basename($filePath);
+
+        $possiblePaths = [
+            storage_path('app/public/' . $filePath),
+            storage_path('app/' . $filePath),
+            public_path('storage/' . $filePath),
+        ];
+
+        foreach ($possiblePaths as $path) {
+            if (file_exists($path)) {
+                return [
+                    'path' => $path,
+                    'name' => $fileName,
+                ];
+            }
+        }
+
+        throw new \Exception("File does not exist on server: {$filePath}");
     }
 
     public function downloadPDF(Appraisal $appraisal)
     {
         $users = User::all();
-        $pdf = PDf::loadView('appraisals.pdf', compact('appraisal', 'users'));
-        return $pdf->download("appraisal-{$appraisal->appraisal_id}.pdf");
+
+        // Step 1: Generate the main appraisal PDF with dompdf
+        $dompdfPdf = Pdf::loadView('appraisals.pdf', compact('appraisal', 'users')) // <-- updated here
+            ->setPaper('A4', 'portrait')
+            ->output();
+
+        // Save temporary dompdf file
+        $mainPdfPath = storage_path("app/temp/appraisal-main-{$appraisal->appraisal_id}.pdf");
+        if (!file_exists(dirname($mainPdfPath))) {
+            mkdir(dirname($mainPdfPath), 0755, true);
+        }
+        file_put_contents($mainPdfPath, $dompdfPdf);
+
+        // Step 2: Collect all PDFs (main + PDF attachments)
+        $pdfFiles = [$mainPdfPath];
+        foreach (($appraisal->relevant_documents ?? []) as $doc) {
+            if (!empty($doc['proof'])) {
+                $filePath = storage_path('app/public/' . $doc['proof']);
+                $extension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+
+                if (file_exists($filePath) && $extension === 'pdf') {
+                    $pdfFiles[] = $filePath;
+                }
+            }
+        }
+
+        // Step 3: Merge PDFs
+        $pdf = new Fpdi();
+        foreach ($pdfFiles as $file) {
+            $pageCount = $pdf->setSourceFile($file);
+
+            for ($i = 1; $i <= $pageCount; $i++) {
+                $tplIdx = $pdf->importPage($i);
+                $size = $pdf->getTemplateSize($tplIdx);
+
+                $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
+                $pdf->useTemplate($tplIdx);
+            }
+        }
+
+        $finalFileName = "appraisal-{$appraisal->appraisal_id}-with-attachments.pdf";
+
+        return response($pdf->Output('S'), 200)
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', "inline; filename={$finalFileName}");
+    }
+
+
+
+    private function authorizeAttachmentAccess($user, Appraisal $appraisal)
+    {
+        $isAppraiser = $user->employee && $user->employee->employee_id === $appraisal->appraiser_id;
+        $isAppraisee = $user->employee && $user->employee->employee_id === $appraisal->employee_id;
+        $isHR = $user->hasRole('HR');
+        $isExecutiveSecretary = $user->hasRole('Executive Secretary');
+
+        if (!$isAppraiser && !$isAppraisee && !$isHR && !$isExecutiveSecretary) {
+            abort(403, 'You do not have permission to access attachments in this appraisal.');
+        }
+    }
+
+
+    public function viewAttachment(Appraisal $appraisal, $index)
+    {
+        try {
+            $user = auth()->user();
+            $this->authorizeAttachmentAccess($user, $appraisal);
+
+            // Retrieve attachment path and name
+            $attachment = $this->getAttachmentData($appraisal, $index);
+            $filePath = $attachment['path'];
+            $fileName = $attachment['name'];
+
+            // Determine MIME type and extension
+            $fileExtension = pathinfo($filePath, PATHINFO_EXTENSION);
+            $mimeType = mime_content_type($filePath);
+
+            // Display PDFs inline
+            if (strtolower($fileExtension) === 'pdf' || $mimeType === 'application/pdf') {
+                return response()->file($filePath, [
+                    'Content-Type' => $mimeType,
+                    'Content-Disposition' => 'inline; filename="' . $fileName . '.pdf"'
+                ]);
+            }
+
+            // Display images inline
+            if (strpos($mimeType, 'image/') === 0) {
+                return response()->file($filePath, [
+                    'Content-Type' => $mimeType,
+                    'Content-Disposition' => 'inline; filename="' . $fileName . '.' . $fileExtension . '"'
+                ]);
+            }
+
+            // All other file types: display inline fallback
+            return response()->file($filePath, [
+                'Content-Type' => $mimeType,
+                'Content-Disposition' => 'inline; filename="' . $fileName . '.' . $fileExtension . '"'
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Attachment view error', [
+                'error' => $e->getMessage(),
+                'appraisal_id' => $appraisal->id,
+                'index' => $index,
+                'user_id' => auth()->id()
+            ]);
+
+            return back()->withErrors('Could not view the attachment.');
+        }
+    }
+
+
+    public function downloadAttachment(Appraisal $appraisal, $index)
+    {
+        try {
+            $user = auth()->user();
+            $this->authorizeAttachmentAccess($user, $appraisal);
+
+            // Retrieve attachment path and name
+            $attachment = $this->getAttachmentData($appraisal, $index);
+            $filePath = $attachment['path'];
+            $fileName = $attachment['name'];
+
+            // Get file extension & MIME type
+            $fileExtension = pathinfo($filePath, PATHINFO_EXTENSION);
+            $mimeType = mime_content_type($filePath);
+
+            return response()->download($filePath, $fileName . '.' . $fileExtension, [
+                'Content-Type' => $mimeType
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Attachment download error', [
+                'error' => $e->getMessage(),
+                'appraisal_id' => $appraisal->id,
+                'index' => $index,
+                'user_id' => auth()->id()
+            ]);
+
+            return back()->withErrors('Could not download the attachment.');
+        }
+    }
+
+
+    public function downloadAllAttachments(Appraisal $appraisal)
+    {
+        try {
+            $user = auth()->user();
+            $this->authorizeAttachmentAccess($user, $appraisal);
+
+            $documents = $appraisal->relevant_documents ?? [];
+
+            if (empty($documents)) {
+                return back()->with('error', 'No attachments found for this appraisal.');
+            }
+
+            // Create temporary ZIP file
+            $zipFileName = "appraisal-{$appraisal->appraisal_id}-attachments-" . now()->format('Y-m-d-H-i-s') . '.zip';
+            $zipPath = storage_path('app/temp/' . $zipFileName);
+
+            if (!file_exists(dirname($zipPath))) {
+                mkdir(dirname($zipPath), 0755, true);
+            }
+
+            $zip = new ZipArchive();
+            if ($zip->open($zipPath, ZipArchive::CREATE) !== true) {
+                return back()->with('error', 'Could not create ZIP file.');
+            }
+
+            foreach ($documents as $index => $document) {
+                try {
+                    $attachment = $this->getAttachmentData($appraisal, $index);
+                    $filePath = $attachment['path'];
+                    $fileName = preg_replace('/[^A-Za-z0-9_\-\.]/', '_', $attachment['name']);
+
+                    $zip->addFile($filePath, $fileName);
+                } catch (\Exception $e) {
+                    // Skip missing or inaccessible files
+                    continue;
+                }
+            }
+
+            if ($zip->numFiles === 0) {
+                $zip->close();
+                return back()->with('error', 'No valid attachments found for download.');
+            }
+
+            $zip->close();
+
+            return response()->download($zipPath, $zipFileName)->deleteFileAfterSend(true);
+
+        } catch (\Exception $e) {
+            \Log::error('Download all attachments error', [
+                'error' => $e->getMessage(),
+                'appraisal_id' => $appraisal->id,
+                'user_id' => auth()->id()
+            ]);
+
+            return back()->with('error', 'Could not create attachment archive: ' . $e->getMessage());
+        }
+    }
+
+
+    /**
+     * Show print preview for appraisal.
+     */
+    public function printPreview(Appraisal $appraisal)
+    {
+        $users = User::whereHas('employee')->get();
+
+        // Load the appraisal with its related employee and appraiser
+        $appraisal->load(['employee', 'appraiser']);
+
+        // Get attachment access info for the current user
+        $user = auth()->user();
+        $attachmentAccessInfo = $this->appraisalService->getAttachmentAccessInfo($appraisal, $user);
+
+        return view('appraisals.print-preview', compact('appraisal', 'users', 'attachmentAccessInfo'));
+    }
+
+    public function printAppraisal(Appraisal $appraisal)
+    {
+        $users = User::all();
+        return view('appraisals.pdf', compact('appraisal', 'users'));
     }
 }

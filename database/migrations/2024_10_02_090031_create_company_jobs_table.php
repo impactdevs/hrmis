@@ -12,8 +12,10 @@ return new class extends Migration {
     {
         Schema::create('company_jobs', function (Blueprint $table) {
             $table->uuid('company_job_id')->primary();
-            $table->string('job_code')->nullable()->unique();
-            $table->string('job_title')->nullable();
+            $table->string('job_code')->unique();
+            $table->string('job_title');
+            $table->timestamp('will_become_active_at');
+            $table->timestamp('will_become_inactive_at')->nullable();
             $table->timestamps();
         });
     }

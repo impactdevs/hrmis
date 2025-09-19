@@ -28,6 +28,14 @@ class Employee extends Model
     // Specify the type of the primary key
     protected $keyType = 'string';
 
+    /**
+     * Get the route key for the model.
+     */
+    public function getRouteKeyName(): string
+    {
+        return 'employee_id';
+    }
+
     // The attributes that are mass assignable
     protected $fillable = [
         'employee_id',
@@ -147,28 +155,37 @@ class Employee extends Model
     public function totalLeaveDays()
     {
         $totalDays = 0;
-        $annualLeaveType = LeaveType::where('leave_type_name', 'Annual')->first();
-        if ($annualLeaveType) {
-            //get leaves where the employee id matches employee id and were created in the current year that were confirmed by the executive secretary
-            $leaves = Leave::where('leave_type_id', $annualLeaveType->leave_type_id)->where('is_cancelled', false)
-                ->where('user_id', $this->user_id)->whereYear('created_at', Carbon::now()->year)
-                ->whereJsonContains('leave_request_status', ['Executive Secretary' => 'approved'])
-                ->get();
 
-            //calculate the total leave days excluding weekends and public holidays
-            $publicHolidays = PublicHoliday::pluck('holiday_date')->toArray();
+        // Get all approved leaves EXCEPT maternity leave
+        $leaves = Leave::where('is_cancelled', false)
+            ->where('user_id', $this->user_id)
+            ->whereYear('created_at', Carbon::now()->year) // Current year only
+            ->whereHas('leaveCategory', function ($query) {
+                // Exclude maternity leave from the balance calculation
+                $query->where('leave_type_name', '!=', 'Maternity');
+            })
+            ->where(function ($query) {
+                // Check if any approval role has approved the leave
+                $query->whereJsonContains('leave_request_status', ['Executive Secretary' => 'approved'])
+                    ->orWhereJsonContains('leave_request_status', ['Head of Division' => 'approved'])
+                    ->orWhereJsonContains('leave_request_status', ['HR' => 'approved'])
+                    ->orWhereJsonContains('leave_request_status', ['fully_approved' => true]);
+            })
+            ->get();
 
-            $publicHolidays = array_map(function ($date) {
-                return Carbon::parse($date)->toDateString();
-            }, $publicHolidays);
+        // Calculate the total leave days excluding weekends and public holidays
+        $publicHolidays = PublicHoliday::pluck('holiday_date')->toArray();
+        $publicHolidays = array_map(function ($date) {
+            return Carbon::parse($date)->toDateString();
+        }, $publicHolidays);
 
-            $totalDays = $leaves->sum(function ($leave) use ($publicHolidays) {
-                return Carbon::parse($leave->start_date)
-                    ->diffInDaysFiltered(function (Carbon $date) use ($publicHolidays) {
-                        return !$date->isWeekend() && !in_array($date->toDateString(), $publicHolidays);
-                    }, Carbon::parse($leave->end_date));
-            });
-        }
+        $totalDays = $leaves->sum(function ($leave) use ($publicHolidays) {
+            return Carbon::parse($leave->start_date)
+                ->diffInDaysFiltered(function (Carbon $date) use ($publicHolidays) {
+                    return !$date->isWeekend() && !in_array($date->toDateString(), $publicHolidays);
+                }, Carbon::parse($leave->end_date));
+        });
+
         return $totalDays;
     }
 
@@ -277,8 +294,60 @@ class Employee extends Model
     }
 
     public function getFullNameAttribute()
-{
-    return "{$this->first_name} {$this->last_name}";
-}
+    {
+        return "{$this->first_name} {$this->last_name}";
+    }
+
+    /**
+     * Define the relationship with the User model
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    public function qualifications()
+    {
+        return $this->hasMany(EmployeeQualification::class, 'employee_id', 'employee_id');
+    }
+
+    /**
+     * Synchronize qualifications from JSON column to qualifications table
+     * This method helps maintain consistency between both systems
+     */
+    public function syncQualificationsToTable()
+    {
+        // Clear existing qualifications in the table
+        $this->qualifications()->delete();
+
+        // If there are qualifications in the JSON column, migrate them
+        if (filled($this->qualifications_details)) {
+            foreach ($this->qualifications_details as $qualData) {
+                $this->qualifications()->create([
+                    'qualification' => $qualData['qualification'] ?? $qualData['title'] ?? null,
+                    'institution' => $qualData['institution'] ?? null,
+                    'year_obtained' => $qualData['year_obtained'] ?? null,
+                    'proof' => $qualData['proof'] ?? null,
+                ]);
+            }
+        }
+    }
+
+    /**
+     * Get qualifications from the new table and format them like the JSON column
+     * This provides backward compatibility for code that expects the old format
+     */
+    public function getQualificationsFromTableAttribute()
+    {
+        return $this->qualifications->map(function ($qualification, $index) {
+            return [
+                'qualification' => $qualification->qualification,
+                'institution' => $qualification->institution,
+                'year_obtained' => $qualification->year_obtained,
+                'proof' => $qualification->proof,
+            ];
+        })->toArray();
+    }
+
 
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CompanyJob;
+use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 
 class CompanyJobController extends Controller
@@ -30,12 +31,12 @@ class CompanyJobController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'job_code' => 'required',
+            'job_code' => 'required|unique:company_jobs,job_code',
             'job_title' => 'required',
             'will_become_active_at' => 'required|date',
             'will_become_inactive_at' => 'nullable|date|after_or_equal:will_become_active_at',
         ]);
-        CompanyJob::create($request->all());
+        CompanyJob::create($validated);
 
         return redirect()->route('company-jobs.index')->with('success', 'Company Job created successfully.');
     }
@@ -61,8 +62,14 @@ class CompanyJobController extends Controller
      */
     public function update(Request $request, CompanyJob $companyJob)
     {
-        //update
-        $companyJob->update($request->all());
+        $validated = $request->validate([
+            'job_code' => ['required', Rule::unique('company_jobs')->ignore($companyJob->company_job_id, 'company_job_id')],
+            'job_title' => 'required',
+            'will_become_active_at' => 'required|date',
+            'will_become_inactive_at' => 'nullable|date|after_or_equal:will_become_active_at',
+        ]);
+
+        $companyJob->update($validated);
 
         return redirect()->route('company-jobs.index')->with('success', 'Company Job updated successfully.');
     }
@@ -75,5 +82,5 @@ class CompanyJobController extends Controller
         $companyJob->delete();
         return redirect()->route('company-jobs.index')->with('success', 'Company Job deleted successfully.');
     }
- 
+
 }

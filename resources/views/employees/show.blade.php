@@ -71,6 +71,11 @@
                         <div class="col-md-4"><strong>Job Description:</strong></div>
                         <div class="col-md-8">{{ $employee->job_description ?? 'No Job Description' }}</div>
                     </div>
+
+                    <div class="mb-3 row">
+                        <div class="col-md-4"><strong>Date of Birth:</strong></div>
+                        <div class="col-md-8">{{ $employee->date_of_birth ?? 'No Date of birth' }}</div>
+                    </div>
                     {{-- <div class="mb-3 row">
                         <div class="col-md-4"><strong>Contract Documents:</strong></div>
                         <div class="col-md-8">
@@ -238,38 +243,62 @@
                 <!-- Qualifications Section -->
                 <section class="p-3 mb-4 border rounded border-1 border-secondary">
                     <h5 class="mt-4 mb-3 text-dark">Qualifications</h5>
-                    @if (!is_null($employee->qualifications_details))
+                    @if (!is_null($employee->qualifications_details) && count($employee->qualifications_details) > 0)
                         @foreach ($employee->qualifications_details as $item)
-                            @if (isset($item['proof']))
-                                <div class="mb-3 row">
+                            <div class="mb-4 p-3 border rounded">
+                                <div class="mb-2 row">
                                     <div class="col-md-4"><strong>Qualification:</strong></div>
-                                    <div class="col-md-8">
-                                        <div>{{ $item['title'] }}</div>
-                                        @php
-                                            $qualificationFilePath = asset('storage/' . $item['proof']);
-                                            $qualificationFileExtension = pathinfo($item['proof'], PATHINFO_EXTENSION);
-                                        @endphp
-                                        @if (in_array($qualificationFileExtension, ['jpg', 'jpeg', 'png', 'gif']))
-                                            <!-- Display Image for Qualification -->
-                                            <img src="{{ $qualificationFilePath }}" alt="Qualification Proof"
-                                                class="mt-2 rounded img-fluid" style="max-width: 120px;">
-                                        @elseif ($qualificationFileExtension === 'pdf')
-                                            <!-- Display PDF Link for Qualification -->
-                                            <a href="{{ $qualificationFilePath }}" target="_blank"
-                                                class="d-flex align-items-center text-decoration-none">
-                                                <img src="{{ asset('assets/img/pdf-icon.png') }}" alt="PDF icon"
-                                                    class="pdf-icon me-2" width="24">
-                                                <span class="text-dark">View Qualification Proof</span>
-                                            </a>
-                                        @else
-                                            <p class="text-muted">Unsupported qualification file type.</p>
-                                        @endif
-                                    </div>
+                                    <div class="col-md-8">{{ $item['qualification'] ?? $item['title'] ?? 'Not specified' }}</div>
                                 </div>
-                            @endif
+                                
+                                @if(isset($item['institution']) && $item['institution'])
+                                    <div class="mb-2 row">
+                                        <div class="col-md-4"><strong>Institution:</strong></div>
+                                        <div class="col-md-8">{{ $item['institution'] }}</div>
+                                    </div>
+                                @endif
+                                
+                                @if(isset($item['year_obtained']) && $item['year_obtained'])
+                                    <div class="mb-2 row">
+                                        <div class="col-md-4"><strong>Year Obtained:</strong></div>
+                                        <div class="col-md-8">{{ $item['year_obtained'] }}</div>
+                                    </div>
+                                @endif
+                                
+                                @if(isset($item['proof']) && $item['proof'])
+                                    <div class="mb-2 row">
+                                        <div class="col-md-4"><strong>Proof Document:</strong></div>
+                                        <div class="col-md-8">
+                                            @php
+                                                $qualificationFilePath = asset('storage/' . $item['proof']);
+                                                $qualificationFileExtension = pathinfo($item['proof'], PATHINFO_EXTENSION);
+                                            @endphp
+                                            @if (in_array($qualificationFileExtension, ['jpg', 'jpeg', 'png', 'gif']))
+                                                <!-- Display Image for Qualification -->
+                                                <img src="{{ $qualificationFilePath }}" alt="Qualification Proof"
+                                                    class="mt-2 rounded img-fluid" style="max-width: 200px;">
+                                            @elseif ($qualificationFileExtension === 'pdf')
+                                                <!-- Display PDF Link for Qualification -->
+                                                <a href="{{ $qualificationFilePath }}" target="_blank"
+                                                    class="btn btn-sm btn-outline-danger d-flex align-items-center" style="max-width: fit-content;">
+                                                    <i class="fas fa-file-pdf text-danger me-2"></i>
+                                                    <span>View Qualification Document</span>
+                                                </a>
+                                            @else
+                                                <p class="text-muted">Unsupported qualification file type.</p>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @else
+                                    <div class="mb-2 row">
+                                        <div class="col-md-4"><strong>Proof Document:</strong></div>
+                                        <div class="col-md-8"><span class="text-muted">No proof document provided</span></div>
+                                    </div>
+                                @endif
+                            </div>
                         @endforeach
                     @else
-                        <p>No qualifications</p>
+                        <p class="text-muted">No qualifications recorded</p>
                     @endif
                 </section>
             </div>

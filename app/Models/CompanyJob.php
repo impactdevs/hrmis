@@ -16,7 +16,6 @@ class CompanyJob extends Model
     public $incrementing = false;
 
     protected $fillable = [
-        'company_job_id',
         'job_code',
         'job_title',
         'will_become_active_at',
@@ -32,7 +31,7 @@ class CompanyJob extends Model
         'will_become_active_at' => 'datetime',
         'will_become_inactive_at' => 'datetime',
     ];
-    
+
 
     protected static function boot()
     {

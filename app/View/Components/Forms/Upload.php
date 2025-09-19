@@ -13,6 +13,7 @@ class Upload extends Component
     public string $form_text_id;
     public string $value;
     public string $description;
+    public string $accept;
 
     public string $filetype;
 
@@ -26,7 +27,8 @@ class Upload extends Component
         string $form_text_id = '',
         string $value = '',
         string $description = 'The file should be in PNG or JPG format.',
-        string $filetype = 'image'
+        string $filetype = 'image',
+        string $accept = '.png,.jpg'
     ) {
         $this->label = $label;
         $this->name = $name;
@@ -35,6 +37,7 @@ class Upload extends Component
         $this->value = $value;
         $this->description = $description;
         $this->filetype = $filetype;
+        $this->accept = $accept;
     }
 
     /**

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Approval Functionality</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Debug Approval Button Test</h1>
+    <p>Open browser console to see debug messages</p>
+    
+    <button id="test-approve" data-appraisal-id="1">Test Approve Button</button>
+    <button id="test-reject" data-appraisal-id="1">Test Reject Button</button>
+    
+    <div id="results"></div>
+
+    <script>
+        // Test the exact same code as in the appraisal form
+        function showToast(message) {
+            console.log('Toast message:', message);
+            document.getElementById('results').innerHTML += '<p>' + message + '</p>';
+        }
+
+        function approveAppraisal(appraisalId, status, reason = null) {
+            console.log('Attempting to approve/reject:', { appraisalId, status, reason });
+            
+            $.ajax({
+                url: `/appraisals/${appraisalId}/status`,
+                type: 'POST',
+                contentType: 'application/json',
+                headers: {
+                    'X-CSRF-TOKEN': 'test-token' // This would normally be the Laravel CSRF token
+                },
+                data: JSON.stringify({
+                    status,
+                    reason
+                }),
+                success: function (data) {
+                    console.log('Success response:', data);
+                    showToast('Success: ' + (data.message || 'Request completed'));
+                },
+                error: function (xhr) {
+                    console.log('Error response:', xhr);
+                    showToast('Error: ' + (xhr.responseJSON?.error || xhr.statusText || 'An error occurred'));
+                }
+            });
+        }
+
+        $(document).ready(function() {
+            console.log('Debug script loaded');
+            
+            $('#test-approve').click(function() {
+                console.log('Approve button clicked');
+                const appraisalId = $(this).data('appraisal-id');
+                approveAppraisal(appraisalId, 'approved');
+            });
+
+            $('#test-reject').click(function() {
+                console.log('Reject button clicked');
+                const appraisalId = $(this).data('appraisal-id');
+                approveAppraisal(appraisalId, 'rejected', 'Test rejection reason');
+            });
+        });
+    </script>
+</body>
+</html>

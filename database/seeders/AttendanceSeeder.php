@@ -13,20 +13,20 @@ class AttendanceSeeder extends Seeder
      */
     public function run(): void
     {
-        $employees = \DB::table('employees')->pluck('employee_id'); // Assuming this table already exists and has data
+        $employees = DB::table('employees')
+                      ->select('employee_id', 'staff_id')
+                      ->get();
 
-        foreach ($employees as $employee_id) {
-            // Set the attendance date to today
-            $attendanceDate = Carbon::today();
-
+        foreach ($employees as $employee) {
             // Generate a random clock-in time within the last 12 hours
-            $clockInTime = Carbon::now()->subHours(rand(0, 12))->format('H:i:s');
+            $accessDateTime = Carbon::now()->subHours(rand(0, 12));
 
             DB::table('attendances')->insert([
                 'attendance_id' => (string) Str::uuid(),
-                'employee_id' => $employee_id,
-                'attendance_date' => $attendanceDate,
-                'clock_in' => $clockInTime,
+                'staff_id' => $employee->staff_id,
+                'access_date_and_time' => $accessDateTime,
+                'access_date' => $accessDateTime->toDateString(),
+                'access_time' => $accessDateTime->toTimeString(),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

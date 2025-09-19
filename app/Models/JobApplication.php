@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 
 class JobApplication extends Model
 {
@@ -80,11 +81,12 @@ class JobApplication extends Model
     {
         // Filter by company_job_id → filter reference_number by prefix
         if (!empty($filters['company_job_id'])) {
-            $companyJob = \App\Models\CompanyJob::where('company_job_id', $filters['company_job_id'])->first();
-            if ($companyJob) {
-                $jobCode = $companyJob->job_code;
-                $query->where('reference_number', 'like', "{$jobCode}%");
-            }
+            $query->whereExists(function ($subQuery) use ($filters) {
+                $subQuery->select(DB::raw(1))
+                    ->from('company_jobs')
+                    ->where('company_job_id', $filters['company_job_id'])
+                    ->whereRaw('job_applications.reference_number LIKE CONCAT(company_jobs.job_code, \'%\')');
+            });
         }
 
         // Filter by date range

@@ -116,20 +116,6 @@ class EmployeeController extends Controller
                 $validatedData['national_id_photo'] = $passportPhotoPath;
             }
 
-            // Format (qualification details documents
-            if (filled($validatedData['qualifications_details'])) {
-                foreach ($validatedData['qualifications_details'] as $key => $value) {
-                    // Check if a file is uploaded for this qualification
-                    // Use the correct input name to check for the file
-                    if ($request->hasFile("qualifications_details.$key.proof")) {
-                        // Store the file and get the path
-                        $filePath = $request->file("qualifications_details.$key.proof")->store('proof_documents', 'public');
-
-                        // Update the proof value to the path
-                        $validatedData['qualifications_details'][$key]['proof'] = $filePath;
-                    }
-                }
-            }
 
             $user = DB::table('users')->where('email', $validatedData['email'])->doesntExist();
             if ($user) {
@@ -147,8 +133,45 @@ class EmployeeController extends Controller
                 //add user_id to employee
                 $validatedData['user_id'] = User::where('email', $validatedData['email'])->first()->id;
             }
+            // Handle qualification details documents and file uploads
+            $processedQualifications = [];
+            if (filled($validatedData['qualifications_details'])) {
+                foreach ($validatedData['qualifications_details'] as $key => $value) {
+                    $proofPath = null;
+                    
+                    // Handle file upload for proof
+                    if ($request->hasFile("qualifications_details.$key.proof")) {
+                        $proofPath = $request->file("qualifications_details.$key.proof")
+                            ->store('proof_documents', 'public');
+                    }
+                    
+                    // Store the processed qualification data for the JSON column
+                    $processedQualifications[$key] = [
+                        'qualification' => $value['qualification'] ?? null,
+                        'institution' => $value['institution'] ?? null,
+                        'year_obtained' => $value['year_obtained'] ?? null,
+                        'proof' => $proofPath,
+                    ];
+                }
+                
+                // Update the validated data with processed qualifications
+                $validatedData['qualifications_details'] = $processedQualifications;
+            }
+            
             // Create a new employee record using validated data
-            Employee::create($validatedData);
+            $employee = Employee::create($validatedData);
+
+            // Also save qualifications to the new employee_qualifications table
+            if (filled($processedQualifications)) {
+                foreach ($processedQualifications as $qualData) {
+                    $employee->qualifications()->create([
+                        'qualification' => $qualData['qualification'],
+                        'institution' => $qualData['institution'],
+                        'year_obtained' => $qualData['year_obtained'],
+                        'proof' => $qualData['proof'],
+                    ]);
+                }
+            }
 
             // Redirect to the employees index with a success message
             return redirect()->route('employees.index')->with('success', 'Employee Registered');
@@ -167,7 +190,7 @@ class EmployeeController extends Controller
     public function show(Employee $employee)
     {
         // Eager load relationships
-        $employee->load('department', 'position', 'contracts'); // Add any other relationships you need
+        $employee->load('department', 'position', 'contracts', 'qualifications'); // Add any other relationships you need
 
         return view('employees.show', compact('employee'));
     }
@@ -193,51 +216,77 @@ class EmployeeController extends Controller
     public function update(StoreEmployeeRequest $request, Employee $employee)
     {
         try {
-            //record being updated
-            $qualification_details = $employee->qualifications_details;
             // Initialize an array to hold the validated data
             $validatedData = $request->validated();
 
             // Handle the passport photo upload
             if ($request->hasFile('passport_photo')) {
-            // Store the photo and get the path
-            $passportPhotoPath = $request->file('passport_photo')->store('passport_photos', 'public');
-            // Add the path to the validated data
-            $validatedData['passport_photo'] = $passportPhotoPath;
+                // Store the photo and get the path
+                $passportPhotoPath = $request->file('passport_photo')->store('passport_photos', 'public');
+                // Add the path to the validated data
+                $validatedData['passport_photo'] = $passportPhotoPath;
             }
 
-            // Handle the passport photo upload
+            // Handle the national ID photo upload
             if ($request->hasFile('national_id_photo')) {
-            // Store the photo and get the path
-            $passportPhotoPath = $request->file('national_id_photo')->store('national_id_photos', 'public');
-            // Add the path to the validated data
-            $validatedData['national_id_photo'] = $passportPhotoPath;
+                // Store the photo and get the path
+                $nationalIdPhotoPath = $request->file('national_id_photo')->store('national_id_photos', 'public');
+                // Add the path to the validated data
+                $validatedData['national_id_photo'] = $nationalIdPhotoPath;
             }
 
-            // Format (qualification details documents
+            // Handle qualification details documents and file uploads
+            $processedQualifications = [];
             if (filled($validatedData['qualifications_details'])) {
-            foreach ($validatedData['qualifications_details'] as $key => $value) {
-                // Check if the current qualification has a proof file
-                if ($request->hasFile("qualifications_details.$key.proof")) {
-                // Store the file and get the path
-                $filePath = $request->file("qualifications_details.$key.proof")->store('proof_documents', 'public');
-
-                // Update the proof value to the path
-                $qualification_details[$key]['proof'] = $filePath;
+                foreach ($validatedData['qualifications_details'] as $key => $value) {
+                    $proofPath = null;
+                    
+                    // Check if the current qualification has a proof file
+                    if ($request->hasFile("qualifications_details.$key.proof")) {
+                        // Store the file and get the path
+                        $proofPath = $request->file("qualifications_details.$key.proof")
+                            ->store('proof_documents', 'public');
+                    } else {
+                        // Keep existing proof if no new file uploaded
+                        $existingQualificationDetails = $employee->qualifications_details ?? [];
+                        $proofPath = $existingQualificationDetails[$key]['proof'] ?? null;
+                    }
+                    
+                    // Store the processed qualification data for the JSON column
+                    $processedQualifications[$key] = [
+                        'qualification' => $value['qualification'] ?? null,
+                        'institution' => $value['institution'] ?? null,
+                        'year_obtained' => $value['year_obtained'] ?? null,
+                        'proof' => $proofPath,
+                    ];
+                    
+                    // Also handle title if provided
+                    if (isset($value['title'])) {
+                        $processedQualifications[$key]['title'] = $value['title'];
+                    }
                 }
-
-                //check if there is title
-                if (isset($validatedData['qualifications_details'][$key]['title'])) {
-                $qualification_details[$key]['title'] = $validatedData['qualifications_details'][$key]['title'];
-                }
-
-                // Update the qualification details
-                $validatedData['qualifications_details'] = $qualification_details;
-            }
+                
+                // Update the validated data with processed qualifications
+                $validatedData['qualifications_details'] = $processedQualifications;
             }
 
             // Update the employee record using validated data
             $employee->update($validatedData);
+
+            // Sync qualifications with the employee_qualifications table
+            if (filled($processedQualifications)) {
+                // Delete existing qualifications and recreate them
+                $employee->qualifications()->delete();
+                
+                foreach ($processedQualifications as $qualData) {
+                    $employee->qualifications()->create([
+                        'qualification' => $qualData['qualification'],
+                        'institution' => $qualData['institution'],
+                        'year_obtained' => $qualData['year_obtained'],
+                        'proof' => $qualData['proof'],
+                    ]);
+                }
+            }
 
             // Redirect to the employee show page with a success message
             return redirect()->route('employees.show', ['employee' => $employee->employee_id])->with('success', 'Employee Updated');

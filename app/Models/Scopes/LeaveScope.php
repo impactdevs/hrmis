@@ -20,6 +20,7 @@ class LeaveScope implements Scope
         $user = Auth::user();
 
         if (!$user) {
+            $builder->where('is_cancelled', false);
             return; // If no user is authenticated, don't apply any scope
         }
 
@@ -29,7 +30,7 @@ class LeaveScope implements Scope
 
         switch ($user_role) {
             case 'HR':
-                // No constraints for HR
+                // HR can see all leave requests (no constraints)
                 break;
 
             case 'Head of Division':
@@ -38,7 +39,6 @@ class LeaveScope implements Scope
                 if ($departmentId) {
                     // Only show leaves from the user's department by using leaves.user_id
                     $users = DB::table('employees')->where('department_id', $departmentId)->pluck('user_id');
-
                     $builder->whereIn('leaves.user_id', $users);
                 } else {
                     // If there's no department, don't show anything
@@ -47,19 +47,35 @@ class LeaveScope implements Scope
                 break;
 
             case 'Executive Secretary':
-            // Add logic if needed
+                // Executive Secretary can see all leave requests (no constraints)
+                // This is needed for final approval stage
+                break;
+
             case 'Assistant Executive Secretary':
-                // Add logic if needed
+                // Assistant Executive Secretary can see all leave requests (no constraints)
                 break;
 
             case 'Staff':
-                // Filter leaves by the user's ID
+                // Filter leaves by the user's ID - staff can only see their own leaves
                 $builder->where('leaves.user_id', $user->id);
                 break;
 
             default:
-                // Handle other roles if needed
+                // For unknown roles, show only their own leaves for security
+                $builder->where('leaves.user_id', $user->id);
                 break;
         }
+
+        if ($user->hasAnyRole(['HR', 'Head of Division', 'Executive Secretary', 'Admin'])) {
+        // Show all leaves (cancelled and non-cancelled) to approvers
+        return; // No filtering for approvers
+    } else {
+        // For regular users, show only their own leaves (cancelled or not)
+        // and non-cancelled leaves of others
+        $builder->where(function($query) use ($user) {
+            $query->where('is_cancelled', false)
+                  ->orWhere('user_id', $user->id);
+        });
+    }
     }
 }

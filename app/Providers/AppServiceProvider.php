@@ -2,10 +2,14 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
+use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Mail\MailManager;
-use App\Mail\Transport\InfobipTransport;class AppServiceProvider extends ServiceProvider
+use App\Mail\Transport\InfobipTransport;
+use App\Models\Appraisal;
+use Illuminate\Support\Facades\Route;
+
+class AppServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
@@ -20,15 +24,28 @@ use App\Mail\Transport\InfobipTransport;class AppServiceProvider extends Service
      */
     public function boot(): void
     {
-        // Implicitly grant "Super-Admin" role all permission checks using can()
+
+         Route::bind('appraisal', function ($value) {
+            return Appraisal::where('appraisal_id', $value)->firstOrFail();
+        });
+
+        parent::boot();
+        // Implicitly grant certain roles permission for appraisal-related actions
         Gate::before(function ($user, $ability) {
-
+            // Grant HR users all permissions
             if ($user->hasRole('HR')) {
-
                 return true;
-
             }
-
+            
+            // Grant Executive Secretary users permission for appraisal approvals
+            if ($user->hasRole('Executive Secretary') && str_contains($ability, 'appraisal')) {
+                return true;
+            }
+            
+            // Grant Head of Division users permission for appraisal approvals
+            if ($user->hasRole('Head of Division') && str_contains($ability, 'appraisal')) {
+                return true;
+            }
         });
 
         $this->app->make(MailManager::class)->extend('infobip', function () {
@@ -40,5 +57,8 @@ use App\Mail\Transport\InfobipTransport;class AppServiceProvider extends Service
                 $config['name'],
             );
         });
+
+
+
     }
 }

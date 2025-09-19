@@ -16,18 +16,188 @@ body {
 }
 
 @media print {
-
+  /* Hide elements that shouldn't appear in print */
   .no-print,
   .d-none,
-  .d-print-none {
+  .d-print-none,
+  .btn,
+  .navbar,
+  .sidebar,
+  .header,
+  .toast,
+  .modal,
+  .dropdown,
+  button,
+  .sticky-bottom,
+  .border-top,
+  .pagination,
+  .alert {
     display: none !important;
   }
 
+  /* Ensure main content takes full width */
   #main {
     max-width: 100% !important;
-    overflow-x: auto;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow-x: visible;
   }
 
+  /* Set print-friendly font sizes and spacing */
+  body {
+    font-size: 12pt !important;
+    line-height: 1.4 !important;
+    background: white !important;
+    color: black !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .container,
+  .container-lg {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Card styling for print */
+  .card {
+    box-shadow: none !important;
+    border: 1px solid #ddd !important;
+    margin-bottom: 20px !important;
+    page-break-inside: avoid;
+  }
+
+  .card-header {
+    background-color: #f8f9fa !important;
+    color: black !important;
+    font-weight: bold !important;
+    padding: 10px !important;
+    border-bottom: 2px solid #dee2e6 !important;
+  }
+
+  .card-body {
+    padding: 15px !important;
+  }
+
+  /* Table styling for print */
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    font-size: 10pt !important;
+    page-break-inside: avoid;
+  }
+
+  table th,
+  table td {
+    border: 1px solid #000 !important;
+    padding: 8px !important;
+    text-align: left !important;
+    vertical-align: top !important;
+  }
+
+  table th {
+    background-color: #f8f9fa !important;
+    font-weight: bold !important;
+  }
+
+  /* Fieldset styling for print */
+  fieldset {
+    border: 2px solid #000 !important;
+    margin-bottom: 20px !important;
+    padding: 15px !important;
+    page-break-inside: avoid;
+  }
+
+  legend {
+    font-weight: bold !important;
+    font-size: 14pt !important;
+    color: black !important;
+    padding: 0 10px !important;
+  }
+
+  /* Form elements for print */
+  .form-control,
+  .form-select,
+  textarea,
+  input {
+    border: 1px solid #000 !important;
+    background: white !important;
+    color: black !important;
+    padding: 5px !important;
+    font-size: 10pt !important;
+  }
+
+  /* Text styling */
+  h1, h2, h3, h4, h5, h6 {
+    color: black !important;
+    font-weight: bold !important;
+    margin-bottom: 10px !important;
+    page-break-after: avoid;
+  }
+
+  h1 { font-size: 18pt !important; }
+  h2 { font-size: 16pt !important; }
+  h3 { font-size: 14pt !important; }
+  h4 { font-size: 13pt !important; }
+  h5 { font-size: 12pt !important; }
+  h6 { font-size: 11pt !important; }
+
+  /* Page breaks */
+  .page-break {
+    page-break-before: always;
+  }
+
+  .avoid-page-break {
+    page-break-inside: avoid;
+  }
+
+  /* Logo and header adjustments */
+  .logo img {
+    max-height: 80px !important;
+    width: auto !important;
+  }
+
+  /* Ensure images are print-friendly */
+  img {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* Score input styling for print */
+  .score-input {
+    width: 50px !important;
+    text-align: center !important;
+    font-weight: bold !important;
+  }
+
+  /* Remove shadows and borders */
+  .shadow,
+  .shadow-sm {
+    box-shadow: none !important;
+  }
+
+  /* Print-specific spacing */
+  .mb-4 {
+    margin-bottom: 15px !important;
+  }
+
+  .mt-4 {
+    margin-top: 15px !important;
+  }
+
+  /* Attachment preview for print */
+  .file-preview {
+    border: 1px solid #000 !important;
+    padding: 10px !important;
+    margin: 5px 0 !important;
+  }
+
+  .file-preview .btn {
+    display: none !important;
+  }
 }
 
 .sidebar {

@@ -83,8 +83,12 @@ Route::middleware(['auth', 'verified', 'check.employee.record', 'data.usage.agre
         ->name('appraisals.approveOrReject');
     Route::post('/appraisals/{appraisal}/status', [AppraisalsController::class, 'approveOrReject'])
         ->name('appraisals.status');
+    Route::post('/appraisals/{appraisal}/withdraw', [AppraisalsController::class, 'withdraw'])
+    ->name('appraisals.withdraw');
     Route::get('/appraisals/{appraisal}/download', [AppraisalsController::class, 'downloadPDF'])
         ->name('appraisals.download');
+    Route::get('/appraisals/{appraisal}/attachment/{index}/download', [AppraisalsController::class, 'downloadAttachment'])
+        ->name('appraisals.attachment.download');
     Route::resource('events', EventController::class);
     Route::resource('trainings', TrainingController::class);
     Route::resource('out-of-station-trainings', OutOfStationTrainingController::class);
@@ -96,11 +100,24 @@ Route::middleware(['auth', 'verified', 'check.employee.record', 'data.usage.agre
         ->name('trainings.approveOrReject');
     Route::resource('positions', PositionController::class);
     Route::resource('attendances', AttendanceController::class);
-    Route::resource('leaves', LeaveController::class);
-    Route::delete('cancel-leave/{leaf}', [LeaveController::class, 'cancel'])->name('leaves.cancel');
+    Route::resource('leaves', LeaveController::class)->parameters([
+        'leaves' => 'leave'
+    ]);
+    Route::patch('/leaves/{leave}/cancel', [LeaveController::class, 'cancel'])->name('leaves.cancel');
+    Route::get('/leaves/debug/info', [LeaveController::class, 'debug'])->name('leaves.debug');
+    Route::get('/leaves/{leave}/debug/edit', [LeaveController::class, 'debugEdit'])->name('leaves.debug.edit');
     //leave actions
     Route::post('/leaves/{leave}/status', [LeaveController::class, 'approveOrReject'])
         ->name('leaves.approveOrReject');
+    // routes/web.php
+    // routes/web.php
+    Route::get('/leaves/{leave}/handover/view', [LeaveController::class, 'viewHandoverFile'])->name('leaves.handover.view');
+    Route::get('/leaves/{leave}/handover/download', [LeaveController::class, 'downloadHandoverFile'])->name('leaves.handover.download');
+    // Leave history routes
+    Route::get('/leaves/{leave}/history', [LeaveController::class, 'showHistory'])
+        ->name('leaves.show-history');
+    Route::get('/api/leaves/{leave}/history', [LeaveController::class, 'history'])
+        ->name('leaves.history-api');
     Route::post('save-leave-data', [LeaveRosterController::class, 'saveLeaveRosterData'])->name('save-leave-data');
     Route::resource('leave-roster', LeaveRosterController::class);
     Route::get('/leave-roster-calendar-data', [LeaveRosterController::class, 'leaveRosterCalendarData'])->name('leave-roster.calendarData');
@@ -108,6 +125,7 @@ Route::middleware(['auth', 'verified', 'check.employee.record', 'data.usage.agre
     Route::get('/leave-roster-tabular', [LeaveRosterController::class, 'getLeaveRoster'])->name('leave-roster-tabular.index');
     Route::get('/leave-roster-tabular/data', [LeaveRosterController::class, 'getLeaveRosterData'])->name('leave-roster-tabular.data');
     Route::resource('leave-types', LeaveTypesController::class);
+    Route::delete('leaves/{leave}', [LeaveController::class, 'destroy'])->name('leaves.destroy');
     Route::resource('public_holidays', PublicHolidayController::class);
     Route::post('calender', [leaveRosterController::class, 'getcalender']);
     Route::get('leave-management', [LeaveController::class, 'leaveManagement'])->name('leave-management');
@@ -124,6 +142,18 @@ Route::middleware(['auth', 'verified', 'check.employee.record', 'data.usage.agre
     Route::get('/employee-appraisal', [AppraisalsController::class, 'survey'])->name('appraisal.survey');
     Route::post('/appraisals', [AppraisalsController::class, 'store'])->name('appraisals.store');
     Route::get('preview-appraisal/{appraisal}', [AppraisalsController::class, 'previewAppraisalDetails'])->name('appraisals.preview');
+    Route::get('/appraisals/{appraisal}/attachment/{index}/download', [AppraisalsController::class, 'downloadAttachment'])
+        ->name('appraisals.attachment.download');
+    Route::get('/appraisals/{appraisal}/attachment/{index}/view', [AppraisalsController::class, 'viewAttachment'])
+        ->name('appraisals.attachment.view');
+    Route::get('/appraisals/{appraisal}/attachments/download-all', [AppraisalsController::class, 'downloadAllAttachments'])
+        ->name('appraisals.attachments.download-all');
+    Route::get('/appraisals/{appraisal}/print-preview', [AppraisalsController::class, 'printPreview'])
+        ->name('appraisals.print-preview');
+    Route::get('/appraisals/{appraisal}/print', [AppraisalsController::class, 'printAppraisal'])
+        ->name('appraisals.print');
+
+
 
     //notifications
     Route::resource('/notifications', NotificationController::class);
@@ -170,5 +200,9 @@ Route::get('/import', [EmployeeController::class, 'import_employees']);
 Route::fallback(function () {
     abort(404, 'we cant find this, sorry for the inconvenience');
 });
+
+
+
+
 
 require __DIR__ . '/auth.php';
