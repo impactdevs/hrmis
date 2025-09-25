@@ -46,7 +46,7 @@ class AppraisalService
     }
 
     /**
-     * 
+     *
      *  approval or rejection of an appraisal
      */
     /**
@@ -58,7 +58,7 @@ class AppraisalService
         $userRole = $this->getUserRoleForApproval($approver);
 
         // ✅ Only HR and ES can approve/reject, not HOD
-        if (!in_array($userRole, ['HR', 'Executive Secretary'])) {
+        if (!in_array($userRole, ['Head of Division', 'HR', 'Executive Secretary'])) {
             throw AppraisalException::unauthorizedRole("Your role ($userRole) cannot approve/reject appraisals. Only HR and Executive Secretary can make approval decisions.");
         }
 
@@ -616,9 +616,9 @@ class AppraisalService
             $appraiseeUser = $appraisee?->user;
 
             if ($appraiseeUser && $appraiseeUser->hasRole('Head of Division')) {
-                $appraisal->current_stage = 'Head of Division';
+                $appraisal->current_stage = 'Executive Secretary';
             } else {
-                $appraisal->current_stage = 'Staff';
+                $appraisal->current_stage = 'Head of Division';
             }
 
             $appraisal->save();

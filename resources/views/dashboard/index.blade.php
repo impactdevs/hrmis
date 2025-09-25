@@ -1813,10 +1813,7 @@
                                                             $url = route('events.show', $notification->data['event_id']);
                                                         }
                                                         if (isset($notification->data['appraisal_id'])) {
-                                                            $url = route(
-                                                                'uncst-appraisals.show',
-                                                                $notification->data['appraisal_id'],
-                                                            );
+                                                           
                                                         }
                                                         if (isset($notification->data['travel_training_id'])) {
                                                             $url = route(

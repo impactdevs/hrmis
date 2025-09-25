@@ -243,6 +243,12 @@ class Appraisal extends Model
         return null;
     }
 
+    public function getDocumentPath($doc)
+    {
+        return $doc['proof'] ? storage_path('app/public/' . $doc['proof']) : null;
+    }
+
+
     public function getPreviousApproverAttribute()
     {
         $approvalFlow = ['Head of Division', 'HR', 'Executive Secretary'];

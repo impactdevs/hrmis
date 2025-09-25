@@ -1,10 +1,10 @@
 <x-app-layout>
-    {{-- 
+    {{--
    PAGE NOTES
    1. I have added .no-break class to some elements to prevent it from breaking into a new line.
 
    --}}
-    @php
+   @php
         //check if appraisal was rejected.
         $rejectedEntry = collect($appraisal->appraisal_request_status)
             ->filter(fn($status) => $status === 'rejected')
@@ -12,6 +12,10 @@
             ->first();
 
         $rejectionReason = $appraisal->rejection_reason ?? 'No reason provided.';
+
+        // Check if appraisal has been rejected and can be edited
+        $hasRejection = $rejectedEntry !== null;
+        $canEditAfterRejection = $hasRejection && (auth()->user()->hasRole('Staff') || auth()->user()->hasRole('Head of Division'));
     @endphp
 
     @php
@@ -52,6 +56,10 @@
         if ($isHeadOfDivisionDraft) {
             $headOfDivisionDraftValue = $appraisal->draft_users['Head of Division'] ?? false;
         }
+
+        // Override editability based on rejection status and user role
+        $canAppraiseeEdit = $appraisal->is_appraisee || $canEditAfterRejection;
+        $canAppraisorEdit = $appraisal->is_appraisor || ($canEditAfterRejection && auth()->user()->hasRole('Head of Division'));
     @endphp
     <div class="gap-2 p-2 no-print bg-white border rounded shadow position-fixed top-50 end-0 translate-middle-y d-flex align-items-center border-primary no-print"
         style="z-index: 9999; cursor: pointer;" role="button" onclick="window.print();" title="Print this page">
@@ -93,6 +101,8 @@
                     </h5>
                     <p class="mb-2">
                         <strong>Rejection Reason:</strong> {{ $rejectionReason }}
+                        <!-- Debug: Raw reason
+                        <small>(Raw: {{ $appraisal->rejection_reason }})</small> -->
                     </p>
                     @if(auth()->user()->hasRole('Staff') || auth()->user()->hasRole('Head of Division'))
                         <hr>
@@ -119,7 +129,7 @@
 
 
     <form action="{{ route('uncst-appraisals.update', ['uncst_appraisal' => $appraisal->appraisal_id]) }}"
-        method="post" class="m-2" id="appraisalForm">
+        enctype="multipart/form-data" method="post" class="m-2" id="appraisalForm">
         @csrf
         @method('PUT')
         <div class="entire-form">
@@ -587,7 +597,7 @@
                                         $appraisal->qualifications ?? '',
                                     )" />
                             </div>
-                            
+
 
                             <div class="mt-4 col-12">
                                 <p class="fw-bold">c. Challenges</p>
@@ -698,7 +708,7 @@
                                                     contenteditable="{{ $appraisal->is_appraisee ? 'true' : 'false' }}"
                                                     data-placeholder="Enter task" oninput="updateHiddenInput(this)"
                                                     @unless ($appraisal->is_appraisee)
-                                                    data-bs-toggle="tooltip" 
+                                                    data-bs-toggle="tooltip"
                                                     data-bs-placement="top"
                                                     title="Editing is disabled for your role"
                                                     onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()"
@@ -717,7 +727,7 @@
                                                     contenteditable="{{ $appraisal->is_appraisee ? 'true' : 'false' }}"
                                                     data-placeholder="Enter result" oninput="updateHiddenInput(this)"
                                                     @unless ($appraisal->is_appraisee)
-                                                        data-bs-toggle="tooltip" 
+                                                        data-bs-toggle="tooltip"
                                                         data-bs-placement="top"
                                                         title="Editing is disabled for your role"
                                                         onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()"
@@ -735,7 +745,7 @@
                                                     contenteditable="{{ $appraisal->is_appraisee ? 'true' : 'false' }}"
                                                     data-type="score" oninput="updateScoreInput(this)"
                                                     @unless ($appraisal->is_appraisee)
-                                                        data-bs-toggle="tooltip" 
+                                                        data-bs-toggle="tooltip"
                                                         data-bs-placement="top"
                                                         title="Editing is disabled for your role"
                                                         onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()"
@@ -754,7 +764,7 @@
                                                     contenteditable="{{ $appraisal->is_appraisor ? 'true' : 'false' }}"
                                                     data-type="score" oninput="updateScoreInput(this)"
                                                     @unless ($appraisal->is_appraisor)
-                                                        data-bs-toggle="tooltip" 
+                                                        data-bs-toggle="tooltip"
                                                         data-bs-placement="top"
                                                         title="Editing is disabled for your role"
                                                         onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()"
@@ -807,7 +817,7 @@
                                                     data-placeholder="Supervisor's comment..."
                                                     oninput="updateHiddenInput(this)"
                                                     @unless ($appraisal->is_appraisor)
-                                                        data-bs-toggle="tooltip" 
+                                                        data-bs-toggle="tooltip"
                                                         data-bs-placement="top"
                                                         title="Editing is disabled for your role"
                                                         onclick="bootstrap.Tooltip.getOrCreateInstance(this).show()"
@@ -1779,13 +1789,31 @@
                                         };
 
                                         $fileSize = '';
-                                        if ($hasProof) {
-                                            $fullPath = storage_path('app/public/' . $doc['proof']);
-                                            if (file_exists($fullPath)) {
-                                                $bytes = filesize($fullPath);
-                                                $fileSize = $bytes > 1024 * 1024 ? round($bytes / (1024 * 1024), 1) . ' MB' : round($bytes / 1024, 1) . ' KB';
-                                            }
-                                        }
+    if ($hasProof) {
+        // Check multiple possible paths for the file
+        $possiblePaths = [
+            storage_path('app/public/' . $doc['proof']),
+            storage_path('app/' . $doc['proof']),
+            public_path('storage/' . $doc['proof'])
+        ];
+
+        $fileExists = false;
+        $fileBytes = 0;
+
+        foreach ($possiblePaths as $path) {
+            if (file_exists($path)) {
+                $fileExists = true;
+                $fileBytes = filesize($path);
+                break;
+            }
+        }
+
+        if ($fileExists && $fileBytes > 0) {
+            $fileSize = $fileBytes > 1024 * 1024
+                ? round($fileBytes / (1024 * 1024), 1) . ' MB'
+                : round($fileBytes / 1024, 1) . ' KB';
+        }
+    }
                                     @endphp
 
                                     <div
@@ -1967,7 +1995,7 @@
                                         {{-- Current User's Decision --}}
                                         @if (isset($appraisal->appraisal_request_status[$userRole]) &&
                                                 $appraisal->appraisal_request_status[$userRole] === 'approved')
-                                            <span class="badge bg-success">You Approved this Leave Request.</span>
+                                            <span class="badge bg-success">You Approved this Appraisal Request.</span>
                                         @elseif (isset($appraisal->appraisal_request_status[$userRole]) &&
                                                 $appraisal->appraisal_request_status[$userRole] === 'rejected')
                                             <span class="badge bg-danger">You Rejected this Request</span>
@@ -2036,7 +2064,7 @@
                 </div>
             </div>
 
-            
+
 
         </div>
 
@@ -2048,7 +2076,7 @@
             </div>
             </div>
 
-        
+
 
         {{-- back button to the form --}}
         <div class="d-flex justify-content-center align-items-center gap-3 my-4 no-print">
@@ -3092,7 +3120,7 @@
                             .preview-section-block .section-body {
                                 border-radius: 0 0 0.25rem 0.25rem;
                             }
-                            .preview-section-block .section-header .fa, 
+                            .preview-section-block .section-header .fa,
                             .preview-section-block .section-header svg {
                                 color: #0d6efd;
                                 font-size: 1.3em;
@@ -3612,7 +3640,7 @@
         <p><strong>Division:</strong> {{ optional($employee->department)->department_name }}</p>
         <p><strong>Appraisal Period:</strong> {{ $appraisal->appraisal_start_date?->toDateString() }} -
             {{ $appraisal->appraisal_end_date?->toDateString() }}</p>
-        
+
         <p><em>This is a summary page for printing. The detailed appraisal follows on subsequent pages.</em></p>
     </div>
 </x-app-layout>

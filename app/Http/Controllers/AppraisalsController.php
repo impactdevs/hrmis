@@ -56,7 +56,8 @@ class AppraisalsController extends Controller
                 //these are the appraisals that the H.R submitted to the E.S.
                 $query = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
                     ->whereJsonContains('appraisal_request_status', ['Head of Division' => 'approved', 'HR' => 'approved'])
-                    ->where('appraisal_drafts.is_submitted', true);
+                    ->where('appraisal_drafts.is_submitted', true)
+                    ->latest('appraisals.created_at');
             } else if (!is_null($dashboard_filter) && $dashboard_filter == 'completed_appraisals') {
                 //get the Executive Secretary's account
                 $executiveSecretary = User::role('Executive Secretary')->first();
@@ -68,8 +69,8 @@ class AppraisalsController extends Controller
                     ->whereJsonContains('appraisal_request_status', ['Head of Division' => 'approved', 'HR' => 'approved', 'Executive Secretary' => 'approved'])
                     //or where the appraser is the Executive Secretary and has approved
                     ->orWhere('appraiser_id', $employeeId)->whereJsonContains('appraisal_request_status', ['Executive Secretary' => 'approved'])
-
-                    ->where('appraisal_drafts.is_submitted', true);
+                    ->where('appraisal_drafts.is_submitted', true)
+                    ->latest('appraisals.created_at');
             } else if (!is_null($dashboard_filter) && $dashboard_filter == 'received_from_HoDs') {
                 $query = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
                     ->where(function ($query) {
@@ -86,7 +87,9 @@ class AppraisalsController extends Controller
                             });
                     })
                     ->whereNull("appraisals.appraisal_request_status->HR")
-                    ->where('appraisal_drafts.is_submitted', true);
+                    ->where('appraisal_drafts.is_submitted', true)
+                    ->latest('appraisals.created_at');
+
             } else if (!is_null($dashboard_filter) && $dashboard_filter == 'awaiting_for_me') {
 
                 $query = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
@@ -115,7 +118,8 @@ class AppraisalsController extends Controller
                         $q->whereNull("appraisals.appraisal_request_status->HR")
                             ->orWhere('appraisal_request_status', null); // Include cleared status after resubmission
                     })
-                    ->where('appraisal_drafts.is_submitted', true);
+                    ->where('appraisal_drafts.is_submitted', true)
+                    ->latest('appraisals.created_at');
             } else {
                 $query = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
                     ->where(function ($query) {
@@ -135,7 +139,8 @@ class AppraisalsController extends Controller
                             });
                     })
                     ->whereNull("appraisals.appraisal_request_status->HR")
-                    ->where('appraisal_drafts.is_submitted', true);
+                    ->where('appraisal_drafts.is_submitted', true)
+                    ->latest('appraisals.created_at');
             }
 
             if ($search) {
@@ -156,7 +161,8 @@ class AppraisalsController extends Controller
                 $query = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
                     ->whereJsonContains('appraisal_request_status', ['Head of Division' => 'approved', 'HR' => 'approved'])
 
-                    ->where('appraisal_drafts.is_submitted', true);
+                    ->where('appraisal_drafts.is_submitted', true)
+                    ->latest('appraisals.created_at');
             } else if (!is_null($dashboard_filter) && $dashboard_filter == 'completed_appraisals') {
 
                 //get the Executive Secretary's account
@@ -169,7 +175,8 @@ class AppraisalsController extends Controller
                     ->whereJsonContains('appraisal_request_status', ['Head of Division' => 'approved', 'HR' => 'approved', 'Executive Secretary' => 'approved'])
                     ->orWhere('appraiser_id', $employeeId)->whereJsonContains('appraisal_request_status', ['Executive Secretary' => 'approved'])
 
-                    ->where('appraisal_drafts.is_submitted', true);
+                    ->where('appraisal_drafts.is_submitted', true)
+                    ->latest('appraisals.created_at');
             } else if (!is_null($dashboard_filter) && $dashboard_filter == 'from_all_supervisors') {
                 $query = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
                     ->where(function ($q) {
@@ -198,14 +205,18 @@ class AppraisalsController extends Controller
                                 'Executive Secretary' => 'approved',
                             ]);
                     })
-                    ->where('appraisal_drafts.is_submitted', true);
+                    ->where('appraisal_drafts.is_submitted', true)
+                    ->latest('appraisals.created_at');
+
             } else if (!is_null($dashboard_filter) && $dashboard_filter == 'pending_appraisals') {
                 //get the logged in person's drafts
                 $query = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
                     ->where('appraisal_drafts.is_submitted', false)
                     ->where(function ($query) {
                         $query->where('appraisal_drafts.employee_id', auth()->user()->employee->employee_id);
-                    });
+                    })
+                    ->latest('appraisals.created_at');
+
             } else {
                 $query = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
                     ->whereJsonContains('appraisal_request_status', ['Head of Division' => 'approved', 'HR' => 'approved'])
@@ -221,7 +232,8 @@ class AppraisalsController extends Controller
                     })
                     //or where the ES is the appraiser
                     ->orWhere('appraiser_id', auth()->user()->employee->employee_id)
-                    ->where('appraisal_drafts.is_submitted', true);
+                    ->where('appraisal_drafts.is_submitted', true)
+                    ->latest('appraisals.created_at');
             }
 
             if ($search) {
@@ -234,36 +246,62 @@ class AppraisalsController extends Controller
 
             $appraisals = $query->paginate();
         } else if (auth()->user()->hasRole('Head of Division')) {
-            // HOD users should see:
-            // 1. Appraisals where they are the appraiser (need to approve)
-            // 2. Appraisals from their department that need their approval
             $dashboard_filter = $request->get('dashboard_filter');
-
             $hodEmployeeId = auth()->user()->employee->employee_id;
 
             if (!is_null($dashboard_filter) && $dashboard_filter == 'pending_approval') {
-                // Appraisals waiting for HOD approval (including resubmissions)
-                $query = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
-                    ->where('appraiser_id', $hodEmployeeId)
-                    ->where('appraisal_drafts.is_submitted', true)
+                // ONLY appraisals waiting for HOD approval (excluding drafts)
+                $query = Appraisal::where('appraiser_id', $hodEmployeeId)
                     ->where(function ($q) {
                         $q->whereNull('appraisal_request_status->Head of Division')
-                            ->orWhere('appraisal_request_status', null) // Handle cleared status after resubmission
+                            ->orWhere('appraisal_request_status', null)
                             ->orWhereJsonDoesntContain('appraisal_request_status', ['Head of Division']);
-                    });
+                    })
+                    ->where('is_draft', false)->latest(); // Exclude drafts
+
             } else if (!is_null($dashboard_filter) && $dashboard_filter == 'approved_by_me') {
-                // Appraisals already approved by this HOD
-                $query = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
-                    ->where('appraiser_id', $hodEmployeeId)
-                    ->where('appraisal_drafts.is_submitted', true)
-                    ->whereJsonContains('appraisal_request_status', ['Head of Division' => 'approved']);
+                // ONLY appraisals approved by this HOD
+                $query = Appraisal::where('appraiser_id', $hodEmployeeId)
+                    ->whereJsonContains('appraisal_request_status', ['Head of Division' => 'approved'])
+                    ->latest();
+
+            } else if (!is_null($dashboard_filter) && $dashboard_filter == 'approved_by_es') {
+                // ONLY appraisals approved by Executive Secretary
+                $query = Appraisal::where('appraiser_id', $hodEmployeeId)
+                    ->whereJsonContains('appraisal_request_status', ['Executive Secretary' => 'approved'])
+                    ->latest();
+
+            } else if (!is_null($dashboard_filter) && $dashboard_filter == 'submitted_to_hr') {
+                // ONLY appraisals submitted to HR (approved by all previous stages)
+                $query = Appraisal::where('appraiser_id', $hodEmployeeId)
+                    ->where(function ($q) {
+                        // Assuming HR is the final stage - adjust based on your workflow
+                        $q->whereJsonContains('appraisal_request_status', ['HR' => 'pending'])
+                            ->orWhereJsonContains('appraisal_request_status', ['HR' => 'approved'])
+                            ->orWhere('current_stage', 'HR');
+                    })
+                    ->where('is_draft', false)
+                    ->latest();
+
+            } else if (!is_null($dashboard_filter) && $dashboard_filter == 'drafts') {
+                // ONLY draft appraisals (both HOD's own drafts and team drafts where HOD is appraiser)
+                $query = Appraisal::where(function ($q) use ($hodEmployeeId) {
+                    $q->where('appraiser_id', $hodEmployeeId) // Team drafts
+                        ->orWhere('employee_id', $hodEmployeeId); // HOD's own drafts
+                })
+                    ->where('is_draft', true)
+                    ->latest();
+
             } else {
-                // All appraisals where HOD is the appraiser
-                $query = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
-                    ->where('appraiser_id', $hodEmployeeId)
-                    ->where('appraisal_drafts.is_submitted', true);
+                // Default: All appraisals where HOD is involved (as appraiser or appraisee)
+                $query = Appraisal::where(function ($q) use ($hodEmployeeId) {
+                    $q->where('appraiser_id', $hodEmployeeId)
+                        ->orWhere('employee_id', $hodEmployeeId);
+                })
+                ->latest();
             }
 
+            // Search functionality
             if ($search) {
                 $query->whereHas('employee', function ($q) use ($search) {
                     $q->where('first_name', 'like', "%{$search}%")
@@ -561,12 +599,26 @@ class AppraisalsController extends Controller
                     $file = $request->file("relevant_documents.$key.proof");
 
                     if ($file && $file->isValid()) {
-                        $filePath = $file->store('proof_documents', 'public');
+                        $filePath = $file->store('relevant_documents', 'public');
                         $requestedData['relevant_documents'][$key]['proof'] = $filePath;
 
                         // Also store the original file name
                         $requestedData['relevant_documents'][$key]['original_name'] = $file->getClientOriginalName();
+
+                        // Debug logging
+                        \Log::info('File uploaded successfully', [
+                            'original_name' => $file->getClientOriginalName(),
+                            'stored_path' => $filePath,
+                            'full_path' => storage_path('app/public/' . $filePath),
+                            'file_exists' => file_exists(storage_path('app/public/' . $filePath))
+                        ]);
+                    } else {
+                        \Log::error('Invalid file upload', [
+                            'key' => $key,
+                            'file_error' => $file ? $file->getError() : 'No file'
+                        ]);
                     }
+
                 } else {
                     // Keep existing file if no new file uploaded
                     if (isset($uncst_appraisal['relevant_documents'][$key]['proof'])) {
@@ -907,9 +959,9 @@ class AppraisalsController extends Controller
         }
     }
 
-   public function approveOrReject(Request $request, Appraisal $appraisal)
+    public function approveOrReject(Request $request, Appraisal $appraisal)
     {
-        
+
         $request->validate([
             'status' => 'required|string|in:approved,rejected',
             'reason' => 'nullable|string',
@@ -963,31 +1015,52 @@ class AppraisalsController extends Controller
                 // Set leave status as approved for Executive Secretary
                 $appraisalRequestStatus['Executive Secretary'] = 'approved';
                 $appraisal->rejection_reason = null; // Clear reason if approved
+
+                $appraisal->appraisal_request_status = $appraisalRequestStatus;
+                $appraisal->save();
             } else {
                 // Set rejection status
                 $appraisalRequestStatus['Executive Secretary'] = 'rejected';
                 $appraisal->rejection_reason = $request->input('reason'); // Store rejection reason
+
+                // Save the rejection status first
+                $appraisal->appraisal_request_status = $appraisalRequestStatus;
+                $appraisal->save();
 
                 // Reset to draft for fresh resubmission
                 $this->resetToDraftForResubmission($appraisal);
             }
 
             // Get the user who requested the appraisal
-            $employee = Employee::withoutGlobalScope(EmployeeScope::class)
-                ->find($appraisal->employee_id);
+            $employee = Employee::withoutGlobalScope(EmployeeScope::class)->find($appraisal->employee_id);
 
-            $appraisalRequester = User::find($employee->user_id); // Removed ->first()
-
-            // Send notification to the User instance
-            Notification::send($appraisalRequester, new AppraisalApproval($appraisal, $employee->first_name, $employee->last_name));
+            if ($employee && $employee->user_id) {
+                $appraisalRequester = User::find($employee->user_id);
+                if ($appraisalRequester) {
+                    Notification::send($appraisalRequester, new AppraisalApproval($appraisal, $employee->first_name, $employee->last_name));
+                }
+            }
         } else {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
+        // ✅ Save rejection reason FIRST before updating status
+        if ($request->input('status') === 'rejected') {
+            $appraisal->rejection_reason = $request->input('reason');
+        } else {
+            $appraisal->rejection_reason = null;
+        }
+
+
         $appraisal->appraisal_request_status = $appraisalRequestStatus;
         $appraisal->save();
 
-        return response()->json(['message' => 'Appraisal application approved successfully.', 'status' => $appraisal->approval_status]);
+        $message = $request->input('status') === 'approved'
+            ? 'Appraisal application approved successfully.'
+            : 'Appraisal application rejected successfully.';
+
+
+        return response()->json(['message' => $message, 'status' => $appraisal->approval_status]);
     }
 
 
@@ -1308,25 +1381,53 @@ class AppraisalsController extends Controller
             throw new \Exception("Attachment not found for index: {$index}");
         }
 
-        $filePath = ltrim($documents[$index]['proof'], '/'); // normalize path
-        $fileName = $documents[$index]['name'] ?? $documents[$index]['title'] ?? basename($filePath);
+        $document = $documents[$index];
+        $filePath = $document['proof'] ?? '';
 
+        if (empty($filePath)) {
+            throw new \Exception("No file path found for attachment at index: {$index}");
+        }
+
+        // Clean the file path
+        $filePath = ltrim($filePath, '/');
+
+        // Get file name from multiple possible sources
+        $fileName = $document['original_name'] ??
+            $document['name'] ??
+            $document['title'] ??
+            basename($filePath);
+
+        // Check multiple possible storage locations
         $possiblePaths = [
             storage_path('app/public/' . $filePath),
+            storage_path('app/public/relevant_documents/' . basename($filePath)),
+            storage_path('app/public/proof_documents/' . basename($filePath)),
             storage_path('app/' . $filePath),
             public_path('storage/' . $filePath),
+            public_path('storage/relevant_documents/' . basename($filePath)),
+            public_path('storage/proof_documents/' . basename($filePath)),
         ];
 
         foreach ($possiblePaths as $path) {
-            if (file_exists($path)) {
+            if (file_exists($path) && is_readable($path)) {
                 return [
                     'path' => $path,
-                    'name' => $fileName,
+                    'name' => pathinfo($fileName, PATHINFO_FILENAME), // Name without extension
+                    'original_name' => $fileName,
+                    'size' => filesize($path),
                 ];
             }
         }
 
-        throw new \Exception("File does not exist on server: {$filePath}");
+        // Log the attempted paths for debugging
+        \Log::error('File not found in any expected location', [
+            'appraisal_id' => $appraisal->appraisal_id,
+            'index' => $index,
+            'stored_path' => $filePath,
+            'attempted_paths' => $possiblePaths,
+        ]);
+
+        throw new \Exception("File does not exist on server: {$filePath}. Please check if the file was uploaded correctly.");
     }
 
     public function downloadPDF(Appraisal $appraisal)
