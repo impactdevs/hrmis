@@ -290,7 +290,7 @@ class HomeController extends Controller
                 // Check for rejections first
                 $isRejected = false;
                 $rejectedBy = '';
-                
+
                 if (($leave->leave_request_status["HR"] ?? "") === 'rejected') {
                     $isRejected = true;
                     $rejectedBy = 'HR';
@@ -307,7 +307,7 @@ class HomeController extends Controller
                     $progress = 66; // HR and HOD approved, then rejected by ES
                     $status = 'Rejected by Executive Secretary';
                 }
-                
+
                 if (!$isRejected) {
                     // Determine the approval status and progress
                     if ($leave->leave_request_status === 'approved') {
@@ -366,15 +366,15 @@ class HomeController extends Controller
                 $progress = 0;
                 $status = '';
                 $currentStage = '';
-                
+
                 // Calculate progress based on approval stages
                 $requestStatus = $appraisal->appraisal_request_status ?? [];
-                
+
                 // Get appraiser info to determine the workflow
                 $appraiserEmployee = \App\Models\Employee::withoutGlobalScope(\App\Models\Scopes\EmployeeScope::class)
                     ->find($appraisal->appraiser_id);
                 $appraiserUser = $appraiserEmployee ? \App\Models\User::find($appraiserEmployee->user_id) : null;
-                
+
                 // Stage 1: Submitted to Appraiser (20% when submitted)
                 $progress = 20;
                 $status = 'Submitted';
@@ -384,7 +384,7 @@ class HomeController extends Controller
                 } else {
                     $currentStage = 'Awaiting appraiser review';
                 }
-                
+
                 // Check if appraiser has reviewed (based on their role)
                 $appraiserReviewed = false;
                 if ($appraiserUser) {
@@ -411,7 +411,7 @@ class HomeController extends Controller
                         }
                     }
                 }
-                
+
                 // Continue with remaining approval stages only after appraiser review
                 if ($appraiserReviewed) {
                     // Stage 3: HoD Approved (60%)
@@ -420,14 +420,14 @@ class HomeController extends Controller
                         $status = 'HoD Approved';
                         $currentStage = 'Awaiting HR approval';
                     }
-                    
+
                     // Stage 4: HR Approved (80%)
                     if (isset($requestStatus['HR']) && $requestStatus['HR'] === 'approved') {
                         $progress = 80;
                         $status = 'HR Approved';
                         $currentStage = 'Awaiting Executive Secretary approval';
                     }
-                    
+
                     // Stage 5: Executive Secretary Approved (100%)
                     if (isset($requestStatus['Executive Secretary']) && $requestStatus['Executive Secretary'] === 'approved') {
                         $progress = 100;
@@ -435,7 +435,7 @@ class HomeController extends Controller
                         $currentStage = 'Appraisal completed successfully';
                     }
                 }
-                
+
                 // Check for rejections at any stage
                 if ($appraiserUser && $appraiserUser->hasRole('HR') && isset($requestStatus['HR']) && $requestStatus['HR'] === 'rejected') {
                     $progress = 20;
@@ -462,7 +462,7 @@ class HomeController extends Controller
                     $status = 'Rejected by Executive Secretary';
                     $currentStage = 'Rejected at Executive Secretary stage';
                 }
-                
+
                 $appraisalProgressData[] = [
                     'appraisal' => $appraisal,
                     'progress' => $progress,
@@ -477,7 +477,7 @@ class HomeController extends Controller
                 ];
             }
         }
-        
+
         //birthdays
         $todayBirthdays = Employee::withoutGlobalScope(EmployeeScope::class)->whereMonth('date_of_birth', Carbon::today()->month)
             ->whereDay('date_of_birth', Carbon::today()->day)
@@ -490,11 +490,17 @@ class HomeController extends Controller
     }
 
     public function agree()
-    {
-        // Store the agreement in the user's profile or session
+{
+    try {
         $user = auth()->user();
         $user->agreed_to_data_usage = true;
         $user->save();
-        return redirect()->back()->with('success', 'Thank you for agreeing to data usage.');
+
+        return redirect()->route('dashboard')
+                         ->with('success', 'Thank you for agreeing to data usage.');
+    } catch (\Exception $e) {
+        return redirect()->back()
+                         ->with('error', 'There was an error saving your agreement.');
     }
+}
 }
