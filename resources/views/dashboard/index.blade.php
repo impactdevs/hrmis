@@ -2079,6 +2079,7 @@
                 var employeeData = {!! $chartEmployeeDataJson !!};
                 console.log(window.isAdminOrSecretary);
                 // open the consent modal here
+                <script src
                 @if (!auth()->user()->agreed_to_data_usage)
                     var consentModal = new bootstrap.Modal(document.getElementById('consent'));
                     consentModal.show();

@@ -14,8 +14,8 @@ return new class extends Migration {
             $table->uuid('company_job_id')->primary();
             $table->string('job_code')->unique();
             $table->string('job_title');
-            $table->timestamp('will_become_active_at');
-            $table->timestamp('will_become_inactive_at')->nullable();
+            // $table->timestamp('will_become_active_at');
+            // $table->timestamp('will_become_inactive_at')->nullable();
             $table->timestamps();
         });
     }
