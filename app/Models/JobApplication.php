@@ -21,6 +21,7 @@ class JobApplication extends Model
         'salary_expectation' => 'decimal:2',
         'academic_documents' => 'array',
         'other_documents' => 'array',
+        'cv' => 'array',
     ];
 
     protected $fillable = [

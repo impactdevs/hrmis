@@ -6,7 +6,14 @@
                     <h3 class="mb-0"><i class="fas fa-file-invoice mr-2"></i>Application Details -
                         {{ $application->reference_number }}</h3>
                     <div>
+
+                        <!-- Print Button -->
+                        <button onclick="window.print()" class="btn btn-light btn-sm">
+                            <i class="fas fa-print mr-2"></i>Print
+                        </button>
+
                     </div>
+                    
                 </div>
             </div>
 
@@ -64,7 +71,7 @@
                                 <dt>NIN</dt>
                                 <dd>{{ $application->nin ?? '-' }}</dd>
 
-                            
+
                             </dl>
                         </div>
                     </div>
@@ -296,6 +303,13 @@
     </div>
 
     <style>
+
+        @media print {
+        .btn { display: none !important; }
+        .card-header { background: #fff !important; color: #000 !important; }
+        body { background: #fff !important; }
+    }
+    
         .section-card {
             padding: 1.5rem;
             border: 1px solid #e3e6f0;

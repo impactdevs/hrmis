@@ -9,7 +9,8 @@ export default defineConfig({
                 'resources/css/fullcalendarcss.css',
                 'resources/js/app.js',
                 'resources/js/custom-dashboard.js',
-                'resources/js/custom-js.js'
+                'resources/js/custom-js.js',
+                'resources/js/dashboard-logic.js',
             ],
             refresh: true,
         }),
