@@ -661,12 +661,12 @@
                             <table class="min-w-full text-base border border-gray-200" id="key-duties-table">
                                 <thead class="text-sm text-gray-700 uppercase bg-blue-100 border-b border-gray-200">
                                     <tr>
-                                        <th class="px-6 py-3 border border-gray-200 w-24" style="">No.</th>
-                                        <th class="px-6 py-3 border border-gray-200">Planned Tasks (Target)</th>
-                                        <th class="px-6 py-3 border border-gray-200">Output / Results</th>
-                                        <th class="px-6 py-3 border border-gray-200 w-32">Supervisee (/6)</th>
-                                        <th class="px-6 py-3 border border-gray-200 w-32">Supervisor (/6)</th>
-                                        <th class="px-6 py-3 border border-gray-200 w-40">Agreed Score (/6)</th>
+                                        <th class="px-6 py-3 border border-gray-200 w-14" style="">No.</th>
+                                        <th class="px-6 py-3 border border-gray-200 w-35">Planned Tasks (Target)</th>
+                                        <th class="px-6 py-3 border border-gray-200 w-35">Output / Results</th>
+                                        <th class="px-6 py-3 border border-gray-200 w-20">Supervisee (/6)</th>
+                                        <th class="px-6 py-3 border border-gray-200 w-20">Supervisor (/6)</th>
+                                        <th class="px-6 py-3 border border-gray-200 w-20">Agreed Score (/6)</th>
                                         <th class="px-6 py-3 border border-gray-200 w-10 no-print"></th>
                                     </tr>
                                 </thead>

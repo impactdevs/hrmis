@@ -2122,6 +2122,8 @@ $(document).ready(function() {
 });
 </script>
 
+@section('scripts')
+<script>
                 // Handle accept button click
             document.getElementById('applyButton').addEventListener('click', function() {
                 console.log('Accept button clicked');
@@ -2312,7 +2314,9 @@ $(document).ready(function() {
         });
     }
 });
-            //real notifications
+</script>
+@endsection
+           
         </script>
     @endpush
 </x-app-layout>
