@@ -54,7 +54,7 @@ class StoreEmployeeRequest extends FormRequest
                 'required',
                 'email',
                 'max:255',
-                Rule::unique('employees')->ignore($employeeId, 'employee_id'), // Specify the primary key
+                Rule::unique('employees', 'email')->ignore($employeeId, 'employee_id'), // Specify the primary key
             ],
             'phone_number' => [
                 'nullable',
@@ -67,6 +67,16 @@ class StoreEmployeeRequest extends FormRequest
             'date_of_birth' => 'nullable|date|before:today',
             'entitled_leave_days' => 'nullable|integer',
         ];
+    }
+
+     public function prepareForValidation()
+    {
+        // Normalize email before validation
+        if ($this->has('email')) {
+            $this->merge([
+                'email' => strtolower(trim($this->email))
+            ]);
+        }
     }
 
     public function messages()

@@ -56,6 +56,27 @@ class User extends Authenticatable
         return $this->hasOne(Employee::class, 'email', 'email')->withoutGlobalScopes();
     }
 
+    protected static function boot()
+    {
+        parent::boot();
+
+                // Normalize email to lowercase when creating
+        static::creating(function ($user) {
+            if (isset($user->email)) {
+                $user->email = strtolower(trim($user->email));
+            }
+        });
+
+        // Normalize email to lowercase when updating
+        static::saving(function ($user) {
+            if (isset($user->email) && $user->isDirty('email')) {
+                $user->email = strtolower(trim($user->email));
+            }
+        });
+
+    }
+
+
     //check if admin or executive sec
     public function getisAdminOrSecretaryAttribute()
     {

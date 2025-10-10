@@ -81,6 +81,18 @@ class Employee extends Model
         // Automatically generate a UUID when creating a new Employee
         static::creating(function ($employee) {
             $employee->employee_id = (string) Str::uuid();
+
+            // Normalize email to lowercase on creation
+            if (isset($employee->email)) {
+                $employee->email = strtolower(trim($employee->email));
+            }
+        });
+
+        // Normalize email to lowercase when updating
+        static::saving(function ($employee) {
+            if (isset($employee->email) && $employee->isDirty('email')) {
+                $employee->email = strtolower(trim($employee->email));
+            }
         });
     }
 
