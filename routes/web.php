@@ -103,6 +103,10 @@ Route::middleware(['auth', 'verified', 'check.employee.record', 'data.usage.agre
     Route::resource('leaves', LeaveController::class)->parameters([
         'leaves' => 'leave'
     ]);
+    Route::get('/leaves/currently-on-leave', [LeaveController::class, 'currentlyOnLeave'])->name('leaves.currently-on-leave');
+   Route::get('/leaves/employees-on-leave', [LeaveController::class, 'getEmployeesOnLeave'])
+    ->name('leaves.employees-on-leave');
+
     Route::patch('/leaves/{leave}/cancel', [LeaveController::class, 'cancel'])->name('leaves.cancel');
     Route::get('/leaves/debug/info', [LeaveController::class, 'debug'])->name('leaves.debug');
     Route::get('/leaves/{leave}/debug/edit', [LeaveController::class, 'debugEdit'])->name('leaves.debug.edit');
