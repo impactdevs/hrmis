@@ -28,19 +28,44 @@ class LeaveController extends Controller
     use AuthorizesRequests;
     public function index()
     {
-        // Temporary workaround: show user's leaves without global scope if they can't see any
-        $leaves = Leave::with('employee', 'leaveCategory')->get();
+        // Base query - use a query builder instead of immediate get()
+        $leavesQuery = Leave::with('employee', 'leaveCategory');
 
-        // If no leaves are visible but user has leaves in database, show them without scope
+        // Check if filter parameter is present for approved current leaves
+        if (request()->has('filter') && request('filter') == 'approved_current') {
+            $leavesQuery->where('is_cancelled', false)
+                ->whereDate('start_date', '<=', now())
+                ->whereDate('end_date', '>=', now())
+                ->whereJsonContains('leave_request_status->Executive Secretary', 'approved')
+                ->count();
+        }
+
+        // Get the leaves based on the query
+        $leaves = $leavesQuery->get();
+
+        // Temporary workaround: show user's leaves without global scope if they can't see any
         if ($leaves->isEmpty() && auth()->user()) {
             $userLeavesCount = Leave::withoutGlobalScopes()->where('user_id', auth()->id())->count();
             if ($userLeavesCount > 0) {
-                $leaves = Leave::withoutGlobalScopes()
+                $userLeavesQuery = Leave::withoutGlobalScopes()
                     ->with('employee', 'leaveCategory')
-                    ->where('user_id', auth()->id())
-                    ->get();
+                    ->where('user_id', auth()->id());
+
+                // Apply the same filter to user's leaves if needed
+                if (request()->has('filter') && request('filter') == 'approved_current') {
+                    $userLeavesQuery->where('is_cancelled', false)
+                        ->where('start_date', '<=', now())
+                        ->where('end_date', '>=', now())
+                        ->where(function ($q) {
+                            $q->where('leave_request_status', 'like', '%"Executive Secretary":"approved"%')
+                                ->orWhere('leave_request_status', 'like', '%Executive Secretary%approved%');
+                        });
+                }
+
+                $leaves = $userLeavesQuery->get();
             }
         }
+
         $totalLeaves = $leaves->count();
         //get all the roles in the system except Staff
         $roles = Role::whereNotIn('name', ['Assistant Executive Secretary', 'Staff'])->pluck('name')->toArray();
@@ -68,7 +93,11 @@ class LeaveController extends Controller
         }
         //departments
         $departments = Department::pluck('department_name', 'department_id')->toArray();
-        return view('leaves.index', compact('leaves', 'totalLeaves', 'totalDays', 'leavesPerCategory', 'users', 'totalLeaveDaysAllocated', 'useDays', 'departments', 'roles'));
+
+        // Pass filter status to view
+        $activeFilter = request()->has('filter') ? request('filter') : null;
+
+        return view('leaves.index', compact('leaves', 'totalLeaves', 'totalDays', 'leavesPerCategory', 'users', 'totalLeaveDaysAllocated', 'useDays', 'departments', 'roles', 'activeFilter'));
     }
 
     /**
@@ -525,13 +554,11 @@ class LeaveController extends Controller
                 'next_approver' => $leave->getNextApproverRole(),
                 'success' => true
             ]);
-
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'error' => 'Validation failed',
                 'errors' => $e->errors()
             ], 422);
-
         } catch (\Exception $e) {
             \Log::error('Leave approval failed', [
                 'error' => $e->getMessage(),
@@ -609,76 +636,124 @@ class LeaveController extends Controller
 
 
     public function leaveData(Request $request)
-    {
-        $department = $request->input('department', 'all');
+{
+    $department = $request->input('department', 'all');
+    $approvalStatus = $request->input('approval_status', 'all'); // Get approval status filter
 
-        if (auth()->user()->isAdminOrSecretary) {
-            // Query to get the leave roster with employee and leave relationships
-            $leaveRosterQuery = LeaveRoster::with(['employee', 'leave', 'leave.leaveCategory'])
-                ->whereHas('leave');
-        } else {
+    \Log::info('LeaveData Filters', [
+        'approval_status' => $approvalStatus,
+        'department' => $department
+    ]);
 
-            $leaveRosterQuery = LeaveRoster::with(['employee', 'leave', 'leave.leaveCategory']);
-        }
-        // Filter by department if selected
-        if ($department !== 'all') {
-            $employeeIds = Employee::where('department_id', $department)->pluck('employee_id');
-            $leaveRosterQuery->whereIn('employee_id', $employeeIds);
-        }
-
-        // Retrieve the filtered leave roster
-        $leaveRoster = $leaveRosterQuery->get()->map(function ($leave, $index) {
-            return [
-                'numeric_id' => $index + 1,
-                'leave_roster_id' => $leave->leave_roster_id,
-                'title' => $leave->leave_title,
-                'start' => $leave->start_date->toIso8601String(),
-                'end' => $leave->end_date->toIso8601String(),
-                'staffId' => $leave->employee->staff_id ?? null,
-                'first_name' => $leave->employee->first_name ?? null,
-                'last_name' => $leave->employee->last_name ?? null,
-                'leave' => $leave->leave,
-                'is_cancelled' => $leave->leave->is_cancelled,
-                // Add duration by calling the durationForLeave method
-                'duration' => $leave->durationForLeave() // This will return the duration excluding weekends and holidays
-            ];
-        });
-
-
-
-        // Query to find leaves that are not in the leave roster
-        $orphanedLeaves = Leave::with('leaveCategory')->whereNull('leave_roster_id')
-            ->with('employee')
-            ->get()
-            ->map(function ($leave, $index) use ($leaveRoster) {
-                $indexOffset = $leaveRoster->count(); // Continue numeric ID from leaveRoster
-                return [
-                    'numeric_id' => $indexOffset + $index + 1,
-                    'leave_roster_id' => null, // Not in leave roster
-                    'title' => $leave->leave_title,
-                    'start' => $leave->start_date->toIso8601String(),
-                    'end' => $leave->end_date->toIso8601String(),
-                    'staffId' => $leave->employee->staff_id ?? null,
-                    'first_name' => $leave->employee->first_name ?? null,
-                    'last_name' => $leave->employee->last_name ?? null,
-                    'leave' => $leave,
-                    'is_cancelled' => $leave->is_cancelled,
-                    // Add duration for orphaned leaves as well
-                    'duration' => $leave->durationForLeave()
-                ];
-            });
-
-        // Combine the leaveRoster and orphanedLeaves
-        $combinedLeaves = collect($leaveRoster)->merge($orphanedLeaves)
-        ->sortByDesc(function($item) {
-        // Use created_at if available, otherwise use start date
-        return $item['created_at'] ?? $item['start'];
-    })
-        ->values();
-
-        // Return the combined leave data
-        return response()->json(['success' => true, 'data' => $combinedLeaves]);
+    if (auth()->user()->isAdminOrSecretary) {
+        $leaveRosterQuery = LeaveRoster::with(['employee', 'leave', 'leave.leaveCategory'])
+            ->whereHas('leave');
+    } else {
+        $leaveRosterQuery = LeaveRoster::with(['employee', 'leave', 'leave.leaveCategory']);
     }
+
+    // Filter by department if selected
+    if ($department !== 'all') {
+        $employeeIds = Employee::where('department_id', $department)->pluck('employee_id');
+        $leaveRosterQuery->whereIn('employee_id', $employeeIds);
+    }
+
+    // Get all leave roster data first
+    $leaveRoster = $leaveRosterQuery->get();
+
+    // Process leave roster data
+    $leaveRosterData = $leaveRoster->map(function ($leave, $index) {
+        return [
+            'numeric_id' => $index + 1,
+            'leave_roster_id' => $leave->leave_roster_id,
+            'title' => $leave->leave_title,
+            'start' => $leave->start_date->toIso8601String(),
+            'end' => $leave->end_date->toIso8601String(),
+            'staffId' => $leave->employee->staff_id ?? null,
+            'first_name' => $leave->employee->first_name ?? null,
+            'last_name' => $leave->employee->last_name ?? null,
+            'leave' => $leave->leave,
+            'is_cancelled' => $leave->leave->is_cancelled ?? false,
+            'duration' => $leave->durationForLeave()
+        ];
+    });
+
+    // Query orphaned leaves
+    $orphanedLeavesQuery = Leave::with('leaveCategory')
+        ->whereNull('leave_roster_id')
+        ->with('employee');
+
+    $orphanedLeaves = $orphanedLeavesQuery->get();
+
+    // Process orphaned leaves data
+    $orphanedLeavesData = $orphanedLeaves->map(function ($leave, $index) use ($leaveRosterData) {
+        $indexOffset = $leaveRosterData->count();
+        return [
+            'numeric_id' => $indexOffset + $index + 1,
+            'leave_roster_id' => null,
+            'title' => $leave->leave_title,
+            'start' => $leave->start_date->toIso8601String(),
+            'end' => $leave->end_date->toIso8601String(),
+            'staffId' => $leave->employee->staff_id ?? null,
+            'first_name' => $leave->employee->first_name ?? null,
+            'last_name' => $leave->employee->last_name ?? null,
+            'leave' => $leave,
+            'is_cancelled' => $leave->is_cancelled,
+            'duration' => $leave->durationForLeave()
+        ];
+    });
+
+    // Combine all data
+    $combinedLeaves = collect($leaveRosterData)->merge($orphanedLeavesData);
+
+    // Apply approval status filter
+    if ($approvalStatus !== 'all') {
+        $combinedLeaves = $combinedLeaves->filter(function ($item) use ($approvalStatus) {
+            $leave = $item['leave'];
+            if (!$leave) return $approvalStatus === 'pending'; // No leave application = pending
+
+            switch ($approvalStatus) {
+                 case 'active':
+                    // Active = currently ongoing and fully approved
+                    $now = Carbon::now();
+                    return $leave->isFullyApproved() && 
+                           $leave->start_date <= $now && 
+                           $leave->end_date >= $now;
+                case 'approved':
+                    return $leave->isFullyApproved();
+                case 'pending':
+                    // Pending = not fully approved AND not rejected AND not cancelled
+                    return !$leave->isFullyApproved() && 
+                           !$leave->isRejected() && 
+                           !$leave->is_cancelled;
+                case 'rejected':
+                    return $leave->isRejected();
+                default:
+                    return true;
+            }
+        });
+    }
+
+    // Remove cancelled leaves from all views except when specifically filtered
+    if ($approvalStatus !== 'all') {
+        $combinedLeaves = $combinedLeaves->filter(function ($item) {
+            return !$item['is_cancelled'];
+        });
+    }
+
+    // Sort the final data
+    $combinedLeaves = $combinedLeaves->sortByDesc(function ($item) {
+        return $item['created_at'] ?? $item['start'];
+    })->values();
+
+    \Log::info('LeaveData Final Results', [
+        'total_records' => $combinedLeaves->count(),
+        'approval_status_filter' => $approvalStatus,
+        'department_filter' => $department
+    ]);
+
+    return response()->json(['success' => true, 'data' => $combinedLeaves]);
+}
 
     public function cancel(Request $request, Leave $leave, LeaveService $leaveService)
     {
@@ -895,4 +970,84 @@ class LeaveController extends Controller
                 ->withErrors('Could not download the handover file: ' . $e->getMessage());
         }
     }
+
+    // Add this method to your LeaveController
+    public function currentlyOnLeave()
+    {
+        try {
+            // Get all currently active and approved leaves with employee data
+            $currentLeaves = Leave::with(['employee', 'employee.department', 'leaveCategory'])
+                ->where('is_cancelled', false)
+                ->where('start_date', '<=', now())
+                ->where('end_date', '>=', now())
+                ->get()
+                ->filter(function ($leave) {
+                    return $leave->isFullyApproved();
+                });
+
+            // For now, return JSON to test
+            return response()->json([
+                'success' => true,
+                'total_employees' => $currentLeaves->count(),
+                'employees' => $currentLeaves->map(function ($leave, $index) {
+                    return [
+                        'number' => $index + 1,
+                        'name' => $leave->employee ? $leave->employee->first_name . ' ' . $leave->employee->last_name : 'Unknown',
+                        'staff_id' => $leave->employee->staff_id ?? 'N/A',
+                        'department' => $leave->employee->department->department_name ?? 'N/A',
+                        'leave_type' => $leave->leaveCategory->leave_type_name ?? 'Unknown',
+                        'start_date' => $leave->start_date->format('M d, Y'),
+                        'end_date' => $leave->end_date->format('M d, Y'),
+                        'status' => $leave->getCurrentStatus(),
+                    ];
+                }),
+                'message' => 'Found ' . $currentLeaves->count() . ' employees currently on approved leave'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage(),
+                'trace' => config('app.debug') ? $e->getTraceAsString() : null
+            ], 500);
+        }
+    }
+
+    public function getEmployeesOnLeave(Request $request)
+{
+    $today = now()->format('Y-m-d');
+
+    // Get leaves that are currently active (today is between start_date and end_date)
+    $activeLeaves = Leave::with(['employee.department', 'leaveCategory'])
+        ->where('start_date', '<=', $today)
+        ->where('end_date', '>=', $today)
+        ->where('is_cancelled', false)
+        ->where(function($query) {
+            // Only include approved leaves (check if all required approvals are given)
+            $query->where(function($q) {
+                $q->whereJsonContains('leave_request_status->HR', 'approved')
+                  ->whereJsonContains('leave_request_status->Head of Division', 'approved')
+                  ->whereJsonContains('leave_request_status->Executive Secretary', 'approved');
+            })->orWhere('leave_request_status', null); // Or include newly submitted leaves if needed
+        })
+        ->get();
+
+    // Transform the data for the response
+    $employeesOnLeave = $activeLeaves->map(function($leave) {
+        return [
+            'first_name' => $leave->employee->first_name ?? 'Unknown',
+            'last_name' => $leave->employee->last_name ?? 'Employee',
+            'staff_id' => $leave->employee->staff_id ?? 'N/A',
+            'department_name' => $leave->employee->department->department_name ?? 'N/A',
+            'leave_type' => $leave->leaveCategory->leave_type_name ?? 'Unknown',
+            'leave_start_date' => $leave->start_date->format('Y-m-d'),
+            'leave_end_date' => $leave->end_date->format('Y-m-d'),
+            'duration' => $leave->durationForLeave(\App\Models\PublicHoliday::pluck('holiday_date')->toArray()),
+        ];
+    });
+
+    return response()->json([
+        'total_count' => $employeesOnLeave->count(),
+        'employees' => $employeesOnLeave
+    ]);
+}
 }

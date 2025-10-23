@@ -202,33 +202,33 @@ class Leave extends Model
     public function getNextApproverRole(): ?string
     {
         $status = $this->leave_request_status ?? [];
-        
+
         // IMPORTANT: If any approver has rejected, stop the workflow entirely
         foreach (['HR', 'Head of Division', 'Executive Secretary'] as $role) {
             if (isset($status[$role]) && $status[$role] === 'rejected') {
                 return null; // Workflow stops on any rejection
             }
         }
-        
+
         // Check if HR has approved, next is Head of Division
         if (isset($status['HR']) && $status['HR'] === 'approved') {
             if (!isset($status['Head of Division']) || $status['Head of Division'] === null) {
                 return 'Head of Division';
             }
         }
-        
+
         // Check if Head of Division has approved, next is Executive Secretary
         if (isset($status['Head of Division']) && $status['Head of Division'] === 'approved') {
             if (!isset($status['Executive Secretary']) || $status['Executive Secretary'] === null) {
                 return 'Executive Secretary';
             }
         }
-        
+
         // If no approvals yet, start with HR
         if (empty($status) || (!isset($status['HR']) || $status['HR'] === null)) {
             return 'HR';
         }
-        
+
         // All approvals complete
         return null;
     }
@@ -262,42 +262,44 @@ class Leave extends Model
     public function getCurrentApprovalStage(): string
     {
         $status = $this->leave_request_status ?? [];
-        
+
         // Check for rejections
         foreach (['HR', 'Head of Division', 'Executive Secretary'] as $role) {
             if (isset($status[$role]) && $status[$role] === 'rejected') {
                 return 'rejected';
             }
         }
-        
+
         // Check completion
         if (isset($status['Executive Secretary']) && $status['Executive Secretary'] === 'approved') {
             return 'completed';
         }
-        
+
         // Check current stage
         if (isset($status['Head of Division']) && $status['Head of Division'] === 'approved') {
             return 'awaiting_executive_secretary';
         }
-        
+
         if (isset($status['HR']) && $status['HR'] === 'approved') {
             return 'awaiting_head_of_division';
         }
-        
+
         return 'awaiting_hr';
     }
 
     /**
      * Check if leave is fully approved
      */
-    public function isFullyApproved(): bool
-    {
-        $status = $this->leave_request_status ?? [];
-        return isset($status['HR']) && $status['HR'] === 'approved' &&
-               isset($status['Head of Division']) && $status['Head of Division'] === 'approved' &&
-               isset($status['Executive Secretary']) && $status['Executive Secretary'] === 'approved';
+   // In your Leave model - UPDATE this method:
+public function isFullyApproved(): bool
+{
+    if ($this->is_cancelled) {
+        return false;
     }
 
+    $status = $this->leave_request_status ?: [];
+    return isset($status['Executive Secretary']) && $status['Executive Secretary'] === 'approved';
+}
     /**
      * Check if leave has been rejected
      */
@@ -312,4 +314,30 @@ class Leave extends Model
         return false;
     }
 
+    /**
+ * Scope for fully approved leaves (by Executive Secretary)
+ */
+public function scopeFullyApproved($query)
+{
+    return $query->where('is_cancelled', false)
+                 ->whereJsonContains('leave_request_status->Executive Secretary', 'approved');
+}
+
+/**
+ * Scope for currently active leaves
+ */
+public function scopeCurrentlyActive($query)
+{
+    $now = now();
+    return $query->where('start_date', '<=', $now)
+                 ->where('end_date', '>=', $now);
+}
+
+/**
+ * Scope for ES-approved and currently active leaves
+ */
+public function scopeApprovedAndActive($query)
+{
+    return $query->fullyApproved()->currentlyActive();
+}
 }

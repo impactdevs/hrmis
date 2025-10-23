@@ -166,7 +166,7 @@ class HomeController extends Controller
         //number of employees
         $number_of_employees = Employee::count();
         $attendances = Attendance::whereDate('access_date_and_time', $today)->count();
-        $available_leave = Leave::count();
+         $available_leave = Leave::approvedAndActive()->count();
         //count the number of clockins per hour
         $clockInCounts = DB::table('attendances')
             ->select(DB::raw('HOUR(access_time) as hour'), DB::raw('count(*) as count'))
@@ -502,5 +502,28 @@ class HomeController extends Controller
         return redirect()->back()
                          ->with('error', 'There was an error saving your agreement.');
     }
+}
+
+public function dashboard()
+{
+    // Count active leaves (currently ongoing + upcoming approved)
+    $available_leave = Leave::where('is_cancelled', false)
+                          ->where(function($query) {
+                              $query->where(function($q) {
+                                  // Currently active
+                                  $q->where('start_date', '<=', now())
+                                    ->where('end_date', '>=', now());
+                              })->orWhere(function($q) {
+                                  // Upcoming approved
+                                  $q->where('start_date', '>', now())
+                                    ->where(function($q2) {
+                                        $q2->where('leave_request_status', 'like', '%"Executive Secretary":"approved"%')
+                                           ->orWhere('leave_request_status', 'like', '%Executive Secretary%approved%');
+                                    });
+                              });
+                          })
+                          ->count();
+    
+    return view('dashboard', compact('available_leave'));
 }
 }
