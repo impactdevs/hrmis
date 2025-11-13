@@ -453,28 +453,25 @@
                             <div class="p-3 rounded form-section bg-light">
                                 <h5 class="mb-3 text-muted">Your Personal Details</h5>
                                 <div class="row g-3">
-                                    @php
-                                        $employee = app\Models\Employee::find($appraisal->employee_id);
-                                    @endphp
                                     <div class="col-md-12">
                                         <p> FULL NAME:
-                                            {{ $employee->first_name . ' ' . $employee->last_name }}
+                                            {{ $appraisal->employee->first_name . ' ' . $appraisal->employee->last_name }}
                                         </p>
                                     </div>
                                     <div class="col-md-12">
                                         <p> POSITION:
-                                            {{ optional($employee->position)->position_name }}
+                                            {{ optional($appraisal->employee->position)->position_name }}
                                         </p>
                                     </div>
 
                                     <div class="col-md-12">
                                         <p> DIVISION:
-                                            {{ optional($employee->department)->department_name }}
+                                            {{ optional($appraisal->employee->department)->department_name }}
                                         </p>
                                     </div>
                                     <div class="col-md-12">
                                         <p> DATE OF 1ST APPOINTMENT:
-                                            {{ \Carbon\Carbon::parse($employee->date_of_entry)->toFormattedDateString() }}
+                                            {{ $appraisal->employee->date_of_entry ? \Carbon\Carbon::parse($appraisal->employee->date_of_entry)->toFormattedDateString() : 'N/A' }}
                                         </p>
                                     </div>
 
@@ -1480,9 +1477,6 @@
 
 
                         <div class="print-summary-cover d-none d-print-block" style="page-break-after: always;">
-                            @php
-                                $employee = app\Models\Employee::find($appraisal->employee_id);
-                            @endphp
                             <h3>Scores Summary</h3>
                             <ul>
                                 <li><strong>Key Duties (60%):</strong> <span id="print-key-duties-score"></span></li>
@@ -1948,11 +1942,11 @@
                         @endif
                         @can('approve appraisal')
                             @php
-                                $userBeingapproved = \App\Models\User::find(
-                                    \App\Models\Employee::find($appraisal->employee_id)->user_id,
-                                );
+                                $userBeingapproved = $appraisal->employee && $appraisal->employee->user_id 
+                                    ? \App\Models\User::find($appraisal->employee->user_id)
+                                    : null;
                             @endphp
-                            @if (!is_null($appraisal->employee->user_id))
+                            @if ($appraisal->employee && !is_null($appraisal->employee->user_id))
                                 @php
                                     $roleNames = [
                                         'Head of Division' => 'Head of Division',
@@ -3629,15 +3623,12 @@
     @endpush
 
     <div class="print-summary-cover d-none d-print-block" style="page-break-after: always;">
-        @php
-            $employee = app\Models\Employee::find($appraisal->employee_id);
-        @endphp
         <h1 class="text-center">Appraisal Summary</h1>
         <hr>
         <p><strong>Employee Name:</strong>
-            {{ $employee->first_name . ' ' . $employee->last_name }}</p>
-        <p><strong>Position:</strong> {{ optional($employee->position)->position_name }}</p>
-        <p><strong>Division:</strong> {{ optional($employee->department)->department_name }}</p>
+            {{ $appraisal->employee->first_name . ' ' . $appraisal->employee->last_name }}</p>
+        <p><strong>Position:</strong> {{ optional($appraisal->employee->position)->position_name }}</p>
+        <p><strong>Division:</strong> {{ optional($appraisal->employee->department)->department_name }}</p>
         <p><strong>Appraisal Period:</strong> {{ $appraisal->appraisal_start_date?->toDateString() }} -
             {{ $appraisal->appraisal_end_date?->toDateString() }}</p>
 

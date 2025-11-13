@@ -226,9 +226,12 @@ class Appraisal extends Model
         $approvalFlow = ['Head of Division', 'HR', 'Executive Secretary'];
 
         //check if the employee who applied for appraisal is the Head of Division and set Head of Division as approved by default
-        $user = User::find(Employee::find($this->employee_id)->user_id);
-        if ($user && $user->hasRole('Head of Division')) {
-            $approvalFlow = ['Executive Secretary'];
+        $employee = Employee::withoutGlobalScopes()->find($this->employee_id);
+        if ($employee && $employee->user_id) {
+            $user = User::find($employee->user_id);
+            if ($user && $user->hasRole('Head of Division')) {
+                $approvalFlow = ['Executive Secretary'];
+            }
         }
         $status = $this->appraisal_request_status ?? [];
 
