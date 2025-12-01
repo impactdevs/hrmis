@@ -164,10 +164,10 @@ class LeaveService
         }
 
         if ($nextApprover === 'Head of Division') {
-            // Notify Head of Department
-            $headOfDepartment = $user->employee->department->department_head;
-            if ($headOfDepartment) {
-                $hod = User::where('id', $headOfDepartment)->first();
+            // Notify the specific Head of Department for the employee's department
+            $department = $user->employee->department;
+            if ($department && $department->department_head) {
+                $hod = User::where('id', $department->department_head)->first();
                 if ($hod && $hod->hasRole('Head of Division')) {
                     Notification::send($hod, new LeaveApplied($leave, 2));
                 }

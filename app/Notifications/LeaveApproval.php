@@ -43,15 +43,16 @@ class LeaveApproval extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
-        if ($this->leave->leave_request_status === 'rejected') {
+        // Check if leave is rejected by checking the isRejected() method
+        if ($this->leave->isRejected()) {
             return (new MailMessage)
                 ->subject('Leave Application Rejected')
                 ->line('Your leave application has been rejected.')
                 ->line('Leave Type: ' . $this->leave->leaveCategory->leave_type_name)
                 ->line('Start Date: ' . $this->leave->start_date->format('Y-m-d'))
                 ->line('End Date: ' . $this->leave->end_date->format('Y-m-d'))
-                ->line('Reason: ' . $this->leave->rejection_reason)
-                ->line('Approved By: ' . $this->approver->name)
+                ->line('Reason: ' . ($this->leave->rejection_reason ?? 'No reason provided'))
+                ->line('Rejected By: ' . $this->approver->name)
                 ->action('View Leave Details', url('/leaves/' . $this->leave->id))
                 ->line('Thank you for using our application!');
         } else {
@@ -81,7 +82,7 @@ class LeaveApproval extends Notification implements ShouldQueue
             'end_date' => $this->leave->end_date,
             'reason' => $this->leave->reason,
             'status' => $this->leave->leave_request_status,
-            'message' => $this->leave->leave_request_status === 'rejected'
+            'message' => $this->leave->isRejected()
                 ? 'Your leave application has been rejected.'
                 : 'Your leave application has been approved.',
             'rejection_reason' => $this->leave->rejection_reason,
@@ -102,7 +103,7 @@ class LeaveApproval extends Notification implements ShouldQueue
             'reason' => $this->leave->reason,
             'status' => $this->leave->leave_request_status,
             'user' => $this->user,
-            'message' => $this->leave->leave_request_status === 'rejected'
+            'message' => $this->leave->isRejected()
                 ? 'Your leave application has been rejected by ' . $this->approver->name . '.'
                 : 'Your leave application has been approved by ' . $this->approver->name . '.',
             'rejection_reason' => $this->leave->rejection_reason,

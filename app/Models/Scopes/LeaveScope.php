@@ -34,14 +34,15 @@ class LeaveScope implements Scope
                 break;
 
             case 'Head of Division':
-                // Get the department_id of the authenticated user
-                $departmentId = DB::table('employees')->where('user_id', $user->id)->value('department_id');
-                if ($departmentId) {
-                    // Only show leaves from the user's department by using leaves.user_id
-                    $users = DB::table('employees')->where('department_id', $departmentId)->pluck('user_id');
-                    $builder->whereIn('leaves.user_id', $users);
+                // Get the department(s) where this user is the head
+                $departmentIds = DB::table('departments')->where('department_head', $user->id)->pluck('department_id');
+                
+                if ($departmentIds->isNotEmpty()) {
+                    // Only show leaves from employees in departments where this user is the head
+                    $userIds = DB::table('employees')->whereIn('department_id', $departmentIds)->pluck('user_id');
+                    $builder->whereIn('leaves.user_id', $userIds);
                 } else {
-                    // If there's no department, don't show anything
+                    // If user is not a head of any department, don't show any leaves
                     $builder->whereRaw('1 = 0'); // This condition will always be false
                 }
                 break;

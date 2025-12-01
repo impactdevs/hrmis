@@ -215,6 +215,9 @@ class EmployeeController extends Controller
      */
     public function update(StoreEmployeeRequest $request, Employee $employee)
     {
+        // Use database transaction to ensure all-or-nothing operation
+        DB::beginTransaction();
+        
         try {
             // Initialize an array to hold the validated data
             $validatedData = $request->validated();
@@ -288,14 +291,24 @@ class EmployeeController extends Controller
                 }
             }
 
-            // Redirect to the employee show page with a success message
-            return redirect()->route('employees.show', ['employee' => $employee->employee_id])->with('success', 'Employee Updated');
-        } catch (Exception $exception) {
-            // Log the error for debugging
-            Log::error('Error updating employee: ' . $exception->getMessage());
+            // Commit the transaction
+            DB::commit();
 
-            // Redirect back with an error message
-            return redirect()->back()->with('error', 'Problem Updating the Employee');
+            // Redirect to the employee show page with a success message
+            return redirect()->route('employees.show', ['employee' => $employee->employee_id])->with('success', 'Employee Updated Successfully');
+        } catch (Exception $exception) {
+            // Rollback the transaction on error
+            DB::rollBack();
+            
+            // Log the error for debugging
+            Log::error('Error updating employee', [
+                'employee_id' => $employee->employee_id ?? 'unknown',
+                'error' => $exception->getMessage(),
+                'trace' => $exception->getTraceAsString()
+            ]);
+
+            // Redirect back with an error message and preserve input
+            return redirect()->back()->withInput()->with('error', 'Problem Updating the Employee: ' . $exception->getMessage());
         }
     }
 
