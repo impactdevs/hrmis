@@ -20,6 +20,21 @@
 
                         </div>
 
+                        <div class="ms-3">
+                <select class="form-select form-select-sm rounded" id="yearSelect"
+                    style="max-width: 120px;">
+                    @php
+                        $currentYear = date('Y');
+                        $years = range($currentYear - 1, $currentYear + 1); // Show previous, current, and next year
+                    @endphp
+                    @foreach ($years as $year)
+                        <option value="{{ $year }}" {{ $year == $currentYear ? 'selected' : '' }}>
+                            {{ $year }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
                         {{-- Approval Status Filter --}}
                         <div class="d-flex align-items-center mb-3 justify-between">
                             @if (auth()->user()->isAdminOrSecretary)
