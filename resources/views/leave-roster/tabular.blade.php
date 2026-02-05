@@ -47,11 +47,11 @@
                             <select class="employees form-select" name="user_id" id="user_id"
                                 data-placeholder="Choose the employee">
                                 @foreach ($users as $user)
-                                    <option value="{{ $user->id }}"
-                                        data-entitled="{{ $user->employee->entitled_leave_days }}"
-                                        data-scheduled="{{ $user->employee->overallRosterDays() }}">{{ $user->name }}
-                                    </option>
-                                @endforeach
+    <option value="{{ $user->id }}"
+        data-entitled="{{ $user->employee?->entitled_leave_days ?? 0 }}"
+        data-scheduled="{{ $user->employee?->overallRosterDays() ?? 0 }}">{{ $user->name }}
+    </option>
+@endforeach
                             </select>
                         </div>
 
