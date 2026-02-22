@@ -639,10 +639,12 @@ class LeaveController extends Controller
 {
     $department = $request->input('department', 'all');
     $approvalStatus = $request->input('approval_status', 'all'); // Get approval status filter
+    $year = $request->input('year', 'all'); // Get year filter
 
     \Log::info('LeaveData Filters', [
         'approval_status' => $approvalStatus,
-        'department' => $department
+        'department' => $department,
+        'year' => $year
     ]);
 
     if (auth()->user()->isAdminOrSecretary) {
@@ -716,21 +718,28 @@ class LeaveController extends Controller
                  case 'active':
                     // Active = currently ongoing and fully approved
                     $now = Carbon::now();
-                    return $leave->isFullyApproved() && 
-                           $leave->start_date <= $now && 
+                    return $leave->isFullyApproved() &&
+                           $leave->start_date <= $now &&
                            $leave->end_date >= $now;
                 case 'approved':
                     return $leave->isFullyApproved();
                 case 'pending':
                     // Pending = not fully approved AND not rejected AND not cancelled
-                    return !$leave->isFullyApproved() && 
-                           !$leave->isRejected() && 
+                    return !$leave->isFullyApproved() &&
+                           !$leave->isRejected() &&
                            !$leave->is_cancelled;
                 case 'rejected':
                     return $leave->isRejected();
                 default:
                     return true;
             }
+        });
+    }
+
+    // Apply year filter on the combined collection
+    if ($year !== 'all') {
+        $combinedLeaves = $combinedLeaves->filter(function ($item) use ($year) {
+            return Carbon::parse($item['start'])->year == $year;
         });
     }
 
@@ -749,7 +758,8 @@ class LeaveController extends Controller
     \Log::info('LeaveData Final Results', [
         'total_records' => $combinedLeaves->count(),
         'approval_status_filter' => $approvalStatus,
-        'department_filter' => $department
+        'department_filter' => $department,
+        'year_filter' => $year
     ]);
 
     return response()->json(['success' => true, 'data' => $combinedLeaves]);

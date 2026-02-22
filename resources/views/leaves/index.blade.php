@@ -20,27 +20,22 @@
 
                         </div>
 
-                        <div class="ms-3">
-                <select class="form-select form-select-sm rounded" id="yearSelect"
-                    style="max-width: 120px;">
-                    @php
-                        $currentYear = date('Y');
-                        $years = range($currentYear - 1, $currentYear + 1); // Show previous, current, and next year
-                    @endphp
-                    @foreach ($years as $year)
-                        <option value="{{ $year }}" {{ $year == $currentYear ? 'selected' : '' }}>
-                            {{ $year }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-
                         {{-- Approval Status Filter --}}
                         <div class="d-flex align-items-center mb-3 justify-between">
                             @if (auth()->user()->isAdminOrSecretary)
                                 <div class="d-flex">
 
                                     {{-- Approval Status Filter --}}
+                                    {{-- Year Filter --}}
+                                    <div class="ms-3">
+                                        <select class="form-select form-select-sm rounded" id="yearSelect" name="year">
+                                            <option value="all">All Years</option>
+                                            @for ($y = now()->year; $y >= now()->year - 4; $y--)
+                                                <option value="{{ $y }}" {{ $y == now()->year ? 'selected' : '' }}>{{ $y }}</option>
+                                            @endfor
+                                        </select>
+                                    </div>
+
                                     <div class="ms-3">
                                         <div class="btn-group" role="group">
                                             <input type="radio" class="btn-check" name="approval_status"
@@ -357,7 +352,8 @@
                             type: 'GET',
                             data: {
                                 approval_status: approvalStatus, // Pass the selected approval status filter
-                                department: department // Pass the selected department filter
+                                department: department, // Pass the selected department filter
+                                year: $('#yearSelect').val() // Pass the selected year filter
                             },
                             success: function(response) {
                                 console.log('Filters sent - Approval:', approvalStatus,
@@ -888,6 +884,11 @@
                 // Listen for filter changes and update the calendar
                 $("input[name='approval_status']").on('change', function() {
                     console.log('Approval status changed to:', $(this).val());
+                    calendar.refetchEvents(); // Re-fetch events based on the new filter
+                });
+
+                $('#yearSelect').on('change', function() {
+                    console.log('Year changed to:', $(this).val());
                     calendar.refetchEvents(); // Re-fetch events based on the new filter
                 });
 
