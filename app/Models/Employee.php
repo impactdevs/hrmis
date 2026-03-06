@@ -176,13 +176,7 @@ class Employee extends Model
                 // Exclude maternity leave from the balance calculation
                 $query->where('leave_type_name', '!=', 'Maternity');
             })
-            ->where(function ($query) {
-                // Check if any approval role has approved the leave
-                $query->whereJsonContains('leave_request_status', ['Executive Secretary' => 'approved'])
-                    ->orWhereJsonContains('leave_request_status', ['Head of Division' => 'approved'])
-                    ->orWhereJsonContains('leave_request_status', ['HR' => 'approved'])
-                    ->orWhereJsonContains('leave_request_status', ['fully_approved' => true]);
-            })
+            ->whereJsonContains('leave_request_status', ['Executive Secretary' => 'approved']) // Only fully approved leaves
             ->get();
 
         // Calculate the total leave days excluding weekends and public holidays
