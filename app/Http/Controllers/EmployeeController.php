@@ -322,8 +322,9 @@ class EmployeeController extends Controller
             'entitled_leave_days' => 'required|numeric|min:0',
         ]);
 
-        // Update the employee's entitled leave days
+        // Update both the current entitlement and the default (used for annual resets)
         $employee->entitled_leave_days = $request->input('entitled_leave_days');
+        $employee->default_entitled_days = $request->input('entitled_leave_days');
         $employee->save();
 
         return response()->json(['success' => true]);

@@ -63,6 +63,7 @@ class Employee extends Model
         'national_id_photo',
         'contract_documents',
         'entitled_leave_days',
+        'default_entitled_days', // The employee's base/default entitlement (used for annual resets)
     ];
 
     // If you want to use casts for certain attributes

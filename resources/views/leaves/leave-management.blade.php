@@ -45,9 +45,17 @@
                             field: 'entitled_leave_days',
                             title: 'ENTITLED LEAVE DAYS',
                             sortable: true,
-                            formatter: function(value) {
-                                return `<span class="entitled-days-text">${value ?? 0}</span>
-                            <input type="number" class="entitled-days-input form-control form-control-sm" style="display: none;" value="${value}">`;
+                            formatter: function(value, row) {
+                                return `
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="entitled-days-text fw-bold">${value ?? 0}</span>
+                                        <button class="btn btn-outline-secondary btn-sm edit-entitled-btn py-0 px-1"
+                                            data-employee-id="${row.employee_id}"
+                                            data-current="${value ?? 0}"
+                                            title="Edit leave days">
+                                            <i class="bi bi-pencil" style="font-size:11px;"></i>
+                                        </button>
+                                    </div>`;
                             }
                         }, {
                             field: 'total_leave_days',
@@ -60,7 +68,7 @@
                         }],
                         rowAttributes: function(row, index) {
                             return {
-                                'data-employee-id': row.employee_id // Attach employee_id to each row
+                                'data-employee-id': row.employee_id
                             };
                         },
                         pagination: true,
@@ -73,6 +81,100 @@
                 // Initialize the table
                 initTable();
 
+                // ── Inline edit handler ─────────────────────────────────────────
+                $table.on('click', '.edit-entitled-btn', function() {
+                    var $btn = $(this);
+                    var employeeId = $btn.data('employee-id');
+                    var currentVal = $btn.data('current');
+                    var $cell = $btn.closest('td');
+
+                    // Replace cell content with an input group
+                    $cell.html(`
+                        <div class="d-flex align-items-center gap-1">
+                            <input type="number" class="form-control form-control-sm entitled-days-edit-input"
+                                style="width:90px;" value="${currentVal}" min="0" max="365"
+                                data-employee-id="${employeeId}" autofocus>
+                            <button class="btn btn-sm btn-success save-entitled-btn py-0 px-1" title="Save">
+                                <i class="bi bi-check-lg"></i>
+                            </button>
+                            <button class="btn btn-sm btn-secondary cancel-entitled-btn py-0 px-1" title="Cancel">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+                    `);
+                    $cell.find('.entitled-days-edit-input').focus().select();
+                });
+
+                // Save on Enter key inside the input
+                $table.on('keydown', '.entitled-days-edit-input', function(e) {
+                    if (e.key === 'Enter') {
+                        $(this).closest('td').find('.save-entitled-btn').click();
+                    }
+                    if (e.key === 'Escape') {
+                        $(this).closest('td').find('.cancel-entitled-btn').click();
+                    }
+                });
+
+                // Save button click
+                $table.on('click', '.save-entitled-btn', function() {
+                    var $cell = $(this).closest('td');
+                    var $input = $cell.find('.entitled-days-edit-input');
+                    var employeeId = $input.data('employee-id');
+                    var newValue = $input.val();
+
+                    if (newValue === '' || newValue < 0) {
+                        alert('Please enter a valid number of leave days.');
+                        return;
+                    }
+
+                    $.ajax({
+                        url: `/update-entitled-leave-days/${employeeId}`,
+                        method: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            entitled_leave_days: newValue,
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                // Update the cell back to display mode with new value
+                                $cell.html(`
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="entitled-days-text fw-bold">${newValue}</span>
+                                        <button class="btn btn-outline-secondary btn-sm edit-entitled-btn py-0 px-1"
+                                            data-employee-id="${employeeId}"
+                                            data-current="${newValue}"
+                                            title="Edit leave days">
+                                            <i class="bi bi-pencil" style="font-size:11px;"></i>
+                                        </button>
+                                    </div>
+                                `);
+
+                                Toastify({
+                                    text: `Leave days updated to ${newValue}`,
+                                    duration: 3000,
+                                    gravity: 'top',
+                                    position: 'right',
+                                    backgroundColor: 'linear-gradient(to right, #00b09b, #96c93d)',
+                                }).showToast();
+                            }
+                        },
+                        error: function(xhr) {
+                            Toastify({
+                                text: xhr.responseJSON?.error || 'Failed to update leave days.',
+                                duration: 3000,
+                                gravity: 'top',
+                                position: 'right',
+                                backgroundColor: 'linear-gradient(to right, #ff5f6d, #ffc371)',
+                            }).showToast();
+                        }
+                    });
+                });
+
+                // Cancel puts the original value back
+                $table.on('click', '.cancel-entitled-btn', function() {
+                    $table.bootstrapTable('refresh');
+                });
+
                 // Add row hover effect for better UI
                 $table.on('mouseenter', 'tr', function() {
                     $(this).addClass('table-active');
@@ -82,6 +184,7 @@
             });
         </script>
     @endpush
+
 
     <style>
         /* Styling for Leave Management Title */
