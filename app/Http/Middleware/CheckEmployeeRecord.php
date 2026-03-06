@@ -23,6 +23,12 @@ class CheckEmployeeRecord
             abort(403, 'Unauthorized');
         }
 
+        // Admin roles don't need an employee record to use the system
+        $adminRoles = ['HR', 'Executive Secretary', 'Head of Division'];
+        if ($user->hasAnyRole($adminRoles)) {
+            return $next($request);
+        }
+
         $employee = Employee::withoutGlobalScopes()
             ->where('email', $user->email)
             ->first();
