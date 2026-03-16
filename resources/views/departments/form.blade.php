@@ -2,7 +2,7 @@
     <div class="col-md-12">
         <x-forms.input name="department_name" label="Department" type="text" id="department_name"
             placeholder="Enter Department Name"
-            value="{{ old('department_name', $department->department_name ?? '') }}" />
+            value="{{ old('department_name', html_entity_decode($department->department_name ?? '')) }}" />
     </div>
 
     <div class="col-md-12">

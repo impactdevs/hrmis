@@ -16,7 +16,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Bind the scoring service as a singleton so it is only instantiated once
+        // per request, no matter how many times it is injected or resolved.
+        $this->app->singleton(\App\Services\ApplicationScoringService::class);
     }
 
     /**
@@ -24,24 +26,24 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-
-         Route::bind('appraisal', function ($value) {
+        Route::bind('appraisal', function ($value) {
             return Appraisal::where('appraisal_id', $value)->firstOrFail();
         });
 
         parent::boot();
+
         // Implicitly grant certain roles permission for appraisal-related actions
         Gate::before(function ($user, $ability) {
             // Grant HR users all permissions
             if ($user->hasRole('HR')) {
                 return true;
             }
-            
+
             // Grant Executive Secretary users permission for appraisal approvals
             if ($user->hasRole('Executive Secretary') && str_contains($ability, 'appraisal')) {
                 return true;
             }
-            
+
             // Grant Head of Division users permission for appraisal approvals
             if ($user->hasRole('Head of Division') && str_contains($ability, 'appraisal')) {
                 return true;
@@ -57,8 +59,5 @@ class AppServiceProvider extends ServiceProvider
                 $config['name'],
             );
         });
-
-
-
     }
 }

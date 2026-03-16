@@ -2,134 +2,96 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\DB;
 
 class JobApplication extends Model
 {
-    use HasFactory;
+    // ── Status constants ──────────────────────────────────────────────────────
+    const STATUS_PENDING     = 'pending';
+    const STATUS_SHORTLISTED = 'shortlisted';
+    const STATUS_INTERVIEWED = 'interviewed';
+    const STATUS_OFFERED     = 'offered';
+    const STATUS_HIRED       = 'hired';
+    const STATUS_REJECTED    = 'rejected';
 
-    protected $casts = [
-        'date_of_birth' => 'date',
-        'date_of_appointment_present_post' => 'date',
-        'education_history' => 'array',
-        'employment_record' => 'array',
-        'education_training' => 'array',
-        'references' => 'array',
-        'salary_expectation' => 'decimal:2',
-        'academic_documents' => 'array',
-        'other_documents' => 'array',
-        'cv' => 'array',
-    ];
-
-    protected $fillable = [
-        // Section 1
-        'post_applied',
-        'reference_number',
-        'full_name',
-        'date_of_birth',
-        'email',
-        'telephone',
-
-
-        // Section 2
-        'nationality',
-        'home_district',
-        'sub_county',
-        'village',
-        'nin',
-        'residency_type',
-
-        // Section 3
-        'present_department',
-        'present_post',
-        'date_of_appointment_present_post',
-        'terms_of_employment',
-
-        // Section 4
-        'marital_status',
-
-        // Section 5-7
-        'employment_record',
-
-        // Section 8-9
-        'criminal_convicted',
-        'criminal_details',
-        'availability',
-        'salary_expectation',
-
-        'education_training',
-
-        // Section 10
-        'references',
-        'recommender_name',
-        'recommender_title',
-        'academic_documents',
-        'cv',
-        'other_documents'
-    ];
-
-    public function companyJob()
+    public static function statuses(): array
     {
-        return $this->belongsTo(CompanyJob::class);
+        return [
+            self::STATUS_PENDING,
+            self::STATUS_SHORTLISTED,
+            self::STATUS_INTERVIEWED,
+            self::STATUS_OFFERED,
+            self::STATUS_HIRED,
+            self::STATUS_REJECTED,
+        ];
     }
 
+    // ── Fillable ──────────────────────────────────────────────────────────────
+    protected $fillable = [
+        'company_job_id',
+        'post_applied', 'reference_number', 'full_name',
+        'date_of_birth', 'email', 'telephone',
+        'nationality', 'nin', 'home_district', 'sub_county', 'village', 'residency_type',
+        'present_department', 'present_post', 'date_of_appointment_present_post', 'terms_of_employment',
+        'marital_status',
+        'employment_record',
+        'education_training',
+        'criminal_convicted', 'criminal_details',
+        'availability', 'salary_expectation',
+        'references', 'recommender_name', 'recommender_title',
+        'academic_documents', 'cv', 'other_documents',
+        'status', 'rejection_reason',
+        'score', 'score_breakdown', 'meets_criteria', 'criteria_failures', 'scored_at',
+    ];
 
+    protected $casts = [
+        'date_of_birth'                    => 'date',
+        'date_of_appointment_present_post' => 'date',
+        'criminal_convicted'               => 'boolean',
+        'salary_expectation'               => 'decimal:2',
+        'employment_record'                => 'array',
+        'education_training'               => 'array',
+        'references'                       => 'array',
+        'academic_documents'               => 'array',
+        'other_documents'                  => 'array',
+        'score_breakdown'                  => 'array',
+        'criteria_failures'                => 'array',
+        'meets_criteria'                   => 'boolean',
+        'scored_at'                        => 'datetime',
+    ];
 
-    public function scopeFilter(\Illuminate\Database\Eloquent\Builder $query, array $filters): \Illuminate\Database\Eloquent\Builder
+    // ── Scopes ────────────────────────────────────────────────────────────────
+
+    public function scopeFilter(Builder $query, array $filters): Builder
     {
-        // Filter by company_job_id → filter reference_number by prefix
         if (!empty($filters['company_job_id'])) {
-            $query->whereExists(function ($subQuery) use ($filters) {
-                $subQuery->select(DB::raw(1))
-                    ->from('company_jobs')
-                    ->where('company_job_id', $filters['company_job_id'])
-                    ->whereRaw('job_applications.reference_number LIKE CONCAT(company_jobs.job_code, \'%\')');
-            });
+            $query->where('company_job_id', $filters['company_job_id']);
         }
-
-        // Filter by date range
-        if (!empty($filters['created_from'])) {
-            $query->whereDate('created_at', '>=', $filters['created_from']);
-        }
-
-        if (!empty($filters['created_to'])) {
-            $query->whereDate('created_at', '<=', $filters['created_to']);
-        }
-
-        // General search across reference_number and full_name
-        if (!empty($filters['search'])) {
-            $search = $filters['search'];
-            $query->where(function ($q) use ($search) {
-                $q->where('reference_number', 'like', "%{$search}%")
-                    ->orWhere('full_name', 'like', "%{$search}%");
-            });
-        }
-
-        // Individual filters (if passed)
-        if (!empty($filters['reference_number'])) {
-            $query->where('reference_number', 'like', "%{$filters['reference_number']}%");
-        }
-
-        if (!empty($filters['full_name'])) {
-            $query->where('full_name', 'like', "%{$filters['full_name']}%");
-        }
-
         if (!empty($filters['status'])) {
             $query->where('status', $filters['status']);
         }
-
-        if (!empty($filters['position'])) {
-            $query->where('position', 'like', "%{$filters['position']}%");
+        if (!empty($filters['search'])) {
+            $s = $filters['search'];
+            $query->where(function (Builder $q) use ($s) {
+                $q->where('reference_number', 'like', "%{$s}%")
+                  ->orWhere('full_name', 'like', "%{$s}%")
+                  ->orWhere('email', 'like', "%{$s}%");
+            });
         }
-
-        // Add more fields below as needed
-        // if (!empty($filters['field_name'])) {
-        //     $query->where('field_name', $filters['field_name']);
-        // }
-
+        if (!empty($filters['created_from'])) {
+            $query->whereDate('created_at', '>=', $filters['created_from']);
+        }
+        if (!empty($filters['created_to'])) {
+            $query->whereDate('created_at', '<=', $filters['created_to']);
+        }
         return $query;
+    }
+
+    // ── Relationships ─────────────────────────────────────────────────────────
+
+    public function companyJob()
+    {
+        return $this->belongsTo(CompanyJob::class, 'company_job_id', 'company_job_id');
     }
 }

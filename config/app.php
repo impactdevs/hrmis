@@ -123,4 +123,6 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'id_encoder_key' => env('APP_ID_ENCODER_KEY', 'default-key'),
+
 ];

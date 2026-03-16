@@ -17,7 +17,7 @@
                 <tbody>
                     @foreach ($departments as $department)
                         <tr>
-                            <td>{!! $department->department_name !!}</td>
+                            <td>{{ $department->department_name }}</td>
                             <td>{{ optional($department->user)->name }}</td>
                             <td>
                                 <a href="{{ route('departments.edit', $department->department_id) }}"
