@@ -1,17 +1,45 @@
 <x-app-layout>
     <div class="mt-4">
-        <form method="GET" action="{{ route('attendances.index') }}" class="row g-3 mb-3">
-            <div class="col-md-4">
-                <label for="filter_date" class="form-label">Date</label>
-                <input type="date" name="filter_date" id="filter_date" class="form-control"
-                    value="{{ request('filter_date', now()->format('Y-m-d')) }}">
+
+        {{-- Filters --}}
+        <form method="GET" action="{{ route('attendances.index') }}" class="row g-3 mb-4">
+
+            {{-- Date From --}}
+            <div class="col-md-2">
+                <label for="date_from" class="form-label">From</label>
+                <input type="date" name="date_from" id="date_from" class="form-control"
+                    value="{{ $dateFrom }}">
             </div>
+
+            {{-- Date To --}}
+            <div class="col-md-2">
+                <label for="date_to" class="form-label">To</label>
+                <input type="date" name="date_to" id="date_to" class="form-control"
+                    value="{{ $dateTo }}">
+            </div>
+
+            {{-- Quick range shortcuts --}}
+            <div class="col-md-3">
+                <label class="form-label">Quick Range</label>
+                <div class="d-flex gap-2">
+                    <a href="{{ route('attendances.index', ['date_from' => now()->format('Y-m-d'), 'date_to' => now()->format('Y-m-d')]) }}"
+                        class="btn btn-sm btn-outline-secondary">Today</a>
+                    <a href="{{ route('attendances.index', ['date_from' => now()->startOfWeek()->format('Y-m-d'), 'date_to' => now()->endOfWeek()->format('Y-m-d')]) }}"
+                        class="btn btn-sm btn-outline-secondary">This Week</a>
+                    <a href="{{ route('attendances.index', ['date_from' => now()->startOfMonth()->format('Y-m-d'), 'date_to' => now()->endOfMonth()->format('Y-m-d')]) }}"
+                        class="btn btn-sm btn-outline-secondary">This Month</a>
+                    <a href="{{ route('attendances.index', ['date_from' => now()->subMonth()->startOfMonth()->format('Y-m-d'), 'date_to' => now()->subMonth()->endOfMonth()->format('Y-m-d')]) }}"
+                        class="btn btn-sm btn-outline-secondary">Last Month</a>
+                </div>
+            </div>
+
+            {{-- Department filter — HR only --}}
             @if (auth()->user()->hasRole('HR'))
-                <div class="col-md-4">
+                <div class="col-md-2">
                     <label for="department_id" class="form-label">Department</label>
                     <select name="department_id" id="department_id" class="form-select">
                         <option value="">All Departments</option>
-                        @foreach (\App\Models\Department::all() as $department)
+                        @foreach ($departments as $department)
                             <option value="{{ $department->id }}"
                                 {{ request('department_id') == $department->id ? 'selected' : '' }}>
                                 {{ $department->department_name }}
@@ -20,47 +48,80 @@
                     </select>
                 </div>
             @endif
-            <div class="col-md-4 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+
+            {{-- Employee filter --}}
+            <div class="col-md-2">
+                <label for="staff_id" class="form-label">Employee</label>
+                <select name="staff_id" id="staff_id" class="form-select">
+                    <option value="">All Employees</option>
+                    @foreach ($employees as $employee)
+                        <option value="{{ $employee->staff_id }}"
+                            {{ request('staff_id') == $employee->staff_id ? 'selected' : '' }}>
+                            {{ $employee->first_name }} {{ $employee->last_name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="col-md-1 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">Filter</button>
             </div>
         </form>
 
+        {{-- Summary bar --}}
+        <div class="mb-3 text-muted small">
+            Showing attendance from <strong>{{ \Carbon\Carbon::parse($dateFrom)->format('d M Y') }}</strong>
+            to <strong>\Carbon\Carbon::parse($dateTo)->format('d M Y') }}</strong>
+            — {{ $summarizedAttendances->total() }} record(s) found
+        </div>
+
+        {{-- Table --}}
         <div class="table-responsive">
-            <table id="attendance-table" class="table table-striped" data-toggle="table" data-pagination="true"
-                data-search="true" data-show-columns="true" data-show-export="true" data-click-to-select="true"
-                data-export-types="['csv', 'excel', 'pdf', 'print']" data-toolbar="#toolbar">
+            <table class="table table-striped table-hover" id="attendance-table">
                 <thead class="table-light">
                     <tr>
-                        <th data-sortable="true">#</th>
-                        <th data-sortable="true">First Name</th>
-                        <th data-sortable="true">Last Name</th>
-                        <th data-sortable="true">Department</th>
-                        <th data-sortable="true">Date</th>
-                        <th data-sortable="true">Clock In</th>
-                        <th data-sortable="true">Clock Out</th>
+                        <th>Staff ID</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Department</th>
+                        <th>Date</th>
+                        <th>Clock In</th>
+                        <th>Clock Out</th>
+                        <th>Hours Worked</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($summarizedAttendances as $index => $attendance)
+                    @forelse ($summarizedAttendances as $attendance)
                         @php
-                            $employee = \App\Models\Employee::where('staff_id', $attendance->staff_id)->first();
+                            $employee = \App\Models\Employee::where('staff_id', $attendance->staff_id)
+                                ->with('department')
+                                ->first();
                         @endphp
                         <tr>
-                            <td>{{ $employee?->staff_id ?? 'N/A' }}</td>
+                            <td>{{ $attendance->staff_id }}</td>
                             <td>{{ $employee?->first_name ?? 'N/A' }}</td>
                             <td>{{ $employee?->last_name ?? 'N/A' }}</td>
                             <td>{{ $employee?->department?->department_name ?? 'N/A' }}</td>
                             <td>{{ \Carbon\Carbon::parse($attendance->access_date)->format('d-m-Y') }}</td>
                             <td>{{ \Carbon\Carbon::parse($attendance->clock_in)->format('H:i:s') }}</td>
                             <td>{{ \Carbon\Carbon::parse($attendance->clock_out)->format('H:i:s') }}</td>
+                            <td>{{ $attendance->hours_worked ?? 'N/A' }}</td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center text-danger">No attendance data available.</td>
+                            <td colspan="8" class="text-center text-danger">
+                                No attendance data found for the selected period.
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
+
+        {{-- Pagination --}}
+        <div class="mt-3">
+            {{ $summarizedAttendances->links() }}
+        </div>
+
     </div>
 </x-app-layout>
