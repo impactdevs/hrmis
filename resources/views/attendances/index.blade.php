@@ -71,7 +71,7 @@
         {{-- Summary bar --}}
         <div class="mb-3 text-muted small">
             Showing attendance from <strong>{{ \Carbon\Carbon::parse($dateFrom)->format('d M Y') }}</strong>
-            to <strong>\Carbon\Carbon::parse($dateTo)->format('d M Y') }}</strong>
+            to <strong>{{ \Carbon\Carbon::parse($dateTo)->format('d M Y') }}</strong>
             — {{ $summarizedAttendances->total() }} record(s) found
         </div>
 
