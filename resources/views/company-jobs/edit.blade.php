@@ -1,3 +1,3 @@
 <x-app-layout>
-    @include('company-jobs._form', ['companyJob' => $companyJob])
+    @include('company-jobs.form', ['companyJob' => $companyJob])
 </x-app-layout>

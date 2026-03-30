@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use App\Models\Employee;
+use Illuminate\Support\Str;
 
 class JobApplicationController extends Controller
 {
@@ -72,7 +74,6 @@ class JobApplicationController extends Controller
                     'other_documents'    => $otherPaths,
                 ]
             ));
-
         } catch (\Throwable $e) {
             foreach ($uploadedPaths as $path) Storage::disk('public')->delete($path);
             return back()->withInput()->with('error', 'Submission failed. Please try again.');
@@ -146,7 +147,8 @@ class JobApplicationController extends Controller
 
         try {
             [$academicPaths, $cvPath, $otherPaths, $uploadedPaths] = $this->uploadFiles(
-                $request, $application
+                $request,
+                $application
             );
 
             $application->update(array_merge(
@@ -157,7 +159,6 @@ class JobApplicationController extends Controller
                     'other_documents'    => $otherPaths,
                 ]
             ));
-
         } catch (\Throwable $e) {
             foreach ($uploadedPaths as $path) Storage::disk('public')->delete($path);
             return back()->withInput()->with('error', 'Update failed. Please try again.');
@@ -251,6 +252,11 @@ class JobApplicationController extends Controller
                 : $application->rejection_reason, // preserve auto-rejection reason
         ]);
 
+        // ── Auto-create employee record when marked as Hired ──────────────────
+        if ($newStatus === JobApplication::STATUS_HIRED) {
+            $this->createEmployeeFromApplication($application);
+        }
+
         try {
             Mail::to($application->email)
                 ->send(new ApplicationStatusChangedMail($application, $previousStatus));
@@ -262,7 +268,51 @@ class JobApplicationController extends Controller
             return response()->json(['success' => true, 'status' => $newStatus]);
         }
 
-        return back()->with('success', 'Status updated to ' . ucfirst($newStatus) . '.');
+        return back()->with('success', 'Status updated to "' . ucfirst($newStatus) . '".'
+            . ($newStatus === JobApplication::STATUS_HIRED ? ' Employee record created.' : ''));
+    }
+
+    /**
+     * Parse full_name and create a minimal Employee record.
+     * The form instruction is "Surname first in CAPITALS", so:
+     *   "MUGISHA John Peter"  →  last_name=MUGISHA, first_name=John, middle_name=Peter
+     *   "OKELLO James"        →  last_name=OKELLO,  first_name=James, middle_name=null
+     *   "NAKATO"              →  last_name=NAKATO,  first_name=null,  middle_name=null
+     *
+     * Does nothing if an employee with the same email already exists.
+     */
+    private function createEmployeeFromApplication(JobApplication $application): void
+    {
+        // Guard: don't create a duplicate if they were previously hired and re-hired
+        if (Employee::where('email', $application->email)->exists()) {
+            Log::info("Employee record already exists for {$application->email} — skipping auto-create.");
+            return;
+        }
+
+        // Split name
+        $parts      = array_values(array_filter(explode(' ', trim($application->full_name ?? ''))));
+        $lastName   = $parts[0] ?? null;
+        $firstName  = $parts[1] ?? null;
+        $middleName = count($parts) > 2 ? implode(' ', array_slice($parts, 2)) : null;
+
+        try {
+            Employee::create([
+                'employee_id'   => (string) Str::uuid(),
+                'first_name'    => $firstName,
+                'middle_name'   => $middleName,
+                'last_name'     => $lastName,
+                'email'         => $application->email,
+                'phone_number'  => $application->telephone,
+                'nin'           => $application->nin,
+                'date_of_birth' => $application->date_of_birth?->toDateString(),
+                'home_district' => $application->home_district,
+                 'staff_id'      => null,
+                // entitled_leave_days has a DB default of 30, no need to set it
+            ]);
+        } catch (\Throwable $e) {
+            // Log the failure but don't let it block the status update
+            Log::error("Failed to auto-create employee from application #{$application->id}: {$e->getMessage()}");
+        }
     }
 
     /**

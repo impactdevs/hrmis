@@ -20,6 +20,37 @@
             @endif
         @endforeach
 
+        {{-- ── Hired banner — shown whenever this application is at hired status ── --}}
+        @if ($application->status === 'hired')
+            @php
+                $employee = \App\Models\Employee::where('email', $application->email)->first();
+            @endphp
+            @if ($employee)
+                <div class="alert alert-success d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+                    <div>
+                        <i class="bi bi-person-check-fill me-2"></i>
+                        <strong>Employee record created.</strong>
+                        {{ $employee->first_name }} {{ $employee->last_name }} is now in the employees list.
+                        Complete their profile to assign a department, position, contract and system access.
+                    </div>
+                    <a href="{{ route('employees.edit', $employee->employee_id) }}"
+                        class="btn btn-success btn-sm fw-semibold text-nowrap">
+                        👤 Complete Employee Record →
+                    </a>
+                </div>
+            @else
+                <div class="alert alert-warning d-flex align-items-center gap-2 mb-3">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <span>
+                        This application is marked as <strong>Hired</strong> but no employee record was found
+                        for <strong>{{ $application->email }}</strong>.
+                        This may mean the auto-create failed — check the Laravel log, or
+                        <a href="{{ route('employees.create') }}" class="alert-link">create the record manually</a>.
+                    </span>
+                </div>
+            @endif
+        @endif
+
         <div class="card shadow">
             {{-- Header --}}
             <div class="card-header bg-primary text-white d-flex justify-content-between align-items-start flex-wrap gap-2">
@@ -315,6 +346,23 @@
                                     <dt class="col-6 text-muted">Marital Status</dt>
                                     <dd class="col-6">{{ $application->marital_status ?? '—' }}</dd>
                                 </dl>
+
+                                {{-- Employee record shortcut when hired --}}
+                                @if ($application->status === 'hired')
+                                    @php $employee = \App\Models\Employee::where('email', $application->email)->first(); @endphp
+                                    @if ($employee)
+                                        <hr>
+                                        <div class="d-grid">
+                                            <a href="{{ route('employees.edit', $employee->employee_id) }}"
+                                                class="btn btn-success btn-sm fw-semibold">
+                                                👤 Complete Employee Record →
+                                            </a>
+                                        </div>
+                                        <div class="text-muted small mt-2 text-center">
+                                            Assign department, position &amp; contract.
+                                        </div>
+                                    @endif
+                                @endif
                             </div>
                         </div>
                     </div>
