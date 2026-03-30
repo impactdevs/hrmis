@@ -68,30 +68,37 @@ class AttendanceController extends Controller
     public function store_api(Request $request)
     {
         $validated = $request->validate([
-            'staff_id'             => 'required|integer|min:1|max:99999999',
+            'staff_id' => 'required|string',
             'access_date_and_time' => 'required|date',
         ]);
 
-        $employee = \App\Models\Employee::where('hikvision_id', $validated['staff_id'])->first();
+        // Normalize staff_id: keep prefix, zero-pad the number to 3 digits
+        // e.g. AP35 → AP035, AP048 → AP048 (already 3), SP51 → SP051
+        $staffId = preg_replace_callback('/^([A-Za-z]+)(\d+)$/', function ($m) {
+            return strtoupper($m[1]) . str_pad($m[2], 3, '0', STR_PAD_LEFT);
+        }, trim($validated['staff_id']));
 
+        // Verify employee exists before recording
+        $employee = Employee::where('staff_id', $staffId)->first();
         if (!$employee) {
             return response()->json([
-                'message' => 'No employee found for device ID ' . $validated['staff_id'],
+                'message' => "No employee found for device ID: {$validated['staff_id']} (normalized: {$staffId})"
             ], 404);
         }
 
         $datetime = date('Y-m-d H:i:s', strtotime($validated['access_date_and_time']));
 
         $attendance = Attendance::create([
-            'staff_id'             => $employee->staff_id,
+            'attendance_id' => Str::uuid(),
+            'staff_id' => $staffId, // store the normalized version
             'access_date_and_time' => $datetime,
-            'access_date'          => date('Y-m-d', strtotime($datetime)),
-            'access_time'          => date('H:i:s', strtotime($datetime)),
+            'access_date' => date('Y-m-d', strtotime($datetime)),
+            'access_time' => date('H:i:s', strtotime($datetime)),
         ]);
 
         return response()->json([
             'message' => 'Attendance recorded successfully',
-            'data'    => $attendance,
+            'data' => $attendance
         ], 201);
     }
 }
