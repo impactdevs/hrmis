@@ -138,13 +138,13 @@ class EmployeeController extends Controller
             if (filled($validatedData['qualifications_details'])) {
                 foreach ($validatedData['qualifications_details'] as $key => $value) {
                     $proofPath = null;
-                    
+
                     // Handle file upload for proof
                     if ($request->hasFile("qualifications_details.$key.proof")) {
                         $proofPath = $request->file("qualifications_details.$key.proof")
                             ->store('proof_documents', 'public');
                     }
-                    
+
                     // Store the processed qualification data for the JSON column
                     $processedQualifications[$key] = [
                         'qualification' => $value['qualification'] ?? null,
@@ -153,11 +153,11 @@ class EmployeeController extends Controller
                         'proof' => $proofPath,
                     ];
                 }
-                
+
                 // Update the validated data with processed qualifications
                 $validatedData['qualifications_details'] = $processedQualifications;
             }
-            
+
             // Create a new employee record using validated data
             $employee = Employee::create($validatedData);
 
@@ -217,7 +217,7 @@ class EmployeeController extends Controller
     {
         // Use database transaction to ensure all-or-nothing operation
         DB::beginTransaction();
-        
+
         try {
             // Initialize an array to hold the validated data
             $validatedData = $request->validated();
@@ -240,36 +240,40 @@ class EmployeeController extends Controller
 
             // Handle qualification details documents and file uploads
             $processedQualifications = [];
+            // Handle qualification details documents and file uploads
+            $processedQualifications = [];
             if (filled($validatedData['qualifications_details'])) {
+
+                // Load existing qualifications from the TABLE (not the JSON column)
+                $existingQualifications = $employee->qualifications->values(); // indexed collection
+
                 foreach ($validatedData['qualifications_details'] as $key => $value) {
+
+                    // Skip rows where qualification name is empty (blank added rows)
+                    if (empty($value['qualification'])) {
+                        continue;
+                    }
+
                     $proofPath = null;
-                    
-                    // Check if the current qualification has a proof file
+
                     if ($request->hasFile("qualifications_details.$key.proof")) {
-                        // Store the file and get the path
                         $proofPath = $request->file("qualifications_details.$key.proof")
                             ->store('proof_documents', 'public');
                     } else {
-                        // Keep existing proof if no new file uploaded
-                        $existingQualificationDetails = $employee->qualifications_details ?? [];
-                        $proofPath = $existingQualificationDetails[$key]['proof'] ?? null;
+                        // Fall back to existing proof from the qualifications TABLE
+                        $proofPath = $existingQualifications[$key]->proof
+                            ?? $employee->qualifications_details[$key]['proof']
+                            ?? null;
                     }
-                    
-                    // Store the processed qualification data for the JSON column
+
                     $processedQualifications[$key] = [
-                        'qualification' => $value['qualification'] ?? null,
-                        'institution' => $value['institution'] ?? null,
+                        'qualification' => $value['qualification'],
+                        'institution'   => $value['institution'] ?? null,
                         'year_obtained' => $value['year_obtained'] ?? null,
-                        'proof' => $proofPath,
+                        'proof'         => $proofPath,
                     ];
-                    
-                    // Also handle title if provided
-                    if (isset($value['title'])) {
-                        $processedQualifications[$key]['title'] = $value['title'];
-                    }
                 }
-                
-                // Update the validated data with processed qualifications
+
                 $validatedData['qualifications_details'] = $processedQualifications;
             }
 
@@ -280,7 +284,7 @@ class EmployeeController extends Controller
             if (filled($processedQualifications)) {
                 // Delete existing qualifications and recreate them
                 $employee->qualifications()->delete();
-                
+
                 foreach ($processedQualifications as $qualData) {
                     $employee->qualifications()->create([
                         'qualification' => $qualData['qualification'],
@@ -299,7 +303,7 @@ class EmployeeController extends Controller
         } catch (Exception $exception) {
             // Rollback the transaction on error
             DB::rollBack();
-            
+
             // Log the error for debugging
             Log::error('Error updating employee', [
                 'employee_id' => $employee->employee_id ?? 'unknown',

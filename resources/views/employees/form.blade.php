@@ -87,61 +87,64 @@
 
     <div id="qualifications-container">
         @php
-            // Determine which qualifications to show
             $qualifications = old('qualifications_details');
-            if (!$qualifications && isset($employee) && $employee->qualifications_details) {
-                $qualifications = $employee->qualifications_details;
+
+            if (!$qualifications && isset($employee)) {
+                // Try the relationship table first, then fall back to JSON column
+                if ($employee->qualifications->isNotEmpty()) {
+                    $qualifications = $employee->qualifications
+                        ->map(
+                            fn($q) => [
+                                'qualification' => $q->qualification,
+                                'institution' => $q->institution,
+                                'year_obtained' => $q->year_obtained,
+                                'proof' => $q->proof,
+                            ],
+                        )
+                        ->toArray();
+                } elseif ($employee->qualifications_details) {
+                    $qualifications = $employee->qualifications_details;
+                }
             }
+
             if (!$qualifications) {
                 $qualifications = [['qualification' => '', 'institution' => '', 'year_obtained' => '', 'proof' => '']];
             }
         @endphp
 
-        @foreach($qualifications as $index => $qual)
+        @foreach ($qualifications as $index => $qual)
             <div class="row mb-3 qualification-row" data-index="{{ $index }}">
                 <div class="col-md-3">
-                    <x-forms.input
-                        name="qualifications_details[{{ $index }}][qualification]"
-                        label="Qualification"
-                        type="text"
-                        value="{{ $qual['qualification'] ?? $qual['title'] ?? '' }}"
+                    <x-forms.input name="qualifications_details[{{ $index }}][qualification]"
+                        label="Qualification" type="text"
+                        value="{{ $qual['qualification'] ?? ($qual['title'] ?? '') }}"
                         placeholder="e.g., Bachelor's Degree, CPA, etc." />
                 </div>
                 <div class="col-md-3">
-                    <x-forms.input
-                        name="qualifications_details[{{ $index }}][institution]"
-                        label="Institution"
-                        type="text"
-                        value="{{ $qual['institution'] ?? '' }}"
+                    <x-forms.input name="qualifications_details[{{ $index }}][institution]"
+                        label="Institution" type="text" value="{{ $qual['institution'] ?? '' }}"
                         placeholder="e.g., Makerere University" />
                 </div>
                 <div class="col-md-2">
-                    <x-forms.input
-                        name="qualifications_details[{{ $index }}][year_obtained]"
-                        label="Year Obtained"
-                        type="number"
-                        value="{{ $qual['year_obtained'] ?? '' }}"
-                        placeholder="YYYY"
-                        min="1950"
-                        max="{{ date('Y') }}" />
+                    <x-forms.input name="qualifications_details[{{ $index }}][year_obtained]"
+                        label="Year Obtained" type="number" value="{{ $qual['year_obtained'] ?? '' }}"
+                        placeholder="YYYY" min="1950" max="{{ date('Y') }}" />
                 </div>
                 <div class="col-md-3">
-                    <x-forms.upload
-                        name="qualifications_details[{{ $index }}][proof]"
-                        label="Proof Document"
-                        id="qualifications_details_{{ $index }}_proof"
-                        accept=".pdf,.jpg,.jpeg,.png"
-                        value="{{ $qual['proof'] ?? '' }}"
-                        description="Upload PDF, JPG, JPEG, or PNG files"
+                    <x-forms.upload name="qualifications_details[{{ $index }}][proof]" label="Proof Document"
+                        id="qualifications_details_{{ $index }}_proof" accept=".pdf,.jpg,.jpeg,.png"
+                        value="{{ $qual['proof'] ?? '' }}" description="Upload PDF, JPG, JPEG, or PNG files"
                         filetype="document" />
-                    @if(isset($qual['proof']) && $qual['proof'])
+                    @if (isset($qual['proof']) && $qual['proof'])
                         <small class="text-muted">
-                            Current: <a href="{{ asset('storage/' . $qual['proof']) }}" target="_blank">View Document</a>
+                            Current: <a href="{{ asset('storage/' . $qual['proof']) }}" target="_blank">View
+                                Document</a>
                         </small>
                     @endif
                 </div>
                 <div class="col-md-1 d-flex align-items-end">
-                    <button type="button" class="btn btn-danger btn-sm remove-qualification" {{ $index === 0 && count($qualifications) === 1 ? 'disabled' : '' }}>
+                    <button type="button" class="btn btn-danger btn-sm remove-qualification"
+                        {{ $index === 0 && count($qualifications) === 1 ? 'disabled' : '' }}>
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
@@ -329,7 +332,7 @@
                         </div>
                     </div>
                 `;
-                
+
                 $('#qualifications-container').append(newRow);
                 qualificationIndex++;
                 updateRemoveButtons();
