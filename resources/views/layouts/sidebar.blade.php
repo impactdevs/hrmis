@@ -120,8 +120,8 @@
                 </a>
             </li>
                 <li class="nav-item">
-                    <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('uncst-job-applications.index')) bg-secondary @endif"
-                        href="{{ route('uncst-job-applications.index') }}">
+                    <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('hr.job-applications.index')) bg-secondary @endif"
+                        href="{{ route('hr.job-applications.index') }}">
                         <i class="bi bi-activity"></i>
                         Applications
                     </a>
@@ -171,7 +171,7 @@
                 <i class="bi bi-gear text-light"></i>
             </h6>
             <ul class="nav flex-column mb-auto">
-                @foreach ([['route' => 'leave-types.index', 'icon' => 'bi-gear', 'label' => 'Leave Types'], ['route' => 'public_holidays.index', 'icon' => 'bi-gear', 'label' => 'Public Holidays'], ['route' => 'company-jobs.index', 'icon' => 'bi-gear', 'label' => 'Company Jobs'], ['route' => 'positions.index', 'icon' => 'bi-gear', 'label' => 'Positions'], ['route' => 'roles.index', 'icon' => 'bi-gear', 'label' => 'Roles', 'sub' => [['route' => 'permissions.index', 'icon' => 'bi-gear', 'label' => 'Permissions'], ['route' => 'users.index', 'icon' => 'bi-gear', 'label' => 'User Management']]], ['route' => 'departments.index', 'icon' => 'bi-gear', 'label' => 'Departments']] as $item)
+                @foreach ([['route' => 'leave-types.index', 'icon' => 'bi-gear', 'label' => 'Leave Types'], ['route' => 'public_holidays.index', 'icon' => 'bi-gear', 'label' => 'Public Holidays'], ['route' => 'hr.company-jobs.index', 'icon' => 'bi-gear', 'label' => 'Company Jobs'], ['route' => 'positions.index', 'icon' => 'bi-gear', 'label' => 'Positions'], ['route' => 'roles.index', 'icon' => 'bi-gear', 'label' => 'Roles', 'sub' => [['route' => 'permissions.index', 'icon' => 'bi-gear', 'label' => 'Permissions'], ['route' => 'users.index', 'icon' => 'bi-gear', 'label' => 'User Management']]], ['route' => 'departments.index', 'icon' => 'bi-gear', 'label' => 'Departments']] as $item)
                     <li class="nav-item">
                         <a class="nav-link text-white d-flex align-items-center gap-2 fs-6 fw-bold @if (request()->routeIs($item['route'])) bg-secondary @endif"
                             href="{{ route($item['route']) }}">

@@ -44,110 +44,134 @@ Route::get('/', function () {
     return redirect('dashboard');
 });
 
-route::get('/aggregations', [HomeController::class, 'getAppraisalStatusCounts'])->name('home');
+Route::get('/aggregations', [HomeController::class, 'getAppraisalStatusCounts'])->name('home');
 
-Route::get('/dashboard', [HomeController::class, 'index'])->middleware(['auth', 'verified', 'check.employee.record'])->name('dashboard');
-Route::post('/agree', [HomeController::class, 'agree'])->middleware(['auth', 'verified'])->name('agree');
+Route::get('/dashboard', [HomeController::class, 'index'])
+    ->middleware(['auth', 'verified', 'check.employee.record'])
+    ->name('dashboard');
+
+Route::post('/agree', [HomeController::class, 'agree'])
+    ->middleware(['auth', 'verified'])
+    ->name('agree');
+
 Route::get('/upload-employee', [UploadEmployees::class, 'process_csv_for_arrears']);
+
 Route::get('/employees/{employee}/generate-pdf', [EmployeeController::class, 'generatePDF'])
     ->name('employees.generate-pdf');
+
 Route::get('/employees/{employee}/print', function (Employee $employee) {
     return view('employees.pdf', ['employee' => $employee]);
 })->name('employees.print');
 
+// ─────────────────────────────────────────────────────────────────────────────
+// PUBLIC ROUTES — no authentication required
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Job application form — accessed via the token link HR shares with candidates
+// e.g. /apply/550e8400-e29b-41d4-a716-446655440000
+Route::prefix('apply')->name('apply.')->group(function () {
+
+    // Thank-you page and edit must come before /{token} to avoid being swallowed
+    Route::get('/thank-you', [JobApplicationController::class, 'thankyou'])
+        ->name('thankyou');
+
+    Route::get('/edit/{encodedId}', [JobApplicationController::class, 'edit'])
+        ->name('edit');
+
+    Route::put('/edit/{encodedId}', [JobApplicationController::class, 'update'])
+        ->name('update');
+
+    // The shareable link: /apply/{token}
+    Route::get('/{token}', [JobApplicationController::class, 'showForm'])
+        ->name('show');
+
+    Route::post('/{token}', [JobApplicationController::class, 'store'])
+        ->name('store')
+        ->middleware('throttle:5,1'); // max 5 submissions per minute per IP
+});
+
+// Whistleblowing (public)
+Route::get('uncst-whistleblowing-form', [WhistleblowingController::class, 'create'])->name('whistleblowing.create');
+Route::post('uncst-whistleblowing-form', [WhistleblowingController::class, 'store'])->name('whistleblowing.store');
+Route::get("uncst-thank-you-for-the-report", [WhistleblowingController::class, 'thankyou'])->name('whistle.thankyou');
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AUTHENTICATED ROUTES
+// ─────────────────────────────────────────────────────────────────────────────
+
 Route::middleware(['auth', 'verified', 'check.employee.record', 'data.usage.agreement'])->group(function () {
+
+    // ── User / Role Management ────────────────────────────────────────────────
     Route::resource('roles', RoleController::class);
     Route::resource('permissions', PermissionController::class);
     Route::resource('users', UsersController::class);
     Route::post('roles/{role}/permissions/add', [RoleController::class, 'addPermissions'])->name('roles.permissions.add');
     Route::post('roles/{role}/permissions/remove', [RoleController::class, 'removePermissions'])->name('roles.permissions.remove');
 
+    // ── Employees ─────────────────────────────────────────────────────────────
     Route::resource('employees', EmployeeController::class);
     Route::get('/contract/{employee_id}/create', [EmployeeController::class, 'create_contract'])->name('contract.create');
     Route::get('/contract/{contract}/edit', [EmployeeController::class, 'edit_contract'])->name('contract.edit');
     Route::put('/contract/{contract}/update', [EmployeeController::class, 'update_contract'])->name('contract.update');
     Route::delete('/contract/{contract}/delete', [EmployeeController::class, 'destroy_contract'])->name('contract.destroy');
     Route::get('/contract/{contract}/show', [EmployeeController::class, 'show_contract'])->name('contract.show');
-
-
-
-
     Route::post('/contract', [EmployeeController::class, 'store_contract'])->name('contract.store');
-    Route::get('/leave-management/data', [LeaveController::class, 'getLeaveManagementData']);
     Route::post('update-entitled-leave-days/{id}', [EmployeeController::class, 'updateEntitledLeaveDays'])->name('update-entitled-leave-days');
+
+    // ── Recruitments ──────────────────────────────────────────────────────────
     Route::resource('recruitments', StaffRecruitmentController::class);
     Route::post('/recruitments/{recruitment}/status', [StaffRecruitmentController::class, 'approveOrReject'])
         ->name('recruitmentments.approveOrReject');
+
+    // ── Job Postings (HR creates postings and gets shareable links) ───────────
+    Route::resource('company-jobs', CompanyJobController::class)
+        ->parameters(['company-jobs' => 'companyJob'])
+        ->names([
+            'index'   => 'hr.company-jobs.index',
+            'create'  => 'hr.company-jobs.create',
+            'store'   => 'hr.company-jobs.store',
+            'show'    => 'hr.company-jobs.show',
+            'edit'    => 'hr.company-jobs.edit',
+            'update'  => 'hr.company-jobs.update',
+            'destroy' => 'hr.company-jobs.destroy',
+        ]);
+
+    Route::post('company-jobs/{companyJob}/regenerate-link', [CompanyJobController::class, 'regenerateLink'])
+        ->name('hr.company-jobs.regenerate-link');
+
+    // ── Job Applications (HR side) ────────────────────────────────────────────
+
+    // Pipeline Kanban board — must be declared before the /{application} routes
+    Route::get('hr/job-applications/pipeline', [JobApplicationController::class, 'pipeline'])
+        ->name('hr.job-applications.pipeline');
+
+    Route::get('hr/job-applications', [JobApplicationController::class, 'index'])
+        ->name('hr.job-applications.index');
+
+    Route::get('hr/job-applications/{application}', [JobApplicationController::class, 'show'])
+        ->name('hr.job-applications.show');
+
+    Route::patch('hr/job-applications/{application}/status', [JobApplicationController::class, 'updateStatus'])
+        ->name('hr.job-applications.updateStatus');
+
+    Route::delete('hr/job-applications/{application}', [JobApplicationController::class, 'destroy'])
+        ->name('hr.job-applications.destroy');
+
+    // ── Appraisals ────────────────────────────────────────────────────────────
     Route::resource('uncst-appraisals', AppraisalsController::class);
     Route::post('/appraisal/appraisal-approval', [AppraisalsController::class, 'approveOrReject'])
         ->name('appraisals.approveOrReject');
     Route::post('/appraisals/{appraisal}/status', [AppraisalsController::class, 'approveOrReject'])
         ->name('appraisals.status');
     Route::post('/appraisals/{appraisal}/withdraw', [AppraisalsController::class, 'withdraw'])
-    ->name('appraisals.withdraw');
+        ->name('appraisals.withdraw');
     Route::get('/appraisals/{appraisal}/download', [AppraisalsController::class, 'downloadPDF'])
         ->name('appraisals.download');
     Route::get('/appraisals/{appraisal}/attachment/{index}/download', [AppraisalsController::class, 'downloadAttachment'])
         ->name('appraisals.attachment.download');
-    Route::resource('events', EventController::class);
-    Route::resource('trainings', TrainingController::class);
-    Route::resource('out-of-station-trainings', OutOfStationTrainingController::class);
-    Route::post('/out-of-station-trainings/{training}/status', [OutOfStationTrainingController::class, 'approveOrReject'])
-        ->name('out-of-station-trainings.approveOrReject');
-    Route::get('training-application', [TrainingController::class, 'apply'])->name('apply');
-    Route::post('save-training-application', [TrainingController::class, 'applyTraining'])->name('save.apply');
-    Route::post('/trainings/{training}/status', [TrainingController::class, 'approveOrReject'])
-        ->name('trainings.approveOrReject');
-    Route::resource('positions', PositionController::class);
-    Route::resource('attendances', AttendanceController::class);
-    Route::resource('leaves', LeaveController::class)->parameters([
-        'leaves' => 'leave'
-    ]);
-    Route::get('/leaves/currently-on-leave', [LeaveController::class, 'currentlyOnLeave'])->name('leaves.currently-on-leave');
-   Route::get('/leaves/employees-on-leave', [LeaveController::class, 'getEmployeesOnLeave'])
-    ->name('leaves.employees-on-leave');
-
-    Route::patch('/leaves/{leave}/cancel', [LeaveController::class, 'cancel'])->name('leaves.cancel');
-    Route::get('/leaves/debug/info', [LeaveController::class, 'debug'])->name('leaves.debug');
-    Route::get('/leaves/{leave}/debug/edit', [LeaveController::class, 'debugEdit'])->name('leaves.debug.edit');
-    //leave actions
-    Route::post('/leaves/{leave}/status', [LeaveController::class, 'approveOrReject'])
-        ->name('leaves.approveOrReject');
-    // routes/web.php
-    // routes/web.php
-    Route::get('/leaves/{leave}/handover/view', [LeaveController::class, 'viewHandoverFile'])->name('leaves.handover.view');
-    Route::get('/leaves/{leave}/handover/download', [LeaveController::class, 'downloadHandoverFile'])->name('leaves.handover.download');
-    // Leave history routes
-    Route::get('/leaves/{leave}/history', [LeaveController::class, 'showHistory'])
-        ->name('leaves.show-history');
-    Route::get('/api/leaves/{leave}/history', [LeaveController::class, 'history'])
-        ->name('leaves.history-api');
-    Route::post('save-leave-data', [LeaveRosterController::class, 'saveLeaveRosterData'])->name('save-leave-data');
-    Route::resource('leave-roster', LeaveRosterController::class);
-    Route::get('/leave-roster-calendar-data', [LeaveRosterController::class, 'leaveRosterCalendarData'])->name('leave-roster.calendarData');
-    Route::get('/leave-data', [LeaveController::class, 'leaveData'])->name('leave.data');
-    Route::get('/leave-roster-tabular', [LeaveRosterController::class, 'getLeaveRoster'])->name('leave-roster-tabular.index');
-    Route::get('/leave-roster-tabular/data', [LeaveRosterController::class, 'getLeaveRosterData'])->name('leave-roster-tabular.data');
-    Route::resource('leave-types', LeaveTypesController::class);
-    Route::delete('leaves/{leave}', [LeaveController::class, 'destroy'])->name('leaves.destroy');
-    Route::resource('public_holidays', PublicHolidayController::class);
-    Route::post('calender', [leaveRosterController::class, 'getcalender']);
-    Route::get('leave-management', [LeaveController::class, 'leaveManagement'])->name('leave-management');
-    Route::get('leave-roster/{leaveRoster}/apply', [LeaveController::class, 'applyForLeave'])->name('apply-for-leave');
-    Route::resource('company-jobs', CompanyJobController::class);
-    Route::resource('departments', DepartmentController::class);
-
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
-
-    //appraisal
     Route::get('/employee-appraisal', [AppraisalsController::class, 'survey'])->name('appraisal.survey');
     Route::post('/appraisals', [AppraisalsController::class, 'store'])->name('appraisals.store');
     Route::get('preview-appraisal/{appraisal}', [AppraisalsController::class, 'previewAppraisalDetails'])->name('appraisals.preview');
-    Route::get('/appraisals/{appraisal}/attachment/{index}/download', [AppraisalsController::class, 'downloadAttachment'])
-        ->name('appraisals.attachment.download');
     Route::get('/appraisals/{appraisal}/attachment/{index}/view', [AppraisalsController::class, 'viewAttachment'])
         ->name('appraisals.attachment.view');
     Route::get('/appraisals/{appraisal}/attachments/download-all', [AppraisalsController::class, 'downloadAllAttachments'])
@@ -157,56 +181,77 @@ Route::middleware(['auth', 'verified', 'check.employee.record', 'data.usage.agre
     Route::get('/appraisals/{appraisal}/print', [AppraisalsController::class, 'printAppraisal'])
         ->name('appraisals.print');
 
+    // ── Events & Training ─────────────────────────────────────────────────────
+    Route::resource('events', EventController::class);
+    Route::resource('trainings', TrainingController::class);
+    Route::resource('out-of-station-trainings', OutOfStationTrainingController::class);
+    Route::post('/out-of-station-trainings/{training}/status', [OutOfStationTrainingController::class, 'approveOrReject'])
+        ->name('out-of-station-trainings.approveOrReject');
+    Route::get('training-application', [TrainingController::class, 'apply'])->name('apply');
+    Route::post('save-training-application', [TrainingController::class, 'applyTraining'])->name('save.apply');
+    Route::post('/trainings/{training}/status', [TrainingController::class, 'approveOrReject'])
+        ->name('trainings.approveOrReject');
 
+    // ── Other HR Resources ────────────────────────────────────────────────────
+    Route::resource('positions', PositionController::class);
+    Route::resource('attendances', AttendanceController::class);
+    Route::resource('departments', DepartmentController::class);
 
-    //notifications
+    // ── Leave Management ──────────────────────────────────────────────────────
+    Route::resource('leaves', LeaveController::class)->parameters(['leaves' => 'leave']);
+    Route::get('/leave-management/data', [LeaveController::class, 'getLeaveManagementData']);
+    Route::get('/leaves/currently-on-leave', [LeaveController::class, 'currentlyOnLeave'])->name('leaves.currently-on-leave');
+    Route::get('/leaves/employees-on-leave', [LeaveController::class, 'getEmployeesOnLeave'])->name('leaves.employees-on-leave');
+    Route::patch('/leaves/{leave}/cancel', [LeaveController::class, 'cancel'])->name('leaves.cancel');
+    Route::get('/leaves/debug/info', [LeaveController::class, 'debug'])->name('leaves.debug');
+    Route::get('/leaves/{leave}/debug/edit', [LeaveController::class, 'debugEdit'])->name('leaves.debug.edit');
+    Route::post('/leaves/{leave}/status', [LeaveController::class, 'approveOrReject'])->name('leaves.approveOrReject');
+    Route::get('/leaves/{leave}/handover/view', [LeaveController::class, 'viewHandoverFile'])->name('leaves.handover.view');
+    Route::get('/leaves/{leave}/handover/download', [LeaveController::class, 'downloadHandoverFile'])->name('leaves.handover.download');
+    Route::get('/leaves/{leave}/history', [LeaveController::class, 'showHistory'])->name('leaves.show-history');
+    Route::get('/api/leaves/{leave}/history', [LeaveController::class, 'history'])->name('leaves.history-api');
+    Route::post('save-leave-data', [LeaveRosterController::class, 'saveLeaveRosterData'])->name('save-leave-data');
+    Route::resource('leave-roster', LeaveRosterController::class);
+    Route::get('/leave-roster-calendar-data', [LeaveRosterController::class, 'leaveRosterCalendarData'])->name('leave-roster.calendarData');
+    Route::get('/leave-data', [LeaveController::class, 'leaveData'])->name('leave.data');
+    Route::get('/leave-roster-tabular', [LeaveRosterController::class, 'getLeaveRoster'])->name('leave-roster-tabular.index');
+    Route::get('/leave-roster-tabular/data', [LeaveRosterController::class, 'getLeaveRosterData'])->name('leave-roster-tabular.data');
+    Route::resource('leave-types', LeaveTypesController::class);
+    Route::delete('leaves/{leave}', [LeaveController::class, 'destroy'])->name('leaves.destroy');
+    Route::resource('public_holidays', PublicHolidayController::class);
+    Route::post('calender', [LeaveRosterController::class, 'getcalender']);
+    Route::get('leave-management', [LeaveController::class, 'leaveManagement'])->name('leave-management');
+    Route::get('leave-roster/{leaveRoster}/apply', [LeaveController::class, 'applyForLeave'])->name('apply-for-leave');
+
+    // ── Profile ───────────────────────────────────────────────────────────────
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // ── Notifications ─────────────────────────────────────────────────────────
     Route::resource('/notifications', NotificationController::class);
     Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
     Route::get('/notifications/count', [NotificationController::class, 'getUnreadCount'])->name('notifications.count');
-
     Route::get('/get-count', [NotificationController::class, 'getCount']);
 
-    Route::get('/uncst-mat rix', [DocumentController::class, 'uncst_matrix'])->name('uncst-matrix');
+    // ── Whistleblowing (HR view) ──────────────────────────────────────────────
+    Route::get('whistleblowing', [WhistleblowingController::class, 'index'])->name('whistleblowing.index');
+    Route::get('whistleblowing/{id}', [WhistleblowingController::class, 'show'])->name('whistleblowing.show');
 
-    Route::resource('uncst-job-applications', JobApplicationController::class)
-        ->except(['create', 'store', 'edit', 'update']); // exclude create because it's public
-
+    // ── Other ─────────────────────────────────────────────────────────────────
+    Route::get('/uncst-matrix', [DocumentController::class, 'uncst_matrix'])->name('uncst-matrix');
     Route::resource('salary-advances', SalaryAdvanceController::class);
-
     Route::post('/salary-advances/{salary_advance}/status', [SalaryAdvanceController::class, 'approveOrReject'])
         ->name('salary-advances.approveOrReject');
+    Route::resource('workfromhome', WorkFromHomeController::class);
+    Route::resource('offdesk', OffDeskController::class);
 });
-
-Route::get('uncst-job-application-form', [JobApplicationController::class, 'create'])->name('job-applications.create');
-Route::post('uncst-job-application-form', [JobApplicationController::class, 'store'])->name('job-applications.store');
-Route::get('uncst-job-application-form/{application}/edit', [JobApplicationController::class, 'edit'])->name('job-applications.edit');
-Route::put('uncst-job-application-form/{application}', [JobApplicationController::class, 'update'])->name('job-applications.update');
-Route::get("uncst-thank-you-for-application", [JobApplicationController::class, 'thankyou'])->name('thankyou');
-
-// whistle blowing
-Route::get('uncst-whistleblowing-form', [WhistleblowingController::class, 'create'])->name('whistleblowing.create');
-Route::post('uncst-whistleblowing-form', [WhistleblowingController::class, 'store'])->name('whistleblowing.store');
-Route::get('whistleblowing', [WhistleblowingController::class, 'index'])->middleware(['auth'])->name('whistleblowing.index');
-Route::get('whistleblowing/{id}', [WhistleblowingController::class, 'show'])->name('whistleblowing.show');
-Route::get("uncst-thank-you-for-the-report", [WhistleblowingController::class, 'thankyou'])->name('whistle.thankyou');
-
-
-Route::resource('workfromhome', WorkFromHomeController::class);
-Route::resource('offdesk', OffDeskController::class);
-
-
-
-
 
 Route::get('/import', [EmployeeController::class, 'import_employees']);
 
-// fallback for routes that are not defined
+// Fallback for undefined routes
 Route::fallback(function () {
-    abort(404, 'we cant find this, sorry for the inconvenience');
+    abort(404, 'We can\'t find this page, sorry for the inconvenience.');
 });
-
-
-
-
 
 require __DIR__ . '/auth.php';

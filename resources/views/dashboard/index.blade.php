@@ -308,7 +308,7 @@
                                                     class="badge bg-primary">{{ $entries->count() }}</span>
                                                 <small class="text-muted">(Latest 5 | Today)</small>
                                             </h5>
-                                            <a href="{{ route('uncst-job-applications.index') }}"
+                                            <a href="{{ route('hr.job-applications.index') }}"
                                                 class="btn btn-sm btn-outline-primary">View All</a>
                                         </div>
                                         <div class="table-responsive">
