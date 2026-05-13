@@ -57,27 +57,29 @@ class JobApplicationController extends Controller
             return back()->with('error', 'Sorry, this application is no longer accepting submissions.');
         }
 
-        $validated    = $this->validateApplication($request, $job);
+        $validated     = $this->validateApplication($request, $job);
         $uploadedPaths = [];
 
+        // Only wrap file I/O — not the DB insert
         try {
             [$academicPaths, $cvPath, $otherPaths, $uploadedPaths] = $this->uploadFiles($request);
-
-            $application = JobApplication::create(array_merge(
-                $this->mapToModel($validated),
-                [
-                    'company_job_id'     => $job->company_job_id,
-                    'post_applied'       => $job->job_title,
-                    'reference_number'   => $job->job_code,
-                    'academic_documents' => $academicPaths,
-                    'cv'                 => $cvPath,
-                    'other_documents'    => $otherPaths,
-                ]
-            ));
         } catch (\Throwable $e) {
             foreach ($uploadedPaths as $path) Storage::disk('public')->delete($path);
-            return back()->withInput()->with('error', 'Submission failed. Please try again.');
+            return back()->withInput()->with('error', 'File upload failed. Please check your files and try again.');
         }
+
+        // Let this throw naturally — validation errors & DB errors will surface correctly
+        $application = JobApplication::create(array_merge(
+            $this->mapToModel($validated),
+            [
+                'company_job_id'     => $job->company_job_id,
+                'post_applied'       => $job->job_title,
+                'reference_number'   => $job->job_code,
+                'academic_documents' => $academicPaths,
+                'cv'                 => $cvPath,
+                'other_documents'    => $otherPaths,
+            ]
+        ));
 
         // Score immediately — may auto-reject if criteria not met
         $this->scorer->score($application);
@@ -306,7 +308,7 @@ class JobApplicationController extends Controller
                 'nin'           => $application->nin,
                 'date_of_birth' => $application->date_of_birth?->toDateString(),
                 'home_district' => $application->home_district,
-                 'staff_id'      => null,
+                'staff_id'      => null,
                 // entitled_leave_days has a DB default of 30, no need to set it
             ]);
         } catch (\Throwable $e) {
