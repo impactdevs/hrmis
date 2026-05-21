@@ -195,6 +195,7 @@ Route::middleware(['auth', 'verified', 'check.employee.record', 'data.usage.agre
     // ── Other HR Resources ────────────────────────────────────────────────────
     Route::resource('positions', PositionController::class);
     Route::resource('attendances', AttendanceController::class);
+    Route::get('attendances/export', [AttendanceController::class, 'export'])->name('attendances.export');
     Route::resource('departments', DepartmentController::class);
 
     // ── Leave Management ──────────────────────────────────────────────────────

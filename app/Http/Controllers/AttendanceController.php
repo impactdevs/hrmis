@@ -8,6 +8,10 @@ use App\Models\Department;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Response;
+use Carbon\Carbon;
+use Dompdf\Dompdf;
+
 
 class AttendanceController extends Controller
 {
@@ -101,4 +105,90 @@ class AttendanceController extends Controller
             'data' => $attendance
         ], 201);
     }
+
+    public function export(Request $request)
+{
+    // Reuse the same query logic as index()
+    $dateFrom = $request->get('date_from', now()->startOfMonth()->format('Y-m-d'));
+    $dateTo   = $request->get('date_to',   now()->endOfMonth()->format('Y-m-d'));
+
+    $query = Attendance::with('employee.department')
+        ->whereBetween('access_date', [$dateFrom, $dateTo])
+        ->orderBy('access_date');
+
+    if ($request->filled('staff_id')) {
+        $query->where('staff_id', $request->staff_id);
+    }
+
+    if ($request->filled('department_id')) {
+        $query->whereHas('employee', fn($q) =>
+            $q->where('department_id', $request->department_id)
+        );
+    }
+
+    // Non-HR users see only their own records
+    if (! auth()->user()->hasRole('HR')) {
+        $query->where('staff_id', auth()->user()->staff_id);
+    }
+
+    $attendances = $query->get();
+
+    if ($request->format === 'csv') {
+        return $this->exportCsv($attendances, $dateFrom, $dateTo);
+    }
+
+    return $this->exportPdf($attendances, $dateFrom, $dateTo);
+}
+
+private function exportCsv($attendances, $dateFrom, $dateTo)
+{
+    $filename = "attendance_{$dateFrom}_to_{$dateTo}.csv";
+
+    $headers = [
+        'Content-Type'        => 'text/csv',
+        'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+    ];
+
+    $callback = function () use ($attendances) {
+        $handle = fopen('php://output', 'w');
+
+        // Header row
+        fputcsv($handle, ['Staff ID', 'First Name', 'Last Name', 'Department', 'Date', 'Clock In', 'Clock Out', 'Hours Worked']);
+
+        foreach ($attendances as $a) {
+            fputcsv($handle, [
+                $a->staff_id,
+                $a->employee?->first_name ?? 'N/A',
+                $a->employee?->last_name  ?? 'N/A',
+                $a->employee?->department?->department_name ?? 'N/A',
+                Carbon::parse($a->access_date)->format('d-m-Y'),
+                Carbon::parse($a->clock_in)->format('H:i:s'),
+                Carbon::parse($a->clock_out)->format('H:i:s'),
+                $a->hours_worked ?? 'N/A',
+            ]);
+        }
+
+        fclose($handle);
+    };
+
+    return Response::stream($callback, 200, $headers);
+}
+
+private function exportPdf($attendances, $dateFrom, $dateTo)
+{
+    // Using a simple HTML-to-PDF approach with DomPDF (recommended for Laravel)
+    $html = view('attendances.export-pdf', compact('attendances', 'dateFrom', 'dateTo'))->render();
+
+    $dompdf = new \Dompdf\Dompdf();
+    $dompdf->loadHtml($html);
+    $dompdf->setPaper('A4', 'landscape');
+    $dompdf->render();
+
+    $filename = "attendance_{$dateFrom}_to_{$dateTo}.pdf";
+
+    return Response::make($dompdf->output(), 200, [
+        'Content-Type'        => 'application/pdf',
+        'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+    ]);
+}
 }
