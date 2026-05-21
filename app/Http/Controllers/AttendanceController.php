@@ -7,11 +7,9 @@ use App\Models\Employee;
 use App\Models\Department;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Str;
 use Carbon\Carbon;
-use Dompdf\Dompdf;
-
 
 class AttendanceController extends Controller
 {
@@ -64,6 +62,139 @@ class AttendanceController extends Controller
         ));
     }
 
+    public function export(Request $request)
+    {
+        $dateFrom = $request->filled('date_from')
+            ? $request->date_from
+            : now()->startOfMonth()->format('Y-m-d');
+
+        $dateTo = $request->filled('date_to')
+            ? $request->date_to
+            : now()->endOfMonth()->format('Y-m-d');
+
+        // *** Must use the SAME grouped DB::table query as index() ***
+        // Using Attendance::with(...) would fetch individual scans, not daily summaries
+        $query = DB::table('attendances')
+            ->select(
+                'staff_id',
+                'access_date',
+                DB::raw('MIN(access_date_and_time) as clock_in'),
+                DB::raw('MAX(access_date_and_time) as clock_out'),
+                DB::raw('TIMEDIFF(MAX(access_date_and_time), MIN(access_date_and_time)) as hours_worked')
+            )
+            ->whereBetween('access_date', [$dateFrom, $dateTo])
+            ->groupBy('staff_id', 'access_date')
+            ->orderBy('access_date', 'desc');
+
+        // Filter by department — HR only
+        if ($request->filled('department_id') && auth()->user()->hasRole('HR')) {
+            $staffIds = Employee::where('department_id', $request->department_id)
+                ->pluck('staff_id');
+            $query->whereIn('staff_id', $staffIds);
+        }
+
+        // Filter by specific employee
+        if ($request->filled('staff_id')) {
+            $query->where('staff_id', $request->staff_id);
+        }
+
+        $rows = $query->get();
+
+        // Build employee lookup keyed by staff_id — done once, outside any closure
+        $uniqueStaffIds = $rows->pluck('staff_id')->unique()->values();
+        $employeeMap    = Employee::with('department')
+            ->whereIn('staff_id', $uniqueStaffIds)
+            ->get()
+            ->keyBy('staff_id');
+
+        // Pre-process everything into plain arrays before streaming/rendering
+        // This avoids Eloquent lazy-loading and Carbon issues inside closures
+        $processedRows = $rows->map(function ($row) use ($employeeMap) {
+            $emp = $employeeMap->get($row->staff_id);
+            return [
+                'staff_id'     => $row->staff_id,
+                'first_name'   => $emp ? $emp->first_name : 'N/A',
+                'last_name'    => $emp ? $emp->last_name  : 'N/A',
+                'department'   => ($emp && $emp->department) ? $emp->department->department_name : 'N/A',
+                'date'         => $row->access_date
+                                    ? date('d-m-Y', strtotime((string) $row->access_date))
+                                    : 'N/A',
+                'clock_in'     => $row->clock_in
+                                    ? date('H:i:s', strtotime((string) $row->clock_in))
+                                    : 'N/A',
+                'clock_out'    => $row->clock_out
+                                    ? date('H:i:s', strtotime((string) $row->clock_out))
+                                    : 'N/A',
+                'hours_worked' => $row->hours_worked ?? 'N/A',
+            ];
+        })->toArray();
+
+        $format = $request->get('format', 'csv');
+
+        return $format === 'pdf'
+            ? $this->exportPdf($processedRows, $dateFrom, $dateTo)
+            : $this->exportCsv($processedRows, $dateFrom, $dateTo);
+    }
+
+    private function exportCsv(array $processedRows, string $dateFrom, string $dateTo)
+    {
+        $filename = "attendance_{$dateFrom}_to_{$dateTo}.csv";
+
+        $headers = [
+            'Content-Type'        => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ];
+
+        // Only plain arrays go into the closure — no Eloquent, no Carbon
+        $callback = function () use ($processedRows) {
+            $handle = fopen('php://output', 'w');
+
+            fputcsv($handle, [
+                'Staff ID', 'First Name', 'Last Name', 'Department',
+                'Date', 'Clock In', 'Clock Out', 'Hours Worked',
+            ]);
+
+            foreach ($processedRows as $row) {
+                fputcsv($handle, [
+                    $row['staff_id'],
+                    $row['first_name'],
+                    $row['last_name'],
+                    $row['department'],
+                    $row['date'],
+                    $row['clock_in'],
+                    $row['clock_out'],
+                    $row['hours_worked'],
+                ]);
+            }
+
+            fclose($handle);
+        };
+
+        return Response::stream($callback, 200, $headers);
+    }
+
+    private function exportPdf(array $processedRows, string $dateFrom, string $dateTo)
+    {
+        $filename = "attendance_{$dateFrom}_to_{$dateTo}.pdf";
+
+        $html = view('attendances.export-pdf', [
+            'processedRows' => $processedRows,
+            'dateFrom'      => $dateFrom,
+            'dateTo'        => $dateTo,
+            'totalRecords'  => count($processedRows),
+        ])->render();
+
+        $dompdf = new \Dompdf\Dompdf(['isRemoteEnabled' => false]);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'landscape');
+        $dompdf->render();
+
+        return Response::make($dompdf->output(), 200, [
+            'Content-Type'        => 'application/pdf',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ]);
+    }
+
     public function show(Attendance $attendance)
     {
         return view('attendances.show', compact('attendance'));
@@ -72,7 +203,7 @@ class AttendanceController extends Controller
     public function store_api(Request $request)
     {
         $validated = $request->validate([
-            'staff_id' => 'required|string',
+            'staff_id'             => 'required|string',
             'access_date_and_time' => 'required|date',
         ]);
 
@@ -93,102 +224,16 @@ class AttendanceController extends Controller
         $datetime = date('Y-m-d H:i:s', strtotime($validated['access_date_and_time']));
 
         $attendance = Attendance::create([
-            'attendance_id' => Str::uuid(),
-            'staff_id' => $staffId, // store the normalized version
+            'attendance_id'        => Str::uuid(),
+            'staff_id'             => $staffId,
             'access_date_and_time' => $datetime,
-            'access_date' => date('Y-m-d', strtotime($datetime)),
-            'access_time' => date('H:i:s', strtotime($datetime)),
+            'access_date'          => date('Y-m-d', strtotime($datetime)),
+            'access_time'          => date('H:i:s',  strtotime($datetime)),
         ]);
 
         return response()->json([
             'message' => 'Attendance recorded successfully',
-            'data' => $attendance
+            'data'    => $attendance,
         ], 201);
     }
-
-    public function export(Request $request)
-{
-    // Reuse the same query logic as index()
-    $dateFrom = $request->get('date_from', now()->startOfMonth()->format('Y-m-d'));
-    $dateTo   = $request->get('date_to',   now()->endOfMonth()->format('Y-m-d'));
-
-    $query = Attendance::with('employee.department')
-        ->whereBetween('access_date', [$dateFrom, $dateTo])
-        ->orderBy('access_date');
-
-    if ($request->filled('staff_id')) {
-        $query->where('staff_id', $request->staff_id);
-    }
-
-    if ($request->filled('department_id')) {
-        $query->whereHas('employee', fn($q) =>
-            $q->where('department_id', $request->department_id)
-        );
-    }
-
-    // Non-HR users see only their own records
-    if (! auth()->user()->hasRole('HR')) {
-        $query->where('staff_id', auth()->user()->staff_id);
-    }
-
-    $attendances = $query->get();
-
-    if ($request->format === 'csv') {
-        return $this->exportCsv($attendances, $dateFrom, $dateTo);
-    }
-
-    return $this->exportPdf($attendances, $dateFrom, $dateTo);
-}
-
-private function exportCsv($attendances, $dateFrom, $dateTo)
-{
-    $filename = "attendance_{$dateFrom}_to_{$dateTo}.csv";
-
-    $headers = [
-        'Content-Type'        => 'text/csv',
-        'Content-Disposition' => "attachment; filename=\"{$filename}\"",
-    ];
-
-    $callback = function () use ($attendances) {
-        $handle = fopen('php://output', 'w');
-
-        // Header row
-        fputcsv($handle, ['Staff ID', 'First Name', 'Last Name', 'Department', 'Date', 'Clock In', 'Clock Out', 'Hours Worked']);
-
-        foreach ($attendances as $a) {
-            fputcsv($handle, [
-                $a->staff_id,
-                $a->employee?->first_name ?? 'N/A',
-                $a->employee?->last_name  ?? 'N/A',
-                $a->employee?->department?->department_name ?? 'N/A',
-                Carbon::parse($a->access_date)->format('d-m-Y'),
-                Carbon::parse($a->clock_in)->format('H:i:s'),
-                Carbon::parse($a->clock_out)->format('H:i:s'),
-                $a->hours_worked ?? 'N/A',
-            ]);
-        }
-
-        fclose($handle);
-    };
-
-    return Response::stream($callback, 200, $headers);
-}
-
-private function exportPdf($attendances, $dateFrom, $dateTo)
-{
-    // Using a simple HTML-to-PDF approach with DomPDF (recommended for Laravel)
-    $html = view('attendances.export-pdf', compact('attendances', 'dateFrom', 'dateTo'))->render();
-
-    $dompdf = new \Dompdf\Dompdf();
-    $dompdf->loadHtml($html);
-    $dompdf->setPaper('A4', 'landscape');
-    $dompdf->render();
-
-    $filename = "attendance_{$dateFrom}_to_{$dateTo}.pdf";
-
-    return Response::make($dompdf->output(), 200, [
-        'Content-Type'        => 'application/pdf',
-        'Content-Disposition' => "attachment; filename=\"{$filename}\"",
-    ]);
-}
 }
