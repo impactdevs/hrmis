@@ -54,12 +54,15 @@
                 </a>
             </li>
 
+             @if (auth()->user()->isAdminOrSecretary)
             <li class="nav-item">
                 <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('attendances.index')) bg-secondary @endif"
                     href="{{ route('attendances.index') }}">
                     <i class="bi bi-check2-all"></i>
-                    {{ auth()->user()->isAdminOrSecretary ? 'Attendances' : 'My Attendance History' }} </a>
-            </li>
+                    Attendances </a>
+            </li> 
+            @endif
+
 
             <li class="nav-item">
                 <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('salary-advances.index')) bg-secondary @endif"
