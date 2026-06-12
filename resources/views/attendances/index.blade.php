@@ -75,6 +75,14 @@
             — {{ $summarizedAttendances->total() }} record(s) found
         </div>
 
+
+        <div class="mb-3 d-flex gap-2">
+            <a href="{{ route('attendances.export', array_merge(request()->query(), ['format' => 'csv'])) }}"
+                class="btn btn-sm btn-success">⬇ Export CSV</a>
+            <a href="{{ route('attendances.export', array_merge(request()->query(), ['format' => 'pdf'])) }}"
+                class="btn btn-sm btn-danger">⬇ Export PDF</a>
+        </div>
+
         {{-- Table --}}
         <div class="table-responsive">
             <table class="table table-striped table-hover" id="attendance-table">
