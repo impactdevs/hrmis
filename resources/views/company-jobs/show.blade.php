@@ -55,7 +55,7 @@
                     {{-- Criteria summary --}}
                     @if ($companyJob->hasCriteria())
                         <div class="mb-4 p-3 bg-info bg-opacity-10 border border-info rounded">
-                            <h6 class="fw-bold mb-2">🎯 Screening Criteria (Auto-filter)</h6>
+                            <h6 class="fw-bold mb-2"> Screening Criteria (Auto-filter)</h6>
                             <div class="row g-2 small">
                                 @if ($companyJob->criteria_min_qualification)
                                     <div class="col-md-6">

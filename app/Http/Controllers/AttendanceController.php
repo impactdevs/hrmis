@@ -34,7 +34,8 @@ class AttendanceController extends Controller
             )
             ->whereBetween('access_date', [$dateFrom, $dateTo])
             ->groupBy('staff_id', 'access_date')
-            ->orderBy('access_date', 'desc');
+            ->orderBy('access_date', 'desc')
+            ->orderBy('clock_in', 'desc');
 
         // Filter by department — HR only
         if ($request->filled('department_id') && auth()->user()->hasRole('HR')) {
@@ -84,7 +85,8 @@ class AttendanceController extends Controller
             )
             ->whereBetween('access_date', [$dateFrom, $dateTo])
             ->groupBy('staff_id', 'access_date')
-            ->orderBy('access_date', 'desc');
+            ->orderBy('access_date', 'desc')
+            ->orderBy('clock_in', 'desc');
 
         // Filter by department — HR only
         if ($request->filled('department_id') && auth()->user()->hasRole('HR')) {

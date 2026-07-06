@@ -30,7 +30,9 @@ class HomeController extends Controller
         $lateCounts = [];
         $allocatedLeaveDays = [];
 
-        $employee = auth()->user()->employee; // Assuming you have a relationship set up
+        // Executive Secretary / HR / Head of Division accounts are allowed to have
+        // no Employee record (see CheckEmployeeRecord middleware), so this can be null.
+        $authEmployeeId = auth()->user()->employee?->employee_id;
 
         $appraisals = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
             ->where('appraisal_drafts.is_submitted', true)
@@ -38,8 +40,8 @@ class HomeController extends Controller
 
         $pendingAppraisals = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
             ->where('appraisal_drafts.is_submitted', false)
-            ->where(function ($query) {
-                $query->where('appraisal_drafts.employee_id', auth()->user()->employee->employee_id);
+            ->where(function ($query) use ($authEmployeeId) {
+                $query->where('appraisal_drafts.employee_id', $authEmployeeId);
             })
             ->count();
 
@@ -72,7 +74,7 @@ class HomeController extends Controller
 
         //submitte by all supervisors
         $submittedAppraisalsByallSupervisors = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
-            ->where(function ($q) {
+            ->where(function ($q) use ($authEmployeeId) {
                 $q->where(function ($q2) {
                     $q2->whereJsonContains('appraisal_request_status', [
                         'Head of Division' => 'approved',
@@ -90,7 +92,7 @@ class HomeController extends Controller
                             ->where('model_has_roles.model_type', User::class)
                             ->where('roles.name', 'Head of Division');
                     })
-                    ->orWhere('appraiser_id', auth()->user()->employee->employee_id);
+                    ->orWhere('appraiser_id', $authEmployeeId);
             })
             ->where(function ($q) {
                 $q->whereNull("appraisals.appraisal_request_status->Executive Secretary")
@@ -123,8 +125,8 @@ class HomeController extends Controller
 
         $ongoingAppraisals = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
             ->where('appraisal_drafts.is_submitted', true)
-            ->where(function ($query) {
-                $query->where('appraisal_drafts.employee_id', auth()->user()->employee->employee_id);
+            ->where(function ($query) use ($authEmployeeId) {
+                $query->where('appraisal_drafts.employee_id', $authEmployeeId);
             })
             ->get();
 
@@ -358,7 +360,7 @@ class HomeController extends Controller
         $appraisalProgressData = [];
         if (auth()->user()->hasRole('Staff')) {
             $userAppraisals = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
-                ->where('appraisal_drafts.employee_id', auth()->user()->employee->employee_id)
+                ->where('appraisal_drafts.employee_id', $authEmployeeId)
                 ->where('appraisal_drafts.is_submitted', true)
                 ->get();
 

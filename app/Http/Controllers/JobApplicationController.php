@@ -9,6 +9,7 @@ use App\Models\CompanyJob;
 use App\Models\JobApplication;
 use App\Services\ApplicationScoringService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
@@ -247,16 +248,32 @@ class JobApplicationController extends Controller
 
         if ($previousStatus === $newStatus) return back();
 
-        $application->update([
-            'status'           => $newStatus,
-            'rejection_reason' => $newStatus === JobApplication::STATUS_REJECTED
-                ? $request->rejection_reason
-                : $application->rejection_reason, // preserve auto-rejection reason
-        ]);
+        try {
+            DB::transaction(function () use ($application, $newStatus, $request) {
+                $application->update([
+                    'status'           => $newStatus,
+                    'rejection_reason' => $newStatus === JobApplication::STATUS_REJECTED
+                        ? $request->rejection_reason
+                        : $application->rejection_reason, // preserve auto-rejection reason
+                ]);
 
-        // ── Auto-create employee record when marked as Hired ──────────────────
-        if ($newStatus === JobApplication::STATUS_HIRED) {
-            $this->createEmployeeFromApplication($application);
+                // ── Auto-create employee record when marked as Hired ──────────
+                if ($newStatus === JobApplication::STATUS_HIRED) {
+                    $this->createEmployeeFromApplication($application);
+                }
+            });
+        } catch (\Throwable $e) {
+            Log::error("Failed to update status for application #{$application->id}: {$e->getMessage()}");
+
+            $message = $newStatus === JobApplication::STATUS_HIRED
+                ? 'Could not create the employee record automatically. Status was not changed — please resolve the conflicting details and try again.'
+                : 'Status update failed. Please try again.';
+
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => $message], 422);
+            }
+
+            return back()->with('error', $message);
         }
 
         try {
@@ -285,35 +302,43 @@ class JobApplicationController extends Controller
      */
     private function createEmployeeFromApplication(JobApplication $application): void
     {
-        // Guard: don't create a duplicate if they were previously hired and re-hired
         if (Employee::where('email', $application->email)->exists()) {
-            Log::info("Employee record already exists for {$application->email} — skipping auto-create.");
+            Log::info("Employee record already exists for {$application->email} — skipping.");
             return;
         }
 
-        // Split name
         $parts      = array_values(array_filter(explode(' ', trim($application->full_name ?? ''))));
-        $lastName   = $parts[0] ?? null;
-        $firstName  = $parts[1] ?? null;
+        $lastName   = $parts[0] ?? 'UNKNOWN';
+        $firstName  = $parts[1] ?? 'UNKNOWN';
         $middleName = count($parts) > 2 ? implode(' ', array_slice($parts, 2)) : null;
+
+        $tempStaffId = 'PENDING-' . strtoupper(Str::random(6));
+
+        // Null out any unique-constrained field that already exists on another employee.
+        // HR can reconcile these manually after onboarding.
+        $nin = ($application->nin && !Employee::where('nin', $application->nin)->exists())
+            ? $application->nin
+            : null;
+
+        $phoneNumber = ($application->telephone && !Employee::where('phone_number', $application->telephone)->exists())
+            ? $application->telephone
+            : null;
 
         try {
             Employee::create([
                 'employee_id'   => (string) Str::uuid(),
                 'first_name'    => $firstName,
-                'middle_name'   => $middleName,
                 'last_name'     => $lastName,
                 'email'         => $application->email,
-                'phone_number'  => $application->telephone,
-                'nin'           => $application->nin,
+                'phone_number'  => $phoneNumber,
+                'nin'           => $nin,
                 'date_of_birth' => $application->date_of_birth?->toDateString(),
                 'home_district' => $application->home_district,
-                'staff_id'      => null,
-                // entitled_leave_days has a DB default of 30, no need to set it
+                'staff_id'      => $tempStaffId,
             ]);
         } catch (\Throwable $e) {
-            // Log the failure but don't let it block the status update
             Log::error("Failed to auto-create employee from application #{$application->id}: {$e->getMessage()}");
+            throw $e;
         }
     }
 

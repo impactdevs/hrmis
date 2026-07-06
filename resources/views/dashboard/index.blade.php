@@ -34,12 +34,12 @@
                                 <div class="card info-card revenue-card">
 
                                     <div class="card-body">
-                                        <h5 class="card-title">Attendees</h5>
+                                        <h5 class="card-title">Attendees <span>| Today</span></h5>
 
                                         <div class="d-flex align-items-center">
                                             <div
                                                 class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                                <i class="bi bi-person"></i>
+                                                <i class="bi bi-person-check"></i>
                                             </div>
                                             <div class="ps-3">
                                                 <h6>{{ $attendances }}</h6>
@@ -54,13 +54,13 @@
                         <!-- Pending Appraisals Card -->
                         <div class="col-xxl-4 col-md-6">
 
-                                <div class="card info-card customers-card">
+                                <div class="card info-card warning-card">
                                     <div class="card-body">
                                         <h5 class="card-title">Submitted Appraisals</h5>
                                         <div class="d-flex align-items-center">
                                             <div
                                                 class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                                <i class="bi bi-hourglass-split text-warning"></i>
+                                                <i class="bi bi-hourglass-split"></i>
                                             </div>
                                             <div class="ps-3">
 
@@ -97,20 +97,18 @@
                         <!-- Ongoing Appraisals Card -->
                         <div class="col-xxl-4 col-md-6">
 
-                            <div class="card info-card customers-card">
+                            <div class="card info-card appraisal-card">
                                 <div class="card-body">
                                     @if (auth()->user()->hasRole('Head of Division'))
                                         <h5 class="card-title">Appraisals Submitted To The H.R</h5>
                                         <div class="d-flex align-items-center">
                                             <div
                                                 class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                                <i class="bi bi-arrow-repeat text-primary"></i>
+                                                <i class="bi bi-arrow-repeat"></i>
                                             </div>
                                             <div class="ps-3">
-                                                <h6>{{ $submittedAppraisalsByHoD->count() }}</h6>Appraisals
-                                                submitted to
-                                                the
-                                                H.R</span>
+                                                <h6>{{ $submittedAppraisalsByHoD->count() }}</h6>
+                                                <span class="pt-2 text-muted small ps-1">Appraisals submitted to the H.R</span>
                                             </div>
                                         </div>
                                     @elseif(auth()->user()->hasRole('HR'))
@@ -119,13 +117,11 @@
                                             <div class="d-flex align-items-center">
                                                 <div
                                                     class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                                    <i class="bi bi-arrow-repeat text-primary"></i>
+                                                    <i class="bi bi-arrow-repeat"></i>
                                                 </div>
                                                 <div class="ps-3">
-                                                    <h6>{{ $submittedAppraisalsByHR->count() }}</h6>Appraisals
-                                                    submitted to
-                                                    the
-                                                    E.S</span>
+                                                    <h6>{{ $submittedAppraisalsByHR->count() }}</h6>
+                                                    <span class="pt-2 text-muted small ps-1">Appraisals submitted to the E.S</span>
                                                 </div>
                                             </div>
                                         </a>
@@ -135,11 +131,11 @@
                                         <div class="d-flex align-items-center">
                                             <div
                                                 class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                                <i class="bi bi-arrow-repeat text-primary"></i>
+                                                <i class="bi bi-arrow-repeat"></i>
                                             </div>
                                             <div class="ps-3">
-                                                <h6>{{ $submittedAppraisalsByHR->count() }}</h6>Appraisals Reviewed
-                                                By The HR</span>
+                                                <h6>{{ $submittedAppraisalsByHR->count() }}</h6>
+                                                <span class="pt-2 text-muted small ps-1">Appraisals Reviewed By The HR</span>
                                             </div>
                                         </div>
                                     </a>
@@ -152,13 +148,13 @@
                         <!-- Complete Appraisals Card -->
                         <div class="col-xxl-4 col-md-6">
                             <a href="{{ route('uncst-appraisals.index', ['dashboard_filter'=>'completed_appraisals']) }}">
-                                <div class="card info-card customers-card">
+                                <div class="card info-card success-card">
                                     <div class="card-body">
                                         <h5 class="card-title">Complete Appraisals</h5>
                                         <div class="d-flex align-items-center">
                                             <div
                                                 class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                                <i class="bi bi-check-circle text-success"></i>
+                                                <i class="bi bi-check-circle"></i>
                                             </div>
                                             <div class="ps-3">
                                                 <h6>{{ $completeAppraisals->count() }}</h6>
@@ -173,13 +169,13 @@
                         @if (!auth()->user()->hasRole('HR'))
                             <div class="col-xxl-4 col-md-6">
                                 <a href="{{ route('uncst-appraisals.index', ['dashboard_filter'=>'pending_appraisals']) }}">
-                                    <div class="card info-card customers-card">
+                                    <div class="card info-card warning-card">
                                         <div class="card-body">
                                             <h5 class="card-title">Pending Appraisals</h5>
                                             <div class="d-flex align-items-center">
                                                 <div
                                                     class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                                    <i class="bi bi-check-circle text-success"></i>
+                                                    <i class="bi bi-pencil-square"></i>
                                                 </div>
                                                 <div class="ps-3">
                                                     <h6>{{ $pendingAppraisals }}</h6>
@@ -195,13 +191,13 @@
 
                         <!-- Complete Appraisals Card -->
                         <div class="col-xxl-4 col-md-6">
-                            <div class="card info-card customers-card">
+                            <div class="card info-card info-alt-card">
                                 <div class="card-body">
                                     <h5 class="card-title">Running Contracts</h5>
                                     <div class="d-flex align-items-center">
                                         <div
                                             class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                            <i class="bi bi-check-circle text-success"></i>
+                                            <i class="bi bi-file-earmark-check"></i>
                                         </div>
                                         <div class="ps-3">
                                             <h6>{{ $runningContracts }}</h6>
@@ -214,13 +210,13 @@
 
                         <!-- Complete Appraisals Card -->
                         <div class="col-xxl-4 col-md-6">
-                            <div class="card info-card customers-card">
+                            <div class="card info-card danger-card">
                                 <div class="card-body">
                                     <h5 class="card-title">Expired Contracts</h5>
                                     <div class="d-flex align-items-center">
                                         <div
                                             class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                            <i class="bi bi-check-circle text-success"></i>
+                                            <i class="bi bi-calendar-x"></i>
                                         </div>
                                         <div class="ps-3">
                                             <h6>{{ $expiredContracts }}</h6>
@@ -244,12 +240,11 @@
                                         <div class="d-flex align-items-center">
                                             <div
                                                 class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                                <i class="bi bi-people"></i>
+                                                <i class="bi bi-calendar2-check"></i>
                                             </div>
                                             <div class="ps-3">
-                                                <h4 class="card-title">Number of Employees on Leave <span>| Currently</span></h4>
-
-                                                <h4>{{ $available_leave }}</h4>
+                                                <h6>{{ $available_leave }}</h6>
+                                                <span class="pt-2 text-muted small ps-1">Employees currently on leave</span>
                                             </div>
                                         </div>
 
@@ -262,7 +257,7 @@
                         <!-- Birthdays Card -->
                         <div class="col-xxl-3 col-xl-12">
 
-                            <div class="card info-card customers-card">
+                            <div class="card info-card pink-card">
 
                                 <div class="card-body">
                                     <h5 class="card-title">Birthdays</h5>
@@ -270,10 +265,11 @@
                                     <div class="d-flex align-items-center">
                                         <div
                                             class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                            <i class="bi bi-people"></i>
+                                            <i class="bi bi-gift"></i>
                                         </div>
                                         <div class="ps-3">
                                             <h6>{{ count($todayBirthdays) }}</h6>
+                                            <span class="pt-2 text-muted small ps-1">Today</span>
                                         </div>
                                     </div>
 
@@ -705,7 +701,7 @@
                                     <div class="d-flex align-items-center">
                                         <div
                                             class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                            <i class="bi bi-person"></i>
+                                            <i class="bi bi-calendar2-week"></i>
                                         </div>
                                         <div class="ps-3">
                                             <h6>{{ auth()->user()->employee->entitled_leave_days }}</h6>
@@ -726,7 +722,7 @@
                                     <div class="d-flex align-items-center">
                                         <div
                                             class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                            <i class="bi bi-person"></i>
+                                            <i class="bi bi-calendar2-check"></i>
                                         </div>
                                         <div class="ps-3">
                                             <h6>{{ auth()->user()->employee->totalLeaveDays() }}</h6>
@@ -740,13 +736,13 @@
                         <!-- Pending Appraisals Card -->
                         <div class="col-xxl-4 col-md-6">
                             <a href="{{ route('uncst-appraisals.index', ['dashboard_filter' => 'my_appraisals']) }}">
-                                <div class="card info-card customers-card">
+                                <div class="card info-card warning-card">
                                     <div class="card-body">
                                         <h5 class="card-title">Submitted Appraisals</h5>
                                         <div class="d-flex align-items-center">
                                             <div
                                                 class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                                <i class="bi bi-hourglass-split text-warning"></i>
+                                                <i class="bi bi-hourglass-split"></i>
                                             </div>
                                             <div class="ps-3">
                                                 <h6>{{ $submittedAppraisalsBystaff->count() }}</h6>
@@ -762,16 +758,17 @@
                         <!-- Ongoing Appraisals Card -->
                         <div class="col-xxl-4 col-md-6">
                             <a href="{{ route('uncst-appraisals.index') }}">
-                                <div class="card info-card customers-card">
+                                <div class="card info-card appraisal-card">
                                     <div class="card-body">
                                         <h5 class="card-title">On Going Appraisals</h5>
                                         <div class="d-flex align-items-center">
                                             <div
                                                 class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                                <i class="bi bi-arrow-repeat text-primary"></i>
+                                                <i class="bi bi-arrow-repeat"></i>
                                             </div>
                                             <div class="ps-3">
-                                                <h6>{{ $ongoingAppraisals->count() }}</h6>Appraisals in Approval</span>
+                                                <h6>{{ $ongoingAppraisals->count() }}</h6>
+                                                <span class="pt-2 text-muted small ps-1">Appraisals in Approval</span>
                                             </div>
                                         </div>
                                     </div>
@@ -782,13 +779,13 @@
                         <!-- Complete Appraisals Card -->
                         <div class="col-xxl-4 col-md-6">
                             <a href="{{ route('uncst-appraisals.index') }}">
-                                <div class="card info-card customers-card">
+                                <div class="card info-card success-card">
                                     <div class="card-body">
                                         <h5 class="card-title">Complete Appraisals</h5>
                                         <div class="d-flex align-items-center">
                                             <div
                                                 class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                                <i class="bi bi-check-circle text-success"></i>
+                                                <i class="bi bi-check-circle"></i>
                                             </div>
                                             <div class="ps-3">
                                                 <h6>{{ $submittedAppraisalsByHR->count() }}</h6>
@@ -802,13 +799,13 @@
 
                         <div class="col-xxl-4 col-md-6">
                             <a href="{{ route('uncst-appraisals.index') }}">
-                                <div class="card info-card customers-card">
+                                <div class="card info-card warning-card">
                                     <div class="card-body">
                                         <h5 class="card-title">Pending Appraisals</h5>
                                         <div class="d-flex align-items-center">
                                             <div
                                                 class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                                <i class="bi bi-check-circle text-success"></i>
+                                                <i class="bi bi-pencil-square"></i>
                                             </div>
                                             <div class="ps-3">
                                                 <h6>{{ $pendingAppraisals }}</h6>
@@ -822,13 +819,13 @@
 
                         <!-- Complete Appraisals Card -->
                         <div class="col-xxl-4 col-md-6">
-                            <div class="card info-card customers-card">
+                            <div class="card info-card info-alt-card">
                                 <div class="card-body">
                                     <h5 class="card-title">Running Contracts</h5>
                                     <div class="d-flex align-items-center">
                                         <div
                                             class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                            <i class="bi bi-check-circle text-success"></i>
+                                            <i class="bi bi-file-earmark-check"></i>
                                         </div>
                                         <div class="ps-3">
                                             <h6>{{ $runningContracts }}</h6>
@@ -841,13 +838,13 @@
 
                         <!-- Complete Appraisals Card -->
                         <div class="col-xxl-4 col-md-6">
-                            <div class="card info-card customers-card">
+                            <div class="card info-card danger-card">
                                 <div class="card-body">
                                     <h5 class="card-title">Expired Contracts</h5>
                                     <div class="d-flex align-items-center">
                                         <div
                                             class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                            <i class="bi bi-check-circle text-success"></i>
+                                            <i class="bi bi-calendar-x"></i>
                                         </div>
                                         <div class="ps-3">
                                             <h6>{{ $expiredContracts }}</h6>
@@ -1652,9 +1649,14 @@
                                 });
                             </script>
                         @endpush
-                        @foreach ($contracts as $contract)
-                            @if ($contract->days_until_end >= 0 && $contract->days_until_end <= 90)
-                                <div class="col-xxl-12 col-md-12">
+                        @php
+                            $expiringContracts = $contracts->filter(
+                                fn($contract) => $contract->days_until_end >= 0 && $contract->days_until_end <= 90,
+                            );
+                        @endphp
+                        @if ($expiringContracts->isNotEmpty())
+                            <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 9999;">
+                                @foreach ($expiringContracts as $contract)
                                     @php
                                         $bgClass =
                                             $contract->days_until_end === 0 ? 'text-bg-danger' : 'text-bg-warning';
@@ -1672,34 +1674,32 @@
                                                 : "Your contract will expire in <strong>{$contract->days_until_end}</strong> days. Please plan accordingly.";
                                     @endphp
 
-                                    <div class="bottom-0 p-3 position-fixed end-0" style="z-index: 9999;">
-                                        <div class="toast show {{ $bgClass }} border-0 shadow-lg rounded-3"
-                                            role="alert" aria-live="assertive" aria-atomic="true">
-                                            <div class="bg-transparent border-0 toast-header">
-                                                <i class="bi {{ $icon }} me-2 fs-5 text-white"></i>
-                                                <strong class="text-white me-auto">{{ $title }}</strong>
-                                                <button type="button" class="btn-close btn-close-white"
-                                                    data-bs-dismiss="toast" aria-label="Close"></button>
+                                    <div class="toast show {{ $bgClass }} border-0 shadow-lg rounded-3 mb-2"
+                                        role="alert" aria-live="assertive" aria-atomic="true">
+                                        <div class="bg-transparent border-0 toast-header">
+                                            <i class="bi {{ $icon }} me-2 fs-5 text-white"></i>
+                                            <strong class="text-white me-auto">{{ $title }}</strong>
+                                            <button type="button" class="btn-close btn-close-white"
+                                                data-bs-dismiss="toast" aria-label="Close"></button>
+                                        </div>
+                                        <div class="text-white toast-body">
+                                            <div class="mb-2">
+                                                <strong>Description:</strong> {{ $contract->description }}
                                             </div>
-                                            <div class="text-white toast-body">
-                                                <div class="mb-2">
-                                                    <strong>Description:</strong> {{ $contract->description }}
-                                                </div>
-                                                <div class="mb-2">
-                                                    <strong>Start Date:</strong>
-                                                    {{ $contract->start_date->format('d M Y') }}<br>
-                                                    <strong>End Date:</strong>
-                                                    {{ $contract->end_date->format('d M Y') }}
-                                                </div>
-                                                <div class="fw-semibold">
-                                                    {!! $message !!}
-                                                </div>
+                                            <div class="mb-2">
+                                                <strong>Start Date:</strong>
+                                                {{ $contract->start_date->format('d M Y') }}<br>
+                                                <strong>End Date:</strong>
+                                                {{ $contract->end_date->format('d M Y') }}
+                                            </div>
+                                            <div class="fw-semibold">
+                                                {!! $message !!}
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            @endif
-                        @endforeach
+                                @endforeach
+                            </div>
+                        @endif
 
 
 
@@ -2089,47 +2089,23 @@
     @push('scripts')
         @vite(['resources/js/custom-dashboard.js'])
 
-        <script type="module">
+        <script>
             $(document).ready(function() {
                 var leaveTypes = {!! $leaveTypesJson !!}; // Leave type names
                 var allocatedDays = {!! $chartDataJson !!}; // Allocated leave days
                 var employeeData = {!! $chartEmployeeDataJson !!};
-                console.log(window.isAdminOrSecretary);
-                // open the consent modal here
-                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-$(document).ready(function() {
-    console.log('jQuery ready - checking agreement');
 
-    @if (!auth()->user()->agreed_to_data_usage)
-        console.log('Showing modal via jQuery');
+                @if (!auth()->user()->agreed_to_data_usage)
+                    $('#consent').modal({
+                        backdrop: 'static',
+                        keyboard: false
+                    });
+                    $('#consent').modal('show');
 
-        // Initialize and show the modal
-        $('#consent').modal({
-            backdrop: 'static',
-            keyboard: false
-        });
-
-        // Show it immediately
-        $('#consent').modal('show');
-
-        // Handle accept button
-        $('#applyButton').click(function() {
-            console.log('Accept button clicked');
-            $('#consentForm').submit();
-        });
-    @endif
-});
-</script>
-
-@section('scripts')
-<script>
-                // Handle accept button click
-            document.getElementById('applyButton').addEventListener('click', function() {
-                console.log('Accept button clicked');
-                document.getElementById('consentForm').submit();
-            });
-
+                    $('#applyButton').on('click', function() {
+                        $('#consentForm').submit();
+                    });
+                @endif
 
                 var budgetChart = echarts.init(document.querySelector("#budgetChart"));
                 budgetChart.setOption({
@@ -2226,97 +2202,98 @@ $(document).ready(function() {
                         }
                     }).render();
                 }
+            });
 
-                document.addEventListener('DOMContentLoaded', function() {
-    // Set up the withdrawal modal
-    const withdrawModal = document.getElementById('withdrawConfirmModal');
-    const withdrawForm = document.getElementById('withdrawForm');
-    let currentAppraisalId = '';
+            document.addEventListener('DOMContentLoaded', function() {
+                // Set up the withdrawal modal (markup for it is currently disabled/commented out)
+                const withdrawModal = document.getElementById('withdrawConfirmModal');
+                if (!withdrawModal) {
+                    return;
+                }
 
-    // When modal is shown, set the form action
-    withdrawModal.addEventListener('show.bs.modal', function (event) {
-        const button = event.relatedTarget;
-        currentAppraisalId = button.getAttribute('data-appraisal-id');
-        withdrawForm.action = `/appraisals/${currentAppraisalId}/withdraw`;
-    });
+                const withdrawForm = document.getElementById('withdrawForm');
+                let currentAppraisalId = '';
 
-    // Handle form submission
-    withdrawForm.addEventListener('submit', function(e) {
-        e.preventDefault();
+                // When modal is shown, set the form action
+                withdrawModal.addEventListener('show.bs.modal', function(event) {
+                    const button = event.relatedTarget;
+                    currentAppraisalId = button.getAttribute('data-appraisal-id');
+                    withdrawForm.action = `/appraisals/${currentAppraisalId}/withdraw`;
+                });
 
-        const submitBtn = document.getElementById('confirmWithdrawBtn');
-        const originalText = submitBtn.innerHTML;
+                // Handle form submission
+                withdrawForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
 
-        // Show loading state
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="bi bi-arrow-repeat spinner"></i> Withdrawing...';
+                    const submitBtn = document.getElementById('confirmWithdrawBtn');
+                    const originalText = submitBtn.innerHTML;
 
-        // Submit the form via AJAX for better UX
-        fetch(this.action, {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({})
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Show success message
-                showToast('success', data.message || 'Appraisal withdrawn successfully');
+                    // Show loading state
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="bi bi-arrow-repeat spinner"></i> Withdrawing...';
 
-                // Close the modal
-                const modal = bootstrap.Modal.getInstance(withdrawModal);
-                modal.hide();
+                    // Submit the form via AJAX for better UX
+                    fetch(this.action, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({})
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Show success message
+                            showWithdrawToast('success', data.message || 'Appraisal withdrawn successfully');
 
-                // Reload the page after a short delay
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1500);
-            } else {
-                throw new Error(data.message || 'Failed to withdraw appraisal');
+                            // Close the modal
+                            const modal = bootstrap.Modal.getInstance(withdrawModal);
+                            modal.hide();
+
+                            // Reload the page after a short delay
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1500);
+                        } else {
+                            throw new Error(data.message || 'Failed to withdraw appraisal');
+                        }
+                    })
+                    .catch(error => {
+                        // Show error message
+                        showWithdrawToast('error', error.message || 'Failed to withdraw appraisal: Unknown error');
+
+                        // Reset button state
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalText;
+                    });
+                });
+            });
+
+            // Toast notification used by the withdraw-appraisal flow above
+            function showWithdrawToast(type, message) {
+                const toast = document.createElement('div');
+                toast.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0`;
+                toast.innerHTML = `
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <i class="bi ${type === 'success' ? 'bi-check-circle' : 'bi-exclamation-circle'} me-2"></i>
+                            ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                `;
+
+                document.body.appendChild(toast);
+                const bsToast = new bootstrap.Toast(toast);
+                bsToast.show();
+
+                // Remove toast after it hides
+                toast.addEventListener('hidden.bs.toast', function() {
+                    document.body.removeChild(toast);
+                });
             }
-        })
-        .catch(error => {
-            // Show error message
-            showToast('error', error.message || 'Failed to withdraw appraisal: Unknown error');
-
-            // Reset button state
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalText;
-        });
-    });
-
-    // Toast notification function
-    function showToast(type, message) {
-        // You can use your preferred toast library or create a simple one
-        const toast = document.createElement('div');
-        toast.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0`;
-        toast.innerHTML = `
-            <div class="d-flex">
-                <div class="toast-body">
-                    <i class="bi ${type === 'success' ? 'bi-check-circle' : 'bi-exclamation-circle'} me-2"></i>
-                    ${message}
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-            </div>
-        `;
-
-        document.body.appendChild(toast);
-        const bsToast = new bootstrap.Toast(toast);
-        bsToast.show();
-
-        // Remove toast after it hides
-        toast.addEventListener('hidden.bs.toast', function () {
-            document.body.removeChild(toast);
-        });
-    }
-});
-</script>
-@endsection
-           
         </script>
     @endpush
 </x-app-layout>

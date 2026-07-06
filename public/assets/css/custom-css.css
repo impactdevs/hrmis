@@ -571,6 +571,13 @@ table {
 /* Info Cards */
 .dashboard .info-card {
   padding-bottom: 10px;
+  border-radius: 10px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dashboard .info-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0px 4px 25px rgba(1, 41, 112, 0.15);
 }
 
 .dashboard .info-card h6 {
@@ -586,6 +593,7 @@ table {
   line-height: 0;
   width: 64px;
   height: 64px;
+  border-radius: 50%;
   flex-shrink: 0;
   flex-grow: 0;
 }
@@ -603,6 +611,37 @@ table {
 .dashboard .customers-card .card-icon {
   color: #ff771d;
   background: #ffecdf;
+}
+
+/* Additional info-card color variants for dashboard stat tiles */
+.dashboard .appraisal-card .card-icon {
+  color: #6f42c1;
+  background: #f1e9fb;
+}
+
+.dashboard .success-card .card-icon {
+  color: #20c997;
+  background: #e1f9f3;
+}
+
+.dashboard .warning-card .card-icon {
+  color: #ffc107;
+  background: #fff8e1;
+}
+
+.dashboard .danger-card .card-icon {
+  color: #dc3545;
+  background: #fde8ea;
+}
+
+.dashboard .info-alt-card .card-icon {
+  color: #0dcaf0;
+  background: #e3f8fc;
+}
+
+.dashboard .pink-card .card-icon {
+  color: #d63384;
+  background: #fce8f3;
 }
 
 /* Activity */
