@@ -640,11 +640,13 @@ class LeaveController extends Controller
     $department = $request->input('department', 'all');
     $approvalStatus = $request->input('approval_status', 'all'); // Get approval status filter
     $year = $request->input('year', 'all'); // Get year filter
+    $month = $request->input('month', 'all'); // Get month filter
 
     \Log::info('LeaveData Filters', [
         'approval_status' => $approvalStatus,
         'department' => $department,
-        'year' => $year
+        'year' => $year,
+        'month' => $month
     ]);
 
     if (auth()->user()->isAdminOrSecretary) {
@@ -743,6 +745,13 @@ class LeaveController extends Controller
         });
     }
 
+    // Apply month filter on the combined collection
+    if ($month !== 'all') {
+        $combinedLeaves = $combinedLeaves->filter(function ($item) use ($month) {
+            return Carbon::parse($item['start'])->month == (int) $month;
+        });
+    }
+
     // Remove cancelled leaves from all views except when specifically filtered
     if ($approvalStatus !== 'all') {
         $combinedLeaves = $combinedLeaves->filter(function ($item) {
@@ -750,16 +759,17 @@ class LeaveController extends Controller
         });
     }
 
-    // Sort the final data
-    $combinedLeaves = $combinedLeaves->sortByDesc(function ($item) {
-        return $item['created_at'] ?? $item['start'];
+    // Sort the final data by leave start date
+    $combinedLeaves = $combinedLeaves->sortBy(function ($item) {
+        return $item['start'];
     })->values();
 
     \Log::info('LeaveData Final Results', [
         'total_records' => $combinedLeaves->count(),
         'approval_status_filter' => $approvalStatus,
         'department_filter' => $department,
-        'year_filter' => $year
+        'year_filter' => $year,
+        'month_filter' => $month
     ]);
 
     return response()->json(['success' => true, 'data' => $combinedLeaves]);

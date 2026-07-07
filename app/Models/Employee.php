@@ -136,26 +136,17 @@ class Employee extends Model
         }
     }
 
-    //calculate retirement years remaining, every employee retires at 60
+    // calculate retirement years remaining, every employee retires at 60
     public function retirementYearsRemaining()
     {
         if (empty($this->date_of_birth)) {
             return "no date of birth specified";
         }
 
-        $today = now()->timezone('UTC'); // Ensure today is in UTC
-        $age = $today->diff($this->date_of_birth); // Get full date difference
+        $retirementDate = $this->date_of_birth->copy()->addYears(60);
+        $diff = now()->timezone('UTC')->diff($retirementDate);
 
-        $yearsRemaining = 60 - $age->y; // 60 is retirement age
-        $monthsRemaining = 12 - $age->m; // Calculate remaining months in current year
-
-        // If we have negative months remaining (i.e., we're already in a new year), adjust the year.
-        if ($monthsRemaining === 12) {
-            $yearsRemaining++;
-            $monthsRemaining = 0;
-        }
-
-        return "{$yearsRemaining} years, {$monthsRemaining} months"; // Return formatted string
+        return "{$diff->y} years, {$diff->m} months";
     }
 
 

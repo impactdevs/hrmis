@@ -37,6 +37,15 @@
                                     </div>
 
                                     <div class="ms-3">
+                                        <select class="form-select form-select-sm rounded" id="monthSelect" name="month">
+                                            <option value="all">All Months</option>
+                                            @foreach (['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'] as $index => $monthName)
+                                                <option value="{{ $index + 1 }}">{{ $monthName }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <div class="ms-3">
                                         <div class="btn-group" role="group">
                                             <input type="radio" class="btn-check" name="approval_status"
                                                 id="allStatus" value="all" checked>
@@ -185,7 +194,8 @@
                         data: {
                             approval_status: approvalStatus, // Pass the selected approval status filter
                             department: department, // Pass the selected department filter
-                            year: $('#yearSelect').val() // Pass the selected year filter
+                            year: $('#yearSelect').val(), // Pass the selected year filter
+                            month: $('#monthSelect').val() // Pass the selected month filter
                         },
                         success: function(response) {
                                 console.log('Filters sent - Approval:', approvalStatus,
@@ -664,6 +674,11 @@
 
                 $('#yearSelect').on('change', function() {
                     console.log('Year changed to:', $(this).val());
+                    loadLeaveTableData();
+                });
+
+                $('#monthSelect').on('change', function() {
+                    console.log('Month changed to:', $(this).val());
                     loadLeaveTableData();
                 });
 
