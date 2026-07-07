@@ -110,7 +110,7 @@ class AppraisalsController extends Controller
                             })
                             // Include resubmissions where HR is the appraiser (after resubmission, status is cleared)
                             ->orWhere(function ($subQuery) {
-                                $subQuery->where('appraiser_id', auth()->user()->employee->employee_id)
+                                $subQuery->where('appraiser_id', auth()->user()->employee?->employee_id)
                                     ->where('appraisal_request_status', null); // Status cleared after resubmission
                             });
                     })
@@ -138,7 +138,13 @@ class AppraisalsController extends Controller
                                     ->join('roles', 'roles.id', '=', 'model_has_roles.role_id');
                             });
                     })
-                    ->whereNull("appraisals.appraisal_request_status->HR")
+                    // Still-pending-for-HR items (HR hasn't decided yet) OR appraisals that have
+                    // gone all the way through and been fully approved by the Executive Secretary —
+                    // those should stay visible to HR too, not just while awaiting HR's own decision.
+                    ->where(function ($q) {
+                        $q->whereNull("appraisals.appraisal_request_status->HR")
+                            ->orWhereJsonContains('appraisals.appraisal_request_status', ['Executive Secretary' => 'approved']);
+                    })
                     ->where('appraisal_drafts.is_submitted', true)
                     ->latest('appraisals.created_at');
             }
@@ -197,7 +203,7 @@ class AppraisalsController extends Controller
                                     ->where('model_has_roles.model_type', User::class)
                                     ->where('roles.name', 'Head of Division');
                             })
-                            ->orWhere('appraiser_id', auth()->user()->employee->employee_id);
+                            ->orWhere('appraiser_id', auth()->user()->employee?->employee_id);
                     })
                     ->where(function ($q) {
                         $q->whereNull("appraisals.appraisal_request_status->Executive Secretary")
@@ -213,7 +219,7 @@ class AppraisalsController extends Controller
                 $query = Appraisal::join('appraisal_drafts', 'appraisal_drafts.appraisal_id', '=', 'appraisals.appraisal_id')
                     ->where('appraisal_drafts.is_submitted', false)
                     ->where(function ($query) {
-                        $query->where('appraisal_drafts.employee_id', auth()->user()->employee->employee_id);
+                        $query->where('appraisal_drafts.employee_id', auth()->user()->employee?->employee_id);
                     })
                     ->latest('appraisals.created_at');
 
@@ -231,7 +237,7 @@ class AppraisalsController extends Controller
                             ->join('roles', 'roles.id', '=', 'model_has_roles.role_id');
                     })
                     //or where the ES is the appraiser
-                    ->orWhere('appraiser_id', auth()->user()->employee->employee_id)
+                    ->orWhere('appraiser_id', auth()->user()->employee?->employee_id)
                     ->where('appraisal_drafts.is_submitted', true)
                     ->latest('appraisals.created_at');
             }
@@ -247,7 +253,7 @@ class AppraisalsController extends Controller
             $appraisals = $query->paginate();
         } else if (auth()->user()->hasRole('Head of Division')) {
             $dashboard_filter = $request->get('dashboard_filter');
-            $hodEmployeeId = auth()->user()->employee->employee_id;
+            $hodEmployeeId = auth()->user()->employee?->employee_id;
 
             if (!is_null($dashboard_filter) && $dashboard_filter == 'pending_approval') {
                 // ONLY appraisals waiting for HOD approval (excluding drafts)
@@ -359,6 +365,10 @@ class AppraisalsController extends Controller
 
             $appraser_id = User::find(auth()->user()->employee->department->department_head)->employee->employee_id;
         } else if ($role == 'Head of Division') {
+            if (!auth()->user()->employee) {
+                return back()->with("success", "No Employee record found! Ask the human resource");
+            }
+
             //get the user with the role of Secretary
             $user = User::role('Executive Secretary')->whereHas('employee')->first();
 
@@ -498,21 +508,6 @@ class AppraisalsController extends Controller
 
 
     /**
-     * Store a newly created resource in storage.
-     */
-
-    public function store(Request $request)
-    {
-        $data = $request->all();
-
-        $data['employee_id'] = auth()->user()->employee->employee_id;
-        Appraisal::create($data);
-
-        return redirect()->back()->with('success', 'Appraisal submitted successfully!');
-    }
-
-
-    /**
      * Display the specified resource.
      */
     public function show(Appraisal $appraisal)
@@ -537,7 +532,7 @@ class AppraisalsController extends Controller
         // get any draft with this appraisal and logged in employee
         $draft = DB::table('appraisal_drafts')
             ->where('appraisal_id', $appraisal->appraisal_id)
-            ->where('employee_id', auth()->user()->employee->employee_id)
+            ->where('employee_id', auth()->user()->employee?->employee_id)
             ->first();
 
         if ($uncst_appraisal->contract_id != null) {
@@ -688,7 +683,7 @@ class AppraisalsController extends Controller
                     // Update draft table
                     DB::table('appraisal_drafts')
                         ->where('appraisal_id', $uncst_appraisal->appraisal_id)
-                        ->where('employee_id', auth()->user()->employee->employee_id)
+                        ->where('employee_id', auth()->user()->employee?->employee_id)
                         ->update(['is_submitted' => true, 'updated_at' => now()]);
 
                     // Determine who to notify based on the new current stage
@@ -731,7 +726,7 @@ class AppraisalsController extends Controller
 
                     DB::table('appraisal_drafts')
                         ->where('appraisal_id', $uncst_appraisal->appraisal_id)
-                        ->where('employee_id', auth()->user()->employee->employee_id)
+                        ->where('employee_id', auth()->user()->employee?->employee_id)
                         ->update(['is_submitted' => true]);
 
                     // Notifications - only notify the next approver
@@ -746,15 +741,16 @@ class AppraisalsController extends Controller
                 $uncst_appraisal->save();
 
                 // Check if draft already exists
-                $draftExists = DB::table('appraisal_drafts')
+                $draftEmployeeId = auth()->user()->employee?->employee_id;
+                $draftExists = $draftEmployeeId && DB::table('appraisal_drafts')
                     ->where('appraisal_id', $uncst_appraisal->appraisal_id)
-                    ->where('employee_id', auth()->user()->employee->employee_id)
+                    ->where('employee_id', $draftEmployeeId)
                     ->exists();
 
-                if (!$draftExists) {
+                if ($draftEmployeeId && !$draftExists) {
                     DB::table('appraisal_drafts')->insert([
                         'appraisal_id' => $uncst_appraisal->appraisal_id,
-                        'employee_id' => auth()->user()->employee->employee_id,
+                        'employee_id' => $draftEmployeeId,
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);
@@ -796,7 +792,7 @@ class AppraisalsController extends Controller
             // Normal submission without draft flag
             DB::table('appraisal_drafts')
                 ->where('appraisal_id', $uncst_appraisal->appraisal_id)
-                ->where('employee_id', auth()->user()->employee->employee_id)
+                ->where('employee_id', auth()->user()->employee?->employee_id)
                 ->update(['is_submitted' => true]);
 
             $uncst_appraisal->is_draft = false;
@@ -867,7 +863,7 @@ class AppraisalsController extends Controller
 
         $user = auth()->user();
 
-        if ($user->employee->employee_id !== $appraisal->employee_id) {
+        if (!$user->employee || $user->employee->employee_id !== $appraisal->employee_id) {
             return back()->with('error', 'You can only withdraw your own appraisals.');
         }
 
@@ -969,14 +965,16 @@ class AppraisalsController extends Controller
 
         $user = auth()->user();
 
-        $isHR = $appraisal->appraiser_id == auth()->user()->employee->employee_id;
+        $isHR = $appraisal->appraiser_id == auth()->user()->employee?->employee_id;
 
         // Retrieve current leave_request_status (it will be an array due to casting)
         $appraisalRequestStatus = $appraisal->appraisal_request_status ?: []; // Default to an empty array if null
+        $decision = $request->input('status');
+        $advanceRole = null;
 
         // Update appraisal request based on the user's role and the input status
         if ($user->hasRole('HR')) {
-            if ($request->input('status') === 'approved') {
+            if ($decision === 'approved') {
                 // Set HR status to approved
                 $appraisalRequestStatus['HR'] = 'approved';
                 if ($isHR) {
@@ -984,6 +982,7 @@ class AppraisalsController extends Controller
                     $appraisalRequestStatus['Head of Division'] = 'approved';
                 }
                 $appraisal->rejection_reason = null;
+                $advanceRole = 'HR';
             } else {
                 $appraisalRequestStatus['HR'] = 'rejected';
                 if ($isHR) {
@@ -997,10 +996,11 @@ class AppraisalsController extends Controller
             }
 
         } elseif ($user->hasRole('Head of Division')) {
-            if ($request->input('status') === 'approved') {
+            if ($decision === 'approved') {
                 // Set Head of Division status to approved
                 $appraisalRequestStatus['Head of Division'] = 'approved';
                 $appraisal->rejection_reason = null; // Clear reason if approved
+                $advanceRole = 'Head of Division';
             } else {
                 // Set Head of Division status to rejected
                 $appraisalRequestStatus['Head of Division'] = 'rejected';
@@ -1011,10 +1011,11 @@ class AppraisalsController extends Controller
             }
 
         } elseif ($user->hasRole('Executive Secretary')) {
-            if ($request->input('status') === 'approved') {
+            if ($decision === 'approved') {
                 // Set leave status as approved for Executive Secretary
                 $appraisalRequestStatus['Executive Secretary'] = 'approved';
                 $appraisal->rejection_reason = null; // Clear reason if approved
+                $advanceRole = 'Executive Secretary';
 
                 $appraisal->appraisal_request_status = $appraisalRequestStatus;
                 $appraisal->save();
@@ -1045,7 +1046,7 @@ class AppraisalsController extends Controller
         }
 
         // ✅ Save rejection reason FIRST before updating status
-        if ($request->input('status') === 'rejected') {
+        if ($decision === 'rejected') {
             $appraisal->rejection_reason = $request->input('reason');
         } else {
             $appraisal->rejection_reason = null;
@@ -1055,7 +1056,24 @@ class AppraisalsController extends Controller
         $appraisal->appraisal_request_status = $appraisalRequestStatus;
         $appraisal->save();
 
-        $message = $request->input('status') === 'approved'
+        // Advance the workflow to the next stage now that this role's decision is recorded
+        if ($advanceRole) {
+            $this->advanceAppraisalStage($appraisal, $advanceRole);
+        }
+
+        // Log the approval/rejection decision to the audit trail
+        AppraisalHistory::logAction(
+            $appraisal->appraisal_id,
+            $decision === 'approved' ? AppraisalHistory::ACTION_APPROVED : AppraisalHistory::ACTION_REJECTED,
+            null,
+            $appraisal->current_stage,
+            $decision === 'rejected' ? $request->input('reason') : null,
+            ['approver_role' => $advanceRole ?? $user->getRoleNames()->first()],
+            $user->employee?->employee_id,
+            $user->getRoleNames()->first()
+        );
+
+        $message = $decision === 'approved'
             ? 'Appraisal application approved successfully.'
             : 'Appraisal application rejected successfully.';
 
@@ -1120,6 +1138,9 @@ class AppraisalsController extends Controller
             // HOD appraisee: Staff → Executive Secretary (skip HR)
             if ($approvedByRole === 'Staff') {
                 $nextStage = 'Executive Secretary';
+            } elseif ($approvedByRole === 'Executive Secretary') {
+                $nextStage = 'Completed';
+                $appraisal->approval_status = 'approved';
             }
         } else {
             // Regular staff: Staff → Head of Division → HR → Executive Secretary
@@ -1182,7 +1203,7 @@ class AppraisalsController extends Controller
         // Update draft status
         DB::table('appraisal_drafts')
             ->where('appraisal_id', $appraisal->appraisal_id)
-            ->where('employee_id', $user->employee->employee_id)
+            ->where('employee_id', $user->employee?->employee_id)
             ->update(['is_submitted' => true]);
 
         // Log the resubmission action

@@ -622,7 +622,7 @@
 
                             <div class="mt-4 col-12">
                                 <p class="fw-bold">f. Suggestions on what management should change or attend to</p>
-                                <x-forms.text-area name="suggestons" :isDisabled="!$appraisal->is_appraisee" :isDraft="$staffDraftValue"
+                                <x-forms.text-area name="suggestions" :isDisabled="!$appraisal->is_appraisee" :isDraft="$staffDraftValue"
                                     label="Indicate the suggestions you think need to be addressed or attended to."
                                     id="suggestions" :value="old('suggestions', $appraisal->suggestions ?? '')" />
                             </div>
@@ -1955,9 +1955,9 @@
                                     ];
                                     $currentApprover = $appraisal->current_approver ?? 'Executive Secretary';
                                     $previousApprover = 'None';
-                                    $isHR = $appraisal->appraiser_id == auth()->user()->employee->employee_id;
+                                    $isHR = $appraisal->appraiser_id == auth()->user()->employee?->employee_id;
                                     $isHoD =
-                                        $appraisal->employee_id == auth()->user()->employee->employee_id &&
+                                        $appraisal->employee_id == auth()->user()->employee?->employee_id &&
                                         auth()->user()->hasRole('Head of Division');
 
                                     if ($userRole == 'Head of Division' && !$isHoD) {
@@ -1996,7 +1996,7 @@
                                             <p class="mt-1"><strong>Rejection Reason:</strong>
                                                 {{ $appraisal->rejection_reason }}</p>
                                         @elseif ($appraisal->approval_status === 'approved')
-                                            <span class="badge bg-danger">Approved</span>
+                                            <span class="badge bg-success">Approved</span>
                                         @else
                                             <span class="badge bg-warning">Pending</span>
                                         @endif

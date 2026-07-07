@@ -168,7 +168,7 @@ class Appraisal extends Model
     public function getIsAppraiseeAttribute()
     {
         // Check if the logged-in user is the appraisee
-        if (auth()->user()->employee->employee_id == $this->employee_id) {
+        if (auth()->user()->employee?->employee_id == $this->employee_id) {
 
             // Optional: check if the appraisee is also a Head of Division
             if ($this->getTheAppraiseeIsHod()) {
@@ -184,7 +184,7 @@ class Appraisal extends Model
 
     public function getIsAppraisorAttribute()
     {
-        if (auth()->user()->employee->employee_id == $this->appraiser_id) {
+        if (auth()->user()->employee?->employee_id == $this->appraiser_id) {
             return true;
         }
 
@@ -272,9 +272,14 @@ class Appraisal extends Model
 
     public function getHasDraftAttribute()
     {
+        $employeeId = auth()->user()?->employee?->employee_id;
+        if (!$employeeId) {
+            return false;
+        }
+
         // cehck in draft table using query builder
         $draft = DB::table('appraisal_drafts')
-            ->where('appraisal_id', $this->appraisal_id)->where('employee_id', auth()->user()->employee->employee_id)->where('is_submitted', false)
+            ->where('appraisal_id', $this->appraisal_id)->where('employee_id', $employeeId)->where('is_submitted', false)
             ->exists();
         if ($draft) {
             return true;
@@ -320,7 +325,7 @@ class Appraisal extends Model
      */
     public function advanceStage(): bool
     {
-        $appraiserRole = $this->appraiser->user->getRoleNames()->first();
+        $appraiserRole = $this->appraiser?->user?->getRoleNames()->first() ?? '';
         $stages = self::getAvailableStages($appraiserRole);
         $currentIndex = array_search($this->current_stage, $stages);
 
@@ -345,7 +350,7 @@ class Appraisal extends Model
      */
     public function canAdvanceToStage(string $stage): bool
     {
-        $appraiserRole = $this->appraiser->user->getRoleNames()->first();
+        $appraiserRole = $this->appraiser?->user?->getRoleNames()->first() ?? '';
         $approvalFlow = self::getAvailableStages($appraiserRole);
         $status = $this->appraisal_request_status ?? [];
 
@@ -391,7 +396,7 @@ class Appraisal extends Model
      */
     public function getNextApproverRole(): ?string
     {
-        $appraiserRole = $this->appraiser->user->getRoleNames()->first();
+        $appraiserRole = $this->appraiser?->user?->getRoleNames()->first() ?? '';
         $approvalFlow = self::getAvailableStages($appraiserRole);
         $currentIndex = array_search($this->current_stage, $approvalFlow);
 
@@ -414,7 +419,8 @@ class Appraisal extends Model
      */
     public function getStageProgressAttribute(): int
     {
-        $stages = self::getAvailableStages();
+        $appraiserRole = $this->appraiser?->user?->getRoleNames()->first() ?? 'Staff';
+        $stages = self::getAvailableStages($appraiserRole);
         $currentIndex = array_search($this->current_stage, $stages);
 
         if ($currentIndex === false) {
@@ -464,10 +470,15 @@ class Appraisal extends Model
 
     public function getDraftWasSubmittedAttribute()
     {
+        $employeeId = auth()->user()?->employee?->employee_id;
+        if (!$employeeId) {
+            return false;
+        }
+
         // Check if a draft exists for the current appraisal and user
         $draft = DB::table('appraisal_drafts')
             ->where('appraisal_id', $this->appraisal_id)
-            ->where('employee_id', auth()->user()->employee->employee_id)
+            ->where('employee_id', $employeeId)
             ->first();
 
         // If a draft exists, return its submission status
@@ -476,7 +487,7 @@ class Appraisal extends Model
         }
 
         // If no draft exists, return false
-        return true;
+        return false;
     }
 
     /**
@@ -592,12 +603,13 @@ class Appraisal extends Model
     public function getWithdrawalDebugInfoAttribute(): array
     {
         $user = auth()->user();
-        $isAppraisee = $user && $user->employee && $user->employee->employee_id === $this->employee_id;
+        $employeeId = $user?->employee?->employee_id;
+        $isAppraisee = $employeeId !== null && $employeeId === $this->employee_id;
 
-        $draft = DB::table('appraisal_drafts')
+        $draft = $employeeId ? DB::table('appraisal_drafts')
             ->where('appraisal_id', $this->appraisal_id)
-            ->where('employee_id', $user->employee->employee_id)
-            ->first();
+            ->where('employee_id', $employeeId)
+            ->first() : null;
 
         $status = $this->appraisal_request_status ?? [];
         $hasFinalDecision = collect($status)->contains(fn($s) => in_array($s, ['approved', 'rejected']));
@@ -643,8 +655,8 @@ class Appraisal extends Model
             'approval_status' => $this->approval_status,
             'appraisal_request_status' => $this->appraisal_request_status,
             'is_draft' => $this->is_draft,
-            'employee_roles' => $this->employee->user->getRoleNames()->toArray() ?? [],
-            'appraiser_roles' => $this->appraiser->user->getRoleNames()->toArray() ?? []
+            'employee_roles' => $this->employee?->user?->getRoleNames()->toArray() ?? [],
+            'appraiser_roles' => $this->appraiser?->user?->getRoleNames()->toArray() ?? []
         ];
     }
 

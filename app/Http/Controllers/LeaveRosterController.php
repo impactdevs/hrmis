@@ -39,7 +39,10 @@ class LeaveRosterController extends Controller
 
     public function getLeaveRoster(Request $request)
     {
-        return view('leave-roster.tabular');
+        $users = User::whereHas('employee')->with('employee')->get();
+        $public_holidays = PublicHoliday::pluck('holiday_date')->toArray();
+
+        return view('leave-roster.tabular', compact('users', 'public_holidays'));
     }
 
 

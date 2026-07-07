@@ -133,7 +133,7 @@
                                     data-placeholder="Choose the Appraiser" required>
                                     @foreach ($users as $user)
                                         <option value=""></option>
-                                        <option value="{{ $user->employee->employee_id }}"
+                                        <option value="{{ $user->employee?->employee_id }}"
                                             {{ $user->employee && $user->employee->employee_id == $appraisal->appraiser_id ? 'selected' : '' }}>
                                             {{ $user->name }}
                                         </option>
@@ -149,23 +149,23 @@
                             <div class="row g-3">
                                 <div class="col-md-12">
                                     <p> FULL NAME:
-                                        {{ auth()->user()->employee->first_name . ' ' . auth()->user()->employee->last_name }}
+                                        {{ auth()->user()->employee?->first_name . ' ' . auth()->user()->employee?->last_name }}
                                     </p>
                                 </div>
                                 <div class="col-md-12">
                                     <p> POSITION:
-                                        {{ optional(auth()->user()->employee->position)->position_name }}
+                                        {{ optional(auth()->user()->employee?->position)->position_name }}
                                     </p>
                                 </div>
 
                                 <div class="col-md-12">
                                     <p> DIVISION:
-                                        {{ optional(auth()->user()->employee->department)->department_name }}
+                                        {{ optional(auth()->user()->employee?->department)->department_name }}
                                     </p>
                                 </div>
                                 <div class="col-md-12">
                                     <p> DATE OF 1ST APPOINTMENT:
-                                        {{ \Carbon\Carbon::parse(auth()->user()->employee->date_of_entry)->toFormattedDateString() }}
+                                        {{ auth()->user()->employee?->date_of_entry ? \Carbon\Carbon::parse(auth()->user()->employee->date_of_entry)->toFormattedDateString() : 'N/A' }}
                                     </p>
                                 </div>
 

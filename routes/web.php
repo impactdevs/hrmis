@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\ApplicationController;
-use App\Http\Controllers\AppraisalController;
 use App\Http\Controllers\AppraisalsController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\CompanyJobController;
@@ -158,7 +157,10 @@ Route::middleware(['auth', 'verified', 'check.employee.record', 'data.usage.agre
         ->name('hr.job-applications.destroy');
 
     // ── Appraisals ────────────────────────────────────────────────────────────
-    Route::resource('uncst-appraisals', AppraisalsController::class);
+    // 'store' is excluded: appraisals are created server-side via create() (which
+    // redirects straight to edit()), there is no form that POSTs to the resource's
+    // implicit store route.
+    Route::resource('uncst-appraisals', AppraisalsController::class)->except(['store']);
     Route::post('/appraisal/appraisal-approval', [AppraisalsController::class, 'approveOrReject'])
         ->name('appraisals.approveOrReject');
     Route::post('/appraisals/{appraisal}/status', [AppraisalsController::class, 'approveOrReject'])
@@ -169,8 +171,7 @@ Route::middleware(['auth', 'verified', 'check.employee.record', 'data.usage.agre
         ->name('appraisals.download');
     Route::get('/appraisals/{appraisal}/attachment/{index}/download', [AppraisalsController::class, 'downloadAttachment'])
         ->name('appraisals.attachment.download');
-    Route::get('/employee-appraisal', [AppraisalsController::class, 'survey'])->name('appraisal.survey');
-    Route::post('/appraisals', [AppraisalsController::class, 'store'])->name('appraisals.store');
+    Route::get('/employee-appraisal', [AppraisalsController::class, 'create'])->name('appraisal.survey');
     Route::get('preview-appraisal/{appraisal}', [AppraisalsController::class, 'previewAppraisalDetails'])->name('appraisals.preview');
     Route::get('/appraisals/{appraisal}/attachment/{index}/view', [AppraisalsController::class, 'viewAttachment'])
         ->name('appraisals.attachment.view');
