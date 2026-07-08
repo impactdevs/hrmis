@@ -19,22 +19,20 @@ class LeaveRosterController extends Controller
      */
     public function index()
     {
-        if (!auth()->user()->hasRole('HR')) {
-            $user_id = auth()->user()->id;
-            $leaveTypes = LeaveType::pluck('leave_type_name', 'leave_type_id')->toArray();
-            $existingValuesArray = [];
-            $users = User::pluck('name', 'id')->toArray();
-            $public_holidays = PublicHoliday::pluck('holiday_date')->toArray();
+        // Everyone (including HR) lands on the calendar view by default, with a
+        // "Tabular View" button (leave-roster-tabular.index) to switch — HR used
+        // to be routed straight to the tabular view here with no way back to the
+        // calendar, unlike Executive Secretary/Head of Division who get both.
+        $user_id = auth()->user()->id;
+        $leaveTypes = LeaveType::pluck('leave_type_name', 'leave_type_id')->toArray();
+        $existingValuesArray = [];
+        $users = User::pluck('name', 'id')->toArray();
+        $public_holidays = PublicHoliday::pluck('holiday_date')->toArray();
 
-            //departments
-            $departments = Department::pluck('department_name', 'department_id')->toArray();
+        //departments
+        $departments = Department::pluck('department_name', 'department_id')->toArray();
 
-            return view('leave-roster.index', compact('leaveTypes', 'user_id', 'existingValuesArray', 'users', 'departments', 'public_holidays'));
-        } else {
-            $public_holidays = PublicHoliday::pluck('holiday_date')->toArray();
-            $users = User::whereHas('employee')->with('employee')->get();
-            return view('leave-roster.tabular', compact('users', 'public_holidays'));
-        }
+        return view('leave-roster.index', compact('leaveTypes', 'user_id', 'existingValuesArray', 'users', 'departments', 'public_holidays'));
     }
 
     public function getLeaveRoster(Request $request)

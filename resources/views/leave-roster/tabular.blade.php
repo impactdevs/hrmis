@@ -1,10 +1,20 @@
 <x-app-layout>
     <div class="mt-3">
-        <div class="d-flex align-items-center mb-3">
-            {{-- Add Leave Roster --}}
-            <button class="btn btn-primary btn-sm mt-3 ms-1 font-weight-bold" id="addLeaveRoster" type="button"
-                style="max-height: 40px; font-size: 12px">
-                <i class="bi bi-plus-circle"></i> Add Leave Days</button>
+        <div class="d-flex">
+            <div class="d-flex align-items-center mb-3">
+                {{-- Add Leave Roster --}}
+                <button class="btn btn-primary btn-sm mt-3 ms-1 font-weight-bold" id="addLeaveRoster" type="button"
+                    style="max-height: 40px; font-size: 12px">
+                    <i class="bi bi-plus-circle"></i> Add Leave Days</button>
+            </div>
+
+            <div class="d-flex align-items-center mb-3">
+                {{-- Calendar view --}}
+                <a class="btn btn-primary btn-sm mt-3 ms-1 font-weight-bold"
+                    style="max-height: 40px; font-size: 12px"
+                    href="{{ route('leave-roster.index') }}">
+                    <i class="bi bi-calendar3"></i> Calendar View</a>
+            </div>
         </div>
         <div class="table-wrapper">
             <table class="table table-striped table-hover table-responsive" id="leave-management-table"

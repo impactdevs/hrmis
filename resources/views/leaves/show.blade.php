@@ -178,10 +178,99 @@
                             <i class="fas fa-ban"></i> Cancel Leave
                         </button>
                     @endif
+
+                    @if($leave->canUserApprove())
+                        <button type="button" class="btn btn-success approve-btn" data-leave-id="{{ $leave->leave_id }}">
+                            <i class="fas fa-check"></i> Approve
+                        </button>
+                        <button type="button" class="btn btn-danger reject-btn" data-leave-id="{{ $leave->leave_id }}"
+                            data-bs-toggle="modal" data-bs-target="#rejectModal">
+                            <i class="fas fa-times"></i> Reject
+                        </button>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Bootstrap Modal for Rejection Reason -->
+    <div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="rejectModalLabel">Reject Leave</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <label for="rejectionReason">Please enter the reason for rejection:</label>
+                    <textarea id="rejectionReason" class="form-control" rows="3"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger" id="confirmReject">Reject</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updateLeaveStatus(leaveId, status, reason = null) {
+            fetch(`/leaves/${leaveId}/status`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ status: status, reason: reason })
+            })
+            .then(async response => {
+                const data = await response.json().catch(() => ({}));
+                if (!response.ok) {
+                    throw new Error(data.error || 'An error occurred while updating the leave request.');
+                }
+                return data;
+            })
+            .then(data => {
+                alert(data.message || 'Leave request updated successfully.');
+                location.reload();
+            })
+            .catch(error => {
+                alert(error.message);
+            });
+        }
+
+        let currentLeaveIdForRejection;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const approveBtn = document.querySelector('.approve-btn');
+            if (approveBtn) {
+                approveBtn.addEventListener('click', function() {
+                    if (confirm('Are you sure you want to approve this leave request?')) {
+                        updateLeaveStatus(this.dataset.leaveId, 'approved');
+                    }
+                });
+            }
+
+            const rejectBtn = document.querySelector('.reject-btn');
+            if (rejectBtn) {
+                rejectBtn.addEventListener('click', function() {
+                    currentLeaveIdForRejection = this.dataset.leaveId;
+                });
+            }
+
+            const confirmRejectBtn = document.getElementById('confirmReject');
+            if (confirmRejectBtn) {
+                confirmRejectBtn.addEventListener('click', function() {
+                    const reason = document.getElementById('rejectionReason').value;
+                    if (!reason) {
+                        alert('Please enter a rejection reason.');
+                        return;
+                    }
+                    updateLeaveStatus(currentLeaveIdForRejection, 'rejected', reason);
+                });
+            }
+        });
+    </script>
 
     <script>
 
