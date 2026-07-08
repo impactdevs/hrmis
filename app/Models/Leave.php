@@ -164,8 +164,10 @@ class Leave extends Model
             return false;
         }
 
-        // User can only edit their own leave requests (handle type casting)
-        if ((string) $this->user_id !== (string) auth()->id()) {
+        // A user can edit their own leave requests (handle type casting).
+        // HR may also edit any staff member's leave request on their behalf.
+        $isOwner = (string) $this->user_id === (string) auth()->id();
+        if (!$isOwner && !auth()->user()->hasRole('HR')) {
             return false;
         }
 

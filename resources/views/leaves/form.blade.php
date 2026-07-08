@@ -64,7 +64,26 @@
     </div>
 </div>
 
-<x-forms.hidden name="user_id" id="user_id" value="{{ $user_id }}" />
+@if ($formMode === 'create' && auth()->user()->hasRole('HR'))
+    <div class="mb-3 col-md-6">
+        <label for="user_id" class="form-label">Staff Member *</label>
+        <select name="user_id" id="user_id"
+            class="form-control @error('user_id') is-invalid @enderror">
+            <option value="">-- Select Staff Member --</option>
+            @foreach ($users as $id => $name)
+                <option value="{{ $id }}" {{ old('user_id') == $id ? 'selected' : '' }}>{{ $name }}</option>
+            @endforeach
+        </select>
+        @error('user_id')
+            <div class="invalid-feedback">
+                {{ $message }}
+            </div>
+        @enderror
+        <small class="text-muted">Leave this blank to apply for yourself instead.</small>
+    </div>
+@else
+    <x-forms.hidden name="user_id" id="user_id" value="{{ $user_id }}" />
+@endif
 
 
 <div class="mb-3 col">

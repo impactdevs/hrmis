@@ -105,7 +105,10 @@ class LeaveController extends Controller
      */
     public function create()
     {
-        if (!auth()->user()->employee->department) {
+        // HR can schedule leave on behalf of any staff member, so this check
+        // (which is about the logged-in user's own department) only applies
+        // when someone is applying for their own leave.
+        if (!auth()->user()->hasRole('HR') && !auth()->user()->employee?->department) {
             return back()->with("error", "No department head found. Contact admin.");
         }
         //get the logged in user email
@@ -147,14 +150,23 @@ class LeaveController extends Controller
             'phone_number' => 'nullable|string',
             'other_contact_details' => 'nullable|string',
             'reason' => 'nullable|string',
+            'user_id' => 'nullable|exists:users,id',
         ]);
 
         $user = auth()->user();
 
+        // HR can schedule leave on behalf of a staff member by picking them in the
+        // form; only HR is trusted to override the owner — everyone else's leave
+        // is always recorded under their own account regardless of what's posted.
+        $targetUserId = ($user->hasRole('HR') && !empty($requestData['user_id']))
+            ? $requestData['user_id']
+            : $user->id;
+        unset($requestData['user_id']);
+
         // Validate maternity leave restrictions
         $maternityError = $leaveService->validateMaternityLeave(
             $requestData['leave_type_id'],
-            $user->id,
+            $targetUserId,
             $requestData['start_date']
         );
 
@@ -167,7 +179,7 @@ class LeaveController extends Controller
         //Validate paternity leave restrictions
         $paternityError = $leaveService->validatePaternityLeave(
             $requestData['leave_type_id'],
-            $user->id,
+            $targetUserId,
             $requestData['start_date']
         );
 
@@ -201,7 +213,7 @@ class LeaveController extends Controller
         }
 
         // Create the leave request with history tracking
-        $leave = $leaveService->createLeaveRequest($requestData, $user->id);
+        $leave = $leaveService->createLeaveRequest($requestData, $targetUserId);
 
         // Send notifications
         $leaveService->sendNotifications($leave);
@@ -229,10 +241,15 @@ class LeaveController extends Controller
      */
     public function edit(Leave $leave)
     {
+        if (!$leave->canBeEdited()) {
+            return back()->with('error', 'You cannot edit this leave request.');
+        }
+
         $leaveTypes = LeaveType::pluck('leave_type_name', 'leave_type_id')->toArray();
         $users = User::pluck('name', 'id')->toArray();
         $holidays = PublicHoliday::pluck('holiday_date')->toArray();
-        $user_id = auth()->user()->id;
+        // Keep the form scoped to the leave's actual owner, not whoever is editing it.
+        $user_id = $leave->user_id;
 
         return view('leaves.edit', compact('leave', 'leaveTypes', 'users', 'holidays', 'user_id'));
     }
