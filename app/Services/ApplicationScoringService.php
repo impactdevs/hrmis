@@ -146,11 +146,16 @@ class ApplicationScoringService
         $application->saveQuietly(); // avoid triggering model events again
 
         // ── Send rejection email if auto-rejected ─────────────────────────────
+        // Only once the job's deadline has passed — candidates shouldn't be told
+        // they're rejected while the posting is still open to other applicants.
+        // If the deadline hasn't passed yet, the scheduled
+        // app:send-deferred-rejection-emails command picks this up later.
 
-        if (!$passesCriteria) {
+        if (!$passesCriteria && $job->applicationsClosed()) {
             try {
                 Mail::to($application->email)
                     ->send(new ApplicationStatusChangedMail($application, JobApplication::STATUS_PENDING));
+                $application->forceFill(['status_notified_at' => now()])->saveQuietly();
             } catch (\Throwable $e) {
                 Log::warning("Auto-rejection email failed for application #{$application->id}: {$e->getMessage()}");
             }

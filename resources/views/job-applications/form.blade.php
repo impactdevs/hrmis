@@ -430,7 +430,7 @@
                 </div>
 
                 <div class="col-md-4">
-                    <label class="form-label fw-semibold">CV / Resume {{ $isEdit ? '' : '*' }}</label>
+                    <label class="form-label fw-semibold">CV and Cover letter {{ $isEdit ? '' : '*' }}</label>
                     @if ($isEdit && $application->cv)
                         <a href="{{ asset('storage/'.$application->cv) }}" target="_blank" class="d-block small text-primary mb-1">📄 {{ basename($application->cv) }}</a>
                     @endif

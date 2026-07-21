@@ -102,6 +102,16 @@ class CompanyJob extends Model
         return 'active';
     }
 
+    /**
+     * True only when this job has a deadline and it has passed. Jobs with no
+     * deadline set never "close" via this check — used to decide whether a
+     * rejection notice can go out now or must wait.
+     */
+    public function applicationsClosed(): bool
+    {
+        return $this->will_become_inactive_at?->isPast() ?? false;
+    }
+
     public function hasCriteria(): bool
     {
         return !empty($this->criteria_min_qualification)

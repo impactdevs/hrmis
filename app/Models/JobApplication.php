@@ -59,6 +59,7 @@ class JobApplication extends Model
         'criteria_failures'                => 'array',
         'meets_criteria'                   => 'boolean',
         'scored_at'                        => 'datetime',
+        'status_notified_at'               => 'datetime',
     ];
 
     // ── Scopes ────────────────────────────────────────────────────────────────

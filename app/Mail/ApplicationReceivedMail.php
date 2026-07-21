@@ -18,7 +18,6 @@ class ApplicationReceivedMail extends Mailable
 
     public function __construct(
         public readonly JobApplication $application,
-        public readonly string $editUrl,
     ) {}
 
     public function envelope(): Envelope

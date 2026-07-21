@@ -42,17 +42,8 @@
         </div>
 
         <p>
-            If you need to update your details before the deadline, use the button below.
-            <strong>Keep this email</strong> — it is the only way to access your application.
-        </p>
-
-        <p style="text-align: center; margin: 28px 0;">
-            <a href="{{ $editUrl }}" class="btn">Edit My Application</a>
-        </p>
-
-        <p class="fallback">
-            If the button doesn't work, copy and paste this link into your browser:<br>
-            <a href="{{ $editUrl }}">{{ $editUrl }}</a>
+            Your application is now final and cannot be edited. Please keep this email and your
+            reference number for your records.
         </p>
     </div>
     <div class="footer">

@@ -29,6 +29,10 @@
             text-align: center;
             border-radius: 8px 8px 0 0;
         }
+        .header img {
+            max-height: 60px;
+            margin-bottom: 12px;
+        }
         .header h1 {
             margin: 0;
             font-size: 24px;
@@ -76,6 +80,7 @@
     <div class="email-container">
         <!-- Header Section -->
         <div class="header">
+            <img src="{{ asset('assets/img/logo.png') }}" alt="UNCST">
             <h1>Your Application Has Been Received</h1>
         </div>
 

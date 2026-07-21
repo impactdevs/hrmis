@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\ApplicationIdEncoder;
 use App\Mail\ApplicationReceivedMail;
 use App\Mail\ApplicationStatusChangedMail;
 use App\Models\CompanyJob;
@@ -86,20 +85,16 @@ class JobApplicationController extends Controller
         $this->scorer->score($application);
         $application->refresh();
 
-        // Send confirmation email with encoded edit link
-        $encodedId = ApplicationIdEncoder::encode($application->id);
-        $editUrl   = route('apply.edit', $encodedId);
-
+        // Send confirmation email — applications are final once submitted, no edit link
         try {
             Mail::to($application->email)
-                ->send(new ApplicationReceivedMail($application, $editUrl));
+                ->send(new ApplicationReceivedMail($application));
         } catch (\Throwable $e) {
             Log::warning("Confirmation email failed for application #{$application->id}: {$e->getMessage()}");
         }
 
         return redirect()->route('apply.thankyou')
-            ->with('applicant_name', $application->full_name)
-            ->with('was_rejected', $application->status === JobApplication::STATUS_REJECTED);
+            ->with('applicant_name', $application->full_name);
     }
 
     /**
@@ -109,70 +104,6 @@ class JobApplicationController extends Controller
     public function thankyou()
     {
         return view('job-applications.thankyou');
-    }
-
-    /**
-     * Show edit form — accessed via encoded link in confirmation email.
-     * GET /apply/edit/{encodedId}
-     */
-    public function edit(string $encodedId)
-    {
-        $application = $this->resolveEncoded($encodedId);
-
-        if ($application->companyJob?->statusLabel() === 'closed') {
-            return view('job-applications.closed', [
-                'message' => 'The deadline for this application has passed. Edits are no longer accepted.',
-            ]);
-        }
-
-        // Rejected applications can still be viewed but not edited
-        if ($application->status === JobApplication::STATUS_REJECTED && $application->meets_criteria === false) {
-            return view('job-applications.rejected-view', compact('application'));
-        }
-
-        return view('job-applications.edit', compact('application', 'encodedId'));
-    }
-
-    /**
-     * Save edits to a submitted application.
-     * PUT /apply/edit/{encodedId}
-     */
-    public function update(string $encodedId, Request $request)
-    {
-        $application = $this->resolveEncoded($encodedId);
-
-        if ($application->companyJob?->statusLabel() === 'closed') {
-            return back()->with('error', 'The deadline has passed. Edits are no longer accepted.');
-        }
-
-        $validated     = $this->validateApplication($request, $application->companyJob, $application->id);
-        $uploadedPaths = [];
-
-        try {
-            [$academicPaths, $cvPath, $otherPaths, $uploadedPaths] = $this->uploadFiles(
-                $request,
-                $application
-            );
-
-            $application->update(array_merge(
-                $this->mapToModel($validated),
-                [
-                    'academic_documents' => $academicPaths,
-                    'cv'                 => $cvPath,
-                    'other_documents'    => $otherPaths,
-                ]
-            ));
-        } catch (\Throwable $e) {
-            foreach ($uploadedPaths as $path) Storage::disk('public')->delete($path);
-            return back()->withInput()->with('error', 'Update failed. Please try again.');
-        }
-
-        // Re-score after edits
-        $application->refresh();
-        $this->scorer->score($application);
-
-        return redirect()->route('apply.edit', $encodedId)
-            ->with('success', 'Your application has been updated successfully.');
     }
 
     // =========================================================================
@@ -276,11 +207,23 @@ class JobApplicationController extends Controller
             return back()->with('error', $message);
         }
 
-        try {
-            Mail::to($application->email)
-                ->send(new ApplicationStatusChangedMail($application, $previousStatus));
-        } catch (\Throwable $e) {
-            Log::warning("Status email failed for application #{$application->id}: {$e->getMessage()}");
+        // Rejections wait until the job's deadline has passed — candidates
+        // shouldn't be told they're out while the posting is still accepting
+        // other applications. Every other status change still notifies right
+        // away. Deferred rejections are picked up later by the scheduled
+        // app:send-deferred-rejection-emails command.
+        $deferRejection = $newStatus === JobApplication::STATUS_REJECTED
+            && $application->companyJob
+            && !$application->companyJob->applicationsClosed();
+
+        if (!$deferRejection) {
+            try {
+                Mail::to($application->email)
+                    ->send(new ApplicationStatusChangedMail($application, $previousStatus));
+                $application->forceFill(['status_notified_at' => now()])->saveQuietly();
+            } catch (\Throwable $e) {
+                Log::warning("Status email failed for application #{$application->id}: {$e->getMessage()}");
+            }
         }
 
         if ($request->ajax()) {
@@ -288,7 +231,8 @@ class JobApplicationController extends Controller
         }
 
         return back()->with('success', 'Status updated to "' . ucfirst($newStatus) . '".'
-            . ($newStatus === JobApplication::STATUS_HIRED ? ' Employee record created.' : ''));
+            . ($newStatus === JobApplication::STATUS_HIRED ? ' Employee record created.' : '')
+            . ($deferRejection ? ' The rejection email will be sent automatically once the application deadline passes.' : ''));
     }
 
     /**
@@ -365,12 +309,6 @@ class JobApplicationController extends Controller
     // =========================================================================
     // PRIVATE HELPERS
     // =========================================================================
-
-    private function resolveEncoded(string $encodedId): JobApplication
-    {
-        $id = ApplicationIdEncoder::decode($encodedId);
-        return JobApplication::findOrFail($id);
-    }
 
     private function validateApplication(Request $request, ?CompanyJob $job, ?int $ignoreId = null): array
     {

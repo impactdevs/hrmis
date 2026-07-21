@@ -70,15 +70,9 @@ Route::get('/employees/{employee}/print', function (Employee $employee) {
 // e.g. /apply/550e8400-e29b-41d4-a716-446655440000
 Route::prefix('apply')->name('apply.')->group(function () {
 
-    // Thank-you page and edit must come before /{token} to avoid being swallowed
+    // Thank-you page must come before /{token} to avoid being swallowed
     Route::get('/thank-you', [JobApplicationController::class, 'thankyou'])
         ->name('thankyou');
-
-    Route::get('/edit/{encodedId}', [JobApplicationController::class, 'edit'])
-        ->name('edit');
-
-    Route::put('/edit/{encodedId}', [JobApplicationController::class, 'update'])
-        ->name('update');
 
     // The shareable link: /apply/{token}
     Route::get('/{token}', [JobApplicationController::class, 'showForm'])
