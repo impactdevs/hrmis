@@ -104,7 +104,7 @@
                     @endif
 
                     {{-- The shareable link --}}
-                    <div class="p-4 rounded border {{ $status === 'active' ? 'border-success bg-success bg-opacity-10' : 'bg-light' }}">
+                    <div class="p-4 rounded border {{ $status === 'active' ? 'border-success bg-success bg-opacity-10' : 'bg-light' }} mb-4">
                         <h6 class="fw-bold mb-1">
                             🔗 Application Link
                             <span class="badge bg-{{ $color }} ms-1">{{ ucfirst($status) }}</span>
@@ -116,7 +116,7 @@
                         <div class="input-group mb-2">
                             <input type="text" class="form-control font-monospace"
                                 id="appLink" value="{{ $companyJob->applicationLink() }}" readonly>
-                            <button class="btn btn-success" onclick="copyAppLink()">📋 Copy</button>
+                            <button type="button" class="btn btn-success" onclick="copyToClipboard('appLink', this)">📋 Copy</button>
                         </div>
                         <form method="POST"
                             action="{{ route('hr.company-jobs.regenerate-link', $companyJob->company_job_id) }}"
@@ -126,6 +126,38 @@
                             <button type="submit" class="btn btn-outline-danger btn-sm">🔄 Regenerate Link</button>
                         </form>
                         <span class="text-muted small ms-2">Use this if the link was shared by mistake.</span>
+                    </div>
+
+                    {{-- Screening board link --}}
+                    <div class="p-4 rounded border bg-light">
+                        <h6 class="fw-bold mb-1">🧑‍⚖️ Screening Board Link</h6>
+                        <p class="text-muted small mb-2">
+                            Share this link and PIN with the screening panel so they can view applicants
+                            and shortlist/reject candidates for this posting — no HRMIS account needed.
+                        </p>
+
+                        @if ($companyJob->hasScreeningLink())
+                            <div class="input-group mb-2">
+                                <input type="text" class="form-control font-monospace"
+                                    id="screeningLink" value="{{ $companyJob->screeningLink() }}" readonly>
+                                <button type="button" class="btn btn-success" onclick="copyToClipboard('screeningLink', this)">📋 Copy</button>
+                            </div>
+                        @endif
+
+                        <form method="POST"
+                            action="{{ route('hr.company-jobs.generate-screening-link', $companyJob->company_job_id) }}"
+                            class="d-flex gap-2 align-items-start flex-wrap"
+                            onsubmit="return {{ $companyJob->hasScreeningLink() ? 'confirm(\'This replaces the current link and PIN — anyone with the old one loses access. Continue?\')' : 'true' }}">
+                            @csrf
+                            <div>
+                                <input type="text" name="screening_pin" class="form-control form-control-sm"
+                                    placeholder="Set a PIN (min 4 chars)" minlength="4" maxlength="20" required
+                                    style="max-width:220px">
+                            </div>
+                            <button type="submit" class="btn btn-outline-primary btn-sm">
+                                {{ $companyJob->hasScreeningLink() ? '🔄 Regenerate Link & PIN' : '🔗 Generate Screening Link' }}
+                            </button>
+                        </form>
                     </div>
 
                 </div>
@@ -160,11 +192,12 @@
     </div>
 
     <script>
-        function copyAppLink() {
-            navigator.clipboard.writeText(document.getElementById('appLink').value).then(() => {
-                const btn = document.querySelector('.btn-success');
+        function copyToClipboard(inputId, btn) {
+            const input = document.getElementById(inputId);
+            navigator.clipboard.writeText(input.value).then(() => {
+                const original = btn.textContent;
                 btn.textContent = '✅ Copied!';
-                setTimeout(() => btn.textContent = '📋 Copy', 2000);
+                setTimeout(() => btn.textContent = original, 2000);
             });
         }
     </script>

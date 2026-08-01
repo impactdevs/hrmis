@@ -70,6 +70,21 @@ class CompanyJobController extends Controller
         return back()->with('success', 'Application link regenerated. The previous link is now invalid.');
     }
 
+    /**
+     * (Re)generate the screening-board link and set the shared PIN for this
+     * job posting. Regenerating invalidates the previous link and PIN.
+     */
+    public function generateScreeningLink(Request $request, CompanyJob $companyJob)
+    {
+        $validated = $request->validate([
+            'screening_pin' => 'required|string|min:4|max:20',
+        ]);
+
+        $companyJob->setScreeningPin($validated['screening_pin']);
+
+        return back()->with('success', 'Screening link generated. Share the link and PIN with the screening board.');
+    }
+
     public function destroy(CompanyJob $companyJob)
     {
         if ($companyJob->jobApplications()->exists()) {

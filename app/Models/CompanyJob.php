@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 class CompanyJob extends Model
@@ -17,6 +18,8 @@ class CompanyJob extends Model
         'job_title',
         'job_description',
         'public_token',
+        'screening_token',
+        'screening_pin',
         'will_become_active_at',
         'will_become_inactive_at',
         // Criteria
@@ -30,6 +33,11 @@ class CompanyJob extends Model
         'weight_experience',
         'weight_keyword_match',
         'weight_age_fit',
+    ];
+
+    // Never expose the hashed PIN if this model is ever serialized to an array/view dump.
+    protected $hidden = [
+        'screening_pin',
     ];
 
     protected $casts = [
@@ -93,6 +101,38 @@ class CompanyJob extends Model
     {
         $this->update(['public_token' => (string) Str::uuid()]);
         return $this;
+    }
+
+    /**
+     * True once HR has generated a screening link (and set a PIN) for this job.
+     */
+    public function hasScreeningLink(): bool
+    {
+        return !empty($this->screening_token) && !empty($this->screening_pin);
+    }
+
+    public function screeningLink(): ?string
+    {
+        return $this->screening_token ? route('screening.show', $this->screening_token) : null;
+    }
+
+    /**
+     * (Re)generate the screening link and set/replace the shared board PIN.
+     * Regenerating invalidates any previously shared link and any sessions
+     * that had verified against the old PIN.
+     */
+    public function setScreeningPin(string $pin): self
+    {
+        $this->update([
+            'screening_token' => (string) Str::uuid(),
+            'screening_pin'   => Hash::make($pin),
+        ]);
+        return $this;
+    }
+
+    public function checkScreeningPin(string $pin): bool
+    {
+        return $this->screening_pin && Hash::check($pin, $this->screening_pin);
     }
 
     public function statusLabel(): string

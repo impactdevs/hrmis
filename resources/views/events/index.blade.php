@@ -50,16 +50,16 @@
                                 @endforeach
 
                                 @foreach ($departmentIds as $id)
-                                    @if (filled($id))
+                                    @if (filled($id) && isset($options['departments'][$id]))
                                         <span
-                                            class="badge bg-success">{{ $options['departments'][$id] == '' ? 'not found' : $options['departments'][$id] ?? 'Unknown Department' }}</span>
+                                            class="badge bg-success">{{ $options['departments'][$id] }}</span>
                                     @endif
                                 @endforeach
 
                                 @foreach ($positionIds as $id)
-                                    @if (filled($id))
+                                    @if (filled($id) && isset($options['positions'][$id]))
                                         <span
-                                            class="badge bg-info">{{ $options['positions'][$id] == '' ? '' : $options['positions'][$id] ?? 'Unknown Position' }}</span>
+                                            class="badge bg-info">{{ $options['positions'][$id] }}</span>
                                     @endif
                                 @endforeach
                             </td>

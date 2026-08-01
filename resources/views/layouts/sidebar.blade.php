@@ -54,13 +54,13 @@
                 </a>
             </li>
 
-             @if (auth()->user()->isAdminOrSecretary)
+             @if (auth()->user()->hasRole('HR') || auth()->user()->hasRole('Executive Secretary'))
             <li class="nav-item">
                 <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('attendances.index')) bg-secondary @endif"
                     href="{{ route('attendances.index') }}">
                     <i class="bi bi-check2-all"></i>
                     Attendances </a>
-            </li> 
+            </li>
             @endif
 
 

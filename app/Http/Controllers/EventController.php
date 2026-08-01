@@ -21,8 +21,12 @@ class EventController extends Controller
      */
     public function index()
     {
+        // withoutGlobalScopes(): these are just label lookups for rendering badges on
+        // events tagged for any department/position — DepartmentScope restricts a
+        // Staff/HoD viewer's query to their own department, which would make any
+        // event tagged for a different department resolve to a missing array key.
         $positions = Position::pluck('position_name', 'position_id')->toArray();
-        $departments = Department::pluck('department_name', 'department_id')->toArray();
+        $departments = Department::withoutGlobalScopes()->pluck('department_name', 'department_id')->toArray();
         $users = User::pluck('name', 'id')->toArray() ?? [];
 
 

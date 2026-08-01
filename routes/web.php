@@ -26,6 +26,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicHolidayController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SalaryAdvanceController;
+use App\Http\Controllers\ScreeningController;
 use App\Http\Controllers\StaffRecruitmentController;
 use App\Http\Controllers\TrainingController;
 use App\Http\Controllers\UploadEmployees;
@@ -83,6 +84,25 @@ Route::prefix('apply')->name('apply.')->group(function () {
         ->middleware('throttle:5,1'); // max 5 submissions per minute per IP
 });
 
+// Screening board — link + PIN shared by HR with external panel members so
+// they can view applicants for one job posting and shortlist/reject them.
+// No HRMIS account required; access is gated by the token + PIN, not auth.
+Route::prefix('screening')->name('screening.')->group(function () {
+    Route::get('/{token}', [ScreeningController::class, 'show'])->name('show');
+
+    Route::post('/{token}/verify', [ScreeningController::class, 'verifyPin'])
+        ->name('verify')
+        ->middleware('throttle:5,1'); // max 5 PIN attempts per minute per IP
+
+    Route::post('/{token}/exit', [ScreeningController::class, 'exit'])->name('exit');
+
+    Route::get('/{token}/applications/{application}', [ScreeningController::class, 'viewApplication'])
+        ->name('applications.show');
+
+    Route::post('/{token}/applications/{application}/status', [ScreeningController::class, 'updateStatus'])
+        ->name('applications.status');
+});
+
 // Whistleblowing (public)
 Route::get('uncst-whistleblowing-form', [WhistleblowingController::class, 'create'])->name('whistleblowing.create');
 Route::post('uncst-whistleblowing-form', [WhistleblowingController::class, 'store'])->name('whistleblowing.store');
@@ -131,6 +151,9 @@ Route::middleware(['auth', 'verified', 'check.employee.record', 'data.usage.agre
 
     Route::post('company-jobs/{companyJob}/regenerate-link', [CompanyJobController::class, 'regenerateLink'])
         ->name('hr.company-jobs.regenerate-link');
+
+    Route::post('company-jobs/{companyJob}/screening-link', [CompanyJobController::class, 'generateScreeningLink'])
+        ->name('hr.company-jobs.generate-screening-link');
 
     // ── Job Applications (HR side) ────────────────────────────────────────────
 
@@ -189,8 +212,12 @@ Route::middleware(['auth', 'verified', 'check.employee.record', 'data.usage.agre
 
     // ── Other HR Resources ────────────────────────────────────────────────────
     Route::resource('positions', PositionController::class);
-    Route::get('attendances/export', [AttendanceController::class, 'export'])->name('attendances.export');
-    Route::resource('attendances', AttendanceController::class);
+
+    Route::middleware('role:HR|Executive Secretary')->group(function () {
+        Route::get('attendances/export', [AttendanceController::class, 'export'])->name('attendances.export');
+        Route::resource('attendances', AttendanceController::class);
+    });
+
     Route::resource('departments', DepartmentController::class);
 
     // ── Leave Management ──────────────────────────────────────────────────────
