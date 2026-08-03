@@ -184,6 +184,8 @@
                             class="btn btn-outline-primary btn-sm">📋 List View</a>
                         <a href="{{ route('hr.job-applications.pipeline', ['company_job_id' => $companyJob->company_job_id]) }}"
                             class="btn btn-outline-secondary btn-sm">🗂 Pipeline Board</a>
+                        <a href="{{ route('hr.company-jobs.export-applicants', ['company_job_id' => $companyJob->company_job_id]) }}"
+                            class="btn btn-outline-success btn-sm">⬇ Export Names (CSV)</a>
                     </div>
                 </div>
             </div>

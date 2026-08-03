@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\CompanyJob;
 use App\Models\JobApplication;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Response;
 
 class CompanyJobController extends Controller
 {
@@ -15,6 +16,44 @@ class CompanyJobController extends Controller
             ->paginate(20);
 
         return view('company-jobs.index', compact('jobs'));
+    }
+
+    /**
+     * CSV export of applicant names alongside the job they applied for.
+     * Optionally scoped to one posting via ?company_job_id=.
+     * GET /hr/company-jobs/export-applicants
+     */
+    public function exportApplicantNames(Request $request)
+    {
+        $applications = JobApplication::with('companyJob')
+            ->when($request->filled('company_job_id'), fn($q) => $q->where('company_job_id', $request->company_job_id))
+            ->orderBy('post_applied')
+            ->orderBy('full_name')
+            ->get(['full_name', 'post_applied', 'company_job_id']);
+
+        $filename = 'applicants_' . now()->format('Y-m-d') . '.csv';
+
+        $headers = [
+            'Content-Type'        => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ];
+
+        $callback = function () use ($applications) {
+            $handle = fopen('php://output', 'w');
+
+            fputcsv($handle, ['Applicant Name', 'Job Applied']);
+
+            foreach ($applications as $application) {
+                fputcsv($handle, [
+                    $application->full_name,
+                    $application->companyJob?->job_title ?? $application->post_applied ?? 'N/A',
+                ]);
+            }
+
+            fclose($handle);
+        };
+
+        return Response::stream($callback, 200, $headers);
     }
 
     public function create()

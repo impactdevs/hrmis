@@ -2,7 +2,12 @@
     <div class="card shadow">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Job Postings</h5>
-            <a href="{{ route('hr.company-jobs.create') }}" class="btn btn-light btn-sm">+ New Posting</a>
+            <div class="d-flex gap-2">
+                <a href="{{ route('hr.company-jobs.export-applicants') }}" class="btn btn-light btn-sm">
+                    ⬇ Export Applicant Names (CSV)
+                </a>
+                <a href="{{ route('hr.company-jobs.create') }}" class="btn btn-light btn-sm">+ New Posting</a>
+            </div>
         </div>
         <div class="card-body">
 

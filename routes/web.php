@@ -137,6 +137,11 @@ Route::middleware(['auth', 'verified', 'check.employee.record', 'data.usage.agre
         ->name('recruitmentments.approveOrReject');
 
     // ── Job Postings (HR creates postings and gets shareable links) ───────────
+    // Must come before the resource route below — otherwise "export-applicants"
+    // would be swallowed by the {companyJob} wildcard on the show route.
+    Route::get('company-jobs/export-applicants', [CompanyJobController::class, 'exportApplicantNames'])
+        ->name('hr.company-jobs.export-applicants');
+
     Route::resource('company-jobs', CompanyJobController::class)
         ->parameters(['company-jobs' => 'companyJob'])
         ->names([
