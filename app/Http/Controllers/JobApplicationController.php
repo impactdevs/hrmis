@@ -207,16 +207,9 @@ class JobApplicationController extends Controller
             return back()->with('error', $message);
         }
 
-        // Rejections wait until the job's deadline has passed — candidates
-        // shouldn't be told they're out while the posting is still accepting
-        // other applications. Every other status change still notifies right
-        // away. Deferred rejections are picked up later by the scheduled
-        // app:send-deferred-rejection-emails command.
-        $deferRejection = $newStatus === JobApplication::STATUS_REJECTED
-            && $application->companyJob
-            && !$application->companyJob->applicationsClosed();
-
-        if (!$deferRejection) {
+        // Rejection emails are disabled — every other status change still
+        // notifies the candidate immediately.
+        if ($newStatus !== JobApplication::STATUS_REJECTED) {
             try {
                 Mail::to($application->email)
                     ->send(new ApplicationStatusChangedMail($application, $previousStatus));
@@ -231,8 +224,7 @@ class JobApplicationController extends Controller
         }
 
         return back()->with('success', 'Status updated to "' . ucfirst($newStatus) . '".'
-            . ($newStatus === JobApplication::STATUS_HIRED ? ' Employee record created.' : '')
-            . ($deferRejection ? ' The rejection email will be sent automatically once the application deadline passes.' : ''));
+            . ($newStatus === JobApplication::STATUS_HIRED ? ' Employee record created.' : ''));
     }
 
     /**

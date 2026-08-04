@@ -116,12 +116,8 @@ class ScreeningController extends Controller
                 : $application->rejection_reason,
         ]);
 
-        // Same deadline-aware deferral as HR's own status changes — don't tell a
-        // candidate they're rejected while the posting is still open to others.
-        $deferRejection = $newStatus === JobApplication::STATUS_REJECTED
-            && !$job->applicationsClosed();
-
-        if (!$deferRejection) {
+        // Rejection emails are disabled — shortlisting still notifies the candidate.
+        if ($newStatus !== JobApplication::STATUS_REJECTED) {
             try {
                 Mail::to($application->email)
                     ->send(new ApplicationStatusChangedMail($application, $previousStatus));
@@ -131,8 +127,7 @@ class ScreeningController extends Controller
             }
         }
 
-        return back()->with('success', 'Candidate marked as "' . ucfirst($newStatus) . '".'
-            . ($deferRejection ? ' The rejection email will be sent automatically once the application deadline passes.' : ''));
+        return back()->with('success', 'Candidate marked as "' . ucfirst($newStatus) . '".');
     }
 
     // ── Private helpers ───────────────────────────────────────────────────────

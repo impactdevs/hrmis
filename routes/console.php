@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Support\Facades\Schedule;
@@ -10,9 +11,6 @@ Schedule::command('reminders:send-birthday')->daily();
 Schedule::command('app:appraisal-reminder')->yearlyOn(6, 1, '00:00');
 
 Schedule::command('app:leave-application-due-reminder')->daily();
-
-// Sends rejection emails deferred until a job's application deadline passes
-Schedule::command('app:send-deferred-rejection-emails')->hourly();
 
 // Runs every minute — picks up new badge events in near real-time
 Schedule::job(new ProcessHikvisionLogs)->everyMinute();
