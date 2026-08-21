@@ -5,6 +5,7 @@
     - [Employee Management](/{{route}}/{{version}}/employee)
     - [Leave Roster Scheduling](/{{route}}/{{version}}/leave-roster)
     - [Leave Management](/{{route}}/{{version}}/leave)
+    - [Attendance Management](/{{route}}/{{version}}/attendance)
     - [Appraisals Management](/{{route}}/{{version}}/appraisal)
     - [Events Management](/{{route}}/{{version}}/event)
     - [Training/Travels Management](/{{route}}/{{version}}/training-travels)
