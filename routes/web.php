@@ -132,9 +132,11 @@ Route::middleware(['auth', 'verified', 'check.employee.record', 'data.usage.agre
     Route::post('update-entitled-leave-days/{id}', [EmployeeController::class, 'updateEntitledLeaveDays'])->name('update-entitled-leave-days');
 
     // ── Recruitments ──────────────────────────────────────────────────────────
-    Route::resource('recruitments', StaffRecruitmentController::class);
-    Route::post('/recruitments/{recruitment}/status', [StaffRecruitmentController::class, 'approveOrReject'])
-        ->name('recruitmentments.approveOrReject');
+    Route::middleware('role:HR|Head of Division|Executive Secretary|Assistant Executive Secretary')->group(function () {
+        Route::resource('recruitments', StaffRecruitmentController::class);
+        Route::post('/recruitments/{recruitment}/status', [StaffRecruitmentController::class, 'approveOrReject'])
+            ->name('recruitments.approveOrReject');
+    });
 
     // ── Job Postings (HR creates postings and gets shareable links) ───────────
     // Must come before the resource route below — otherwise "export-applicants"
@@ -263,8 +265,10 @@ Route::middleware(['auth', 'verified', 'check.employee.record', 'data.usage.agre
     Route::get('/get-count', [NotificationController::class, 'getCount']);
 
     // ── Whistleblowing (HR view) ──────────────────────────────────────────────
-    Route::get('whistleblowing', [WhistleblowingController::class, 'index'])->name('whistleblowing.index');
-    Route::get('whistleblowing/{id}', [WhistleblowingController::class, 'show'])->name('whistleblowing.show');
+    Route::middleware('role:HR|Executive Secretary')->group(function () {
+        Route::get('whistleblowing', [WhistleblowingController::class, 'index'])->name('whistleblowing.index');
+        Route::get('whistleblowing/{id}', [WhistleblowingController::class, 'show'])->name('whistleblowing.show');
+    });
 
     // ── Other ─────────────────────────────────────────────────────────────────
     Route::get('/uncst-matrix', [DocumentController::class, 'uncst_matrix'])->name('uncst-matrix');

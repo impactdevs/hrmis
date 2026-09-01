@@ -15,16 +15,18 @@ class StaffRecruitmentApproval extends Notification implements ShouldQueue
 
     public StaffRecruitment $staffRecrutment;
     public User $user;
-    public User $approver; // User who approved/rejected the leave
+    public User $approver; // User who approved/rejected the request
+    public string $decision; // 'approved' or 'rejected'
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(StaffRecruitment $staffRecrutment, User $approver)
+    public function __construct(StaffRecruitment $staffRecrutment, User $approver, string $decision)
     {
         $this->user = User::find($staffRecrutment->user_id);
         $this->staffRecrutment = $staffRecrutment;
-        $this->approver = $approver; // Store the approver
+        $this->approver = $approver;
+        $this->decision = $decision;
     }
 
     /**
@@ -42,27 +44,27 @@ class StaffRecruitmentApproval extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
-        if ($this->staffRecrutment->approval_status === 'rejected') {
+        if ($this->decision === 'rejected') {
             return (new MailMessage)
                 ->subject('Staff Recruitment Application Rejected')
                 ->line('Your staff recruitment application has been rejected.')
                 ->line('Staff Recruitment Position: ' . $this->staffRecrutment->position)
                 ->line('Staff Recruitment Needed By: ' . $this->staffRecrutment->date_of_recruitment->format('Y-m-d'))
                 ->line('Justification: ' . $this->staffRecrutment->justification)
-                ->line('Approved By: ' . $this->approver->name)
+                ->line('Rejected By: ' . $this->approver->name)
                 ->action('View Staff Recruitment Details', url('/recruitments/' . $this->staffRecrutment->staff_recruitment_id))
                 ->line('Thank you for using our application!');
-        } else {
-            return (new MailMessage)
-                ->subject('Staff Recruitment Application Rejected')
-                ->line('Your staff recruitment application has been approved.')
-                ->line('Staff Recruitment Position: ' . $this->staffRecrutment->position)
-                ->line('Staff Recruitment Needed By: ' . $this->staffRecrutment->date_of_recruitment->format('Y-m-d'))
-                ->line('Justification: ' . $this->staffRecrutment->justification)
-                ->line('Approved By: ' . $this->approver->name)
-                ->action('View StaffRecruitment Details', url('/recruitments/' . $this->staffRecrutment->staff_recruitment_id))
-                ->line('Thank you for using our application!');
         }
+
+        return (new MailMessage)
+            ->subject('Staff Recruitment Application Approved')
+            ->line('Your staff recruitment application has been approved.')
+            ->line('Staff Recruitment Position: ' . $this->staffRecrutment->position)
+            ->line('Staff Recruitment Needed By: ' . $this->staffRecrutment->date_of_recruitment->format('Y-m-d'))
+            ->line('Justification: ' . $this->staffRecrutment->justification)
+            ->line('Approved By: ' . $this->approver->name)
+            ->action('View Staff Recruitment Details', url('/recruitments/' . $this->staffRecrutment->staff_recruitment_id))
+            ->line('Thank you for using our application!');
     }
 
     /**
@@ -76,8 +78,8 @@ class StaffRecruitmentApproval extends Notification implements ShouldQueue
             'staff_recruitment_id' => $this->staffRecrutment->staff_recruitment_id,
             'title' => $this->staffRecrutment->position,
             'start_date' => $this->staffRecrutment->date_of_recruitment,
-            'status' => $this->staffRecrutment->approval_status,
-            'message' => $this->user->name . ' requested for a training',
+            'status' => $this->decision,
+            'message' => 'Your staff recruitment request for "' . $this->staffRecrutment->position . '" was ' . $this->decision,
             'rejection_reason' => $this->staffRecrutment->rejection_reason,
             'approved_by' => $this->approver->name, // Include who approved
         ];
@@ -92,8 +94,8 @@ class StaffRecruitmentApproval extends Notification implements ShouldQueue
             'staff_recruitment_id' => $this->staffRecrutment->staff_recruitment_id,
             'title' => $this->staffRecrutment->position,
             'start_date' => $this->staffRecrutment->date_of_recruitment,
-            'status' => $this->staffRecrutment->approval_status,
-            'message' => $this->user->name . ' requested for a training',
+            'status' => $this->decision,
+            'message' => 'Your staff recruitment request for "' . $this->staffRecrutment->position . '" was ' . $this->decision,
             'rejection_reason' => $this->staffRecrutment->rejection_reason,
             'approved_by' => $this->approver->name, // Include who approved
         ]);

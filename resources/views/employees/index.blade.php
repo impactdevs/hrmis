@@ -79,7 +79,7 @@
                 data-page-list="[20, 25, 50, 100, 500, 1000, 2000, 10000, all]" data-pagination="true">
                 <thead>
                     <tr>
-                        <th scope="col" data-field="id">#</th>
+                        <th scope="col" data-field="id">ID</th>
                         <th scope="col" data-field="title">Title</th>
                         <th scope="col" data-field="first_name">First Name</th>
                         <th scope="col" data-field="middle_name">Middle Name</th>

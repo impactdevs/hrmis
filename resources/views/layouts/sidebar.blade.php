@@ -114,14 +114,16 @@
                     Anonymous Report
                 </a>
             </li>
-            @if (auth()->user()->hasRole('HR'))
+            @if (auth()->user()->hasRole('HR') || auth()->user()->hasRole('Executive Secretary'))
                         <li class="nav-item">
-                <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('whistleblowing.index') || request()->routeIs('whistleblowing.index')) bg-secondary @endif"
+                <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('whistleblowing.index') || request()->routeIs('whistleblowing.show')) bg-secondary @endif"
                     href="{{ route('whistleblowing.index') }}">
                     <i class="bi bi-file-earmark-break-fill"></i>
                     Manage Anonymous Reports
                 </a>
             </li>
+            @endif
+            @if (auth()->user()->hasRole('HR'))
                 <li class="nav-item">
                     <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('hr.job-applications.index')) bg-secondary @endif"
                         href="{{ route('hr.job-applications.index') }}">
@@ -142,14 +144,6 @@
                     </a>
                 </li>
             @endif
-
-                <li class="nav-item">
-                    <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('whistleblower.index') || request()->routeIs('whistleblower.show')) bg-secondary @endif"
-                        href="{{ route('whistleblowing.index') }}">
-                        <i class="fas fa-user-secret text-white-600"></i>
-                        WhistleBlower
-                    </a>
-                </li>
 
                 <li class="nav-item">
                     <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('workfromhome.index') || request()->routeIs('workfromhome.show')) bg-secondary @endif"

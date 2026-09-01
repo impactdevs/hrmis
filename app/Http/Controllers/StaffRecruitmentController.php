@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Department;
 use App\Models\StaffRecruitment;
 use App\Http\Requests\StoreStaffRecruitmentRequest;  // The request validation class
+use App\Http\Requests\UpdateStaffRecruitmentRequest;
 use App\Models\User;
 use App\Notifications\StaffRecruitmentApplication;
 use App\Notifications\StaffRecruitmentApproval;
@@ -18,7 +19,15 @@ class StaffRecruitmentController extends Controller
      */
     public function index()
     {
-        $rectrutmentRequests = StaffRecruitment::with('department')->paginate();
+        // Department carries a global scope that filters by the CURRENT
+        // viewer's own employee-department — right for "which departments
+        // can I see" queries, wrong here: this list shows every recruitment
+        // request regardless of viewer, so each row needs its own actual
+        // department, not one filtered by who's looking.
+        $rectrutmentRequests = StaffRecruitment::with(['department' => function ($query) {
+            $query->withoutGlobalScopes();
+        }])->paginate();
+
         return view('staff-recruitment.index', compact('rectrutmentRequests'));
     }
 
@@ -66,7 +75,9 @@ class StaffRecruitmentController extends Controller
      */
     public function show(StaffRecruitment $recruitment)
     {
-        $recruitment->load('department');
+        $recruitment->load(['department' => function ($query) {
+            $query->withoutGlobalScopes();
+        }]);
         return view('staff-recruitment.show', compact('recruitment'));
     }
 
@@ -85,9 +96,17 @@ class StaffRecruitmentController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, StaffRecruitment $recruitment)
+    public function update(UpdateStaffRecruitmentRequest $request, StaffRecruitment $recruitment)
     {
-        $recruitment->update($request->all());
+        // Once any stage has recorded a decision, the request is in the
+        // approval pipeline — editing it afterwards would let its details
+        // (or the approval_status itself) be changed out from under an
+        // approval that's already been given.
+        if (!empty($recruitment->approval_status)) {
+            return redirect()->back()->with('error', 'This request has already entered the approval process and can no longer be edited.');
+        }
+
+        $recruitment->update($request->validated());
 
         return redirect()->route('recruitments.index')->with('success', 'Recruitment Request updated successfully.');
     }
@@ -120,57 +139,90 @@ class StaffRecruitmentController extends Controller
         ]);
 
         $user = auth()->user();
+        $status = $request->input('status');
 
-        // Retrieve current leave_request_status (it will be an array due to casting)
-        $recruitmentRequestStatus = $recruitment->approval_status ?: []; // Default to an empty array if null
+        $recruitmentRequestStatus = $recruitment->approval_status ?: [];
 
-        // Update leave request based on the user's role and the input status
         if ($user->hasRole('HR')) {
-            if ($request->input('status') === 'approved') {
-                // Set HR status to approved
-                $recruitmentRequestStatus['HR'] = 'approved';
-                $recruitment->rejection_reason = null; // Clear reason if approved
-            } else {
-                // Set HR status to rejected
-                $recruitmentRequestStatus['HR'] = 'rejected';
-                $recruitment->rejection_reason = $request->input('reason'); // Store rejection reason
-            }
+            $recruitmentRequestStatus['HR'] = $status;
+            $recruitment->rejection_reason = $status === 'approved' ? null : $request->input('reason');
         } elseif ($user->hasRole('Head of Division')) {
-            if ($request->input('status') === 'approved') {
-                // Set Head of Division status to approved
-                $recruitmentRequestStatus['Head of Division'] = 'approved';
-                $recruitment->rejection_reason = null; // Clear reason if approved
-            } else {
-                // Set Head of Division status to rejected
-                $recruitmentRequestStatus['Head of Division'] = 'rejected';
-                $recruitment->rejection_reason = $request->input('reason'); // Store rejection reason
+            // Department::query() carries a global scope that filters by the
+            // ACTING user's own employee-department — fine for "list the
+            // departments I can see", wrong here, where we need this specific
+            // recruitment's department regardless of who's asking.
+            $department = Department::withoutGlobalScopes()->find($recruitment->department_id);
+
+            // A Head of Division may only decide on requests for their own
+            // department — not any division's request.
+            if (!$department || (string) $department->department_head !== (string) $user->id) {
+                return response()->json(['error' => 'You are not the Head of Division for this request\'s department.'], 403);
             }
+
+            $recruitmentRequestStatus['Head of Division'] = $status;
+            $recruitment->rejection_reason = $status === 'approved' ? null : $request->input('reason');
         } elseif ($user->hasRole('Executive Secretary')) {
-            if ($request->input('status') === 'approved') {
-                // Set leave status as approved for Executive Secretary
-                $recruitmentRequestStatus['Executive Secretary'] = 'approved';
-                $recruitment->rejection_reason = null; // Clear reason if approved
-            } else {
-                // Set rejection status
-                $recruitmentRequestStatus['Executive Secretary'] = 'rejected';
-                $recruitment->rejection_reason = $request->input('reason'); // Store rejection reason
+            $hrApproved = ($recruitmentRequestStatus['HR'] ?? null) === 'approved';
+            $hodApproved = ($recruitmentRequestStatus['Head of Division'] ?? null) === 'approved';
+
+            // The Executive Secretary gives the final decision — it can't be
+            // given until HR and the Head of Division have both approved.
+            // Rejecting is always allowed, since that just ends the request.
+            if ($status === 'approved' && !($hrApproved && $hodApproved)) {
+                return response()->json([
+                    'error' => 'This request cannot be approved yet — it is still awaiting HR and/or Head of Division approval.',
+                ], 422);
             }
 
-            // Send notification
-            $leaveRequester = User::find($recruitment->user_id); // Get the user who requested the leave
-            $approver = User::find(auth()->user()->id);
-            Notification::send($leaveRequester, new StaffRecruitmentApproval($recruitment, $approver));
-
+            $recruitmentRequestStatus['Executive Secretary'] = $status;
+            $recruitment->rejection_reason = $status === 'approved' ? null : $request->input('reason');
         } else {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
-        // Save the updated leave_request_status
+
         $recruitment->approval_status = $recruitmentRequestStatus;
         $recruitment->save();
 
-        // Save the updated leave status
-        $recruitment->save();
+        $requester = User::find($recruitment->user_id);
+
+        if ($status === 'rejected') {
+            // A rejection at any stage ends the request — let the requester
+            // know immediately rather than leaving them waiting on a request
+            // that's already dead.
+            Notification::send($requester, new StaffRecruitmentApproval($recruitment, $user, 'rejected'));
+        } elseif ($user->hasRole('Executive Secretary')) {
+            Notification::send($requester, new StaffRecruitmentApproval($recruitment, $user, 'approved'));
+        } else {
+            $this->notifyNextApprover($recruitment, $recruitmentRequestStatus);
+        }
 
         return response()->json(['message' => 'Recruitment application updated successfully.', 'status' => $recruitment->approval_status]);
+    }
+
+    /**
+     * Once HR and the Head of Division have each recorded a decision, let
+     * whoever's turn it is next know the request is waiting on them —
+     * otherwise it only ever surfaces if they think to check the list.
+     */
+    private function notifyNextApprover(StaffRecruitment $recruitment, array $statuses): void
+    {
+        $hrApproved = ($statuses['HR'] ?? null) === 'approved';
+        $hodApproved = ($statuses['Head of Division'] ?? null) === 'approved';
+
+        if ($hrApproved && !$hodApproved) {
+            $department = Department::withoutGlobalScopes()->find($recruitment->department_id);
+            $hod = $department?->department_head
+                ? User::find($department->department_head)
+                : null;
+
+            if ($hod && $hod->hasRole('Head of Division')) {
+                Notification::send($hod, new StaffRecruitmentApplication($recruitment));
+            }
+        }
+
+        if ($hrApproved && $hodApproved && !isset($statuses['Executive Secretary'])) {
+            $executiveSecretaries = User::role('Executive Secretary')->get();
+            Notification::send($executiveSecretaries, new StaffRecruitmentApplication($recruitment));
+        }
     }
 }

@@ -3,6 +3,8 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Exceptions\PostTooLargeException;
+use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -23,5 +25,19 @@ return Application::configure(basePath: dirname(__DIR__))
         
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        // Thrown by ValidatePostSize before routing/session/auth even run, so
+        // Laravel's own error handling can't flash a validation message back —
+        // it falls through to the raw debug/whoops page instead. Render a
+        // friendly, self-contained page for it (no auth/session dependency),
+        // regardless of APP_DEBUG, since this is a normal user-input problem,
+        // not something a developer needs a stack trace for.
+        $exceptions->render(function (PostTooLargeException $e, Request $request) {
+            $bytes = ini_parse_quantity(ini_get('post_max_size'));
+            $maxUploadSize = $bytes > 0
+                ? round($bytes / 1048576) . ' MB'
+                : 'a few megabytes';
+
+            return response()
+                ->view('errors.413', compact('maxUploadSize'), 413);
+        });
     })->create();
