@@ -130,12 +130,18 @@ class HomeController extends Controller
             })
             ->get();
 
-        // contracts
-        $contracts = Contract::whereTodayOrAfter('end_date')->get();
+        // Contracts — an employee can have several contract rows over time
+        // (renewals), and only the most recent one reflects their real
+        // status. Counting every row here would flag someone as "expired"
+        // because of a contract they were renewed out of a year ago, even
+        // though their current contract is still running.
+        $currentContracts = Contract::orderByDesc('start_date')->get()->unique('employee_id');
 
-        $runningContracts = Contract::where('end_date', '>=', Carbon::today())->count();
+        $contracts = $currentContracts->where('end_date', '>=', Carbon::today())->values();
 
-        $expiredContracts = Contract::where('end_date', '<', Carbon::today())->count();
+        $runningContracts = $contracts->count();
+
+        $expiredContracts = $currentContracts->where('end_date', '<', Carbon::today())->count();
 
         $leaveTypes = LeaveType::all()->keyBy('leave_type_id');
 
