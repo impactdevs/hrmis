@@ -19,8 +19,10 @@ class CompanyJobController extends Controller
     }
 
     /**
-     * CSV export of applicant names alongside the job they applied for.
-     * Optionally scoped to one posting via ?company_job_id=.
+     * CSV report of applicants and their application details, grouped by
+     * company job (sorted by job then name, with the job repeated on every
+     * row so the file reads correctly whether opened as-is or filtered/
+     * pivoted in Excel). Optionally scoped to one posting via ?company_job_id=.
      * GET /hr/company-jobs/export-applicants
      */
     public function exportApplicantNames(Request $request)
@@ -29,9 +31,9 @@ class CompanyJobController extends Controller
             ->when($request->filled('company_job_id'), fn($q) => $q->where('company_job_id', $request->company_job_id))
             ->orderBy('post_applied')
             ->orderBy('full_name')
-            ->get(['full_name', 'post_applied', 'company_job_id']);
+            ->get();
 
-        $filename = 'applicants_' . now()->format('Y-m-d') . '.csv';
+        $filename = 'applicants_report_' . now()->format('Y-m-d') . '.csv';
 
         $headers = [
             'Content-Type'        => 'text/csv',
@@ -41,12 +43,43 @@ class CompanyJobController extends Controller
         $callback = function () use ($applications) {
             $handle = fopen('php://output', 'w');
 
-            fputcsv($handle, ['Applicant Name', 'Job Applied']);
+            fputcsv($handle, [
+                'Job Applied',
+                'Reference Number',
+                'Applicant Name',
+                'Email',
+                'Telephone',
+                'Date of Birth',
+                'Gender/Marital Status',
+                'National ID (NIN)',
+                'Home District',
+                'Present Department',
+                'Present Post',
+                'Availability',
+                'Salary Expectation',
+                'Status',
+                'Score',
+                'Date Applied',
+            ]);
 
             foreach ($applications as $application) {
                 fputcsv($handle, [
-                    $application->full_name,
                     $application->companyJob?->job_title ?? $application->post_applied ?? 'N/A',
+                    $application->reference_number,
+                    $application->full_name,
+                    $application->email,
+                    $application->telephone,
+                    $application->date_of_birth?->format('Y-m-d'),
+                    $application->marital_status,
+                    $application->nin,
+                    $application->home_district,
+                    $application->present_department,
+                    $application->present_post,
+                    $application->availability,
+                    $application->salary_expectation,
+                    ucfirst($application->status),
+                    $application->score,
+                    $application->created_at?->format('Y-m-d'),
                 ]);
             }
 

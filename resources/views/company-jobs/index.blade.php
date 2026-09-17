@@ -4,7 +4,7 @@
             <h5 class="mb-0">Job Postings</h5>
             <div class="d-flex gap-2">
                 <a href="{{ route('hr.company-jobs.export-applicants') }}" class="btn btn-light btn-sm">
-                    ⬇ Export Applicant Names (CSV)
+                    ⬇ Export Applicants Report (CSV)
                 </a>
                 <a href="{{ route('hr.company-jobs.create') }}" class="btn btn-light btn-sm">+ New Posting</a>
             </div>
