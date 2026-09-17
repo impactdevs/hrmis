@@ -28,12 +28,20 @@ class EmployeeController extends Controller
         $position_id = $request->get('position');
         $department_id = $request->get('department');
         $contract_expiry_filter = (int) $request->get('contract_expiry');
+        $statusFilter = $request->get('status', 'active'); // active | inactive | all
         $perPage = 25;
 
         $query = Employee::query();
 
         // Initialize the applied filters message
         $appliedFiltersMessage = [];
+
+        if ($statusFilter === 'active') {
+            $query->where('is_active', true);
+        } elseif ($statusFilter === 'inactive') {
+            $query->where('is_active', false);
+            $appliedFiltersMessage[] = 'Status: Inactive';
+        }
 
         // Apply the filters to the query
         if (!empty($keyword)) {
@@ -73,7 +81,7 @@ class EmployeeController extends Controller
         $expiryOptions = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
         // Return the view with the filtered results, employee count, filter options, and filter message
-        return view('employees.index', compact('employees', 'keyword', 'positions', 'departments', 'expiryOptions', 'employeeCount', 'appliedFiltersMessage'));
+        return view('employees.index', compact('employees', 'keyword', 'positions', 'departments', 'expiryOptions', 'employeeCount', 'appliedFiltersMessage', 'statusFilter'));
     }
 
     /**
@@ -338,20 +346,45 @@ class EmployeeController extends Controller
     /**
      * Remove the specified resource from storage.
      */
+    /**
+     * Deactivate an employee (they've left) without deleting their record —
+     * leave history, appraisals, attendance, and contracts all stay intact.
+     * Their linked login account is blocked at the next sign-in attempt
+     * (see LoginRequest::authenticate()).
+     */
     public function destroy(Employee $employee)
     {
         try {
-            // Delete the employee record
-            $employee->delete();
+            $employee->update([
+                'is_active' => false,
+                'deactivated_at' => now(),
+            ]);
 
-            // Redirect to the employees index with a success message
-            return redirect()->route('employees.index')->with('success', 'Employee Deleted');
+            return redirect()->route('employees.index')->with('success', 'Employee deactivated. Their records have been kept, and their account can no longer sign in.');
         } catch (Exception $exception) {
-            // Log the error for debugging
-            Log::error('Error deleting employee: ' . $exception->getMessage());
+            Log::error('Error deactivating employee: ' . $exception->getMessage());
 
-            // Redirect back with an error message
-            return redirect()->back()->with('error', 'Problem Deleting the Employee');
+            return redirect()->back()->with('error', 'Problem deactivating the employee');
+        }
+    }
+
+    /**
+     * Reverse a deactivation — e.g. the employee was let go by mistake, or
+     * has rejoined.
+     */
+    public function reactivate(Employee $employee)
+    {
+        try {
+            $employee->update([
+                'is_active' => true,
+                'deactivated_at' => null,
+            ]);
+
+            return redirect()->route('employees.index')->with('success', 'Employee reactivated.');
+        } catch (Exception $exception) {
+            Log::error('Error reactivating employee: ' . $exception->getMessage());
+
+            return redirect()->back()->with('error', 'Problem reactivating the employee');
         }
     }
 

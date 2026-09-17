@@ -122,7 +122,19 @@ Route::middleware(['auth', 'verified', 'check.employee.record', 'data.usage.agre
     Route::post('roles/{role}/permissions/remove', [RoleController::class, 'removePermissions'])->name('roles.permissions.remove');
 
     // ── Employees ─────────────────────────────────────────────────────────────
-    Route::resource('employees', EmployeeController::class);
+    // index/show stay open — Staff use them for their own "About Me" page,
+    // and the EmployeeScope global scope already limits what each role sees.
+    // create/edit/deactivate/reactivate/delete are HR-only.
+    //
+    // The HR-only group (literal /create and /{employee}/edit paths) must be
+    // registered BEFORE the public show route below — otherwise show's
+    // wildcard /{employee} matches "create" as if it were an ID first, since
+    // Laravel resolves routes in registration order.
+    Route::middleware('role:HR')->group(function () {
+        Route::resource('employees', EmployeeController::class)->except(['index', 'show']);
+        Route::post('/employees/{employee}/reactivate', [EmployeeController::class, 'reactivate'])->name('employees.reactivate');
+    });
+    Route::resource('employees', EmployeeController::class)->only(['index', 'show']);
     Route::get('/contract/{employee_id}/create', [EmployeeController::class, 'create_contract'])->name('contract.create');
     Route::get('/contract/{contract}/edit', [EmployeeController::class, 'edit_contract'])->name('contract.edit');
     Route::put('/contract/{contract}/update', [EmployeeController::class, 'update_contract'])->name('contract.update');

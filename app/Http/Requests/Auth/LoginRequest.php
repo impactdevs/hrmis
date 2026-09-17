@@ -49,6 +49,18 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        // A deactivated employee's account can no longer sign in. Users
+        // without an Employee record (HR/Executive Secretary/etc.) are
+        // unaffected — this only ever fires for someone who was marked
+        // inactive via Employees > Deactivate.
+        if (Auth::user()->employee?->is_active === false) {
+            Auth::logout();
+
+            throw ValidationException::withMessages([
+                'email' => 'This account has been deactivated. Contact HR if you believe this is a mistake.',
+            ]);
+        }
+
         RateLimiter::clear($this->throttleKey());
     }
 

@@ -43,19 +43,27 @@
                     </div>
 
                     <div class="col">
+                        <select name="status" class="form-select">
+                            <option value="active" {{ $statusFilter === 'active' ? 'selected' : '' }}>Active</option>
+                            <option value="inactive" {{ $statusFilter === 'inactive' ? 'selected' : '' }}>Inactive</option>
+                            <option value="all" {{ $statusFilter === 'all' ? 'selected' : '' }}>All</option>
+                        </select>
+                    </div>
+
+                    <div class="col">
                         <button type="submit" class="btn btn-primary">Apply Filter</button>
                     </div>
                     <div class="col">
                         <a href="{{ route('employees.index') }}" class="btn btn-secondary">Reset Filters</a>
                     </div>
 
-                    @can('add an employee')
+                    @if (auth()->user()->hasRole('HR'))
                         <div class="col">
                             <a href="{{ route('employees.create') }}" class="btn border-t-neutral-50 btn-primary">
                                 <i class="bi bi-database-add me-2"></i>Add
                             </a>
                         </div>
-                    @endcan
+                    @endif
                 </div>
             </form>
         </div>
@@ -96,6 +104,7 @@
                         <th scope="col" data-field="date_of_entry">Date of Entry</th>
                         <th scope="col" data-field="contract_expiry">Contract Expiry</th>
                         <th class="col" data-field="retirement_years">Retirement Yrs</th>
+                        <th scope="col" data-field="status">Status</th>
                         <th scope="col" data-field="actions" data-force-hide="true">Actions</th>
                     </tr>
                 </thead>
@@ -125,6 +134,13 @@
                             <td>{{ $employee->contract_expiry_date ? $employee->contract_expiry_date->format('Y-m-d') : 'N/A' }}
                             </td>
                             <td>{{ $employee->retirementYearsRemaining() }}</td>
+                            <td>
+                                @if ($employee->is_active)
+                                    <span class="badge bg-success">Active</span>
+                                @else
+                                    <span class="badge bg-secondary">Inactive</span>
+                                @endif
+                            </td>
                             <td class="align-middle">
                                 <div class="dropdown">
                                     <button class="btn btn-secondary btn-sm dropdown-toggle" type="button"
@@ -138,27 +154,38 @@
                                                 <i class="fas fa-eye"></i> View
                                             </a>
                                         </li>
-                                        @can('can edit an employee')
+                                        @if (auth()->user()->hasRole('HR'))
                                             <li>
                                                 <a class="dropdown-item"
                                                     href="{{ route('employees.edit', $employee->employee_id) }}">
                                                     <i class="fas fa-edit"></i> Edit
                                                 </a>
                                             </li>
-                                        @endcan
-                                        @can('can delete an employee')
-                                            <li>
-                                                <form action="{{ route('employees.destroy', $employee->employee_id) }}"
-                                                    method="POST" style="display:inline;">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="dropdown-item text-danger"
-                                                        onclick="return confirm('Are you sure?')">
-                                                        <i class="bi bi-trash"></i> Delete
-                                                    </button>
-                                                </form>
-                                            </li>
-                                        @endcan
+                                            @if ($employee->is_active)
+                                                <li>
+                                                    <form action="{{ route('employees.destroy', $employee->employee_id) }}"
+                                                        method="POST" style="display:inline;">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="dropdown-item text-warning"
+                                                            onclick="return confirm('Deactivate this employee? Their records are kept, but they will no longer be able to sign in.')">
+                                                            <i class="bi bi-person-dash"></i> Deactivate
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                            @else
+                                                <li>
+                                                    <form action="{{ route('employees.reactivate', $employee->employee_id) }}"
+                                                        method="POST" style="display:inline;">
+                                                        @csrf
+                                                        <button type="submit" class="dropdown-item text-success"
+                                                            onclick="return confirm('Reactivate this employee?')">
+                                                            <i class="bi bi-person-check"></i> Reactivate
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                            @endif
+                                        @endif
                                     </ul>
                                 </div>
                             </td>

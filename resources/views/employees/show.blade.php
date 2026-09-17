@@ -5,6 +5,11 @@
                 <div class="flex-grow-1">
                     <h2 class="mb-0 text-dark">{{ $employee->title }} {{ $employee->first_name }}
                         {{ $employee->last_name }}
+                        @if ($employee->is_active)
+                            <span class="badge bg-success">Active</span>
+                        @else
+                            <span class="badge bg-secondary">Inactive</span>
+                        @endif
                         <span class="text-muted">(Remaining with {{ $employee->retirementYearsRemaining() }} to
                             retire)</span>
                     </h2>
@@ -16,12 +21,32 @@
                         class="btn btn-danger btn-sm" title="Generate PDF">
                         <i class="fas fa-file-pdf"></i> Export PDF
                     </a>
-                    @can('can edit an employee')
+                    @if (auth()->user()->hasRole('HR'))
                         <a href="{{ route('employees.edit', $employee->employee_id) }}" class="btn btn-warning btn-sm"
                             title="Edit Bio Data">
                             <i class="fas fa-edit"></i> Edit Bio Data
                         </a>
-                    @endcan
+                        @if ($employee->is_active)
+                            <form action="{{ route('employees.destroy', $employee->employee_id) }}" method="POST"
+                                style="display:inline;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-outline-warning btn-sm"
+                                    onclick="return confirm('Deactivate this employee? Their records are kept, but they will no longer be able to sign in.')">
+                                    <i class="bi bi-person-dash"></i> Deactivate
+                                </button>
+                            </form>
+                        @else
+                            <form action="{{ route('employees.reactivate', $employee->employee_id) }}" method="POST"
+                                style="display:inline;">
+                                @csrf
+                                <button type="submit" class="btn btn-outline-success btn-sm"
+                                    onclick="return confirm('Reactivate this employee?')">
+                                    <i class="bi bi-person-check"></i> Reactivate
+                                </button>
+                            </form>
+                        @endif
+                    @endif
                     @if ($employee->passport_photo)
                         <img src="{{ asset('storage/' . $employee->passport_photo) }}" alt="Passport Photo"
                             class="img-fluid rounded-circle" width="100">
@@ -146,9 +171,9 @@
                                     <th data-field="description">Description</th>
                                     <th data-field="attachments">Attachments</th>
                                     <th data-sortable="true" data-field="status">Status</th>
-                                    @can('can edit an employee')
+                                    @if (auth()->user()->hasRole('HR'))
                                         <th data-field="actions">Actions</th>
-                                    @endcan
+                                    @endif
                                 </tr>
                             </thead>
                             <tbody>
@@ -193,7 +218,7 @@
                                             @endphp
                                             <span class="badge {{ $badgeClass }} ">{{ $status }}</span>
                                         </td>
-                                        @can('can edit an employee')
+                                        @if (auth()->user()->hasRole('HR'))
                                             <td>
                                                 <div class="gap-2 d-flex">
                                                     <a href="{{ route('contract.edit', $contract->id) }}"
@@ -215,7 +240,7 @@
                                                     <a href="{{ route('contract.show', $contract->id) }}">show</a>
                                                 </div>
                                             </td>
-                                        @endcan
+                                        @endif
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -303,10 +328,10 @@
                 </section>
             </div>
         </div>
-        @can('can delete an employee')
+        @if (auth()->user()->hasRole('HR'))
             <div class="mt-4 text-center">
                 <a href="{{ route('employees.index') }}" class="btn btn-primary">Back to Employee List</a>
             </div>
-        @endcan
+        @endif
     </div>
 </x-app-layout>

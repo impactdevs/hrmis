@@ -64,6 +64,8 @@ class Employee extends Model
         'contract_documents',
         'entitled_leave_days',
         'default_entitled_days', // The employee's base/default entitlement (used for annual resets)
+        'is_active',
+        'deactivated_at',
     ];
 
     // If you want to use casts for certain attributes
@@ -72,7 +74,14 @@ class Employee extends Model
         'contract_documents' => 'array',
         'date_of_entry' => 'date',
         'date_of_birth' => 'date',
+        'is_active' => 'boolean',
+        'deactivated_at' => 'datetime',
     ];
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
 
     // Model boot method
     protected static function boot()
