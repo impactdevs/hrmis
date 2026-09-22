@@ -172,7 +172,7 @@ class HomeController extends Controller
         // Fetch leave requests where end date is greater than today
         $leaveRequests = Leave::where('end_date', '>', $today)->get();
         //number of employees
-        $number_of_employees = Employee::count();
+        $number_of_employees = Employee::active()->count();
         $attendances = Attendance::whereDate('access_date_and_time', $today)->count();
          $available_leave = Leave::approvedAndActive()->count();
         //count the number of clockins per hour
@@ -251,6 +251,7 @@ class HomeController extends Controller
         // Get the number of employees per department with department names
         $employeeCounts = DB::table('employees')
             ->join('departments', 'employees.department_id', '=', 'departments.department_id')
+            ->where('employees.is_active', true)
             ->select('departments.department_name', DB::raw('count(*) as total'))
             ->groupBy('departments.department_name')
             ->get();
