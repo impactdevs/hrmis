@@ -1,18 +1,18 @@
 <x-app-layout>
     <div class="mt-3">
         <div class="d-flex justify-content-between">
-            @can('create offdesk')
+            @if (auth()->user()->hasRole('HR'))
                 <a href="{{ route('offdesk.create') }}" class="btn btn-primary">
-                    <i class="bi bi-plus-circle me-1"></i> Request for Off Desk Time
+                    <i class="bi bi-plus-circle me-1"></i> New Off Desk Entry
                 </a>
-            @endcan
+            @endif
         </div>
 
         <div class="table-wrapper mt-3">
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th>#</th>
+                        <th>No.</th>
                         <th>Employee</th>
                         <th>Start</th>
                         <th>End</th>
@@ -29,7 +29,7 @@
                             <td class="d-flex gap-2">
                                 <a href="{{ route('offdesk.show', $entry->off_desk_id) }}"
                                     class="btn btn-sm btn-info">View</a>
-                                    @if (auth()->user()->employee->employee_id == $entry->employee_id)
+                                    @if (auth()->user()->hasRole('HR'))
                                 <a href="{{ route('offdesk.edit', $entry->off_desk_id) }}"
                                     class="btn btn-sm btn-warning">Edit</a>
                                     <form action="{{ route('offdesk.destroy', $entry->off_desk_id) }}" method="POST">

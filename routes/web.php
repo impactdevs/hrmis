@@ -287,8 +287,18 @@ Route::middleware(['auth', 'verified', 'check.employee.record', 'data.usage.agre
     Route::resource('salary-advances', SalaryAdvanceController::class);
     Route::post('/salary-advances/{salary_advance}/status', [SalaryAdvanceController::class, 'approveOrReject'])
         ->name('salary-advances.approveOrReject');
-    Route::resource('workfromhome', WorkFromHomeController::class);
-    Route::resource('offdesk', OffDeskController::class);
+    // Anyone signed in can view (scoped to their own records unless HR);
+    // only HR files these on an employee's behalf.
+    // The HR-only group (which includes the literal /create and /{id}/edit
+    // paths) must be registered BEFORE the public show route below —
+    // otherwise show's wildcard /{workfromhome} matches "create" as if it
+    // were an ID first, since Laravel resolves routes in registration order.
+    Route::middleware('role:HR')->group(function () {
+        Route::resource('workfromhome', WorkFromHomeController::class)->except(['index', 'show']);
+        Route::resource('offdesk', OffDeskController::class)->except(['index', 'show']);
+    });
+    Route::resource('workfromhome', WorkFromHomeController::class)->only(['index', 'show']);
+    Route::resource('offdesk', OffDeskController::class)->only(['index', 'show']);
 });
 
 Route::get('/import', [EmployeeController::class, 'import_employees']);

@@ -1,20 +1,20 @@
 <x-app-layout>
     <div class="mt-3">
         <div class="flex-row flex-1 d-flex justify-content-between">
-            @can('can add work from home request')
+            @if (auth()->user()->hasRole('HR'))
                 <div>
                     <a href="{{ route('workfromhome.create') }}" class="btn border-t-neutral-50 btn-primary">
-                        <i class="bi bi-house-add me-2"></i>Apply To work from home
+                        <i class="bi bi-house-add me-2"></i>New Work From Home Entry
                     </a>
                 </div>
-            @endcan
+            @endif
         </div>
 
         <div class="table-wrapper mt-3">
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th scope="col">#</th>
+                        <th scope="col">No. </th>
                         <th scope="col">Employee</th>
                         <th scope="col">Start Date</th>
                         <th scope="col">End Date</th>
@@ -29,7 +29,7 @@
                             <td>{{ $entry->work_from_home_start_date }}</td>
                             <td>{{ $entry->work_from_home_end_date }}</td>
                             <td class="d-flex gap-2">
-                                @if (auth()->user()->employee->employee_id == $entry->employee_id)
+                                @if (auth()->user()->hasRole('HR'))
                                     <a href="{{ route('workfromhome.edit', $entry->work_from_home_id) }}"
                                         class="btn btn-sm btn-warning">
                                         Edit

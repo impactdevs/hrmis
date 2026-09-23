@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\OffDesk;
 use App\Models\Employee;
-use App\Models\User;
 use App\Notifications\OffDeskNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
@@ -13,18 +12,31 @@ class OffDeskController extends Controller
 {
     public function index()
     {
-        $entries = OffDesk::with('employee')->paginate(10);
+        $query = OffDesk::with('employee');
+
+        // HR files these on an employee's behalf, so HR sees everyone's;
+        // everyone else only sees their own.
+        if (!auth()->user()->hasRole('HR')) {
+            $employeeId = auth()->user()->employee->employee_id ?? null;
+            $employeeId ? $query->where('employee_id', $employeeId) : $query->whereRaw('1 = 0');
+        }
+
+        $entries = $query->paginate(10);
         return view('offdesk.index', compact('entries'));
     }
 
     public function create()
     {
-        return view('offdesk.create');
+        // Only active employees — you wouldn't schedule this for someone
+        // who's left.
+        $employees = Employee::active()->get();
+        return view('offdesk.create', compact('employees'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'employee_id'    => 'required|exists:employees,employee_id',
             'start_datetime' => 'required|date',
             'end_datetime'   => 'required|date|after_or_equal:start_datetime',
             'destination'         => 'nullable|string|max:100',
@@ -32,21 +44,18 @@ class OffDeskController extends Controller
             'reason'         => 'nullable|string|max:1000',
         ]);
 
-        // Fetch employee ID from logged-in user
-        $employeeId = auth()->user()->employee->employee_id ?? null;
-
-        if (!$employeeId) {
-            return back()->with('error', 'Employee record not found for the current user.');
-        }
-
-        // Merge employee ID into data
-        $validated['employee_id'] = $employeeId;
-
+        // HR is filing this on behalf of the selected employee.
         $offdesk = OffDesk::create($validated);
 
-        $hrUser = User::role('HR')->first();
-        if ($hrUser) {
-            Notification::send($hrUser, new OffDeskNotification($offdesk, auth()->user()->employee->first_name, auth()->user()->employee->last_name));
+        // Let the employee know HR scheduled this for them.
+        $offdesk->loadMissing('employee.user');
+        $recipient = $offdesk->employee?->user;
+        if ($recipient) {
+            Notification::send($recipient, new OffDeskNotification(
+                $offdesk,
+                $offdesk->employee->first_name,
+                $offdesk->employee->last_name
+            ));
         }
 
         return redirect()->route('offdesk.index')->with('success', 'Off desk record created successfully.');
@@ -69,8 +78,9 @@ class OffDeskController extends Controller
     {
         $entry = OffDesk::findOrFail($id);
 
+        // employee_id isn't on this form and shouldn't be editable here — it's
+        // set once by HR at creation (see store()) and never reassigned.
         $validated = $request->validate([
-            'employee_id'    => 'required|exists:employees,id',
             'start_datetime' => 'required|date',
             'end_datetime'   => 'required|date|after_or_equal:start_datetime',
             'destination'         => 'required|string|max:100',

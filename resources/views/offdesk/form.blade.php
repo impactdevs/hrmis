@@ -1,3 +1,19 @@
+@if ($formMode === 'create')
+    <div class="mb-3 row">
+        <div class="col-md-6">
+            <label for="employee_id" class="form-label">Employee</label>
+            <select name="employee_id" id="employee_id" class="form-control" required>
+                <option value="">-- Select Employee --</option>
+                @foreach ($employees as $employee)
+                    <option value="{{ $employee->employee_id }}" {{ old('employee_id') == $employee->employee_id ? 'selected' : '' }}>
+                        {{ $employee->full_name ?? ($employee->first_name . ' ' . $employee->last_name) }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+    </div>
+@endif
+
 <div class="mb-3 row">
     <div class="col-md-6">
         <x-forms.input name="start_datetime" label="Start Date & Time" type="datetime-local" id="start_datetime"

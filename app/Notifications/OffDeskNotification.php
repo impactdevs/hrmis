@@ -45,11 +45,11 @@ class OffDeskNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Off-Desk Request')
-            ->line('A new off-desk request has been submitted.')
-            ->line('Employee: ' . $this->name . ' ' . $this->last_name)
-            ->line('Start Date: ' . $this->offDesk->start_date)
-            ->line('End Date: ' . $this->offDesk->end_date)
+            ->subject('Off-Desk Time Recorded')
+            ->line('HR has recorded off-desk time for you.')
+            ->line('Start: ' . $this->offDesk->start_datetime)
+            ->line('End: ' . $this->offDesk->end_datetime)
+            ->line('Destination: ' . $this->offDesk->destination)
             ->line('Reason: ' . $this->offDesk->reason);
     }
 
@@ -66,17 +66,17 @@ class OffDeskNotification extends Notification implements ShouldQueue
             'employee_first_name' => $this->name,
             'employee_last_name' => $this->last_name,
             'reason' => $this->offDesk->reason,
-            'message' => 'A new Off Desk Application from ' . $this->name . ' ' . $this->last_name
+            'message' => 'HR has recorded off-desk time for you (' . $this->offDesk->start_datetime . ' to ' . $this->offDesk->end_datetime . ').'
         ];
     }
 
     public function toBroadcast(object $notifiable): BroadcastMessage
     {
         return new BroadcastMessage([
-            'off_desk_id' => $this->offDesk->id,
+            'off_desk_id' => $this->offDesk->off_desk_id,
             'employee_first_name' => $this->name,
             'employee_last_name' => $this->last_name,
-            'message' => 'New Off-Desk Request from ' . $this->name . ' ' . $this->last_name
+            'message' => 'HR has recorded off-desk time for you.'
         ]);
     }
 }

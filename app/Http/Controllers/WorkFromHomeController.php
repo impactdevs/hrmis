@@ -6,9 +6,7 @@ use App\Models\WorkFromHome;
 use App\Models\Employee;
 use Illuminate\Http\Request;
 use App\Models\Task;
-use App\Models\User;
 use App\Notifications\WorkFromHomeNotification;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 
@@ -17,19 +15,31 @@ class WorkFromHomeController extends Controller
 {
     public function index()
     {
-        $entries = WorkFromHome::with('employee', 'tasks')->paginate(10);
+        $query = WorkFromHome::with('employee', 'tasks');
+
+        // HR files these on an employee's behalf, so HR sees everyone's;
+        // everyone else only sees their own.
+        if (!auth()->user()->hasRole('HR')) {
+            $employeeId = auth()->user()->employee->employee_id ?? null;
+            $employeeId ? $query->where('employee_id', $employeeId) : $query->whereRaw('1 = 0');
+        }
+
+        $entries = $query->paginate(10);
         return view('workfromhome.index', compact('entries'));
     }
 
     public function create()
     {
-        $employees = Employee::all();
+        // Only active employees — you wouldn't schedule this for someone
+        // who's left.
+        $employees = Employee::active()->get();
         return view('workfromhome.create', compact('employees'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'employee_id'                => 'required|exists:employees,employee_id',
             'work_from_home_start_date' => 'required|date',
             'work_from_home_end_date'   => 'required|date|after_or_equal:work_from_home_start_date',
             'work_from_home_reason'     => 'required|string|max:1000',
@@ -45,18 +55,10 @@ class WorkFromHomeController extends Controller
             $validated['work_from_home_attachments'] = $request->file('work_from_home_attachments')->store('attachments', 'public');
         }
 
-        // Employee ID from logged in user
-        $employeeId = auth()->user()->employee->employee_id ?? null;
-        if (!$employeeId) {
-            return back()->with('error', 'Employee record not found for the current user.');
-        }
-
         try {
-            // Create work from home record
-            $workFromHome = WorkFromHome::create([
-                ...$validated,
-                'employee_id' => $employeeId,
-            ]);
+            // Create work from home record — HR is filing this on behalf of
+            // the selected employee, so employee_id comes from the form.
+            $workFromHome = WorkFromHome::create($validated);
 
             // Save each task
             $startDates = $request->input('task_start_date', []);
@@ -73,14 +75,18 @@ class WorkFromHomeController extends Controller
                 ]);
             }
 
-            $hrUser = User::role('HR')->first();
-            if ($hrUser) {
-                Notification::send($hrUser, new WorkFromHomeNotification($workFromHome, auth()->user()->employee->first_name, auth()->user()->employee->last_name));
+            // Let the employee know HR scheduled this for them.
+            $workFromHome->loadMissing('employee.user');
+            $recipient = $workFromHome->employee?->user;
+            if ($recipient) {
+                Notification::send($recipient, new WorkFromHomeNotification(
+                    $workFromHome,
+                    $workFromHome->employee->first_name,
+                    $workFromHome->employee->last_name
+                ));
             }
 
-
-
-            return redirect()->route('workfromhome.index')->with('success', 'Work from home request created successfully.');
+            return redirect()->route('workfromhome.index')->with('success', 'Work from home entry created successfully.');
         } catch (\Throwable $e) {
             return back()->with('error', 'Failed to save request: ' . $e->getMessage());
         }
@@ -103,8 +109,9 @@ class WorkFromHomeController extends Controller
     {
         $entry = WorkFromHome::findOrFail($id);
 
+        // employee_id isn't on this form and shouldn't be editable here — it's
+        // set once by HR at creation (see store()) and never reassigned.
         $validated = $request->validate([
-            'employee_id'                 => 'required|exists:employees,id',
             'work_from_home_start_date'   => 'required|date',
             'work_from_home_end_date'     => 'required|date|after_or_equal:work_from_home_start_date',
             'work_location'             => 'required|string|max:100',

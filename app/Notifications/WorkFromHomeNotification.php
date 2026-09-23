@@ -45,12 +45,11 @@ class WorkFromHomeNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->line('A new work from home request has been submitted.')
-            ->line('Employee: ' . $this->name . ' ' . $this->last_name)
-            ->line('Start Date: ' . $this->workFromHome->start_date)
-            ->line('End Date: ' . $this->workFromHome->end_date)
-            ->line('Reason: ' . $this->workFromHome->reason)
-            ->subject('Work From Home Request');
+            ->subject('Work From Home Scheduled')
+            ->line('HR has scheduled a work-from-home period for you.')
+            ->line('Start Date: ' . $this->workFromHome->work_from_home_start_date)
+            ->line('End Date: ' . $this->workFromHome->work_from_home_end_date)
+            ->line('Reason: ' . $this->workFromHome->work_from_home_reason);
     }
 
     /**
@@ -64,8 +63,8 @@ class WorkFromHomeNotification extends Notification implements ShouldQueue
             'work_from_home_id' => $this->workFromHome->work_from_home_id,
             'employee_first_name' => $this->name,
             'employee_last_name' => $this->last_name,
-            'reason' => $this->workFromHome->reason,
-            'message' => 'A new Work From home Application from ' . $this->name . ' ' . $this->last_name
+            'reason' => $this->workFromHome->work_from_home_reason,
+            'message' => 'HR has scheduled a work-from-home period for you (' . $this->workFromHome->work_from_home_start_date . ' to ' . $this->workFromHome->work_from_home_end_date . ').'
         ];
     }
 
@@ -75,7 +74,7 @@ class WorkFromHomeNotification extends Notification implements ShouldQueue
             'work_from_home_id' => $this->workFromHome->work_from_home_id,
             'employee_first_name' => $this->name,
             'employee_last_name' => $this->last_name,
-            'message' => 'A new work from home request has been submitted.',
+            'message' => 'HR has scheduled a work-from-home period for you.',
         ]);
     }
 }

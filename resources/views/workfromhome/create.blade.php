@@ -15,6 +15,18 @@
         <form action="{{ route('workfromhome.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
+            <div class="mb-3">
+                <label for="employee_id" class="form-label">Employee</label>
+                <select name="employee_id" id="employee_id" class="form-control" required>
+                    <option value="">-- Select Employee --</option>
+                    @foreach ($employees as $employee)
+                        <option value="{{ $employee->employee_id }}" {{ old('employee_id') == $employee->employee_id ? 'selected' : '' }}>
+                            {{ $employee->full_name ?? ($employee->first_name . ' ' . $employee->last_name) }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
             <div class="mb-3 row">
                 <div class="col-md-6">
                     <label for="work_from_home_start_date" class="form-label">Start Date</label>

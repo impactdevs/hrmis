@@ -149,7 +149,7 @@
                     <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('workfromhome.index') || request()->routeIs('workfromhome.show')) bg-secondary @endif"
                         href="{{ route('workfromhome.index') }}">
                         <i class="bi bi-house-check"></i>
-                        Work From Home
+                        {{ auth()->user()->hasRole('HR') ? 'Work From Home' : 'My Work From Home' }}
                     </a>
                 </li>
 
@@ -157,7 +157,7 @@
                     <a class="nav-link text-white d-flex align-items-center gap-2 fs-5 fw-bold @if (request()->routeIs('offdesk.index') || request()->routeIs('offdesk.show') || request()->routeIs('offdesk.edit')) bg-secondary @endif"
                         href="{{ route('offdesk.index') }}">
                         <i class="bi bi-briefcase"></i>
-                        Off Desk
+                        {{ auth()->user()->hasRole('HR') ? 'Off Desk' : 'My Off Desk' }}
                     </a>
                 </li>
         </ul>
