@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Scopes\EmployeeScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
@@ -73,6 +74,11 @@ class Employee extends Model
         'date_of_entry' => 'date',
         'date_of_birth' => 'date',
     ];
+
+    public function scopeActive(Builder $query): Builder
+    {
+        return $query->where('is_active', true);
+    }
 
     // Model boot method
     protected static function boot()
