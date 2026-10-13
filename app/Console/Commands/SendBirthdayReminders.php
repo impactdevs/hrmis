@@ -34,16 +34,19 @@ class SendBirthdayReminders extends Command
 
         // Get all employees whose birthdays are today (comparing month and day), bypassing global scopes
         $employeesToday = Employee::withoutGlobalScope(EmployeeScope::class) // Bypass the global scope
+            ->where('is_active', true)
             ->whereRaw('DATE_FORMAT(date_of_birth, "%m-%d") = ?', [$todayMonthDay])
             ->get();
 
         // Get all employees whose birthdays are tomorrow (comparing month and day), bypassing global scopes
         $employeesTomorrow = Employee::withoutGlobalScope(EmployeeScope::class) // Bypass the global scope
+            ->where('is_active', true)
             ->whereRaw('DATE_FORMAT(date_of_birth, "%m-%d") = ?', [$tomorrowMonthDay])
             ->get();
 
         //get all users and let them know about the birthday
         $employees = Employee::withoutGlobalScope(EmployeeScope::class)
+            ->where('is_active', true)
             ->whereNotIn('employee_id', $employeesToday->pluck('employee_id')) // Extract IDs only for exclusion
             ->get();
 

@@ -488,7 +488,9 @@ class HomeController extends Controller
         }
 
         //birthdays
-        $todayBirthdays = Employee::withoutGlobalScope(EmployeeScope::class)->whereMonth('date_of_birth', Carbon::today()->month)
+        $todayBirthdays = Employee::withoutGlobalScope(EmployeeScope::class)
+            ->where('is_active', true)
+            ->whereMonth('date_of_birth', Carbon::today()->month)
             ->whereDay('date_of_birth', Carbon::today()->day)
             ->get();
 
